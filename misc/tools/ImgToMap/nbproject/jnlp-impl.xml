@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+
+
+The contents of this file are subject to the terms of either the GNU
+General Public License Version 2 only ("GPL") or the Common
+Development and Distribution License("CDDL") (collectively, the
+"License"). You may not use this file except in compliance with the
+License. You can obtain a copy of the License at
+http://www.netbeans.org/cddl-gplv2.html
+or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+specific language governing permissions and limitations under the
+License.  When distributing the software, include this License Header
+Notice in each file and include the License file at
+nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+particular file as subject to the "Classpath" exception as provided
+by Sun in the GPL Version 2 section of the License file that
+accompanied this code. If applicable, add the following below the
+License Header, with the fields enclosed by brackets [] replaced by
+your own identifying information:
+"Portions Copyrighted [year] [name of copyright owner]"
+
+Contributor(s):
+
+The Original Software is NetBeans. The Initial Developer of the Original
+Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+Microsystems, Inc. All Rights Reserved.
+
+If you wish your version of this file to be governed by only the CDDL
+or only the GPL Version 2, indicate your decision by adding
+"[Contributor] elects to include this software in this distribution
+under the [CDDL or GPL Version 2] license." If you do not indicate a
+single choice of license, a recipient has the option to distribute
+your version of this file under either the CDDL, the GPL Version 2 or
+to extend the choice of license to its licensees as provided above.
+However, if you add GPL Version 2 code and therefore, elected the GPL
+Version 2 license, then the option applies only if the new code is
+made subject to such option by the copyright holder.
+-->
+
+<project name="jnlp-impl" default="default" basedir="..">
+
+    <property name="master.jnlp.file" location="master.jnlp"/>
+    <property name="launch.jnlp.file" value="launch.jnlp"/>
+    <property name="jnlp.dest.dir" location="dist"/>
+    
+    <!-- helper file to create list of arguments, etc. -->
+    <property name="helper.file" location="helper.txt"/>
+    
+    <target name="default">
+        <echo message="Default target is not set."/>
+    </target>
+    
+    <!-- Main target -->
+    
+    <target name="jnlp" depends="-init-check,-test-jnlp-enabled" if="is.jnlp.enabled">
+        <delete file="dist/lib/javaws.jar" failonerror="false"/>
+        <antcall target="generate-jnlp"/>
+    </target>
+    
+    <!-- Generate master -->
+    
+    <target name="-check-for-master.jnlp">
+        <available file="${master.jnlp.file}" property="master.jnlp.exists"/>
+    </target>
+    <target name="jnlp-init-generate-master" depends="-check-for-master.jnlp" unless="master.jnlp.exists">
+        <echo file="${master.jnlp.file}" encoding="UTF-8"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="$${jnlp.codebase}" href="launch.jnlp">
+    <information>
+        <title>$${APPLICATION.TITLE}</title>
+        <vendor>$${APPLICATION.VENDOR}</vendor>
+        <homepage href="$${APPLICATION.HOMEPAGE}"/>
+        <description>$${APPLICATION.DESC}</description>
+        <description kind="short">$${APPLICATION.DESC.SHORT}</description>
+<!--$${JNLP.ICONS}-->
+<!--$${JNLP.OFFLINE.ALLOWED}-->
+    </information>
+<!--$${JNLP.SECURITY}-->
+    <resources>
+<!--$${JNLP.RESOURCES.RUNTIME}-->
+<!--$${JNLP.RESOURCES.MAIN.JAR}-->
+<!--$${JNLP.RESOURCES.JARS}-->
+    </resources>
+    <application-desc main-class="$${jnlp.main.class}">
+<!--$${JNLP.APPLICATION.ARGS}-->
+    </application-desc>
+</jnlp>
+]]></echo>
+    </target>
+    
+    <!-- Initial check -->
+    
+    <target name="-init-check">
+        <fail unless="application.title" message="Must set application title."/>
+        <fail unless="application.vendor" message="Must set application vendor."/>
+    </target>
+    
+    <!-- Icons -->
+    
+    <target name="-init-icons" depends="-preinit-icons,-set-icon-elem,-set-splash-elem">
+        <property name="jnlp.icon.elem" value=""/>
+        <property name="application.splash.elem" value=""/>
+        <property name="icon.separator" value=""/>
+        <property name="jnlp.icons.value" value="${jnlp.icon.elem}${icon.separator}${application.splash.elem}"/>
+    </target>
+    <target name="-preinit-icons" depends="-copy-app-icon,-copy-app-splash"/>
+    <target name="-copy-app-icon" if="jnlp.icon" depends="-get-app-icon-name">
+        <copy file="${jnlp.icon}" todir="${jnlp.dest.dir}" failonerror="false"/>
+        <available file="${jnlp.dest.dir}${file.separator}${jnlp.icon.name}" property="jnlp.icon.copied"/>
+    </target>
+    <target name="-copy-app-splash" if="application.splash" depends="-get-app-splash-name">
+        <copy file="${application.splash}" todir="${jnlp.dest.dir}" failonerror="false"/>
+        <available file="${jnlp.dest.dir}${file.separator}${application.splash.name}" property="application.splash.copied"/>
+    </target>
+    <target name="-get-app-icon-name" if="jnlp.icon">
+        <dirname file="${jnlp.icon}" property="jnlp.icon.basedir"/>
+        <pathconvert property="jnlp.icon.name" setonempty="false">
+            <path location="${jnlp.icon}"/>
+            <map from="${jnlp.icon.basedir}${file.separator}" to=""/>
+        </pathconvert>
+    </target>
+    <target name="-get-app-splash-name" if="application.splash">
+        <dirname file="${application.splash}" property="application.splash.basedir"/>
+        <pathconvert property="application.splash.name" setonempty="false">
+            <path location="${application.splash}"/>
+            <map from="${application.splash.basedir}${file.separator}" to=""/>
+        </pathconvert>
+    </target>
+    <target name="-set-icon-elem" if="jnlp.icon.copied">
+        <property name="jnlp.icon.elem" value='        &lt;icon href="${jnlp.icon.name}" kind="default"/&gt;'/>
+    </target>
+    <target name="-set-splash-elem" if="application.splash.copied" depends="-set-icon-elem">
+        <property name="application.splash.elem" value='        &lt;icon href="${application.splash.name}" kind="splash"/&gt;'/>
+        <condition property="icon.separator" value="${line.separator}">
+            <isset property="jnlp.icon.elem"/>
+        </condition>
+    </target>
+    
+    <!-- Offline-Allowed -->
+    
+    <target name="-init-offline" if="offline.allowed.set" depends="-preinit-offline">
+        <property name="jnlp.offline.allowed.value" value="        &lt;offline-allowed/&gt;"/>
+    </target>
+    <target name="-preinit-offline">
+        <condition property="offline.allowed.set">
+            <equals arg1="${jnlp.offline-allowed}" arg2="true" trim="true"/>
+        </condition>
+    </target>
+    
+    <!-- Descriptions -->
+    
+    <target name="-init-descriptions" depends="-descriptions-props-check,-init-desc-value,-init-desc-value-short">
+        <property name="application.desc.value" value="${application.title}"/>
+        <property name="application.desc.short.value" value="${application.title}"/>
+    </target>
+    <target name="-descriptions-props-check">
+        <condition property="application.desc.set">
+            <and>
+                <isset property="application.desc"/>
+                <not>
+                    <equals arg1="${application.desc}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="application.desc.short.set">
+            <and>
+                <isset property="application.desc.short"/>
+                <not>
+                    <equals arg1="${application.desc.short}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+    </target>
+    <target name="-init-desc-value" if="application.desc.set">
+        <property name="application.desc.value" value="${application.desc}"/>
+    </target>
+    <target name="-init-desc-value-short" if="application.desc.short.set">
+        <property name="application.desc.short.value" value="${application.desc.short}"/>
+    </target>
+    
+    <!-- Security -->
+    
+    <target name="-init-security" depends="-check-signing-possible" if="jnlp.signed.true+signjarstask.available">
+        <property name="jnlp.security" value="    &lt;security&gt;${line.separator}        &lt;all-permissions/&gt;${line.separator}    &lt;/security&gt;"/>
+    </target>
+    <target name="-security-props-check">
+        <condition property="jnlp.signed.true">
+            <istrue value="${jnlp.signed}"/>
+        </condition>
+    </target>
+    <target name="-jnlp-init-keystore" depends="-jnlp-init-keystore-props,-check-keystore-exists" unless="jnlp.signjar.keystore.exists">
+        <echo message="${application.vendor}" file="${helper.file}"/>
+        <loadfile property="application.vendor.filtered" srcfile="${helper.file}">
+            <filterchain>
+                <deletecharacters chars=","/>
+            </filterchain>
+        </loadfile>
+        <delete file="${helper.file}"/>
+        <property name="jnlp.signjar.vendor" value="CN=${application.vendor.filtered}"/>
+        <echo message="Going to create default keystore in ${jnlp.signjar.keystore}"/>
+        <genkey dname="${jnlp.signjar.vendor}" alias="${jnlp.signjar.alias}" keystore="${jnlp.signjar.keystore}"
+            storepass="${jnlp.signjar.storepass}" keypass="${jnlp.signjar.keypass}"/>
+    </target>
+    <target name="-check-keystore-exists">
+        <available property="jnlp.signjar.keystore.exists" file="${jnlp.signjar.keystore}"/>
+    </target>
+    <target name="-jnlp-init-keystore-props">
+        <property name="jnlp.signjar.keystore" value="${basedir}/build/nb-jws.ks"/>
+        <property name="jnlp.signjar.storepass" value="storepass"/>
+        <property name="jnlp.signjar.keypass" value="keypass"/>
+        <property name="jnlp.signjar.alias" value="nb-jws"/>
+    </target>    
+    
+    <!-- Generating JNLP file -->
+    
+    <target name="generate-jnlp" depends="jnlp-init-generate-master,-init-codebase,-init-resources-runtime,-init-security,-init-resources-jars,-init-application-args,-init-icons,-init-offline,-init-descriptions,jnlp-init-notinited">
+        <copy file="${master.jnlp.file}" tofile="${jnlp.dest.dir}/${launch.jnlp.file}__" overwrite="true" encoding="UTF-8">
+            <filterchain>
+                <replacestring from="$${jnlp.codebase}" to="${jnlp.codebase.value}"/>
+                <replacestring from="&lt;!--$${JNLP.ICONS}--&gt;" to="${jnlp.icons.value}"/>
+                <replacestring from="&lt;!--$${JNLP.SECURITY}--&gt;" to="${jnlp.security}"/>
+                <replacestring from="&lt;!--$${JNLP.OFFLINE.ALLOWED}--&gt;" to="${jnlp.offline.allowed.value}"/>
+                <replacestring from="&lt;!--$${JNLP.RESOURCES.RUNTIME}--&gt;" to="${jnlp.resources.runtime.value}"/>
+                <replacestring from="&lt;!--$${JNLP.RESOURCES.MAIN.JAR}--&gt;" to="${jnlp.resources.main.jar.value}"/>
+                <replacestring from="&lt;!--$${JNLP.RESOURCES.JARS}--&gt;" to="${jnlp.resources.jars.value}"/>
+                <replacestring from="&lt;!--$${JNLP.APPLICATION.ARGS}--&gt;" to="${jnlp.application.args.value}"/>
+                <replacestring from="$${APPLICATION.TITLE}" to="${application.title}"/>
+                <replacestring from="$${APPLICATION.VENDOR}" to="${application.vendor}"/>
+                <replacestring from="$${APPLICATION.DESC}" to="${application.desc.value}"/>
+                <replacestring from="$${APPLICATION.DESC.SHORT}" to="${application.desc.short.value}"/>
+                <replacestring from="$${APPLICATION.HOMEPAGE}" to="${application.homepage}"/>
+                <replacestring from="$${jnlp.main.class}" to="${main.class}"/>
+            </filterchain>
+        </copy>
+        <antcall target="-strip-empty-lines"/>
+        <antcall target="-generate-html-page"/>
+    </target>
+    <target name="jnlp-init-notinited">
+        <property name="jnlp.security" value=""/>
+        <property name="jnlp.offline.allowed.value" value=""/>
+        <property name="application.homepage" value=""/>
+        <property name="jnlp.application.args.value" value=""/>
+    </target>
+    <target name="-strip-empty-lines">
+        <move file="${jnlp.dest.dir}/${launch.jnlp.file}__" tofile="${jnlp.dest.dir}/${launch.jnlp.file}" overwrite="true" encoding="UTF-8">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern=".+"/>
+                </linecontainsregexp>
+            </filterchain>
+        </move>
+    </target>
+    
+    <!-- Codebase processing -->
+    
+    <target name="-init-codebase" depends="-codebase-props-check,-init-non-user-codebase,-init-user-codebase"/>
+    <target name="-codebase-props-check">
+        <condition property="local.codebase">
+            <or>
+                <not>
+                    <isset property="jnlp.codebase.type"/>
+                </not>
+                <equals arg1="${jnlp.codebase.type}" arg2="local" trim="true"/>
+            </or>
+        </condition>
+        <condition property="non.user.codebase">
+            <or>
+                <not>
+                    <isset property="jnlp.codebase.type"/>
+                </not>
+                <equals arg1="${jnlp.codebase.type}" arg2="local" trim="true"/>
+                <equals arg1="${jnlp.codebase.type}" arg2="web" trim="true"/>
+            </or>
+        </condition>
+        <condition property="user.codebase">
+            <equals arg1="${jnlp.codebase.type}" arg2="user" trim="true"/>
+        </condition>
+    </target>
+    <target name="-init-non-user-codebase" if="non.user.codebase">
+        <property name="jnlp.codebase.value" value="${jnlp.codebase.url}"/>
+    </target>
+    <target name="-init-user-codebase" if="user.codebase">
+        <property name="jnlp.codebase.value" value="${jnlp.codebase.user}"/>
+    </target>
+    
+    <!-- j2se resources -->
+    
+    <target name="-init-resources-runtime" depends="-init-runtime-props">
+        <property name="run.jvmargs.value" value=""/>
+        <property name="initial-heap-size.value" value=""/>
+        <property name="max-heap-size.value" value=""/>
+        <property name="jnlp.resources.runtime.value" 
+            value='        &lt;j2se version="${javac.target}+"${initial-heap-size.value}${max-heap-size.value}${run.jvmargs.value}/&gt;'/>
+    </target>
+    <target name="-init-runtime-props" depends="-runtime-props-check,-init-run-jvmargs-value,-init-initial-heap-size-value,-init-max-heap-size-value"/>
+    <target name="-runtime-props-check">
+        <condition property="run.jvmargs.set">
+            <and>
+                <isset property="run.jvmargs"/>
+                <not>
+                    <equals arg1="${run.jvmargs}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="jnlp.initial-heap-size.set">
+            <and>
+                <isset property="jnlp.initial-heap-size"/>
+                <not>
+                    <equals arg1="${jnlp.initial-heap-size}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="jnlp.max-heap-size.set">
+            <and>
+                <isset property="jnlp.max-heap-size"/>
+                <not>
+                    <equals arg1="${jnlp.max-heap-size}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+    </target>
+    <target name="-init-run-jvmargs-value" if="run.jvmargs.set">
+        <property name="run.jvmargs.value" value=' java-vm-args="${run.jvmargs}"'/>
+    </target>
+    <target name="-init-initial-heap-size-value" if="jnlp.initial-heap-size.set">
+        <property name="initial-heap-size.value" value=' initial-heap-size="${jnlp.initial-heap-size}"'/>
+    </target>
+    <target name="-init-max-heap-size-value" if="jnlp.max-heap-size.set">
+        <property name="max-heap-size.value" value=' max-heap-size="${jnlp.max-heap-size}"'/>
+    </target>
+    
+    <!-- JAR resources -->
+    
+    <target name="-init-resources-jars" depends="-preinit-resources-unsigned-jars,-preinit-resources-signed-jars,-preinit-resources-main-jar"/>
+    <target name="-preinit-resources-unsigned-jars" depends="-exclude-javaws-from-cp,-check-signing-possible" unless="jnlp.signed.true+signjarstask.available">
+        <pathconvert pathsep="${line.separator}" property="jnlp.resources.jars.value">
+            <path path="${run.classpath.without.javaws.jar}"/>
+            <mapper type="regexp" from="^.*[/\\]([^/\\]+\.jar)"
+                to='        &lt;jar href="lib/\1" download="eager"/&gt;'/>
+        </pathconvert>
+    </target>
+    <target name="-preinit-resources-main-jar">
+        <pathconvert pathsep="${line.separator}" property="jnlp.resources.main.jar.value">
+            <path location="${dist.jar}"/>
+            <mapper type="regexp" from="^.*[/\\]([^/\\]+\.jar)"
+                to='        &lt;jar href="\1" main="true" download="eager"/&gt;'/>
+        </pathconvert>
+    </target>
+    <target name="-exclude-javaws-from-cp">
+        <pathconvert property="path.element.to.be.removed">
+            <path path="${run.classpath}"/>
+            <mapper type="regexp" from="(^.*[/\\]javaws.jar)" to="\1"/>
+        </pathconvert>
+        <pathconvert property="run.classpath.without.javaws.jar">
+            <path path="${run.classpath}"/>
+            <map from="${path.element.to.be.removed}" to=""/>
+        </pathconvert>
+    </target>
+    <target name="-check-task-available">
+        <condition property="signjarstask.available">
+            <isset property="netbeans.home"/>
+        </condition>
+    </target>
+    <target name="-check-signing-possible" depends="-security-props-check,-check-task-available">
+        <condition property="jnlp.signed.true+signjarstask.available">
+            <and>
+                <isset property="jnlp.signed.true"/>
+                <isset property="signjarstask.available"/>
+            </and>
+        </condition>
+    </target>
+    <target name="-unavailable-task-warning" depends="-check-task-available" unless="signjarstask.available">
+        <echo message="Signtask is not available, jar files will not be signed. Task is available only when running inside NetBeans IDE."/>
+        <echo message="You can fix the problem by adding following jar file to Ant classpath: [NetBeans install dir]/java2/ant/nblib/org-netbeans-modules-javawebstart-signtask.jar"/>
+    </target>
+    <target name="-preinit-resources-signed-jars" depends="-unavailable-task-warning,-sign-jars" if="jnlp.signed.true+signjarstask.available">
+        <property name="jnlp.resources.jars.value" value="${jnlp.signed.jars}${jnlp.components}"/>
+    </target>
+    <target name="-sign-jars" depends="-jnlp-init-keystore,-check-signing-possible" if="jnlp.signed.true+signjarstask.available">
+        <jnlpsignjars keystore="${jnlp.signjar.keystore}" storepass="${jnlp.signjar.storepass}" 
+                keypass="${jnlp.signjar.keypass}" alias="${jnlp.signjar.alias}" mainjar="${dist.jar}" destdir="dist"
+                codebase="${jnlp.codebase.value}" signedjarsprop="jnlp.signed.jars"
+                componentsprop="jnlp.components">
+            <fileset dir="dist/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </jnlpsignjars>
+    </target>
+    
+    <!-- Application arguments -->
+    
+    <target name="-init-application-args" if="application.args">
+        <echo message="${application.args}" file="${helper.file}"/>
+        <loadfile srcfile="${helper.file}" property="jnlp.application.args.value">
+            <filterchain>
+                <tokenfilter delimoutput="\n">
+                    <stringtokenizer/>
+                    <replaceregex pattern="(.+)" replace="        &lt;argument&gt;\1&lt;/argument&gt;"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <delete file="${helper.file}"/>
+    </target>
+    
+    <!-- Running/Debugging -->
+    
+    <target name="jws-run" depends="jar,-verify-jnlp-enabled,-verify-codebase" description="Start javaws execution">
+        <exec executable="${java.home}/bin/javaws">
+            <arg file="${jnlp.dest.dir}/${launch.jnlp.file}"/>
+        </exec>
+    </target>
+    <target name="jws-debug" if="netbeans.home" depends="jar,-verify-jnlp-enabled,-verify-codebase,-debug-start-debugger,-debug-javaws-debuggee" 
+        description="Debug javaws project in IDE"/>
+    <target name="-debug-javaws-debuggee">
+        <exec executable="${java.home}/bin/javaws">
+            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <arg file="${jnlp.dest.dir}/${launch.jnlp.file}"/>
+        </exec>
+    </target>
+    <target name="-verify-codebase" depends="-codebase-props-check" unless="local.codebase">
+        <fail message="Project cannot be run with non-local codebase. Open project properties dialog and set Web Start Codebase to Local Execution."/>
+    </target>
+    <target name="-verify-jnlp-enabled" depends="-test-jnlp-enabled" unless="is.jnlp.enabled">
+        <fail message="Project cannot be run with selected Run Configuration when Java Web Start is disabled."/>
+    </target>
+    
+    <!-- Test JNLP enabled-->
+    
+    <target name="-test-jnlp-enabled">
+        <condition property="is.jnlp.enabled">
+            <equals arg1="${jnlp.enabled}" arg2="true" casesensitive="false" trim="true"/>
+        </condition>
+    </target>
+    
+    <!-- Generate simple HTML test page -->
+    
+    <target name="-generate-html-page">
+        <echo file="${jnlp.dest.dir}/launch.html"><![CDATA[<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <title>Test page for launching the application via JNLP</title>
+    </head>
+    <body>
+        <h3>Test page for launching the application via JNLP</h3>
+        <a href="launch.jnlp">Launch the application</a>
+        <!-- or use following script element to launch via Deployment Toolkit
+        <script src="http://java.com/js/deployJava.js"></script>
+        <script>
+            var url="http://[fill in your URL]/launch.jnlp";
+            deployJava.createWebStartLaunchButton(url, "1.6");
+        </script>
+        -->
+    </body>
+</html>
+]]></echo>
+    </target>
+    
+</project>

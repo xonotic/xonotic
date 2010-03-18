@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
+<game
+  name="Nexuiz"
+  basegame="data"
+  enginepath="/home/havoc/nexuizsvn/trunk"
+  engine="nexuiz-linux-sdl"
+  gametools="/home/havoc/ZeroRadiant/install/games"
+  gamename="nexuiz"
+  prefix=".nexuiz"
+  shaderpath="scripts/"
+  default_scale="0.5"
+/>

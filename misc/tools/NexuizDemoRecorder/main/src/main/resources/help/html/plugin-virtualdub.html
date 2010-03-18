@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+<H1>VirtualDub plug-in</H1>
+<H2>Introduction</H2>
+<P><B><U>Important:</U> Make sure that
+you read this documentation carefully in order to avoid mistakes!</B></P>
+<P>The prerequisite for using this
+plug-in is that you already familiar with the &ldquo;manual&rdquo;
+process of encoding clips with VirtualDub (<A HREF="http://www.virtualdub.org/">www.virtualdub.org</A>).
+The great thing about VirtualDub is that it offers both a graphical
+user interface (GUI), accessible via <B>virtualdub.exe</B>, and a
+command line interface (CLI), accessible via <B>vdub.exe</B>.</P>
+<H2>Step 1: create VDub configuration
+files (VCF)</H2>
+<P>Let's say we had a clip that we
+wanted to encode not only once, but twice &ndash; into different
+formats. Let's say that the first goal is to encode it to a loss-less
+Huffyuv clip, and the second goal is to encode it to a quality-based
+1-pass XviD clip using MP3 sound.</P>
+<P>What you need to do first is to open
+VirtualDub, set up the settings for one of the goals (by going into
+the video compression and audio compression dialogs) and then click
+on File &rarr; Save processing settings (CTRL+S). You will end up
+with saving a .vcf file somewhere on your hard drive &hellip;
+remember where you put it! After that, you'd set up the settings for
+your second goal and save these processing settings as well, as a new
+.vcf file.</P>
+<H2>Step 2: Enable and set up the VDub
+plug-in</H2>
+<P>First we need to set up the global
+settings of the plug-in. Go into the preferences dialog and enable
+the plug-in.</P>
+<P><img src="images/preferences_global_vdub.gif"/></P>
+<P>Use the &ldquo;...&rdquo; button to
+specify the path to the vdub.exe file. The setting <B>max number of
+VCFs per job</B> is important, because the number you put in there
+will influence how many VCF files you will be able to select in the
+<B>job dialog</B> (the dialog where you create or edit a
+job/template). For our example we need to set it to 2, but it doesn't
+matter if you choose a higher value. Since VDub will encode <B>two</B>
+files for us, we will have to tell VDub under which filenames to save
+them. You can select which approach you want to use by configuring
+the setting <B>output as suffix(0) or file(1)</B>. If you <B>don't</B>
+check the checkbox this means that you will enter a small part of the
+file name, the <B>suffix</B>, that will be put at the end of the
+original file name. E.g. if your original filename was
+&ldquo;C:\render\myVideoFile.avi&rdquo;, and the suffix is
+&ldquo;_huffyuv&rdquo;, the resulting file would be
+&ldquo;C:\render\myVideoFile_huffyuv.avi&rdquo;. However, if you
+checked that checkbox, you would instead get a &ldquo;...&rdquo;
+button that allows you to specify the filename for the resulting file
+manually (this is handy if you wanted to save the file to another
+folder for example).</P>
+<P>The <B>show extra options</B> setting
+will be explained at the end of this page.</P>
+<P>Let's now have a look at the dialog
+when editing a job</P>
+<H2>Step 3: Set up the job-specific
+settings</H2>
+<P>Open the job dialog.</P>
+<P><img src="images/edit_job_vdub.gif" />/P>
+<P>Let's ignore the 2 checkboxes at the
+top for a moment. What you will need to do is to specify the path to
+the 2 .vcf files you created previously in VirtualDub in step 1. Then
+you need to specify the suffix (or the file using the file-chooser)
+so that VDub knows where to save the encoded videos.</P>
+<H2>Step 4: Run the plug-in</H2>
+<UL>
+	<LI><P>If you had your job recorded
+	(without using the plug-in) then the status of the job will already
+	be &ldquo;<B>done&rdquo;</B> and you can right-click the job and run
+	the VirtualDub plug-in</P>
+	<LI><P>If the job has <B>not</B> been
+	recorded yet, just click on Start processing and wait for the result</P>
+</UL>
+<H2>Additional information</H2>
+<H3>Empty VCF paths</H3>
+<P>As you know you can specify any
+number in the <B>preferences dialog</B> for the setting <B>max number
+of VCFs per job</B>. In case of our example that consists of 2 jobs,
+if you selected 3 (or more) as max. number, and then opened the <B>job
+dialog</B>, you would see 3 fields each for the <B>path to VCF file</B>
+and <B>output file</B> setting. This, however, is not a problem. The
+plug-in will only execute those VCF jobs for which both the path to
+the VCF and the output file fields are filled with proper
+information.</P>
+<H3>VDub job control</H3>
+<P>You still don't know what the 2
+checkboxes in the <B>job dialog</B> at the top of the VDub settings
+mean. What you need to know is that VirtualDub is having its own &ldquo;job
+queue&rdquo;, which, however, is called <B>&ldquo;job control&rdquo;</B>.</P>
+<P>The following scenarios can make
+sense:</P>
+<UL>
+	<LI><P>Having <B>both</B> checkboxes
+	<B>enabled</B>: Each time a new NDR job is executed which has
+	VirtualDub jobs, the <B>job control</B> of VirtualDub will be
+	cleared. This means that if you had other, old things in there
+	(possibly when working with VirtualDub outside of the NDR) that
+	these will be deleted from VirtualDub's job control, before the new
+	jobs are added there. Checking the second checkbox means that after
+	adding one of the VirtualDub jobs from within the the NDR,
+	VirtualDub will actually encode them right away (which you will
+	want, at least under normal circumstances).</P>
+	<LI><P>Having <B>both</B> checkboxes
+	<B>disabled</B>: In this case the only thing the NDR would do would
+	be to add the two jobs to the job control of VirtualDub, but
+	VirtualDub won't be encoding them. They are just put into the queue.
+	This means that if you were to start the the graphical user
+	interface of VirtualDub after the NDR completed processing, and open
+	the Job Control (F4), you'd see these jobs &ldquo;waiting&rdquo;,
+	and you could render them by pressing the Start button in Virtual
+	Dub.</P>
+</UL>
+<P>The reason why these checkboxes exist
+is flexibility. I often want the NDR to record stuff over night,
+because during the recording process my PC is virtually unusable.
+However, encoding clips in VirtualDub is a task that, depending on
+the codec, can be done in the background and allows me to use the PC
+for other things. In this case I'd disable both checkboxes, have the
+NDR record all clips and add them to VirtualDub's job control, and
+then on the next day, I decide when and which jobs to encode into
+different formats from within the VirtualDub GUI.</P>
+<P>And btw, just to be clear, the <B>second</B>
+checkbox means that, <B>when enabled</B>, VirtualDub would actually
+start encoding <U><B>all</B></U> clips that have already been in
+VirtualDub's job control and that have not been encoded yet.</P>
+<H3>Extra options</H3>
+<P>If you selected the <B>show extra
+options</B> checkbox in the <B>preferences dialog</B>, you will
+notice that, in the <B>job dialog</B>, you got 2 additional
+settings/checkboxes for each VCF file. Their names are pretty much
+self-explanatory. I added these checkboxes because, after a scene was
+rendered, I usually have the clip encoded into a loss-less format
+(e.g. Huffyuv) right away. Since it is no problem to encode further
+things (e.g. compressed XviD movies) based on the Huffyuv clip
+(instead of always using the original avi file), enabling both these
+checkboxes for VCF 1 would mean that the 2<SUP>nd</SUP> (3<SUP>rd</SUP>,
+4<SUP>th</SUP> &hellip;) VCF jobs will be based on the
+huffyuv-encoded file, and I got rid of original, big video as well,
+saving hard disk space.</P>
+<H3>Trouble shooting</H3>
+<P>In case you suspect that the
+expected, encoded file(s) is somehow incorrect (or even missing),
+have a look at the <B>logs</B> directory in the NDR folder. You will
+see log-files with the following format:</P>
+<P>VirtualDub_NameOfTheJob_vcf1.log</P>
+<P>Instead of &ldquo;vcf1&rdquo; you
+might also find &ldquo;vcf2&rdquo;, &ldquo;vcf3&rdquo;... it
+specifies for which VCF file of that job the log file stands for.</P>
+<P><BR><BR>
+</P>
+  </body>
+</html>
+

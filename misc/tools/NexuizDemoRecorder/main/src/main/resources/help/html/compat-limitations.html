@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+   <H1>Compatibility and limitations</H1>
+<P><BR><BR>
+</P>
+<H1>Compatibility</H1>
+<H2>Operating system</H2>
+<P>Since this tool is written in Java
+you can use it on Windows, Linux and Mac OS. This means that it can
+be used on all platforms supported by Nexuiz. You do need Java 6.</P>
+<H2>Nexuiz engine version</H2>
+<P>In order to use this tool you will
+need to use a Nexuiz engine of version 2.5 or newer. The reason is
+that the engine needs to have the variables
+cl_capturevideo_nameformat and cl_capturevideo_number. If you use
+older engines, such as the 2.3 engine, recording will work, but the
+tool will be unable to move the avi clip rendered by the engine to
+your desired location. However, you can manually move it and simply
+ignore the fact that the job finished with an &ldquo;error&rdquo;.</P>
+<H2>Demo file version</H2>
+<P>There is not really any limitation
+about the Nexuiz version that was used when recording the demo. That
+means that you should be able to use the Nexuiz demo recorder with
+demos from previous Nexuiz versions (they can be older than 2.5). You
+just have to make sure that the engine binary you use for recording
+them is v2.5 and newer. Keep in mind that using a newer-generation
+engine such as the 2.5 one for older demos should usually work
+without problems. You might have to move the dataXXXXXX.pk3 files
+from the Nexuiz version that corresponds to the demo version into the
+data directory.</P>
+<H2>Nexuiz Demo Recorder job queues</H2>
+<P>Table preferences, job queues and template lists are not compatible
+between v0.1 and newer versions! Make sure you install this in a different
+direcory than v0.1!</P>
+<H1>Limitations</H1>
+<P>This tool only works with 1-map demos
+(such as the one being automatically recorded by Nexuiz when using
+the cl_autodemo feature). If you manually recorded a demo that
+contains several maps, you can only specify a start- and endtime for
+the first map. However, you can try to use the demosplit.pl script
+from svn (trunk/misc/tools/demosplit.pl) to split demos having
+several maps into several 1-map demos. However, note that this tool
+will probably only work properly for older demos (up to Nexuiz v2.4.2
+demos).</P>
+  </body>
+</html>
+

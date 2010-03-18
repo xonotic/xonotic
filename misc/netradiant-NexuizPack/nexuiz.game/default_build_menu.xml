@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+build commands
+[RadiantPath]: path to Radiant .. C:\Program Files\Gtkradiant
+[EnginePath]: path to the engine .. C:\quake3\ C:\Program Files\Quake III Arena\ /usr/local/games/quake3/
+-->
+<project version="2.0">
+<var name="q3map2">"[RadiantPath]q3map2.[ExecutableType]" -v<cond value="[MonitorAddress]"> -connect [MonitorAddress]</cond> -game nexuiz -fs_basepath "[EnginePath]"<cond value="[GameName]"> -fs_game [GameName]</cond></var>
+<build name="Q3Map2: (single) BSP">
+<command>[q3map2] -meta "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (single) -vis">
+<command>[q3map2] -vis "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (single) -light, low quality">
+<command>[q3map2] -light -deluxe -cheapgrid -faster "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (single) -light, medium quality">
+<command>[q3map2] -light -deluxe -fast "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (single) -light, high quality">
+<command>[q3map2] -light -deluxe -fast -samples 3 "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (single) -minimap">
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (rebuild only entitys) ">
+<command>[q3map2] -onlyents "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (test)">
+<command>[q3map2] -meta -v -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -fast -samples 3 "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (test) fast vis, fast light">
+<command>[q3map2] -meta -v -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt -fast "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -faster -cheapgrid -filter "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (test) fast vis, good light">
+<command>[q3map2] -meta -v -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt -fast "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -fast -samples 2 "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (final) simple lighting">
+<command>[q3map2] -meta -v -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -fast -patchshadows -samples 2 "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (final) long distance lighting">
+<command>[q3map2] -meta -v -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -patchshadows -samples 3 "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (final) + radiosity (Nexuiz 2.4.2 default)">
+<command>[q3map2] -meta -v -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -patchshadows -samples 3 -bounce 8 -fastbounce -bouncegrid "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (final) + highres external lightmaps (Nexuiz 2.5 default, 2.5 required)">
+<command>[q3map2] -meta -v -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -patchshadows -samples 3 -lightmapsize 512 -bounce 8 -fastbounce -bouncegrid "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+<build name="Q3Map2: (final) + ambient occlusion (Nexuiz 2.5 required)">
+<command>[q3map2] -meta -v -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000 "[MapFile]"</command>
+<command>[q3map2] -vis -saveprt "[MapFile]"</command>
+<command>[q3map2] -light -deluxe -patchshadows -samples 3 -lightmapsize 512 -bounce 8 -fastbounce -bouncegrid -dirty -dirtscale 2 "[MapFile]"</command>
+<command>[q3map2] -minimap "[MapFile]"</command>
+</build>
+</project>
+

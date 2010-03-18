@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+<H1>Applying templates</H1>
+<P>Since version 0.3 you are able to
+selectively apply settings from a template of your choice to any job
+you like. One reason might be that you want jobs that have already
+been recorded to be recorded using different config settings (e.g.
+other quality settings, resolution, etc.). If you wanted to do this
+for many jobs at once, it would be very tedious to edit each job
+manually, setting up changes.</P>
+<P>You can apply properties of templates
+very easily:</P>
+<UL>
+	<LI><P>Select the template you want to
+	use</P>
+	<LI><P>Select the job(s) whose
+	properties you want to be affected by the template</P>
+	<LI><P>Right-click inside the jobs
+	table and select &ldquo;Apply template&rdquo;</P>
+	<LI><P>A new dialog will open where you
+	will be able to select which one of the settings should be copied
+	from the template to the job. Please, be aware that old settings of
+	the job will be overwritten!</P>
+	<LI><P>Usually the settings will be
+	copied 1:1 from the template to the job. <B>There are 2 exceptions,
+	though</B>:</P>
+	<UL>
+		<LI><P><B>Demo directory:</B> Here
+		copying the value from the template to the job would not make
+		sense, because in a template you actually specified a <B>directory</B>,
+		<U>not</U> a <B>file</B>. However, a job needs to point at a <B>file</B>.
+		What will happen shall be demonstrated by the following example:
+		Let's say that the job's path to the demo file (before applying the
+		template) has been <B>C:\Nexuiz\data\demos\mydemo.dem</B>
+		and the path setup in the template has been pointing to the
+		directory<B> C:\Games\Nexuiz2.5.2\data\demos</B>.
+		The new demo file path, after the &ldquo;apply&rdquo; process is
+		done, would be <B>C:\Games\Nexuiz2.5.2\data\demos\mydemo.dem</B>;
+		this means that from the <B>job's</B>
+		demo path the program will just take the name of the demo by itself
+		(mydemo.dem), and put the path from the <B>template</B>
+		in front of it</P>
+		<LI><P><b>Video
+		destination:</b> Here the same thing happens like for the Demo
+		directory. The new video destination will be &lt;Directory set up
+		in the template&gt; + &lt;just the filename of the setting of the
+		job&gt;</P>
+	</UL>
+</UL>
+<P>Another example of how this feature could be useful is this one: Suppose some
+movie maker was to create a community movie with frags from different
+people, or a movie maker was to continue or finish a movie from
+someone else. If one person creates a queue of jobs (which naturally
+includes the demo's names, start second and end second) and then
+decides not to record the frags herself but send it to some other
+movie maker, all that needs to be done is to save the job queue and
+send it to the other movie maker, together with the demos. The other
+movie maker can then copy the demos into his own demo directory and
+import the job queue. Of course the problem would then be that all
+these imported jobs could not really be executed right away, because
+all these paths might be incorrect, I mean, would simply not exist or
+match to the system of the movie maker who wants to record the jobs
+(e.g. path to Nexuiz engine or demo directory). But this can easily
+be fixed. The movie maker just needs to select the imported jobs and
+apply one of her own templates to them, and by doing so, fix all
+incorrect paths.</P>
+  </body>
+</html>
+

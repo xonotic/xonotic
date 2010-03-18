@@ -1,0 +1,44 @@
+cvars:
+______________
+
+   sv_logscores_console		print scores to serverconsole after each match (default: 0, set to 1 to enable)
+   sv_logscores_file		print scores to a file after each match (default: 0)
+   sv_logscores_filename	filename of the output file if sv_logscores_file is enabled (default: "scores.log",
+   				  the file will be stored in Nexuiz/data/data or ~/.nexuiz/data/data)
+   sv_logscores_bots		choose whether bot are included in stats or not (default: 0)
+
+
+commands:
+______________
+
+   printstats			print current scores to file/console (requires sv_logscores_console and/or 
+				  sv_logscores_file to be enabled)
+
+
+log format:
+______________
+
+example:
+   
+   :scores:dm_nexdm01:131
+   :player:1:7:129:1:GrooveMachine
+   :player:1:4:129:1:DanceWithMe
+   :player:10:1:130:3:Player
+   :end
+   
+   start of a new section:	:scores:<gametype>_<mapname>:<map runtime>		(if the dump was triggered
+   				   by "printstats", the line starts with :status:)
+   player entry:		:player:<frags>:<deaths>:<playtime>:<team>:<nickname>	(playername might contain ":",
+   				   so be sure your parser doesn't split them, playtime is messured in seconds)
+   section end:			:end
+
+team colors:
+   Red Team	=  5
+   Blue Team	= 14
+   Yellow Team	= 13
+   Pink Team	= 10
+
+   other team numbers may appear in free for all games
+
+   for an example parser (written in php, thanks to tChr) have a look at:
+      http://excalibur.nvg.ntnu.no/nexuiz/statsparser

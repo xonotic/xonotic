@@ -1,0 +1,96 @@
+rcon2irc - IRC gateway for Nexuiz servers, using rcon authorization
+
+
+Quick installation guide:
+
+1. Set up rcon access on your Nexuiz server, by adding some line like
+     rcon_password hackme
+   in your server.cfg. This password gives anyone FULL access to your server,
+   so do not give it away! This IRC gateway does not work with a
+   rcon_restricted_password.
+
+2. Copy rcon2irc-example.conf to another name (e.g. rcon2irc.conf), and edit
+   the settings to match your setup. At the very least:
+   - change dp_server to the IP (or IP:port) of your Nexuiz server
+   - change dp_password to the rcon password set above
+   - change irc_server to the IRC server to connect to
+   - change irc_nick to the nick name to use
+   - change irc_channel to the channel to join
+   
+3. Run it:
+     perl rcon2irc.pl rcon2irc.conf
+   You may possibly want to run it in nohup so you can disconnect from your ssh
+   connection, like this:
+     nohup perl rcon2irc.pl rcon2irc.conf &
+   Logging will then go to a file nohup.out in the same directory. Another way
+   to run it permanently and to see its output is to run it inside a screen(1).
+
+
+Features:
+
+- Show results of matches in the IRC channel
+
+- Act as a gateway to allow chat between Nexuiz server and IRC users, useful
+  for making the server more interesting to the public, but also useful as a
+  mere helper for the server admin to watch what's happening in game (like, if
+  people complain about a problem):
+  - Any line written in game using say (not say_team) goes to the IRC channel.
+  - Any line written in the channel, prefixed by the bot's nick name and a :,
+    goes into the Nexuiz game.
+  - Example:
+    View in game:
+      XSAX LTU: GREAT WIN AHAHAHAHAHAHAHAHAH))
+      (RedAlert) stop teamkilling!
+      .ThreeHeadedMonkey.: I am behind you!
+    View on IRC, assuming the IRC gateway has the nick noobNex and is voiced:
+      <+noobNex> <XSAX LTU> GREAT WIN AHAHAHAHAHAHAHAHAH))
+      <+noobNex> <.ThreeHeadedMonkey.> I am behind you!
+
+- Notify about free slots on the server. Example:
+    * noobNex is full!
+    * noobNex can be joined again (2 free slots); join now: nexuiz +connect 172.23.42.54!
+    <+noobNex> ctf_capturecity_v2r1 has begun (2 free slots); join now: nexuiz +connect 172.23.42.54
+
+- Display scores at the end of a match in the IRC channel. Example:
+    <+noobNex> ctf_capturecity_v2r1 ended: 301:78 Nicole 115, elsteer BLD {Y} 77,
+               CensoredNickname 57, 0grueN# 29, Bigus 23, ZeroA 36, ricer 22,
+               Treey@suse8 12, cZaR6RUSS7 8, BrightDev1l 0
+
+- Authenticate to the IRC services by Nickserv or Quakenet protocol, so the
+  server bot can be set up to always get voice when entering the channel, and
+  in case of Nickserv, make sure nobody else prevents it from using its
+  configured nick. Other authentication protocols can often be set up using
+  configuration, and if not, as plugin.
+
+- Support for /whois queries: the server hostname is put into the real name
+  field for /whois, so people can see how to find the server in the server
+  list.
+
+- Plugin interface for plugins written in Perl. See included rbiserver.pl for
+  an example.
+
+
+License:
+
+Copyright (c) 2008 Rudolf "divVerent" Polzer
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

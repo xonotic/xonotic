@@ -1,0 +1,50 @@
+This file contains the q3map2 compile settings used to compile the maps that are part of Nexuiz.
+There are also compile-scripts for some maps (mapname.sh). 
+They can be found in your Nexuiz/data/maps folder
+
+------------
+Standard
+------------
+
+"...q3map2.exe" -meta "...nexuizmap.map"
+"...q3map2.exe" -vis "...nexuizmap.bsp"
+"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...nexuizmap.bsp"
+
+------------
+Only update the entities.
+------------
+
+"...q3map2.exe" -onlyents "...nexuizmap.map"
+
+------------
+bloodprison.map
+------------
+
+"...q3map2.exe" -meta -samplesize 8 -mv 1000000 -mi 6000000 "...bloodprisonctf.map"
+"...q3map2.exe" -scale 1.2 "...bloodprisonctf.bsp"
+"...q3map2.exe" -vis "...bloodprisonctf.bsp"
+"...q3map2.exe" -light -deluxe -fast -filter -deluxe -patchshadows -samples 3 "...bloodprisonctf.bsp"
+
+------------
+final_rage.map
+------------
+
+"...q3map2.exe" -meta -v -samplesize 8 -skyfix -np 50 "...final_rage.map"
+"...q3map2.exe" -vis -v "...final_rage.map"
+"...q3map2.exe" -light -deluxe -compensate 1.4 -fast -gamma 1.5 -patchshadows -areascale 1.5 -pointscale 2 -v -bounce 3 -bouncegrid "...final_rage.map"
+
+------------
+reslimed.map
+------------
+
+"...q3map2.exe" -meta -patchmeta -v "...reslimed.map"
+"...q3map2.exe" -vis "...reslimed.bsp"
+"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...reslimed.bsp"
+
+------------
+strength.map
+------------
+
+"...q3map2.exe" -meta "...strength.map"
+"...q3map2.exe" -vis "...strength.bsp"
+"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...strength.bsp"

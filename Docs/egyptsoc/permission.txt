@@ -1,0 +1,11 @@
+Hello, 
+
+greetings from a conference in greece. I just got permission from Simon O'Callaghan to distribute the textures from http://www.simonoc.com/pages/materials/tpegypt/index.htm under the terms of the GPL with future versions of Nexuiz, provided classical attribution is given and that the game documentation includes a link to http://www.simonoc.com/pages/materials.htm so artists can find his stuff. 
+
+Thanks alot Simon! 
+
+This is good news, as some Nexuiz community maps use these textures, albeit as of yet licensed under a GPL-incompatible Creative Commons license. 
+
+Does anybody feel like creating bumpmaps/normalmaps and glossmaps for that set of textures?
+
+-- SavageX

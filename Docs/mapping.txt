@@ -1,0 +1,503 @@
+==============
+=Mapping Help=
+==============
+
+While I can't help you make a map, I can help you get it listed in the menu and
+working in the maplist. :p  The central object is the .mapinfo file, but
+there's much more available.
+
+Table of Contents
+-----------------
+I        Map Lists & Scripts
+         (get your map listed and working)
+  i.     mapinfo
+  ii.    mapname.cfg
+
+II       Map Image
+
+III      Domination
+
+IV       CTF
+
+V        Rune Match
+
+VI       Race/CTS
+
+VII      Nexball
+
+Appendix A - Advanced mapinfo
+
+Appendix B - Helpful extras
+  i.     Team Colors
+  ii.    Text Colors
+
+Appendix C - Advanced Darkplaces shaders
+
+========================
+=I. Map Lists & Scripts=
+========================
+
+There now is just a single script/cfg file available to you, containing all map
+specific settings:
+
+mapname.mapinfo
+
+The mapinfo is actually required - however, the game is so nice that it
+automatically generates a draft of it for you.
+
+------------------
+-The mapinfo file-
+------------------
+
+*cue even more scary music*
+
+The mapinfo file is basically what gets your map listed in the menu, and sets
+up the options needed to change to it. If no mapinfo file exists, the menu
+will automatically generate a rough draft for you on game startup. It will get
+stored into data/data/mapname.mapinfo.
+
+As an example, let's say I make a map called "wazat1.bsp". As long as I'm
+fantasizing, I might as well say this map is so well done I'm actually willing
+to release it for friends, neighbors, fellow forum visitors and other people
+who like me to judge me by. Let's also assume that I want domination,
+deathmatch/team deathmatch and runematch to all be playable on my map.
+
+This is very easy. First, I start the game and exit it again so the game writes
+data/data/wazat1.mapinfo for me. The file may look like:
+
+    title Wazat's Great Map
+    description Bleh.
+    author Unknown
+    _diameter 1966.839355
+    _spawnpoints 5
+    has weapons
+	cdtrack 5
+    type dm 30 20
+    type dom 200 20
+    type rune 200 20
+    type lms 9 20
+    type arena 10 20
+
+As I see, the menu autodetected that my map may be suitable for deathmatch,
+domination, runematch, last man standing and arena. But I want the map to be
+played in domination, deathmatch, team deathmatch, runematch only, and I also
+want different timelimits/fraglimits, so I will change the "type" lines to:
+
+    type dom 100 15
+    type rune 1000 25
+    type dm 40 15
+    type tdm 50 0 2
+
+Also, while I am at it, I should fix the placeholders in the map description lines:
+
+    title Wibble
+    description A large multi level arena map
+    author Wazat
+
+Although not entirely necessary, I will now move the .mapinfo file from
+data/data/maps/wazat1.mapinfo to data/maps/wazat1.mapinfo, so it is at the same
+place as my map. Next time I start the game, my map will be shown supporting
+the right game modes and with the right description in the menu.
+
+Also, note the "has weapons" line. If this line is not there (which happens if
+the map contains no weapon entities other than the Nex), the map will run in
+MinstaGib only and not be shown in the menu normally. So if you look for your
+map and don't find it, add "has weapons" to the mapinfo file, and make sure you
+have weapon entities placed.
+
+There's much more power in a mapinfo file. See Appendix A for more details.
+
+Gametype        | Syntax                                                                              | Notes
+----------------+-------------------------------------------------------------------------------------+-------------------------------------------------------
+Deathmatch      | type dm    <fraglimit>  <timelimit>                                                 |
+Team Deathmatch | type tdm   <fraglimit>  <timelimit> <teams>                                         | 2, 3, or 4 teams
+Domination      | type dom   <pointlimit> <timelimit>                                                 | teams are set by the map's entities
+CTF             | type ctf   <pointlimit> <timelimit> <caplimit>                                      | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
+Runematch       | type rune  <pointlimit> <timelimit>                                                 |
+LMS             | type lms   <lives>      <timelimit>                                                 |
+Arena           | type arena <fraglimit>  <timelimit>                                                 |
+Key Hunt        | type kh    <pointlimit> <timelimit> <teams>                                         | 2, 3, or 4 teams
+Assault         | type as                 <timelimit>                                                 | never uses points
+Onslaught       | type ons                <timelimit>                                                 | never uses points
+Race            | type rc                 <timelimit> <qualifyingtimelimit> <laplimit> <teamlaplimit> | g_race_teams: teamlaplimit is used instead of laplimit
+CTS             | type cts                <timelimit> <skill>                                         | never uses points
+
+
+===============
+=II. Map Image=
+===============
+
+So, you've got your map listed in the menu and it plays properly, but the menu
+isn't showing your picture! Or the picture is scaled badly! What manner of man
+would create such an accursed abomination?!
+
+Well... That sounds like something I'd do. :D
+
+And it is really easy: just make a screenshot of the map in action (preferably
+with crosshair and HUD switched off), and place it next to the map as
+mapname.jpg. For best rendering and file size, make the image in 4:3 aspect
+ratio, but scale it to the resolution 256x256 or possibly 512x512. It will look
+skewed in your image editing app, but the menu will show it right, and your
+graphics card LOVES images of such dimension.
+
+
+=================
+=III. Domination=
+=================
+
+In order to get Domination working well in your map, you need to place dom_team
+and dom_controlpoint entites. You *must* have at least 3 dom_team entities - 2
+minimum teams and one blank one (empty netname and no team). You can have up to
+4 teams (5 dom_team entities), and remember: if you set 3 teams, the third team
+must be the yellow one, according to the team order.
+
+Dom Team
+--------
+classname  dom_team
+netname    name of team (Red Team). Set to "" or don't define for the required
+           blank team.
+cnt        color of the team. See the "Helpful Extras" section for info.
+model      When this team captures control points, the points turn to this
+           model. If this is the neutral team, points start out as this model.
+noise      Sound to be played on the control point when it's captured. Only
+           players nearby will hear it.
+noise1     Sound to be played to all players when the control point is
+           captured. Also good for an annoncer voice ("Red Team has captured a
+           control point")
+
+Control Points
+--------------
+classname  dom_controlpoint
+message    message to be displayed to all players when this point is captured,
+           preceded by the team's name. This defaults to " has captured a control point".
+           You can specify different names for each point, for example " has captured the
+           Lava Room".
+origin     where in the map this point is
+wait       How often this point gives its controlling team frags.
+frags      How many frags this point gives each wait cycle.
+
+Here is an example entry in a .ent file that includes colored text and 3 teams:
+
+{
+"classname" "dom_team"
+"netname" ""
+"model" "models/domination/dom_unclaimed.md3"
+}
+{
+"classname" "dom_team"
+"netname" "^4Blue Team"
+"cnt" "13"
+"noise" ""
+"noise1" "domination/claim.wav"
+"model" "models/domination/dom_blue.md3"
+}
+{
+"classname" "dom_team"
+"netname" "^1Red Team"
+"cnt" "4"
+"noise" ""
+"noise1" "domination/claim.wav"
+"model" "models/domination/dom_red.md3"
+}
+{
+"netname" "^3Yellow Team"
+"cnt" "12"
+"noise" ""
+"noise1" "domination/claim.wav"
+"model" "models/domination/dom_yellow.md3"
+}
+{
+"netname" "^6Pink Team"
+"cnt" "9"
+"noise" ""
+"noise1" "domination/claim.wav"
+"model" "models/domination/dom_pink.md3"
+}
+{
+"classname" "dom_controlpoint"
+"message" " ^3has captured the ^1Hallways"
+"origin" "-206.0 -488.8 -150.0"
+"frags" "3"
+"wait" "5"
+"scale" "1.3"
+}
+{
+"classname" "dom_controlpoint"
+"message" " ^3has captured the ^1Lavaroom"
+"origin" "1457.1  19.9 -110.0"
+"frags" "1"
+"wait" "5"
+}
+{
+"classname" "dom_controlpoint"
+"message" " ^3controls the ^1Nex & Strength"
+"origin" "-259.8 299.3  5"
+"frags" "1"
+"wait" "5"
+}
+{
+"classname" "dom_controlpoint"
+"message" " ^3has captured the ^1Upper Platform"
+"origin" "539.7 1206.0 182.0"
+"frags" "1"
+"wait" "5"
+}
+{
+"classname" "dom_controlpoint"
+"message" " ^3has captured the ^1Teleport Room"
+"origin" "-1000.0 636.2 -16.0"
+"frags" "1"
+"wait" "5"
+}
+
+
+As you can see in the example, there are 5 dom_team ents: one blank, Red, Blue,
+Yellow and Pink. Each control point has a different message (giving it a
+special name), and the one in the hallways gives 3 frags every 5 seconds
+instead of just one, making it more valuable.
+
+If your map contains the required entities for Domination, the menu will
+automatically detect it for supporting Domination. To force the map to get
+re-detected after you add such entities, delete the data/data/mapname.mapinfo
+file - or simply edit it to add the "type dom" line.
+
+
+=========
+=IV. CTF=
+=========
+
+Capture the flag needs at least 1 CTF flag per team, and can also make use of
+team spawnpoints.
+
+CTF Flags
+---------
+classname  item_flag_team1 or item_flag_team2
+angle      direction the flag will point
+model      model of the flag (default: models/ctf/flag_red.md3 or
+           models/ctf/flag_blue.md3)
+noise      sound played when flag is stolen (default: "ctf/take.wav")
+noise1     sound played when flag is returned by a teammate (default:
+           "ctf/return.wav")
+noise2     sound played when flag is captured (default: "ctf/capture.wav")
+noise3     sound played when flag returns itself (default: "ctf/respawn.wav")
+
+Team Spawnpoints
+----------------
+classname  info_player_team1 or info_player_team2
+*note: These function just like info_player_deathmatch, but for one team only.
+If you don't make team spawnpoints, info_player_deathmatch is used instead.
+
+If your map contains the required entities for CTF, the menu will automatically
+detect it for supporting CTF. To force the map to get re-detected after you add
+such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
+add the "type ctf" line.
+
+==============
+=V. Runematch=
+==============
+
+Runematch needs only one type of entity to work: rune spawn points. You will
+need at least one for each rune (5 minimum at the time of this writing), though
+you should probably have more than that in the map. Just give the points a
+classname and origin.
+
+Rune Spawnpoints
+----------------
+classname  runematch_spawn_point
+
+If your map contains the required entities for Runematch, the menu will automatically
+detect it for supporting Runematch. To force the map to get re-detected after you add
+such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
+add the "type rune" line.
+
+==============
+=VI. Race/CTS=
+==============
+
+Making a race map is not hard: you need some special spawnpoints, and some checkpoints.
+
+Spawnpoints
+-----------
+classname  info_player_race
+target     targetname of the checkpoint
+race_place for finish line checkpoints, the place of the point, or -1 to make it qualifying/CTS-only, or unset to let all the other players spawn
+
+Checkpoints
+-----------
+classname  trigger_race_checkpoint
+targetname some name to target the checkpoint with
+cnt        number of the checkpoint (or 0 for finish line)
+
+Note that checkpoints are brush entities, and they should be somewhat thick and
+cover the full volume the player could use to get past them.
+
+Example of entity placement:
+
+                         ###
+    ---------------------###---
+   /    9999  7  5  3  1>###   \
+  /     9999 8  6  4  2 >###    \
+ |     ------------------###     |
+%%%%%%%%                 ###|    |
+%%%%%%%%                 $$$|    |
+ | ^ ^ ------------------$$$     |
+ \                       $$$ <  /
+  \                      $$$ < /
+   ----------------------$$$---
+                         $$$
+
+###:  classname = trigger_race_checkpoint, cnt = 0, targetname = finish
+$$$:  classname = trigger_race_checkpoint, cnt = 1, targetname = cp1
+%%%:  classname = trigger_race_checkpoint, cnt = 2, targetname = cp2
+>:    classname = info_player_race,                 target = finish, angle = 0
+1:    classname = info_player_race,                 target = finish, angle = 0, race_place = 1
+2:    classname = info_player_race,                 target = finish, angle = 0, race_place = 2
+....
+8:    classname = info_player_race,                 target = finish, angle = 0, race_place = 8
+9:    classname = info_player_race,                 target = finish, angle = 0, race_place = 9
+<:    classname = info_player_race,                 target = cp1,    angle = 180
+^:    classname = info_player_race,                 target = cp2,    angle = 90
+
+If your map contains the required entities for Race, the menu will automatically
+detect it for supporting Race. To force the map to get re-detected after you add
+such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
+add the "type rc" line.
+
+CTS maps do not use checkpoints with race_place set, so you can leave them out
+for CTS maps.
+
+The skill parameter in the mapinfo entry for CTS shall be in the range from 0 (easy) to 10 (impossible).
+
+=============
+=VI. Nexball=
+=============
+
+There are three required entities: nexball_redgoal, nexball_bluegoal, and one of nexball_basketball
+or nexball_football. There are also optional nexball_yellowgoal and nexball_pinkgoal entities (don't
+add a pink goal when there is no yellow goal on the map, it will crash)
+
+Goals are made just like any other regular triggers. You can use multiple brushes for one trigger,
+but avoid this if possible.
+
+There are also two other goal-like entities, nexball_fault and nexball_bound, the first taking a point
+from the team that hits the trigger with the ball, the second simply returning it. You can spawn the
+ball inside a goal-like trigger, this can be useful for basketball maps with separate teams and a
+common ball spawn.
+The different keys for the entities are documented in entities.def.
+
+The ball is affected by trigger_impulse, but not by trigger_push or teleporters.
+
+You should better avoid patches on the field, as collisions can sometimes get buggy on these.
+
+
+===============================
+=Appendix A - Advanced mapinfo=
+===============================
+
+You now know how to make a basic, bare-bones mapinfo to set up a couple options
+and load your map. However, there's much more you can do!  Consider these
+senarios:
+
+1. The laser has too high of a force for laser jumps and ruins CTF
+2. I don't want players to start out with the shotgun, but with the machinegun
+   instead
+3. The map takes so much server CPU performance that the anti-wallhack can't be
+   made active
+
+Each of these situations can be resolved with ease with a little work in the
+mapinfo file.
+
+To do this, I can add the following lines to my mapinfo file:
+
+    settemp_for_type ctf g_balance_laser_primary_force 200
+    settemp_for_type all g_start_weapon_shotgun 0
+    settemp_for_type all g_start_weapon_uzi 1
+    settemp_for_type all sv_cullentities_trace 0
+
+These "settemp" settings are automatically removed when the map is left and
+another is loaded. As you can see, it is possible to make per-mode temporary
+settings, and global ones.
+
+Similar settings are also possible for the client:
+
+    clientsettemp_for_type all r_shadow_glossexponent 96
+
+Another possibility is to specify fog settings in the mapinfo, for convenience
+in case you set sv_foginterval by it too (to force the fog on the clients):
+
+    fog 0.2 0.25 0.3 0.3 1 1500
+    settemp_for_type all sv_foginterval 5
+
+
+=============================
+=Appendix B - Helpful Extras=
+=============================
+
+----------------
+-i. Team Colors-
+----------------
+When you need to set an entity's color or team, use these values:
+
+Red
+---
+Team:      5
+Color:     4
+
+Blue
+----
+Team:      14
+Color:     13
+
+Yellow
+------
+Team:      13
+Color:     12
+
+Pink
+-----
+Team:      10
+Color:     9
+
+
+----------------
+-i. Text Colors-
+----------------
+Occasionally you may want to print text in color, such as team names. Here are your options:
+
+1  Red
+2  Green
+3  Yellow
+4  Blue
+5  Cyan
+6  Magenta
+7  White
+8  Grey (transparent)
+9  Grey (solid)
+0  Black
+
+==========================================
+=Appendix C - Advanced Darkplaces shaders=
+==========================================
+
+Shader parameters for DP's own features:
+- dp_reflect <distort> <r> <g> <b> <a>
+  Makes surfaces of this shader reflective with r_water. The reflection is
+  alpha blended on the texture with the given alpha, and modulated by the given
+  color. distort is used in conjunction with the normalmap to simulate a
+  nonplanar water surface.
+- dp_refract <distort> <r> <g> <b>
+  Makes surfaces of this shader refractive with r_water. The refraction
+  replaces the transparency of the texture. distort is used in conjunction with
+  the normalmap to simulate a nonplanar water surface.
+- dp_water <reflectmin> <reflectmax> <refractdistort> <reflectdistort> <refractr> <refractg> <refractb> <reflectr> <reflectg> <reflectb> <alpha>
+  This combines the effects of dp_reflect and dp_refract to simulate a water
+  surface. However, the refraction and the reflection are mixed using a Fresnel
+  equation that makes the amount of reflection slide from reflectmin when
+  looking parallel to the water to reflectmax when looking directly into the
+  water. The result of this reflection/refraction mix is then layered BELOW the
+  texture of the shader, so basically, it "fills up" the alpha values of the
+  water. The alpha value is a multiplicator for the alpha value on the texture
+  - set this to a small value like 0.1 to emphasize the reflection and make
+  the water transparent; but if r_water is 0, alpha isn't used, so the water can
+  be very visible then too.
+

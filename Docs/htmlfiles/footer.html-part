@@ -1,0 +1,28 @@
+		  <p><br style="clear:left" />
+        </p>
+	  </div>
+	  <!-- end content -->
+		<div id="footer">
+			<p id="ninja"><a href="http://www.detrition.net" title="Tyler Mulligan's Working Portfolio" target="_blank">page created by</a> <a href="http://www.nexuizninjaz.com" title="Nexuiz Ninjaz - Practicing the ninja arts of Nexuiz" target="_blank">a ninja</a></p>
+			<ul>
+
+				<li class="first"><a href="http://alientrap.org/nexuiz/news.php" title="Nexuiz - Latest News">News</a></li>
+				<li><a href="http://alientrap.org/nexuiz/media.php" title="Nexuiz - Media (Screenshots, videos and graphics)">Media</a></li>
+				<li><a href="http://alientrap.org/nexuiz/information.php" title="Nexuiz Information  (General, System Requirements)">Info</a></li>
+				<li><a href="http://alientrap.org/nexuiz/team.php" title="The Nexuiz Team">Team</a></li>
+				<li><a href="http://alientrap.org/nexuiz/links.php" title="Nexuiz Links">Links</a></li>
+				<li><a href="http://alientrap.org/forum/index.php?c=3" title="Official Nexuiz Forums" target="_blank">Forums</a></li>
+				<li><a href="http://planetnexuiz.com/ladder/" title="Nexuiz Ladder" target="_blank">Ladder</a></li>
+				<li><a href="http://planetnexuiz.com/tourney/" title="Nexuiz Tournaments" target="_blank">Tournament</a></li>
+			</ul>		</div><!-- end footer -->
+		<p class="subFooter">Come to the Nexuiz IRC channel: <a href="irc://irc.quakenet.org/nexuiz" title="#nexuiz on irc.quakenet.org">#nexuiz on irc.quakenet.org</a> or the team channel: <a href="irc://irc.anynet.org/alientrap" title="#alientrap on irc.anynet.org">#alientrap on irc.anynet.org</a></p>
+
+		<div id="valid">
+			<a id="valid_css" href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
+			<a id="valid_xhtml" href="http://validator.w3.org/check?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
+			<p>&copy; 2004-2008 Nexuiz.com</p>
+	  </div>
+	</div><!-- end right -->
+</div>
+</body>
+</html>

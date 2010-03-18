@@ -1,0 +1,14 @@
+Made using the included map file (edited to contain the name of the current gun) at fov 90, 1280x768, normal settings except gl_picmip 0.
+
+Partial image cropped out, then edited using ImageMagick with the parameters
+
+-level -3%,70%,1 -geometry 209x240
+
+respective
+
+-level -3%,70%,1 -geometry 162x80
+
+The crop regions were:
+
+firstperson = bottom 627x310 pixels (later scaled down to 240 height)
+thirdperson = 288x331 pixels, anchored at the right foot of marine (bottom left corner on the image)

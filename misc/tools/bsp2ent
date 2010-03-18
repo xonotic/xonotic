@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Fcntl qw/:seek/;
+
+sub get($$)
+{
+	my ($fh, $n) = @_;
+	read $fh, my $v, $n
+		or die "read: $!";
+	return $v;
+}
+
+use constant LUMP_ENTITIES => 0;
+
+if(!@ARGV)
+{
+	die "Usage: bsp2ent BSPFILE > ENTFILE\n";
+}
+
+my $bspfile = $ARGV[0];
+open my $fh, '<', $bspfile
+	or die "open $bspfile: $!";
+get($fh, 4) eq 'IBSP'
+	or die "$bspfile is no IBSP";
+unpack('V', get($fh, 4)) == 0x2e
+	or die "$bspfile is no Q3 BSP";
+my @directory = map
+{
+	[unpack('VV', get($fh, 8))] # offset, length
+}
+0..16;
+
+seek($fh, $directory[LUMP_ENTITIES][0], SEEK_SET);
+my $ent = get($fh, $directory[LUMP_ENTITIES][1]);
+$ent =~ s/\000//g;
+
+print $ent;

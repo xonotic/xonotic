@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+    <H1>FAQ</H1>
+<P><I>Question: Is it possible to have a
+job being recorded with one of the Nexuiz presets (Low, medium,
+normal, high, ultra), without affecting my Nexuiz installation in
+general (so that this configuration is just active during capturing
+the current demo?</I></P>
+<P>Yes it is. In Nexuiz there are config
+files for this, which are called:</P>
+<UL>
+	<LI><P>effects-low.cfg</P>
+	<LI><P>effects-med.cfg</P>
+	<LI><P>effects-normal.cfg</P>
+	<LI><P>effects-high.cfg</P>
+	<LI><P>effects-ultra.cfg</P>
+	<LI><P>effects-ultimate.cfg</P>
+	<LI><P>effects-omg.cfg</P>
+</UL>
+<P>In order to use them, there are 2
+approaches</P>
+<P><B>Approach 1:</B> You should
+consider to use a new directory for each new set of effect configs
+you want to try out. This will simply help you to avoid loss of your
+original config, or any unwanted modification to it. For example,
+setup Nexuiz manually by starting it with some userdir, e.g. <B>-userdir
+effectTestUltimate</B>, start Nexuiz, go into the menu and set the
+effects to ultimate (e<I>xec effects-ultimate.cfg</I> in the
+console). Maybe fine-tune settings as you like. Then put the <B>-userdir
+effectTestUltimate</B> directive into the <B>engine parameters</B>
+field of the job.</P>
+<P><b>Approach 2:</b> For this approach it is
+recommended that you do a backup of your config somewhere else, even
+though everything should work fine and your original config should
+not be modified at all after the demo was recorded.</P>
+<P>Add these 4 lines to the <b>exec before
+capture</b> field:</P>
+<P><B>saveconfig backup.cfg</B></P>
+<P><B>cvar_resettodefaults_all</B></P>
+<P><B>exec effects-ultimate.cfg</B></P>
+<P><B>r_restart</B></P>
+<P>The first line will backup your
+current config to &ldquo;backup.cfg&rdquo;. The second line resets
+all variables (you can remove this if you want, but sometimes these
+effect-xyz.cfg config files will not set every single variable to the
+new value, but assume that some values have their default value,
+which might not be the case in your config. So resetting everything
+to defaults is recommended. Of course you can choose to use another
+effects config than <B>effects-ultimate.cfg</B>. After executing that
+effects config a restart of the renderer (<B>r_restart</B>) is
+mandatory, because of some of the changes of the effects config not
+being applied without a renderer-restart. Also, keep in mind that the
+cvar_resettodefaults_all will have changed your Nexuiz screen
+resolution (vid_height, vid_width). The r_restart command however
+won't take these changes into account (it will still use your old resolution),
+only <B>vid_restart</B> would.
+This just means that you do not have to change these 2 variables
+manually to &ldquo;keep&rdquo; your old screen resolution, as long as
+you don't use vid_restart.</P>
+<P>Also add this to your <b>exec after
+capture</b> field:</P>
+<P><B>cvar_resettodefaults_all</B></P>
+<P><B>exec backup.cfg</B></P>
+<P>Please note: in case you want to
+setup other special things, e.g. whether to record in the AVI instead
+of OGV format, the video FPS, etc, you'd have to put these settings
+some place <B>after</B> the <B>cvar_resettodefaults_all</B> command
+in the <B>exec before capture</B> field.</P>
+<P><BR><BR>
+</P>
+<P><I>Question: Is it possible to record
+a job in a particular screen resolution?</I></P>
+<P>Yes it is. The height and width are
+configured by setting the value vid_height and vid_width to your
+desired value. For example to record a demo in the HD resolution,
+which is 1280x720, put this into the <B>exec before capture</B>
+field:</P>
+<P ALIGN=LEFT><B>vid_width 1280</B></P>
+<P ALIGN=LEFT><B>vid_height 720</B></P>
+<P ALIGN=LEFT><B>vid_restart</B></P>
+<P><BR><BR>
+</P>
+<P><I>Question: I have found a bug, or I
+encountered some other problem, what do I do? </I>
+</P>
+<P>Well, truth to be told, I cannot
+guarantee for any support of this tool. You can put questions or
+comments into the forum thread of the AlienTrap forums where you
+downloaded the tool from.</P>
+  </body>
+</html>
+

@@ -1,0 +1,98 @@
+map download:
+______________
+
+
+CLIENT SIDE:
+
+Should already work without configuration. You can however use the following
+cvars for further tuning:
+
+   cl_curl_enabled              download support enabled (master switch, default: 1)
+   cl_curl_maxdownloads         maximum number of downloads at once (default: 1)
+   cl_curl_maxspeed             maximum total speed in KiB/s (default: 100)
+
+Downloaded packages end up in |Nexuiz/data/dlcache/| or
+|~/.nexuiz/data/dlcache/| and are only used till you exit Nexuiz.
+ If you want to play them localy or use them to setup a server of your
+own you can "accept" the packages by moving it one level up - right
+next to your config.cfg.
+
+You should regularily clean up your cache to save space and make the maps
+you really want available from the menu.
+
+
+SERVER SIDE:
+
+First of all, you need a HTTP or FTP server to host your PK3s. You can either
+use some web space provider, or set up your own. For this, use any FTP or HTTP
+server software you want (HTTP: lighttpd, Apache, thttpd; FTP: Filezilla,
+vsftpd). HTTP is to be preferred because it works better for firewalled
+players.
+
+On the server, you need to set up where to download the PK3s of the maps you
+are running. You can either use the cvar
+
+   sv_curl_defaulturl           default download URL
+
+to set it to some site, or put a file named "curl_urls.txt" in the data
+directory of the following format:
+
+   pattern        url
+   pattern        url
+   pattern        url
+   ...
+
+where always the first wildcard pattern match is taken.
+
+   data*          -
+   strale*        http://stralemaps.invalid/
+   *              http://all.the.other.stuff.invalid/id/here.php?pak=
+   foo*           http://wont.get.here.invalid/
+
+The pk3 name will be appended to the URL by DarkPlaces. Note that you NEED to
+append a trailing slash if you refer to a directory. If you specify a "-" as
+URL, the package will not be offered for download.
+
+
+INFORMATION FOR MIRROR/MAP SERVER ADMINS:
+
+The Referer is always set to dp://serverhost:serverport/, the User-Agent
+always starts with "Nexuiz". Look at this sample log line:
+
+141.2.16.3 - - [06/Jun/2006:19:43:14 +0000] "GET /~polzer/temp/nexmaps.php?filename=o-fun.pk3 HTTP/1.1" 302 - "dp://141.2.16.3:26000/" "Nexuiz Linux 21:26:17 Jun  6 2006"
+
+
+If you want to set up a redirection service, here is a sample PHP code for you
+to start from:
+
+<?
+
+function findmap($filename)
+{
+    # insert your database query or whatever you want here
+    if($filename == "foo.pk3")
+        return "http://barserver.invalid/foo.pk3";
+    return FALSE;
+}
+
+function bailout($code, $title, $message)
+{
+    header("HTTP/1.1 $code $title");
+    echo "<html><title>$title</title><h1>$title</h1>$message</html>";
+    exit(0);
+}   
+
+$filename = $_GET['filename'];
+
+$useragent = getenv("HTTP_USER_AGENT");
+if(strpos($useragent, "Nexuiz ") !== 0)
+    bailout(403, "Forbidden", "You're not a Nexuiz client.");
+    
+$url = findmap($filename);
+if(!$url)
+    bailout(404, "Not Found", "Well... try another file name?");
+    
+header("HTTP/1.1 302 Moved Temporarily");
+header("Location: $url");
+
+?>

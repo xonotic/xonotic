@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+<H1>Changelog</H1>
+<H2>v0.2 -&gt; v0.3</H2>
+<H3>Compatibility changes</H3>
+<P>None. Job and template queues are completely compatible between v0.2 and v0.3</P>
+<H3>Functionality changes and fixes</H3>
+<UL>
+	<LI><P>New feature: loading and saving of the template list to file is now
+	possible</P>
+	<LI><P>Open dialogs for jobs or templates allow you to select whether to overwrite
+	the current list/queue or not (if not, the loaded items will be added to the
+	current list/queue)</P>
+	<LI><P>New feature: <a href="apply_templates.html">Applying properties of a template </a>
+	selectively to one or more selected jobs</P>
+</UL>
+
+
+<H2>v0.1 -&gt; v0.2</H2>
+<H3>Compatibility changes</H3>
+<UL>
+	<LI><P>Table preferences, job queues and template lists are not compatible
+	between v0.1 and 0.2! Make sure you install v0.2 in a new direcory!</P>
+	<LI><P>NDR v0.2 requires Java SE 6 now (instead of Java SE 5 which was
+	required for v0.1)</P>
+</UL>
+<H3>Functionality changes and fixes</H3>
+<UL>
+	<LI><P><a href="plugin-architecture.html">Plugin architecture</a> that allows other Java developers to include
+	their own plug-ins that can encode the recorded job to
+	another format (e.g. H.264)</P>
+	<LI><P>Ships with <a href="plugin-virtualdub.html">encoder plug-in for VirtualDub</a> (MS Windows,
+	www.virtualdub.org)</P>
+	<LI><P>Duplicates can now be created with <b>more than one job</b> selected,
+	duplicating <b>all</b> selected ones at once</P>
+	<LI><P><b>Templates</b> can now be duplicated</P>
+	<LI><P>Fixed bug where deleting selected rows in the tables caused
+	a weird exception</P>
+	<LI><P>Jobs can be given individual names (don't have to be "Job 1",
+	"Job 2", ... anymore)</P>
+</UL>
+  </body>
+</html>
+

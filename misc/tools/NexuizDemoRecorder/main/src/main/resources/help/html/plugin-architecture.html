@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+<H1>Plug-in architecture</H1>
+<H2>Introduction</H2>
+<P>While the Nexuiz Demo Recorder (NDR)
+saves you a lot of time, what many video editors still need to do is
+to transcode/convert/encode/you-name-it the resulting huge avi clip
+to another (lossless) format. Or, if you are not an editor but just a
+player who wants to distribute the recorded clip, unless you had
+Nexuiz encode the clip in the Ogg Theora codec (cl_capturevideo_ogg
+1), you might want to encode it in XviD, H.264 or some other lossy
+codec. For encoding people use all different kinds of tools. Some
+have a GUI, some don't. Some are available on just one platform, some
+are cross-platform to some extent. However, since this release the
+NDR is now able to also encode clips to whatever format you like by
+the use of <B>encoder plug-ins</B>. For this the NDR has been
+extended with a plug-in architecture that will look for plug-ins in
+the &ldquo;plugins&rdquo; folder. NDR plug-ins are basically just a
+bridge between the NDR application and an actual encoder. Examples
+for actual encoders are <B>VirtualDub</B> for MS Windows, or <B>mencoder</B>
+for Linux. What a plug-in will do is to assemble a command line that
+will execute this encoder and hand it the required parameters.</P>
+<H2>Extension is easy</H2>
+<P>In this release the NDR ships with
+just one plug-in: the VirtualDub plug-in. However, if you are a Java
+developer it is really easy for you to write your own plug-ins that
+will be able to handle whatever encoder you want to use. If you are
+interested, have a look into the <B>src</B> folder at the <B>Sample
+Plugin</B>. All you need to do is to implement an interface, edit
+some meta-information files and build a jar file that is being put
+into the <B>plugins</B> directory of the NDR.</P>
+<H2>Plug-in settings</H2>
+<P>Each plug-in allows the user to
+interact with it, by offering settings (or &ldquo;preferences&rdquo;).
+There are 2 kinds of settings:</P>
+<UL>
+	<LI><P>Global settings, which will be
+	shown in the File &rarr; Preferences dialog</P>
+	<LI><P>Job/template-specific settings,
+	which will be shown in the dialog you use when creating or editing
+	jobs or templates</P>
+</UL>
+<H2>Use plug-ins later on</H2>
+<P>In order to invoke the functionality
+of the plug-in you are not required to set up everything at the very
+beginning (before the clip has actually been recorded). Of course,
+you can do so, and in this case the job would be recorded and, right
+after that, be encoded as well. But you can also choose to have jobs
+recorded first, and then later when you see the need to encode them,
+edit the job settings (add your plug-in settings there), and then
+right-click the job and select &ldquo;just run the xyz plug-in&rdquo;.
+Basically this menu item will work on any job with status = <B>done</B>.</P>
+<P>Of course you may not move the
+recorded clip from the destination that you set up, because otherwise
+the plug-in would not find the file to encode it.</P>
+<H2>Error handling</H2>
+<P>In case something went wrong during
+the execution of the plug-in itself, you will see a &ldquo;plug-in
+error&rdquo; in the <B>status</B> column of the jobs table. Like for
+normal &ldquo;errors&rdquo;, you can right-click the job and click on
+&ldquo;show error message&rdquo; in order to see the error message of
+the plug-in. In case you can repair whatever went wrong, do so, then
+right-click the job and click on &ldquo;reset job status to <B>done</B>&rdquo;.
+Then you can run the plug-in again.</P>
+<P>If a plug-in appeared to do its job
+just fine but you suspect that something went wrong, you might want
+to have a look at the <B>logs</B> directory in the NDR folder.
+Depending on whether the one who created the plug-in implemented it,
+you might see log files which are basically text files containing the
+output of the encoder itself.</P>
+  </body>
+</html>
+

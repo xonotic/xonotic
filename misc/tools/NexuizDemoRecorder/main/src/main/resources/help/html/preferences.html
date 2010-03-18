@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+    <H1>Preferences dialog</H1>
+<P>The preferences dialog allows you to
+change the behavior of the program in certain situaitons.</P>
+<P><img src="images/preferences_dialog.gif" /></P>
+<UL>
+	<LI><P><b>Overwrite final video
+	destination file if it exists:</b> This checkbox allows you to determine
+	whether the final destination video file (e.g.
+	<B>C:\render\fragOfTheMonth.avi</B>) should be overwritten by a job
+	if that file already existed from your harddrive. By default this
+	option is disabled. The program will, in this case, not overwrite
+	any existing files, but save the video file with a &ldquo;copyX&rdquo;
+	suffix, for example <B>C:\render\fragOfTheMonth_copy1.avi</B></P>
+	<LI><P><b>Disable rendering while
+	fast-forwarding:</b> As the Nexuiz demo recorder creates a cutted demo
+	that has slowmo-commands in it to fast-forward it to the desired
+	start time, the fast-forwarding process is often slowed down due to
+	the action taking place on your screen (and your graphic card
+	choking with the mere speed of the demo, e.g. during a &ldquo;slowmo
+	100&rdquo; period). However, there is a variable called r_render in
+	the engine which can be set to 0, which will disable any render
+	updates. This will speed up the fast-forwarding process massively.
+	Of course, r_render is being set to 1 a few seconds before start
+	time is reached.</P>
+	<LI><P><b>Disable sound while
+	fast-forwarding:</b> The value of the variable volume is saved and the
+	set to 0 right after the demo was loaded. The reason is that it can
+	be annoying to hear the in-game sounds while fast-forwarding.</P>
+	<LI><P><b>Fast-forward speed (first stage
+	or second stage):</b> The demo is fast-forwarded using two different
+	fast-forward speeds. In the first stage, when the start time is
+	still about a minute away, the &ldquo;first stage&rdquo; value is
+	used. Then, until 5 seconds before the start time, the &ldquo;second
+	stage&rdquo; value is used. You will only need to manipulate these
+	values if you discover that the final recorded video is inaccurate
+	when it comes to the time when the recording starts (e.g. when then
+	video recording starts too late, reduce these 2 values for first and
+	second stage a bit &ndash; you will have to experiment)</P>
+	<LI><P><b>Do not delete cut demos:</b> The
+	file name of the automatically created cut demo is like the original
+	name of your demo, but ends with &ldquo;_autocut.dem&rdquo;.
+	Normally this demo is created, being recorded from, and then deleted
+	again. If you enable this option the demo file is not deleted, and
+	you can inspect it with a Hex editor or whatever else you want to do
+	with it (maybe send it to a friend to have him record it?)</P>
+	<LI><P><b>Append this suffix to job-name when duplicating jobs:</b>
+	As you now have customizable job names it would probably be a bad idea to
+	give duplicated jobs the same name as the original jobs. This is why you can
+	set up a suffix that will be appended to the original job name.</P>
+
+</UL>
+  </body>
+</html>
+

@@ -1,0 +1,307 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use POSIX;
+use File::Temp;
+
+# change these to match your system, or define them in ~/.nexuiz-map-compiler
+# (just copy paste this part to the file ~/.nexuiz-map-compiler)
+
+	# Path to Nexuiz (where the data directory is in)
+	our $NEXUIZDIR   = '/home/polzer/Nexvn/nexuiz';
+
+	# Path to your q3map2 program. You find it in your GtkRadiant/install
+	# directory.
+	our $Q3MAP2      = '/home/users4/ommz/polzer/bin/q3map2.x86';
+
+	# General flags for q3map2 (for example -threads 4)
+	our $Q3MAP2FLAGS = '';
+
+	# Default flags for the -bsp stage
+	our $BSPFLAGS    = '-meta -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000';
+
+	# Default flags for the -vis stage
+	our $VISFLAGS    = '';
+
+	# Default flags for the -light stage
+	our $LIGHTFLAGS  = '-deluxe -patchshadows -samples 3 -lightmapsize 512 -bounce 8 -fastbounce -bouncegrid';
+
+	# Default flags for the -minimap stage
+	our $MINIMAPFLAGS = '';
+
+	# Default order of commands
+	our $ORDER = 'light,vis,minimap';
+
+# end of user changable part
+
+do "$ENV{HOME}/.nexuiz-map-compiler";
+
+sub Usage()
+{
+	print <<EOF;
+Usage:
+$0 mapname [-bsp bspflags...] [-vis visflags...] [-light lightflags...]
+EOF
+	exit 1;
+}
+
+my $options =
+{
+	bsp => [split /\s+/, $BSPFLAGS],
+	vis => [split /\s+/, $VISFLAGS],
+	light => [split /\s+/, $LIGHTFLAGS],
+	minimap => [split /\s+/, $MINIMAPFLAGS],
+	order => [split /\s*,\s*/, $ORDER],
+	maps => [],
+	scale => 1
+};
+
+my $curmode = 'maps';
+
+while(@ARGV)
+{
+	$_ = shift @ARGV;
+	my $enterflags = undef;
+	if($_ eq '-bsp')
+	{
+		$enterflags = 'bsp';
+	}
+	elsif($_ eq '-vis')
+	{
+		$enterflags = 'vis';
+	}
+	elsif($_ eq '-light')
+	{
+		$enterflags = 'light';
+	}
+	elsif($_ eq '-minimap')
+	{
+		$enterflags = 'minimap';
+	}
+	elsif($_ eq '-map')
+	{
+		$curmode = 'maps';
+	}
+	elsif($_ eq '-scale')
+	{
+		$options->{scale} = (shift @ARGV) || 1;
+	}
+	elsif($_ eq '-novis')
+	{
+		$options->{vis} = undef;
+	}
+	elsif($_ eq '-nolight')
+	{
+		$options->{light} = undef;
+	}
+	elsif($_ eq '-nominimap')
+	{
+		$options->{minimap} = undef;
+	}
+	elsif($_ eq '-order')
+	{
+		$options->{order} = [split /\s*,\s*/, shift @ARGV];
+	}
+	elsif($_ =~ /^-(-.*)/)
+	{
+		if($curmode eq 'maps')
+		{
+			$curmode = 'bsp';
+		}
+		push @{$options->{$curmode}}, $1;
+	}
+	elsif($_ =~ /^-/ and $curmode eq 'maps')
+	{
+		$curmode = 'bsp';
+		push @{$options->{$curmode}}, $_;
+	}
+	else
+	{
+		push @{$options->{$curmode}}, $_;
+	}
+	if(defined $enterflags)
+	{
+		$curmode = $enterflags;
+		if($ARGV[0] eq '+')
+		{
+			shift @ARGV;
+		}
+		else
+		{
+			$options->{$curmode} = [];
+		}
+	}
+}
+
+my $linkdir = File::Temp::tempdir("nexuiz-map-compiler.XXXXXX", TMPDIR => 1, CLEANUP => 1);
+
+sub q3map2(@)
+{
+	my @args = ($Q3MAP2, split(/\s+/, $Q3MAP2FLAGS), '-game', 'nexuiz', '-fs_basepath', $NEXUIZDIR, '-fs_basepath', $linkdir, '-v', @_);
+	print "\$ @args\n";
+	return !system @args;
+}
+
+(my $mapdir = getcwd()) =~ s!/[^/]*(?:$)!!;
+$mapdir = "/" if $mapdir eq "";
+symlink "$mapdir", "$linkdir/data";
+
+my ($prescale, $postscale) = ($options->{scale} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
+$postscale = 1 if not defined $postscale;
+
+for my $m(@{$options->{maps}})
+{
+	$m =~ s/\.(?:map|bsp)$//;
+	if($prescale != 1)
+	{
+		open my $checkfh, "<", "$m.map"
+			or die "open $m.map: $!";
+		my $keeplights = 0;
+		while(<$checkfh>)
+		{
+			/^\s*"_keeplights"\s+"1"\s*$/
+				or next;
+			$keeplights = 1;
+		}
+		close $checkfh;
+		die "$m does not define _keeplights to 1"
+			unless $keeplights;
+	}
+
+	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "../scripts/*.shader";
+
+	my $previous_shaderlist = undef;
+	my $shaderlist = "";
+	if(open my $fh, "<", "$NEXUIZDIR/scripts/shaderlist.txt")
+	{
+		while(<$fh>)
+		{
+			$shaderlist .= $_;
+		}
+
+		# we may have to restore the file on exit
+		$previous_shaderlist = $shaderlist
+			if "$NEXUIZDIR/data" eq $mapdir;
+	}
+	else
+	{
+		# possibly extract the shader list from a pk3?
+		local $ENV{N} = $NEXUIZDIR;
+		$shaderlist = `cd "\$N" && for X in "\$N"/data/data*.pk3; do Y=\$X; done; unzip -p "\$Y" scripts/shaderlist.txt`;
+	}
+
+	my $shaderlist_new = "";
+	for(split /\r?\n|\r/, $shaderlist)
+	{
+		delete $shaders{$_};
+		$shaderlist_new .= "$_\n";
+	}
+	if(%shaders)
+	{
+		for(sort keys %shaders)
+		{
+			$shaderlist_new .= "$_\n";
+		}
+	}
+	else
+	{
+		$shaderlist_new = undef;
+	}
+
+	my $restore_shaderlist = sub
+	{
+		if(defined $shaderlist_new)
+		{
+			if(defined $previous_shaderlist)
+			{
+				open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
+				print $fh $previous_shaderlist;
+				close $fh;
+			}
+			else
+			{
+				unlink "$mapdir/scripts/shaderlist.txt";
+			}
+		}
+	};
+	local $SIG{INT} = sub
+	{
+		print "SIGINT caught, cleaning up...\n";
+		$restore_shaderlist->();
+		exit 0;
+	};
+
+	eval
+	{
+		if(defined $shaderlist_new)
+		{
+			mkdir "$mapdir/scripts";
+			open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
+			print $fh $shaderlist_new;
+			close $fh;
+		}
+
+		unlink <$m/lm_*>; # delete old external lightmaps
+		q3map2 '-bsp', @{$options->{bsp}},   "$m.map"
+			or die "-bsp: $?";
+		if($prescale != 1)
+		{
+			q3map2 '-scale', $prescale, "$m.bsp"
+				or die "-scale: $?";
+			rename "${m}_s.bsp", "$m.bsp"
+				or die "rename ${m}_s.bsp $m.bsp: $!";
+		}
+		my @o = @{$options->{order}};
+		push @o, qw/light vis minimap/;
+		my %o = ();
+
+		for(@o)
+		{
+			next if $o{$_}++;
+			if($_ eq 'light')
+			{
+				if(defined $options->{light})
+				{
+					q3map2 '-light',        @{$options->{light}}, "$m.map"
+						or die "-light: $?";
+				}
+			}
+			if($_ eq 'vis')
+			{
+				if(defined $options->{vis})
+				{
+					q3map2 '-vis',          @{$options->{vis}},   "$m.map"
+						or die "-vis: $?";
+				}
+			}
+			if($_ eq 'minimap')
+			{
+				if(defined $options->{minimap})
+				{
+					q3map2 '-minimap',      @{$options->{minimap}}, "$m.map"
+						or die "-minimap: $?";
+				}
+			}
+		}
+
+		if($postscale != 1)
+		{
+			q3map2 '-scale', $postscale, "$m.bsp"
+				or die "-scale: $?";
+			rename "${m}_s.bsp", "$m.bsp"
+				or die "rename ${m}_s.bsp $m.bsp: $!";
+		}
+
+		unlink "$m.srf";
+		unlink "$m.prt";
+
+		$restore_shaderlist->();
+		1;
+	}
+	or do
+	{
+		$restore_shaderlist->();
+		die $@;
+	};
+}

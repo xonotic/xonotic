@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg5531"
+   sodipodi:version="0.32"
+   inkscape:version="0.44"
+   sodipodi:docbase="/home/users4/ommz/polzer/WWW/temp/running-marine"
+   sodipodi:docname="flag-dropped.svg"
+   inkscape:export-filename="/home/users4/ommz/polzer/WWW/temp/running-marine/flag-dropped-blue.png"
+   inkscape:export-xdpi="13.401096"
+   inkscape:export-ydpi="13.401096">
+  <defs
+     id="defs5533" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="375"
+     inkscape:cy="574.45286"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="854"
+     inkscape:window-height="582"
+     inkscape:window-x="153"
+     inkscape:window-y="185" />
+  <metadata
+     id="metadata5536">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="opacity:0.4;fill:#6f6f6f;fill-opacity:1;stroke:black;stroke-width:8;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 128.57143,612.36219 L 240,442.36218 L 545.71428,463.79076 L 372.85714,636.6479 L 128.57143,612.36219 z "
+       id="path5540"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       sodipodi:nodetypes="cccsccscc"
+       id="path3671"
+       d="M 260.11602,526.80611 L 269.0491,540.74905 L 436.33978,433.56795 C 423.14748,412.0414 404.06506,395.95356 389.14932,375.28684 C 375.75138,354.37505 364.8752,322.02443 364.8752,322.02443 L 309.10345,357.75672 C 309.10345,357.75672 320.00421,390.09157 333.40215,411.00337 C 346.80009,431.91517 371.63495,455.35729 371.63495,455.35729 L 260.11602,526.80611 z "
+       style="fill:blue;fill-opacity:1;stroke:black;stroke-width:7.47643995;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+  </g>
+</svg>

@@ -1,0 +1,171 @@
+#!/bin/sh
+
+usage()
+{
+	cat <<EOF
+Usage:
+  $0 -o difference.zip -f from.zip -t to.zip
+  $0 -f from.zip -t to.zip
+EOF
+	exit 1
+}
+
+output=
+from=
+to=
+excludes=
+
+while [ $# -gt 0 ]; do
+	o=$1
+	shift
+	case "$o" in
+		-o)
+			output=$1
+			shift
+			;;
+		-f)
+			from=$1
+			shift
+			;;
+		-t)
+			to=$1
+			shift
+			;;
+		-x)
+			excludes="$excludes $1"
+			shift
+			;;
+		*)
+			usage
+			;;
+	esac
+done
+
+[ -n "$from" ] || usage
+[ -n "$to" ] || usage
+
+found()
+{
+	type=$1
+	source=$2
+	echo >&2 "$type: $source"
+	case "$type" in
+		new|changed|deleted)
+			echo "$source"
+			;;
+		excluded)
+			;;
+		deleted|*)
+			echo >&2 " * Sorry, can't handle deletion of $source."
+			;;
+	esac
+}
+
+tempdir=`mktemp -d -t zipdiff.XXXXXX`
+
+newline="
+"
+fromlist="$(zipinfo -1 "$from" | grep -v /\$)"
+tolist="$(zipinfo -1 "$to" | grep -v /\$)"
+
+diffit()
+{
+	echo "$fromlist" | while IFS= read -r line; do
+		case "$newline$tolist$newline" in
+			*$newline$line$newline*)
+				;;
+			*)
+				isexcluded=false
+
+				for P in $excludes; do
+					case "$line" in
+						$P)
+							found excluded "$line"
+							isexcluded=true
+							break
+							;;
+					esac
+				done
+
+				if ! $isexcluded; then
+					found deleted "$line"
+				fi
+				;;
+		esac
+	done
+	echo "$tolist" | while IFS= read -r line; do
+		case "$newline$fromlist$newline" in
+			*$newline$line$newline*)
+				# check if equal
+				isexcluded=false
+
+				for P in $excludes; do
+					case "$line" in
+						$P)
+							found excluded "$line"
+							isexcluded=true
+							break
+							;;
+					esac
+				done
+
+				if ! $isexcluded; then
+					unzip -p "$from" "$line" > "$tempdir/v1"
+					unzip -p "$to" "$line" > "$tempdir/v2"
+					if ! diff --brief "$tempdir/v1" "$tempdir/v2" >/dev/null 2>&1; then
+						found changed "$line"
+					fi
+					rm "$tempdir/v1"
+					rm "$tempdir/v2"
+				fi
+				;;
+			*)
+				# check if equal
+				isexcluded=false
+
+				for P in $excludes; do
+					case "$line" in
+						$P)
+							found excluded "$line"
+							isexcluded=true
+							break
+							;;
+					esac
+				done
+
+				if ! $isexcluded; then
+					found new "$line"
+				fi
+				;;
+		esac
+	done
+}
+
+result=`diffit`
+
+case "$output" in
+	'')
+		;;
+	*)
+		rm -f "$output"
+		echo "$result" | while IFS= read -r line; do
+			echo >&2 "extracting $line..."
+			dline=./$line
+			mkdir -p "$tempdir/${dline%/*}"
+			unzip -p "$to" "$line" > "$tempdir/$line" # this may create an empty file - don't care, DP handles this as deletion
+		done
+		case "$output" in
+			/*)
+				;;
+			*)
+				output=`pwd`/$output
+				;;
+		esac
+		cd "$tempdir"
+		#zip -9r "$output" .
+		7za a -tzip -mx=9 "$output" .
+		cd ..
+		;;
+esac
+
+rm -rf "$tempdir"

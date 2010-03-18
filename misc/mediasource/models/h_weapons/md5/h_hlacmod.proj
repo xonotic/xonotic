@@ -1,0 +1,10 @@
+project "h_hlacmod.tmdl"
+	importmd5mesh "h_hlacmod.md5mesh"
+	normals
+	importmd5anim "h_hlacmod_fire.md5anim" "fire"
+	importmd5anim "h_hlacmod_fire2.md5anim" "fire2"
+	importmd5anim "h_hlacmod_idle.md5anim" "idle"
+	importmd5anim "h_hlacmod_reload.md5anim" "reload"
+finish
+
+

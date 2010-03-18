@@ -1,0 +1,10 @@
+project "h_rl.tmdl"
+	importmd5mesh "h_rl.md5mesh"
+	normals
+	importmd5anim "h_rl_fire.md5anim" "fire"
+	importmd5anim "h_rl_fire2.md5anim" "fire2"
+	importmd5anim "h_rl_idle.md5anim" "idle"
+	importmd5anim "h_rl_reload.md5anim" "reload"
+finish
+
+

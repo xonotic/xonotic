@@ -1,0 +1,10 @@
+project "h_shotgun.tmdl"
+	importmd5mesh "h_shotgun.md5mesh"
+	normals
+	importmd5anim "h_shotgun_fire.md5anim" "fire"
+	importmd5anim "h_shotgun_fire2.md5anim" "fire2"
+	importmd5anim "h_shotgun_idle.md5anim" "idle"
+	importmd5anim "h_shotgun_reload.md5anim" "reload"
+finish
+
+

@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+    <H1>How it works</H1>
+<P>The following is a description of how
+the program processes a single job:</P>
+<UL>
+	<LI><P>The program takes your original
+	demo, e.g. &ldquo;C:\Nexuiz\data\demos\test.dem&rdquo; and creates a
+	copy of it, the <I>cut demo</I>. This file has the name
+	&lt;original_demo_name&gt;<B>_autocut</B>.dem. The cut demo is
+	different to the original demo in a way that console commands have
+	been <I>injected</I>, so basically the engine thinks that you had
+	entered them yourself (e.g. cl_capturevideo 1 to start recording).</P>
+	<UL>
+		<LI><P>Since it is possible to inject
+		any possible console command, the first command that is injected is
+		to disable rendering (r_render 0), save the value of your &ldquo;volume&rdquo;
+		setting and then setting it to 0 (as long as you have sound and
+		rendering disabled while fast-forwarding in the preferences of the
+		Demo Recorder). Then a slowmo 100 command (first stage value from
+		the Demo Recorder preferences) is injected in order to fast-forward
+		the demo.</P>
+		<LI><P>Then, when the game time in the
+		demo is about 1 minute less than your specified start time of the
+		job, slowmo is reduced to 10 (second stage value from the
+		preferences)</P>
+		<LI><P>Then, when the game time in the
+		demo is about 5 seconds less than your specified start time, <B>slowmo</B>
+		is set to <B>1</B>, rendering and sound is enabled again, and
+		whatever your put into the <B>exec before capture</B> field is
+		being injected, too. Then, the values of cl_capturevideo_nameformat
+		and _number are being saved to a temporary variable and are
+		overwritten with defined values (<B>autorec</B> and <B>1234567</B>),
+		so that the Nexuiz Demo Recorder will know the exact name of the
+		output file (which is necessary so that it can move that file to
+		your desired video destination/location)</P>
+		<LI><P>When the the start time is
+		reached, cl_capturevideo 1 is injected, once the end time is
+		reached, cl_capturevideo 0 is injected.</P>
+		<LI><P>Shortly after, whatever you put
+		into the exec after capture field is executed, and then the
+		original values of cl_capturevideo_nameformat and _number are being
+		restored.</P>
+		<LI><P>Then a disconnect command is
+		injected</P>
+	</UL>
+	<LI><P>Next, your specified Nexuiz
+	engine binary is launched. The parameters given to the binary are:</P>
+	<UL>
+		<LI><P>The content of the <B>engine
+		parameters</B> field of the job, and</P>
+		<LI><P><B>-demo
+		&lt;relative-demo-path&gt;/&lt;demo-file-name&gt;</B> (this will
+		start Nexuiz, e.g. <B>-demo demos/test.dem</B>, launch the <B>test.dem</B>
+		demo, and the engine will play the complete demo until a disconnect
+		is issued (which we have injected above), and then Nexuiz will
+		close automatically. This -demo parameter exists since Nexuiz 1.0</P>
+	</UL>
+	<LI><P>Once the Nexuiz Demo Recorder
+	notices that your Nexuiz engine binary closed, it will look for the
+	recorded video file in &lt;DPVideo-directory&gt;/autorec1234567.&lt;avi/ogv&gt;
+	and move it (rename it) to your desired &lt;video-destination&gt;,
+	keeping the original extension of the file. In case the preferences
+	are setup to not overwrite an existing video file, a file with
+	ending _copy1 (2, 3, &hellip;) will be created.</P>
+</UL>
+  </body>
+</html>
+

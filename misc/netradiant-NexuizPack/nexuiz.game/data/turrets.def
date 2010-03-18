@@ -1,0 +1,246 @@
+/*QUAKED turret_machinegun (1 0 0) (-32 -32 0) (32 32 50) - PILLAR
+Fast firing moderate damage bullet (hitscan) turret.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/mg.md3"
+*/
+
+/*QUAKED turret_plasma (1 0 0) (-32 -32 0) (32 32 50) - PILLAR
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+---------NOTES----------
+Basic energy cannon
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/plasma.md3"
+*/
+
+/*QUAKED turret_plasma_dual (1 0 0) (-32 -32 0) (32 32 50) - PILLAR
+basic energy cannon * 2
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/plasma2.md3"
+*/
+
+/*QUAKED turret_flac (1 0 0) (-32 -32 0) (32 32 50) - PILLAR
+Only kills missiles, rockets, grenadelauncher & electro secondaries to be precise.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/flac.md3"
+*/
+
+/*QUAKED turret_mlrs (1 0 0) (-32 -32 0) (32 32 50)
+6 unguided rockers fired in a rapid burst.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/mlrs.md3"
+*/
+
+/*QUAKED turret_hellion (1 0 0) (-32 -32 0) (32 32 50)
+2 guided moderate damage accelerating rockets 
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/hellion.md3"
+*/
+
+
+/*QUAKED turret_hk (1 0 0) (-32 -32 0) (32 32 50)
+Single powerful rocket with the ability to evade obstacles to find its target. Varied speed.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/hk.md3"
+*/
+
+/*QUAKED turret_tesla (1 0 0) (-32 -32 0) (32 32 50)
+Fires a lightning bolt that will jump to up to 10 targets if they are close enough to each other. Missiles included.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/tesla.md3"
+*/
+
+/*QUAKED turret_phaser (1 0 0) (-32 -32 0) (32 32 50)
+Constant beam weapon that will considerably slow its target down while dealing low but constant damage.
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+master_name: This turret controls what all turrets with master_nameof set to this aim at
+master_nameof: Dont select own targets, use the target of the turret with this master_name
+target: Defend the position of this entity
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/phaser.md3"
+*/
+
+
+/*QUAKED turret_fusionreactor (1 0 0) (-32 -32 0) (32 32 50)
+-------- KEYS --------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range: 2 = double range, 0.5 = half
+turret_scale_refire: 2 = double refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo: 2 = double ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim: 2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+team: 5=red, 14=blue
+-------- SPAWNFLAGS --------
+PILLAR: Adds a supporting pillar under this turret, for turrets on terrain/uneven surfaces. (only for visuals)
+---------NOTES----------
+Supplies neerby energy based turrets with more power so they can fire more often.
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/reactor.md3"
+*/
+
+/*QUAKED turret_targettrigger (.5 .5 .5) ?
+Used to feed turrets capable of it with remote target info. currently only turret_hk supports this.
+*/
+
+
+/*QUAKED turret_walker (1 0 0) (-32 -32 0) (32 32 50)
+-----------KEYS------------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range:  2 = double range, 0.5 = half
+turret_scale_refire: 2 = doubble refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo:   2 = doubble ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim:    2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+
+team : 5=red, 14=blue
+-----------SPAWNFLAGS-----------
+---------NOTES----------
+
+A nasty mechanical ceature that will engage longrange target with missiles, midrange with its miniguna and meele things up close and personal.
+
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/walker.md3"
+*/
+
+
+/*QUAKED turret_ewheel (1 0 0) (-32 -32 0) (32 32 50)
+-----------KEYS------------
+turret_scale_damage: 2 = double damage, 0.5 = half
+turret_scale_range:  2 = double range, 0.5 = half
+turret_scale_refire: 2 = doubble refire (SLOWER!), 0.5 = half (FASTER!)
+turret_scale_ammo:   2 = doubble ammo carry & regen, 0.5 = half ammo carry & regen
+turret_scale_aim:    2 = aim twice as fast, 0,5 = aim at half speed
+turret_scale_health: 2 = double health, 0.5 = half
+
+team : 5=red, 14=blue
+-----------SPAWNFLAGS-----------
+---------NOTES----------
+
+Small, agile and move capable turret.
+
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/turrets/radiant/ewheel.md3"
+*/
+
+
+/*QUAKED turret_checkpoint (1 0 1) (-32 -32 -32) (32 32 32)
+-----------KEYS------------
+target: .targetname of next wapoint in chain.
+wait:   Pause at this point # seconds.
+-----------SPAWNFLAGS-----------
+
+---------NOTES----------
+If a loop is of targets are formed, any unit entering this loop will patrol it indefinitly.
+If the checkpoint chain in not looped, the unit will go "Roaming" when the last point is reached.
+*/

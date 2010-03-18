@@ -1,0 +1,1770 @@
+/*QUAKED _skybox (0.77 0.88 1.0) (-4 -4 -4) (4 4 4) 
+Compiler-only entity that specifies a the origin of a sky box (a wholly contained, separate area of the map), similar to some games' portal skies. When compiled with Q3Map2, the sky box surfaces will be visible from any place where sky is normally visible. It will cast shadows on the normal parts of the map, and can be used with cloud layers and other effects. As it is compiler-only, it can't "scale up" entities in its box.
+To use this, carve a small box in some larger structure on your map, place this entity inside that box hole, and make a small version on what should be seen in the sky there.
+-------- KEYS --------
+angle: rotation angle of the sky surfaces.
+angles: Individual control of PITCH, YAW, and ROLL (default 0 0 0).
+_scale: scaling factor (default 64), good values are between 50 and 300, depending on the map.
+*/
+
+/*QUAKED dom_controlpoint (.3 .3 1) (-16 -16 -16) (16 16 16) 
+Domination  control point
+In order to get Domination working well in your map, you need to place dom_team and dom_controlpoint entities.  You *must* have at least 3 dom_team entities - 2 minimum teams and one blank one (empty netname and no team).  You can have up to 4 teams (5 dom_team entities).
+-------- KEYS --------
+message: message to be displayed to all players when this point is captured, preceded by the team's name.  This defaults to " has captured a control point".  You can specify different names for each point, for example " has captured the Lava Room".
+wait: How often this point gives its controlling team frags.
+frags: How many frags this point gives each wait cycle.
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+zbqry="zbqryf/qbzvangvba/qbz_hapynvzrq.zq3"
+
+*/
+
+/*QUAKED dom_team (.3 .3 1) (-16 -16 -16) (16 16 16) 
+Domination team.
+In order to get Domination working well in your map, you need to place dom_team and dom_controlpoint entities.  You *must* have at least 3 dom_team entities - 2 minimum teams and one blank one (empty netname and no team).  You can have up to 4 teams (5 dom_team entities).
+-------- KEYS --------
+netname: name of team (Red Team).  Set to "" or don't define for the required blank team.
+cnt: color of the team.  See the "Helpful Extras" section for info.
+model: When this team captures control points, the points turn to this model.  If this is the neutral team, points start out as this model.
+noise: Sound to be played on the control point when it's captured.  Only players nearby will hear it.
+noise1: Sound to be played to all players when the control point is captured.  Also good for an announcer voice ("Red Team has captured a control point")
+*/
+
+/*QUAKED func_assault_destructible (.5 0 .5) ? - - - - - - - - NOSPLASH
+This is a brush model which can be damaged. Once triggered it's active and will happily receive damage players inflict upon it. Once all health is consumed it'll disappear and trigger the targeted entity/entities. As damage is received the brush model will be tinted in an increasingly visible flavor of red to give visible feedback.
+-------- KEYS --------
+health: The damage this trigger can take
+target: The entity/entities to be triggered once this entity gets invisible
+targetname: The name other entities can use to target this entity
+mdl: particle effect name to show when destroyed
+count: particle effect multiplier
+mdl_dead: optional replacement model to show when destroyed
+debris: names of debris models to show when destroyed, separated by spaces
+noise: sound to play when destroyed
+dmg: damage to deal to the environment when destroyed
+dmg_edge: edge damage to deal to the environment when destroyed
+dmg_radius: damage radius
+dmg_force: damage force
+message: death message when a player gets hit by the explosion
+message2: death message when someone gets pushed into this (default: "was pushed into an explosion by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+debrismovetype: way in which the debris moves: one of 1 = ANGLENOCLIP, 2 = ANGLECLIP, 3 = WALK, 4 = STEP, 5 = FLY, 6 = TOSS, 7 = PUSH, 8 = NOCLIP, 9 = FLYMISSILE, 10 = BOUNCE, 11 = BOUNCEMISSILE
+debrissolid: solidity of the debris: one of 0 = NOT, 1 = TRIGGER, 2 = BBOX, 3 = SLIDEBOX, 4 = BSP, 5 = CORPSE
+debrisvelocity: initial velocity vector of the debris (static part)
+debrisvelocityjitter: initial velocity vector of the debris (random part)
+debrisavelocityjitter: initial angular velocity vector of the debris (random part)
+debristime: time till the debris fades (average)
+debristimejitter: time till the debris fades (random part)
+debrisfadetime: how long debris takes to fade
+debrisdamageforcescale: how much debris is affected by damage force (e.g. explosions)
+debrisskin: skin number of debris
+-------- SPAWNFLAGS --------
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED func_assault_wall (.5 0 .5) ?
+Brush model that will disappear once the targeted target_objective is fulfilled. This can be used to restrict access to parts of the map until a certain objective has been conquered.
+-------- KEYS --------
+target: targetname of a target_objective
+*/
+
+/*QUAKED func_bobbing (0 .5 .8) ? X_AXIS Y_AXIS
+Solid entity that oscillates back and forth in a linear motion. By default, it will have an amount of displacement in either direction equal to the dimension of the brush in the axis in which it's bobbing. Entity bobs on the Z axis (up-down) by default. It can also emit sound if the "noise" key is set. Will crush the player when blocked.
+-------- KEYS --------
+speed: amount of time in seconds for one complete oscillation cycle (default 4).
+height: sets the amount of travel of the oscillation movement (default 32). 
+phase: sets the start offset of the oscillation cycle. Values must be 0 < phase < 1. Any integer phase value is the same as no offset (default 0).
+noise: path/name of .wav or .ogg file to play. Use looping sounds only (e.g. sound/world/drone6.wav - See Notes).
+dmg: damage a player who gets crushed by it receives
+dmgtime: interval to apply dmg to a player who is s in the way
+message: death message when a player gets crushed
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+-------- SPAWNFLAGS --------
+X_AXIS: entity will bob along the X axis.
+Y_AXIS: entity will bob along the Y axis.
+*/
+
+/*QUAKED func_button (0 .5 .8) ? - - - - - - - - NOSPLASH
+When a button is touched by a player, it moves in the direction set by the "angle" key, triggers all its targets, stays pressed by an amount of time set by the "wait" key, then returns to it's original position where it can be operated again.
+-------- KEYS --------
+angle: determines the direction in which the button will move (up = -1, down = -2).
+target: all entities with a matching targetname will be triggered.
+target2: all entities with a matching targetname will be triggered.
+target3: all entities with a matching targetname will be triggered.
+target4: all entities with a matching targetname will be triggered.
+speed: speed of button's displacement (default 40).
+wait: number of seconds button stays pressed (default 1, -1 = return immediately).
+lip: lip remaining at end of move (default 4 units).
+health: (default 0) if set to any non-zero value, the button must take damage (any amount) to activate.
+-------- SPAWNFLAGS --------
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED func_door (0 .5 .8) ? START_OPEN - DOOR_DONT_LINK - - TOGGLE - - NOSPLASH
+Normal sliding door entity. By default, the door will activate when player walks close to it or when damage is inflicted to it.
+If DOOR_DONT_LINK is not set, the door will be linked with all doors it touches. Note however that for linked doors to work properly, it is necessary that ALL linked doors have SOME volume of common area (that is, there must be a point that is part of ALL doors).
+-------- KEYS --------
+message: is printed when the door is touched if it is a trigger door and it hasn't been fired yet, or death message if dmg is set
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+angle: determines the opening direction
+targetname: if set, no touch field will be spawned and a remote button or trigger field activates the door.
+health: if set, door must be shot open
+speed: movement speed (100 default)
+wait: wait before returning (3 default, -1 = never return)
+lip: lip remaining at end of move (8 default)
+dmg: damage to inflict when blocked (when triggered and someone is in the way)
+sounds: when 1, use default door sounds
+noise1: sound when the door opens
+noise2: sound when the door closes
+-------- SPAWNFLAGS --------
+START_OPEN: causes the door to move to its destination when spawned, and operate in reverse.  It is used to temporarily or permanently close off an area when triggered (not useful for touch or damage triggered doors).
+DOOR_DONT_LINK: the door won't link with another door it touches
+TOGGLE: causes the door to wait in both the start and end states for a trigger event.
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED func_door_rotating (0 .5 .8) ? START_OPEN BIDIR DOOR_DONT_LINK BIDIR_IN_DOWN - TOGGLE X_AXIS Y_AXIS NOSPLASH
+Normal rotating door entity that opens by rotating around an axis (default: Z). Use an origin brush to specify the rotation axis.
+By default, the door will activate when player walks close to it or when damage is inflicted to it.
+If DOOR_DONT_LINK is not set, the door will be linked with all doors it touches.
+BIDIR makes the door work bidirectional, so that the opening direction is always away from the requestor.
+The usage of bidirectional doors requires two manually instantiated triggers (trigger_multiple), the one to open it in the other direction
+must have set trigger_reverse to 1.
+BIDIR_IN_DOWN will the door prevent from reopening while closing if it is triggered from the other side.
+-------- KEYS --------
+message: is printed when the door is touched if it is a trigger door and it hasn't been fired yet, or death message if dmg is set
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+angle: determines the destination angle for opening. negative values reverse the direction (90 default)
+targetname: if set, no touch field will be spawned and a remote button or trigger field activates the door.
+health: if set, door must be shot open
+speed: speed to rotate (in degrees per second)
+wait: wait before returning (3 default, -1 = never return)
+dmg: damage to inflict when blocked (when triggered and someone is in the way)
+sounds: when 1, use default door sounds
+noise1: sound when the door opens
+noise2: sound when the door closes
+-------- SPAWNFLAGS --------
+START_OPEN: causes the door to move to its destination when spawned, and operate in reverse.  It is used to temporarily or permanently close off an area when triggered (not useful for touch or damage triggered doors).
+DOOR_DONT_LINK: the door won't link with another door it touches
+TOGGLE: causes the door to wait in both the start and end states for a trigger event.
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED func_door_secret (0 .5 .8) ? OPEN_ONCE 1ST_LEFT 1ST_DOWN NO_SHOOT ALWAYS_SHOOT
+Basic secret door. Slides back, then to the side. Angle determines direction. Opens when targeted or when shot; does not create its own trigger field like func_door does.
+-------- KEYS --------
+wait: # of seconds before coming back
+key1: first entity key with one-line description
+key2: second entity key with one-line description
+t_width: override WIDTH to move back (or height if going down)
+t_length: override LENGTH to move sideways
+dmg: damage to inflict when blocked (2 default)
+message: text to display when activating the door, or death message if dmg is set
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+noise1: sound when opening backwards or closing
+noise2: sound when opening sideways
+noise3: sound when stopping
+-------- SPAWNFLAGS --------
+OPEN_ONCE: only work once, then stay open
+1ST_LEFT: 1st move is left of arrow
+1ST_DOWN: 1st move is down from arrow
+NO_SHOOT: never respond to shots
+ALWAYS_SHOOT: even if targetname is set, respond to shots
+*/
+
+/*QUAKED func_group (0 .5 .8) ? 
+This is not an entity as such. It is strictly an editor utility to group world brushes and patches together for convenience (selecting, moving, copying, etc). You cannot group entities with this.
+-------- Q3MAP2 KEYS --------
+_lightmapscale: light map resolution factor
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+-------- KEYS --------
+_indexmap: Path/name for the TGA file used to guide the mapping of textures on the terrain surface.
+_layers: number of unique root shaders that will be use on the terrain.
+_shader: Path to the metashader used to assign textures to the terrain entity. Note: Omit the "textures/" prefix.
+_offsets: space separated list of height offsets for the index map
+*/
+
+/*QUAKED func_ladder (0 .5 .8) ? 
+a ladder, need i say no more
+grab a trigger brush and put it in front of the part that you want the player to climb
+*/
+
+/*QUAKED func_plat (0 .5 .8) ? - - CRUSH
+Rising platform the player can ride to reach higher places. Plats must always be drawn in the raised position, so they will operate and be lighted correctly but they spawn in the lowered position. The plat will stay in the raised position until the player steps off.
+-------- KEYS --------
+speed: determines how fast the plat moves (default 150).
+lip: lip remaining at end of move (default 16). Has no effect if "height" is set.
+height: if set, this will determine the total amount of vertical travel of the plat.
+dmg: damage to inflict on player when he blocks operation of plat. Plat will reverse direction when blocked.
+targetname: if set, the trigger that points to this will lower the plat each time it fires. The plat lowers and lifts someone up later.
+sounds: 2 for alternate sound set, -1 for silence, or use the fields below
+sound1: platform starts moving sound
+sound2: platform stop sound
+message: kill message, when someone gets killed by this plat
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+-------- SPAWNFLAGS --------
+CRUSH: crush players hit by the platform instantly
+-------- NOTES --------
+By default, the total amount of vertical travel of a platform is implicitly determined by the overall vertical size of the brushes of which it's made minus the lip value. But if the "height" key is used, then the total amount of vertical travel of the plat will be exactly that value regardless of the shape and size of the plat and regardless of the value of the "lip" key. Using the "height" key is the best method for any kind of platforms and the only possible one for thin plats which need to travel vertical distances many times their own thickness. Setting the origin key is simply an alternate method to using an origin brush. When using the model2 key, the origin point of the model will correspond to the origin point defined by either the origin brush or the origin coordinate value.
+*/
+
+/*QUAKED func_rain (0 .5 .8) ? 
+This is an invisible area like a trigger, which rain falls inside of.
+-------- KEYS --------
+velocity: falling direction (should be something like '0 0 -700', use the X and Y velocity for wind)
+cnt: sets color of rain in the Quake palette (default 12 - white)
+count: adjusts density, this many particles fall every second for a 1024x1024 area, default is 2000
+*/
+
+/*QUAKED func_rotating (0 .5 .8) ? - - X_AXIS Y_AXIS
+Brush entity that spins in place on one axis (default Z). Use an origin brush to specify the rotation axis.
+To rotate around another axis, make a func_wall with an explicit avelocity given.
+-------- KEYS --------
+speed: speed to rotate (in degrees per second)
+noise: path/name of looping .wav file to play.
+dmg: Do this much dmg every .dmgtime interval when blocked
+dmgtime: See above. (0.25s default)
+message: kill message when crushed by this
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+-------- SPAWNFLAGS --------
+X_AXIS: rotate around the X axis
+Y_AXIS: rotate around the Y axis
+*/
+
+/*QUAKED func_snow (0 .5 .8) ? 
+This is an invisible area like a trigger, which snow falls inside of.
+-------- KEYS --------
+velocity: falling direction (should be something like '0 0 -300', use the X and Y velocity for wind)
+cnt: sets color of snow in the Quake palette (default 12 - white)
+count: adjusts density, this many particles fall every second for a 1024x1024 area, default is 2000
+*/
+
+/*QUAKED func_stardust (.5 .5 .5) (-8 -8 -8) (8 8 8) 
+Point entity with EF_STARDUST applied. This will spawn a particle cloud with mostly golden particles. Used as eye-candy.
+*/
+
+/*QUAKED func_train (0 .5 .8) ? 
+Trains are moving solids that follow a cycle of path_corner entities. Origin brushes are NOT supported; they use the "mins" corner as reference (that is, lowest x, y, and z coordinates).
+At each node, the train's mins corner hits exactly the path_corner.
+Trains always start on in the game.
+Trains do not damage the played when blocked.
+Trains cannot emit sound.
+Trains are not trigger-able or toggle-able.
+Trains cannot be block-stopped just by getting in their way, the player must be wedged between the train and another obstacle to block it.
+-------- KEYS --------
+speed: default/initial speed of train (default 100 or overridden by speed value of targeted path_corner)
+target: targetname of first path_corner to move to at the default speed; ideally, this path_corner shall be exactly where the train starts
+noise: path/name of .wav or .ogg file to play while moving. Use looping sounds only (e.g. sound/world/drone6.wav - See Notes).
+dmg: damage a player who gets crushed by it receives
+dmgtime: interval to apply dmg to a player who is s in the way
+message: death message when a player gets crushed
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+*/
+
+/*QUAKED info_location (1 1 0) (-8 -8 -8) (8 8 8) 
+Location for use by the %l escape in "say" messages.
+The closest "visible" info_location entity is chosen to find the right location name for a point.
+-------- KEYS --------
+netname: name of location, possibly with color codes
+*/
+
+/*QUAKED info_notnull (0 .5 0) (-8 -8 -8) (8 8 8) 
+Entity that does nothing, but may be targeted (e.g. to use its position)
+-------- KEYS --------
+targetname: must match the target key of entity that uses this for pointing.
+*/
+
+/*QUAKED info_null (0 .5 0) (-8 -8 -8) (8 8 8) 
+Aiming target for q3map2-internal entities like _decal or light. Removes itself when loaded, so it can NOT be used for in-game stuff!
+-------- KEYS --------
+targetname: the entity that requires an aiming direction points to this.
+*/
+
+/*QUAKED info_player_attacker (1 0.5 0) (-16 -16 -24) (16 16 45) 
+Attacking team's player spawning location in Assault. Should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+target: this should point to a target_objective to decide when this spawning point is active.
+target2: trigger all entities with this targetname when someone spawns
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_deathmatch (0 1 0) (-16 -16 -24) (16 16 45) 
+Normal player spawning location in game types without team spawns. Should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+target: trigger all entities with this targetname when someone spawns
+targetname: when targeted by a func_button, pressing the button will assign the spawn point to the team of the activator as an additional spawn point, or reassign it if it was already assigned. Also used to assign spawn points to Onslaught control points.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_defender (.5 .5 .5) (-16 -16 -24) (16 16 45) 
+Defending team's player spawning location in Assault. Should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+target: this should point to a target_objective to decide when this spawning point is active.
+target2: trigger all entities with this targetname when someone spawns
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_team1 (1 0 0) (-16 -16 -24) (16 16 45) 
+Red team's player spawning location in e.g. CTF and Onslaught. Should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+target: trigger all entities with this targetname when someone spawns
+targetname: when targeted by a func_button, pressing the button will reassign the spawn point to the team of the activator. If a team has no more spawn point left, it immediately loses.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_team2 (0 0 1) (-16 -16 -24) (16 16 45) 
+Blue team's player spawning location in e.g. CTF and Onslaught. Should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+target: trigger all entities with this targetname when someone spawns
+targetname: when targeted by a func_button, pressing the button will reassign the spawn point to the team of the activator. If a team has no more spawn point left, it immediately loses.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_team3 (1 1 0) (-16 -16 -24) (16 16 45) 
+Yellow team's player spawning location, but there is no game mode to use this yet. Anyway, should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+target: trigger all entities with this targetname when someone spawns
+targetname: when targeted by a func_button, pressing the button will reassign the spawn point to the team of the activator. If a team has no more spawn point left, it immediately loses.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED info_player_team4 (1 0 1) (-16 -16 -24) (16 16 45) 
+Pink team's player spawning location, but there is no game mode to use this yet. Anyway, should touch the floor, but not the walls, and should point where the player should look when he spawns there.
+-------- KEYS --------
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+target: trigger all entities with this targetname when someone spawns
+targetname: when targeted by a func_button, pressing the button will reassign the spawn point to the team of the activator. If a team has no more spawn point left, it immediately loses.
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED item_armor_large (.4 .8 .4) (-30 -30 0) (30 30 32) FLOATING
+Large Armor (default 100 armor points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 30)
+armorvalue: amount of armor it gives (default: 100 (g_pickup_armorlarge))
+max_armorvalue: max of armor it increases to (default: 999 (g_pickup_armorlarge_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_a25.md3"
+*/
+
+/*QUAKED item_armor_big (.4 .8 .4) (-30 -30 0) (30 30 32) FLOATING
+Big Armor (default 50 armor points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 20)
+armorvalue: amount of armor it gives (default: 50 (g_pickup_armorlarge))
+max_armorvalue: max of armor it increases to (default: 999 (g_pickup_armorlarge_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_a50.md3"
+*/
+
+/*QUAKED item_armor_medium (.4 .8 .4) (-30 -30 0) (30 30 32) FLOATING
+Medium Armor (default 25 armor points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 20)
+armorvalue: amount of armor it gives (default: 25 (g_pickup_armormedium))
+max_armorvalue: max of armor it increases to (default: 999 (g_pickup_armormedium_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_armormedium.md3"
+*/
+
+/*QUAKED item_armor_small (.4 .8 .4) (-30 -30 0) (30 30 32) FLOATING
+Small Armor (default 5 armor points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 15)
+armorvalue: amount of armor it gives (default: 5 (g_pickup_armorsmall))
+max_armorvalue: max of armor it increases to (default: 999 (g_pickup_armorsmall_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_a1.md3"
+*/
+
+/*QUAKED item_bullets (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Machine Gun ammo
+-------- KEYS --------
+ammo_nails: bullets gained by this item (if unset, g_pickup_nails is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/a_bullets.md3"
+*/
+
+/*QUAKED item_cells (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Nex, Electro and Crylink ammo
+-------- KEYS --------
+ammo_cells: cells gained by this item (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/a_cells.md3"
+*/
+
+/*QUAKED item_flag_team1 (1 0 0) (-32 -32 0) (32 32 74) 
+CTF flag for team one (Red). Use more than one if you really insist.
+-------- KEYS --------
+model: model to use
+scale: scaling factor (DO set this when using your own model!)
+noise: sound played when flag is picked up
+noise1: sound played when flag is returned
+noise2: sound played when flag is captured
+noise3: sound played when flag is lost in the field and respawns itself
+-------- ZBQRY SBE ENQVNAG BAYL - QB ABG FRG GUVF NF N XRL --------
+zbqry="zbqryf/pgs/enqvnag/synt_erq_enqvnag.zq3"
+*/
+
+/*QUAKED item_flag_team2 (0 0 1) (-32 -32 0) (32 32 74) 
+CTF flag for team two (Blue). Use more than one if you really insist.
+-------- KEYS --------
+model: model to use
+scale: scaling factor (DO set this when using your own model!)
+noise: sound played when flag is picked up
+noise1: sound played when flag is returned
+noise2: sound played when flag is captured
+noise3: sound played when flag is lost in the field and respawns itself
+-------- ZBQRY SBE ENQVNAG BAYL - QB ABG FRG GUVF NF N XRL --------
+zbqry="zbqryf/pgs/enqvnag/synt_oyhr_enqvnag.zq3"
+*/
+
+/*QUAKED item_health_large (.9 .3 .3) (-30 -30 0) (30 30 48) FLOATING
+Large Health (default 50 health points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 20)
+health: amount of health it gives (default: 50 (g_pickup_healthlarge))
+max_health: max of health it increases to (default: 999 (g_pickup_healthlarge_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_h50.md3"
+*/
+
+/*QUAKED item_health_medium (.9 .3 .3) (-30 -30 0) (30 30 48) FLOATING
+Medium Health (default 25 health points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 15)
+health: amount of health it gives (default: 25 (g_pickup_healthmedium))
+max_health: max of health it increases to (default: 999 (g_pickup_healthmedium_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_h25.md3"
+*/
+
+/*QUAKED item_health_mega (.9 .3 .3) (-30 -30 0) (30 30 48) FLOATING
+Mega Health (default 100 health points)
+In Minstagib, this randomly turns into either an invisibility, an extra lives or a speed power-up with a default respawn time of 120.
+-------- KEYS --------
+respawntime: time till it respawns (default: 30)
+health: amount of health it gives (default: 100 (g_pickup_healthmega))
+max_health: max of health it increases to (default: 999 (g_pickup_healthmega_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_h100.md3"
+*/
+
+/*QUAKED item_health_small (.9 .3 .3) (-30 -30 0) (30 30 48) FLOATING
+Small Health (default 5 health points)
+-------- KEYS --------
+respawntime: time till it respawns (default: 15)
+health: amount of health it gives (default: 5 (g_pickup_healthsmall))
+max_health: max of health it increases to (default: 5 (g_pickup_healthsmall_max))
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_h1.md3"
+*/
+
+/*QUAKED item_invincible (.3 .3 1) (-30 -30 0) (30 30 48) FLOATING
+Strong Shield
+In Minstagib, this randomly turns into either an invisibility, an extra lives or a speed power-up with a default respawn time of 120.
+-------- KEYS --------
+respawntime: time till it respawns (default: 120)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_invincible.md3"
+*/
+
+/*QUAKED item_minst_cells (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Minstagib ammo.
+Always contains 5 (g_minstagib_ammo_drop) shots.
+It only appears when playing Minstagib and prevents auto-replacement of weapon_nex & weapon_rocketlauncher when used.
+-------- KEYS --------
+respawntime: time till it respawns (default: 45)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/a_cells.md3"
+*/
+
+/*QUAKED item_rockets (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Rocket Launcher, Hagar and Mortar ammo
+-------- KEYS --------
+ammo_rockets: rockets gained by this item (if unset, g_pickup_rockets is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/a_rockets.md3"
+*/
+
+/*QUAKED item_shells (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Shotgun ammo
+-------- KEYS --------
+ammo_shells: shells gained by this item (if unset, g_pickup_shells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/a_shells.md3"
+*/
+
+/*QUAKED item_strength (.3 .3 1) (-30 -30 0) (30 30 48) FLOATING
+Strength aka Quad damage
+In Minstagib, this randomly turns into either an invisibility, an extra lives or a speed power-up with a default respawn time of 120.
+-------- KEYS --------
+respawntime: time till it respawns (default: 120)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_strength.md3"
+*/
+
+/*QUAKED light (.65 .65 1) (-8 -8 -8) (8 8 8) LINEAR NOANGLE - - NOGRIDLIGHT
+Non-displayed point light source. The -pointscale and -scale arguments to Q3Map2 affect the brightness of these lights. The -skyscale argument affects brightness of entity sun lights.
+Maximum intensity (in a radius 16 sphere around the light): regular lights have light/256, linear lights have light/8000-16*fade.
+Falloff radius to a negligible light amount: regular lights have light have 16*sqrt(light), linear lights have light/(fade*8000).
+By this you see that you HAVE to specify fade for a linear light... use values below 0.01 there.
+-------- KEYS --------
+light: intensity factor (default: 300). A linear
+_color: weighted RGB value of light color (default white - 1.0 1.0 1.0).
+target: Lights pointed at a target will be spotlights.
+radius: radius of a spotlight at the target point (default: 64)
+_anglescale: scales angle attenuation
+fade: Fade factor of light attenuation of linear lights. Linear lights completely vanish at distance light/(fade*8000), so if you want the light to vanish at distance X, specify light/(8000*X) here.
+_filterradius: filter radius for this light, similar to -light -filter
+_sun: if 1, this light is an infinite sun light
+_samples: number of samples to use to get soft shadows from a light
+_deviance: position deviance of the samples of a regular light (distributes the light samples in a cube of side length 2*_deviance around the origin), or angle deviance of the sun light samples in radians
+-------- SPAWNFLAGS --------
+LINEAR: Use a linear falloff. Default is inverse distance squared (more realistic).
+NOANGLE: Ignore angle attenuation.
+NOGRIDLIGHT: Do not affect the light grid (dynamic entity lighting).
+*/
+
+/*QUAKED lightJunior (.65 .65 1) (-8 -8 -8) (8 8 8) LINEAR NOANGLE
+Non-displayed point light source that JUST APPLIES TO THE LIGHT GRID. No idea what this is good for. The -pointscale and -scale arguments to Q3Map2 affect the brightness of these lights. The -skyscale argument affects brightness of entity sun lights.
+Maximum intensity (in a radius 16 sphere around the light): regular lights have light/256, linear lights have light/8000-16*fade.
+Falloff radius to a negligible light amount: regular lights have light have 16*sqrt(light), linear lights have light/(fade*8000).
+By this you see that you HAVE to specify fade for a linear light... use values below 0.01 there.
+-------- KEYS --------
+light: intensity factor (default: 300). A linear
+_color: weighted RGB value of light color (default white - 1.0 1.0 1.0).
+target: Lights pointed at a target will be spotlights.
+radius: radius of a spotlight at the target point (default: 64)
+_anglescale: scales angle attenuation
+fade: Fade factor of light attenuation of linear lights. Linear lights completely vanish at distance light/(fade*8000), so if you want the light to vanish at distance X, specify light/(8000*X) here.
+_filterradius: filter radius for this light, similar to -light -filter
+_sun: if 1, this light is an infinite sun light
+_samples: number of samples to use to get soft shadows from a light
+_deviance: position deviance of the samples of a regular light (distributes the light samples in a cube of side length 2*_deviance around the origin), or angle deviance of the sun light samples in radians
+-------- SPAWNFLAGS --------
+LINEAR: Use a linear falloff. Default is inverse distance squared (more realistic).
+NOANGLE: Ignore angle attenuation.
+*/
+
+/*QUAKED misc_laser (.5 .5 .5) (-8 -8 -8) (8 8 8) START_ON FINITE
+Laser beam emitter. Note that for the laser to be deadly, it has to start OUTSIDE the player's collision box. To ensure this, you may want to put this entity inside the walls (or directly on their surface), or cover it with a playerclip brush.
+-------- KEYS --------
+target: target_position the laser targets (may be another entity, preferably target_position, possibly controlled by misc_follow)
+mdl: name of particle effect for the beam end point (see effectinfo.txt; default is laser_deadly if dmg is set, and none if not)
+colormod: color of the laser beam (default: red, that is, 1 0 0)
+dmg: damage inflicted by the beam per second, or -1 for an instant-death ray
+targetname: name to target this (then its state is toggled)
+alpha: when set, makes a dark laser of the given strength; may be combined with colormod
+scale: scales the beam thickness (default 1)
+modelscale: scales the dynamic light radius at the endpoint (default 1, -1 to turn off)
+-------- SPAWNFLAGS --------
+START_ON: when targeted, the laser will start switched on
+FINITE: the laser does not extend over its target like light would do, but stops there (takes more bandwidth)
+-------- NOTES --------
+Use trigger_monoflop if you want the laser to turn off for a while, then turn back on.
+When the laser's target has itself target set, its targets are triggered when someone enters or leaves the laser.
+*/
+
+/*QUAKED misc_model (1 .5 .25) (-16 -16 -16) (16 16 16) - SOLID - EXTRUDE_NORMALS EXTRUDE_TERRAIN COLOR_TO_ALPHA
+Generic placeholder for inserting MD3 models in game. Requires compilation of map geometry to be added to level. If the map is compiled with Q3Map2, then ASE, 3DS, OBJ and other model formats are supported.
+-------- Q3MAP2 KEYS --------
+model: file name of model to include
+_frame: frame of model to include
+_remap: string of the form from;to specifying which texture name of the model to replace by which shader; * is allowed. Any key starting with this prefix will work, so if you need more remappings, create _remap2, etc.
+angle: view direction of the model
+angles: view direction of the model in PITCH YAW ROLL
+modelscale: scaling factor
+modelscale_vec: scaling vector for non-uniform scaling
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_lightmapscale: light map resolution factor
+_celshader: the cel shader for this
+-------- SPAWNFLAGS --------
+SOLID: make the model solid
+EXTRUDE_NORMALS: for converting triangles to clip brushes, extrude along the model normals (by default, extrusion happens in a coordinate axis direction that is decided per triangle)
+EXTRUDE_TERRAIN: always extrude downwards (for terrain)
+COLOR_TO_ALPHA: use the color value as alpha (for terrain blending)
+*/
+
+/*QUAKED misc_gamemodel (0 .5 .8) (-8 -8 -8) (8 8 8) ALIGN_ORIGIN ALIGN_BOTTOM
+A way to load models from a map by the engine (e.g. self-animated zym models).
+Is non-solid by default.
+The keys below actually apply to most engine-loaded model entities as they are engine features; however, they are described here as they aren't overridden by game code in misc_gamemodel. Its q3map2 keys below will work on any brush entity!
+-------- KEYS --------
+model: when used as a point entity, file name of model to load; when used as a brush entity, do not specify that
+frame: animation frame to play (for self-animated zym models)
+skin: number of skin to load (when model is used)
+movetype: way in which it moves: one of 0 = NONE, 1 = ANGLENOCLIP, 2 = ANGLECLIP, 3 = WALK, 4 = STEP, 5 = FLY, 6 = TOSS, 7 = PUSH, 8 = NOCLIP, 9 = FLYMISSILE, 10 = BOUNCE, 11 = BOUNCEMISSILE
+solid: solidity: one of 0 = NOT, 1 = TRIGGER, 2 = BBOX, 3 = SLIDEBOX, 4 = BSP, 5 = CORPSE
+avelocity: vector giving its angular velocity (useful for spinning models)
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+velocity: when movetype isn't 0, initial velocity vector
+angles: initial looking direction
+modelscale: scaling factor
+effects: sum of 1 = BRIGHTFIELD, 4 = BRIGHTLIGHT, 8 = DIMLIGHT, 32 = ADDITIVE, 64 = BLUE, 128 = RED, 512 = FULLBRIGHT, 1024 = FLAME, 2048 = STARDUST, 4096 = NOSHADOW, 8192 = NODEPTHTEST, 32768 = DOUBLESIDED, 8388608 = NOMODELFLAGS (ignores the following coming from a model file), 16777216 = ROCKET, 33554432 = GRENADE, 67108864 = GIB, 134217728 = ROTATE, 268435456 = TRACER, 536870912 = ZOMGIB, 1073741824 = TRACER2, -2147483648 = TRACER3
+loddistance1: distance after which to show the first LOD model replacement (default: 1000)
+loddistance2: distance after which to show the second LOD model replacement (default: 2000)
+lodmodel1: file name of the first LOD model replacement
+lodmodel2: file name of the second LOD model replacement
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature.
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+cvarfilter: either a + sign and a space separated list of conditions, or a - sign and the same for an inverted filter. The conditions are ALWAYS combined with AND! Possible conditions are: "cvar==value", "cvar!=value", "cvar<value", "cvar>value", "cvar<=value", "cvar>=value", "cvar===string", "cvar!==string", "cvar", "!cvar". Ridiculous example filter: "-g_balance_health_start<150 g_balance_armor_start==0" spawns an item only if start health is at least 150 or start armor is not 0. Other ideas: "+g_campaign" and "-g_campaign" for enabling/disabling items when the map is played as part of the campaign.
+-------- SPAWNFLAGS --------
+ALIGN_ORIGN: align the origin to the surface below the model
+ALIGN_BOTTOM: align the bottom of the model to the surface below it
+*/
+
+/*QUAKED func_illusionary (0 .5 .8) ? 
+NOTE: THIS ENTITY IS BROKEN REGARDING CLIENT AND PROJECTILE PREDICTION. DO NOT USE IT. USE NONSOLID SHADERS OR FUNC_CLIENTILLUSIONARY INSTEAD.
+A non-solid brush entity. Use func_wall if you want it solid.
+The keys below actually apply to most brush entities as they are engine features; however, they are described here as they aren't overridden by game code in misc_models. Its q3map2 keys below will work on any brush entity!
+-------- KEYS --------
+movetype: way in which it moves: one of 0 = NONE, 1 = ANGLENOCLIP, 2 = ANGLECLIP, 3 = WALK, 4 = STEP, 5 = FLY, 6 = TOSS, 7 = PUSH, 8 = NOCLIP, 9 = FLYMISSILE, 10 = BOUNCE, 11 = BOUNCEMISSILE
+avelocity: vector giving its angular velocity (useful for spinning models)
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+velocity: when movetype isn't 0, initial velocity vector
+angles: initial looking direction
+effects: sum of 1 = BRIGHTFIELD, 4 = BRIGHTLIGHT, 8 = DIMLIGHT, 32 = ADDITIVE, 64 = BLUE, 128 = RED, 512 = FULLBRIGHT, 1024 = FLAME, 2048 = STARDUST, 4096 = NOSHADOW, 8192 = NODEPTHTEST, 32768 = DOUBLESIDED, 8388608 = NOMODELFLAGS (ignores the following coming from a model file), 16777216 = ROCKET, 33554432 = GRENADE, 67108864 = GIB, 134217728 = ROTATE, 268435456 = TRACER, 536870912 = ZOMGIB, 1073741824 = TRACER2, -2147483648 = TRACER3
+loddistance1: distance after which to show the first LOD model replacement (default: 1000)
+loddistance2: distance after which to show the second LOD model replacement (default: 2000)
+lodtarget1: targetname of the first LOD model entity (can be used instead of lodmodel1 to use a brush model instead)
+lodtarget2: targetname of the second LOD model entity (can be used instead of lodmodel2 to use a brush model instead)
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature. Works only with _shirt and _pants textures.
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+-------- Q3MAP2 KEYS --------
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_clone: copies brushes from entity with identical _clonename. Still needs a single brush that will get replaced.
+_clonename: template name so one can clone from it
+min: override automatically found minimum coordinate bounds
+max: override automatically found maximum coordinate bounds
+targetname: if targeted by a misc_model, its brushes get inserted into this
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+*/
+
+/*QUAKED func_wall (0 .5 .8) ? 
+A solid brush entity. Use func_clientillusionary if you want it non-solid.
+The keys below actually apply to most brush entities as they are engine features; however, they are described here as they aren't overridden by game code in misc_models. Its q3map2 keys below will work on any brush entity!
+-------- KEYS --------
+movetype: way in which it moves: one of 0 = NONE, 1 = ANGLENOCLIP, 2 = ANGLECLIP, 3 = WALK, 4 = STEP, 5 = FLY, 6 = TOSS, 7 = PUSH, 8 = NOCLIP, 9 = FLYMISSILE, 10 = BOUNCE, 11 = BOUNCEMISSILE
+solid: solidity: one of 1 = TRIGGER, 2 = BBOX, 3 = SLIDEBOX, 4 = BSP, 5 = CORPSE (default: 4, any other value causes prediction problems and should not be used until further notice)
+avelocity: vector giving its angular velocity (useful for spinning models)
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+velocity: when movetype isn't 0, initial velocity vector
+angles: initial looking direction
+effects: sum of 1 = BRIGHTFIELD, 4 = BRIGHTLIGHT, 8 = DIMLIGHT, 32 = ADDITIVE, 64 = BLUE, 128 = RED, 512 = FULLBRIGHT, 1024 = FLAME, 2048 = STARDUST, 4096 = NOSHADOW, 8192 = NODEPTHTEST, 32768 = DOUBLESIDED, 8388608 = NOMODELFLAGS (ignores the following coming from a model file), 16777216 = ROCKET, 33554432 = GRENADE, 67108864 = GIB, 134217728 = ROTATE, 268435456 = TRACER, 536870912 = ZOMGIB, 1073741824 = TRACER2, -2147483648 = TRACER3
+loddistance1: distance after which to show the first LOD model replacement (default: 1000)
+loddistance2: distance after which to show the second LOD model replacement (default: 2000)
+lodtarget1: targetname of the first LOD model entity (can be used instead of lodmodel1 to use a brush model instead)
+lodtarget2: targetname of the second LOD model entity (can be used instead of lodmodel2 to use a brush model instead)
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature. Works only with _shirt and _pants textures.
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+-------- Q3MAP2 KEYS --------
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_clone: copies brushes from entity with identical _clonename. Still needs a single brush that will get replaced.
+_clonename: template name so one can clone from it
+min: override automatically found minimum coordinate bounds
+max: override automatically found maximum coordinate bounds
+targetname: if targeted by a misc_model, its brushes get inserted into this
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+*/
+
+/*QUAKED misc_clientmodel (0 .5 .8) (-8 -8 -8) (8 8 8) ALIGN_ORIGIN ALIGN_BOTTOM
+A way to load models from a map by the engine (e.g. self-animated zym models) on client side.
+Is non-solid by default.
+-------- KEYS --------
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+angles: initial looking direction
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature. Works only with _shirt and _pants textures.
+bgmscript: emitter class from the BGM script (if prefixed with <, movedir is treated as an angle value)
+bgmscriptattack: attack time of the effect strength (0 to 3.9)
+bgmscriptdecay: decay time of the effect strength (0 to 3.9)
+bgmscriptsustain: sustain level of the effect strength (0.1 to 1, set to -1 to disable sustain)
+bgmscriptrelease: release time of the effect strength (0 to 3.9)
+movedir: vector by which the entity moves when "pressed" by the bgmscript
+lip: alpha change when "pressed" by the bgmscript (if > 0, it fades in when pressed, if < 0, it fades out when pressed)
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+-------- SPAWNFLAGS --------
+ALIGN_ORIGN: align the origin to the surface below the model
+ALIGN_BOTTOM: align the bottom of the model to the surface below it
+*/
+
+/*QUAKED func_clientillusionary (0 .5 .8) ? 
+A client-side non-solid brush entity. Use func_wall if you want it solid.
+-------- KEYS --------
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+angles: initial looking direction
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature. Works only with _shirt and _pants textures.
+bgmscript: emitter class from the BGM script
+bgmscriptattack: attack time of the effect strength (0 to 3.9)
+bgmscriptdecay: decay time of the effect strength (0 to 3.9)
+bgmscriptsustain: sustain level of the effect strength (0.1 to 1, set to -1 to disable sustain)
+bgmscriptrelease: release time of the effect strength (0 to 3.9)
+movedir: vector by which the entity moves when "pressed" by the bgmscript
+lip: alpha change when "pressed" by the bgmscript (if > 0, it fades in when pressed, if < 0, it fades out when pressed)
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+-------- Q3MAP2 KEYS --------
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_clone: copies brushes from entity with identical _clonename. Still needs a single brush that will get replaced.
+_clonename: template name so one can clone from it
+min: override automatically found minimum coordinate bounds
+max: override automatically found maximum coordinate bounds
+targetname: if targeted by a misc_model, its brushes get inserted into this
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+*/
+
+/*QUAKED func_clientwall (0 .5 .8) ? 
+NOTE: THIS ENTITY IS IN MOST USE CASES BROKEN REGARDING CLIENT AND PROJECTILE PREDICTION. DO NOT USE IT. USE FUNC_WALL INSTEAD.
+A client-side solid brush entity. Use func_clientillusionary if you want it non-solid.
+-------- KEYS --------
+solid: solidity: one of 1 = TRIGGER, 2 = BBOX, 3 = SLIDEBOX, 4 = BSP, 5 = CORPSE (default: 4, any other value causes prediction problems and should not be used until further notice)
+scale: scale factor of the model (range: 0.0625 to 15.9375)
+colormap: 1024 + 16 * pantscolor + shirtcolor
+angles: initial looking direction
+targetname: when invoking it by a button etc., it changes the color to the initiator of the action (e.g. the one pressing a button). In Onslaught, this can be used to color control points for team who owns them. In other game types, this can be used as a fun feature. Works only with _shirt and _pants textures.
+bgmscript: emitter class from the BGM script
+bgmscriptattack: attack time of the effect strength (0 to 3.9)
+bgmscriptdecay: decay time of the effect strength (0 to 3.9)
+bgmscriptsustain: sustain level of the effect strength (0.1 to 1, set to -1 to disable sustain)
+bgmscriptrelease: release time of the effect strength (0 to 3.9)
+movedir: vector by which the entity moves when "pressed" by the bgmscript
+lip: alpha change when "pressed" by the bgmscript (if > 0, it fades in when pressed, if < 0, it fades out when pressed)
+originjitter: a vector describing a random offset this entity will be moved on initial spawn. This corresponds to the "origin" field. Works on any non-q3map2-only entity.
+anglesjitter: a vector in the order "pitch yaw roll" describing a random angles change on this entity on initial spawn. The value 180 180 180 makes the angles entirely random and uniformly distributed (among euler angles). This corresponds to the "angles" field. Works on any non-q3map2-only entity.
+anglejitter: a float describing a random yaw angle change on this entity on initial spawn. The value 180 makes the yaw angle entirely random (maybe good for items). This corresponds to the "angle" field. Works on any non-q3map2-only entity.
+gametypefilter: either a + sign and a comma separated list of game types or the aliases "teams" and "noteams" to ONLY show the entity in the listed game types, or a - sign and a comma separated list of game types or the aliases "teams" and "noteams" to NOT show the entity in the listed game types. The syntax is the same as in sbar_columns_set strings. Works on any non-q3map2-only entity.
+-------- Q3MAP2 KEYS --------
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_clone: copies brushes from entity with identical _clonename. Still needs a single brush that will get replaced.
+_clonename: template name so one can clone from it
+min: override automatically found minimum coordinate bounds
+max: override automatically found maximum coordinate bounds
+targetname: if targeted by a misc_model, its brushes get inserted into this
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+*/
+
+/*QUAKED misc_teleporter_dest (1 .5 .25) (-16 -16 -24) (16 16 45) 
+Teleport destination location point for trigger_teleport entities. Do not let it touch the floor, but place it slightly higher (like, 16 units above) for better flow when jumping through it.
+-------- KEYS --------
+targetname: make the trigger_teleporter point to this.
+target: target to activate when a teleporter targeting this is used
+angle: direction in which player will look when teleported, OR use
+angles: pitch and yaw when coming out of the teleporter (also specifies the direction the player will aim when coming out)
+cnt: weight for random selection, in case a teleporter points at multiple misc_teleporter_dest
+speed: maximum speed cap for the teleported player (if -1, teleported players will have no speed)
+*/
+
+/*QUAKED onslaught_controlpoint (0 .5 .8) (-32 -32 0) (32 32 128) 
+Control point.  Be sure to give this enough clearance so that the shootable part has room to exist
+This should link to an onslaught_controlpoint entity or onslaught_generator entity.
+-------- KEYS --------
+targetname: name that onslaught_link entities will use to target this.
+target: target any entities that are tied to this control point, such as vehicles and buildable structure entities.
+message: name of this control point (should reflect the location in the map, such as "center bridge", "north tower", etc)
+*/
+
+/*QUAKED onslaught_generator (0 .5 .8) (-32 -32 -24) (32 32 64) 
+Base generator.
+
+onslaught_link entities can target this.
+-------- KEYS --------
+team: team that owns this generator (5 = red, 14 = blue, etc), MUST BE SET.
+targetname: name that onslaught_link entities will use to target this.
+*/
+
+/*QUAKED onslaught_link (0 .5 .8) (-16 -16 -16) (16 16 16) 
+Link between control points.
+
+This entity targets two different onslaught_controlpoint or onslaught_generator entities, and suppresses shielding on both if they are owned by different teams.
+-------- KEYS --------
+target: first control point.
+target2: second control point.
+*/
+
+/*QUAKED path_corner (.5 .3 0) (-8 -8 -8) (8 8 8) 
+Path corner entity that func_train will follow.
+All path_corner entities of a train have to connect in a circular manner, while the func_train shall point to one of the path_corners (ideally the one at the train's starting point)
+-------- KEYS --------
+target: point to next path_corner in the path.
+targetname: the train following the path or the previous path_corner in the path points to this.
+speed: speed of func_train while moving to this path corner. If unset, the value from the func_train will be used.
+wait: number of seconds func_train will pause on this path corner before moving to next path corner (default: 0.1; to not wait, set this to -1
+*/
+
+/*QUAKED runematch_spawn_point (.3 .3 1) (-16 -16 -16) (16 16 16) 
+Spawn point for runes in a runematch.
+Runematch can work without runes also, it then spawn runes at random safe locations.
+*/
+
+/*QUAKED target_assault_roundend (1 0 0) (-8 -8 -8) (8 8 8) 
+This entity ends the current assault round if triggered or if the timelimit is reached.
+Ending a round means swapping attacker/defender teams, resetting objectives and rewarding the winning team.
+Every assault map needs this entity. There should only be one per map.
+-------- KEYS --------
+targetname: Name to target this entity
+*/
+
+/*QUAKED target_assault_roundstart (.5 0 .5) (-8 -8 -8) (8 8 8) 
+This entity triggers its targets whenever a new assault round is started. This can be used to e.g. activate the first objective.
+-------- KEYS --------
+target: targetname of entities to be enabled/triggered on round start (e.g. the first target_objective)
+target2: targetname of entities to be enabled/triggered on round start (e.g. the func_assault_destructibles targeting the target_objective)
+target3: targetname of entities to be enabled/triggered on round start
+target4: targetname of entities to be enabled/triggered on round start
+*/
+
+/*QUAKED target_objective (.5 0 .5) (-8 -8 -8) (8 8 8) 
+target_objective controls an objective. Once triggered the objective is active and has 100 "health" points. If this "health" falls below zero it is assumed this objective has been fulfilled and entities targeted will be triggered (e.g. to activate the next objective or to end this round). Use target_objective_decrease to decrease the objective health.
+-------- KEYS --------
+target: targetname of entities to be enabled/triggered on objective fulfilling (e.g. the next target_objective, or target_assault_roundend)
+target2: targetname of entities to be enabled/triggered on objective fulfilling (e.g. the func_assault_destructibles targeting the target_objective)
+target3: targetname of entities to be enabled/triggered on objective fulfilling
+target4: targetname of entities to be enabled/triggered on objective fulfilling
+targetname: targetname for this entity so it can be triggered by other entities.
+*/
+
+/*QUAKED target_objective_decrease (0 1 0) (-8 -8 -8) (8 8 8) 
+When triggered decreases health of the targeted target_objective by the amount specified in dmg. Remember, target_objective has 100 health points and is considered conquered if health falls below zero.
+If you want e.g. two events to happen to conquer an objective you'd need two target_objective_decrease, each with a value for cnt of e.g. 51. To show attackers and defenders where to go, target_objective_decrease will show a fitting sprite ("Defend" to defenders, "Destroy"/"Push" to attackers) which can be seen through walls.
+-------- KEYS --------
+target: The targetname of the target_objective you want to manipulate.
+targetname: Name for other entities to target this entity.
+dmg: The amount of "health"-points you want to subtract from the objective health. Defaults to 101. Also used as score for triggering this objective.
+*/
+
+/*QUAKED target_position (0 .5 0) (-8 -8 -8) (8 8 8) 
+Aiming target for entities like light and trigger_push.
+-------- KEYS --------
+targetname: the entity that requires an aiming direction points to this.
+target: target to activate when a jumppad targeting this is used
+*/
+
+/*QUAKED target_speaker (0 .7 .7) (-8 -8 -8) (8 8 8) 
+Sound generating entity that plays sound files.
+If targeted, it plays the sound file every time when triggered.
+If not targeted, it loops the sound file as an ambient noise.
+-------- KEYS --------
+noise: path/name of .wav/.ogg file to play
+targetname: the activating button or trigger points to this.
+atten: distance attenuation of the sound (a value from 0.1 to 3.9), default is 0.5 if targeted, 3 otherwise; set to -1 for no attenuation (global sound)
+volume: volume of the sound
+*/
+
+/*QUAKED trigger_counter (.5 .5 .5) ? NOMESSAGE
+Acts as an intermediary for an action that takes multiple inputs.
+After the counter has been triggered "count" times, it will fire all of its targets and remove itself.
+-------- KEYS --------
+count: how many times this needs to be triggered to activate its targets
+target: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+delay: delay the triggering by the given time
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+-------- SPAWNFLAGS --------
+NOMESSAGE: don't print a "2 more to go..."-like message when triggered
+*/
+
+/*QUAKED trigger_delay (.5 .5 .5) (-8 -8 -8) (8 8 8) 
+Trigger that delays triggering by a given amount of time. Only one action can be waited for; if triggered again before the "wait" time expires, the timer will restart (as opposed to trigger_relay).
+-------- KEYS --------
+wait: delay the triggering by the given time
+target: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+*/
+
+/*QUAKED trigger_hurt (.5 .5 .5) ? 
+Any object touching this will be hurt.
+Has the useful effect of automatically returning flags, keys and runes when they touch it.
+-------- KEYS --------
+dmg: amount of damage to deal (default: 1000)
+message: kill message when someone gets killed by this (default: "was in the wrong place")
+message2: kill message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+*/
+
+/*QUAKED trigger_impulse (.5 .5 .5) ? 
+An accelerator/dampener/wind field.
+Can be used in two ways:
+"dampener field": just set strength to a value from 0 to 1. Entering the field will slow down to this factor.
+"accelerator field": just set strength to a value from 1 to infinity. Entering the field will accelerate by this factor.
+"wind field": set strength to the amount of velocity to add per second, and target a target_position. The field will apply force in the direction from its own origin to the target (use an origin brush to specify its own origin, or this will fail) when touched.
+"gravity field": set strength to the amount of velocity to add per second at the center, and set radius to the radius of the field. Set falloff to the desired falloff characteristics.
+-------- KEYS --------
+target: "wind field": points to the target_position to which the player will get pushed.
+strength: "wind field", "gravity field": amount of force per second to apply. "dampener/accelerator field": slowdown/speedup factor.
+falloff: "gravity field": 0 means no falloff, 1 means linear falloff (zero at the outside), 2 means inverted linear falloff (zero at the inside)
+*/
+
+/*QUAKED trigger_multiple (.5 .5 .5) ? NOTOUCH ALLENTS - - - - - - NOSPLASH
+Variable sized repeatable trigger.  Must be targeted at one or more entities.  If "health" is set, the trigger must be killed to activate each time.
+-------- KEYS --------
+health: amount of damage that has to be dealt to the trigger to activate (it then won't respond to merely touching it)
+wait: prevent triggering again for this amount of time (default: 0.2, set to -1 to wait indefinitely, or -2 to not wait at all)
+sounds: 1 to play misc/secret.wav, 2 to play misc/talk.wav, 3 to play misc/trigger1.wav
+noise: path to sound file, if you want to play something else
+target: trigger all entities with this targetname when triggered
+target2: trigger all entities with this targetname when triggered
+target3: trigger all entities with this targetname when triggered
+target4: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+delay: delay the triggering by the given time
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+-------- SPAWNFLAGS --------
+NOTOUCH: the trigger can only be triggered by other entities, not by touching or firing (you should probably use trigger_relay or trigger_delay instead)
+ALLENTS: the trigger responds to all entities, not just players (useful for targetting trigger_items)
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED trigger_once (.5 .5 .5) ? NOTOUCH - - - - - - - NOSPLASH
+Variable sized repeatable trigger.  Must be targeted at one or more entities.  If "health" is set, the trigger must be killed to activate each time.
+Basically, it's a use-once trigger_multiple.
+-------- KEYS --------
+health: amount of damage that has to be dealt to the trigger to activate (it then won't respond to merely touching it)
+sounds: 1 to play misc/secret.wav, 2 to play misc/talk.wav, 3 to play misc/trigger1.wav
+noise: path to sound file, if you want to play something else
+target: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+delay: delay the triggering by the given time
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+-------- SPAWNFLAGS --------
+NOTOUCH: the trigger can only be triggered by other entities, not by touching or firing (you should probably use trigger_relay or trigger_delay instead)
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED trigger_push (1 .5 0) ? - - INVERT_TEAM
+Jump pad. What else?
+Can be used in three ways:
+Nexuiz "target/height" way: put the target_position where the player should land, and tune height to get a nice jump path. A good starting value for height is 100.
+Q3A "target" way: put the target_position at the apex of the jump, and hope the player will land at the right spot. Good luck.
+Quake "movedir/speed" way: player will get velocity movedir * speed * 10 when using the jump pad
+-------- KEYS --------
+target: point the player will fly to when using the jump pad (use a target_position here)
+height: if height is 0, the (player's origin at the) apex of the jump will be at the target; otherwise, the apex will be abs(height) above the higher point of player's origin and the target; if positive, the apex will be reached in the jump from initial origin to target
+movedir: when target is not set, direction vector to push to
+speed: speed of jump pad (default: 1000)
+noise: sound to play when jump pad is used; default is misc/jumppad.wav; you can set it to "" to make the pad silent
+team: team that owns this jump pad (5 = red, 14 = blue, etc) (when set, only this team can teleport)
+targetname: when targeted by a func_button, pressing the button will reassign the teleporter to the team of the activator.
+-------- SPAWNFLAGS --------
+INVERT_TEAM: the team that owns the teleporter will NOT jump when touching this
+*/
+
+/*QUAKED trigger_relay (.5 .5 .5) (-8 -8 -8) (8 8 8) 
+This fixed size trigger cannot be touched, it can only be fired by other events. It can, like any other trigger, contain killtargets, targets, delays, and messages.
+One possible use is to trigger entities with more than one targetname on an action, e.g. a button. For this, set target of your button to foobar. Create two trigger_relay with targetname=foobar. Give one of the trigger_relay entities target=ent1, and give the other target=ent2.
+More than one "trigger event" can be delayed at once, as opposed to trigger_delay.
+-------- KEYS --------
+target: trigger all entities with this targetname when triggered
+target2: trigger all entities with this targetname when triggered
+target3: trigger all entities with this targetname when triggered
+target4: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+delay: delay the triggering by the given time
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+*/
+
+/*QUAKED trigger_swamp (.5 .5 .5) ? 
+Players getting into the swamp will get slowed down and damaged
+-------- KEYS --------
+dmg: damage per interval to deal (default is 5)
+swamp_interval: interval of damage when in swamp (default is 1)
+swamp_slowdown: amount of slowdown caused by the swamp (default is 0.5)
+*/
+
+/*QUAKED trigger_teleport (.5 .5 .5) ? - - INVERT_TEAM
+Touching this will teleport players to the location of the targeted misc_teleporter_dest entity.
+Note that in Nexuiz, teleporters preserve momentum of the player using them.
+-------- KEYS --------
+target: this must point to a misc_teleporter_dest entity. If it points to more than one, a destination is randomly selected on teleport.
+team: team that owns this teleporter (5 = red, 14 = blue, etc) (when set, only this team can teleport)
+targetname: when targeted by a func_button, pressing the button will reassign the teleporter to the team of the activator.
+-------- SPAWNFLAGS --------
+INVERT_TEAM: the team that owns the teleporter will NOT teleport when touching this
+*/
+
+/*QUAKED weapon_crylink (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Crylink
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_crylink.md3"
+*/
+
+/*QUAKED weapon_electro (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Electro
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_electro.md3"
+*/
+
+/*QUAKED weapon_grenadelauncher (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Mortar
+-------- KEYS --------
+ammo_rockets: initial rockets of the weapon (if unset, g_pickup_rockets is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_gl.md3"
+*/
+
+/*QUAKED weapon_hagar (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Hagar
+-------- KEYS --------
+ammo_rockets: initial rockets of the weapon (if unset, g_pickup_rockets is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_hagar.md3"
+*/
+
+/*QUAKED weapon_laser (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Laser. Note that unless you use
+  settemp_for_type all g_start_weapon_laser 0
+in your mapinfo file, everyone will already spawn with one, making this pickup useless.
+-------- KEYS --------
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_laser.md3"
+*/
+
+/*QUAKED weapon_nex (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Nex
+In Minstagib, this turns into an item_minst_cells if no explicit item_minst_cells have been placed.
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 15 * g_balance_nex_respawntime_modifier)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_nex.md3"
+*/
+
+/*QUAKED weapon_rocketlauncher (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Rocket Launcher
+In Minstagib, this turns into an item_minst_cells if no explicit item_minst_cells have been placed.
+-------- KEYS --------
+ammo_rockets: initial rockets of the weapon (if unset, g_pickup_rockets is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_rl.md3"
+*/
+
+/*QUAKED weapon_shotgun (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Shotgun. Note that unless you use
+  settemp_for_type all g_start_weapon_shotgun 0
+in your mapinfo file, everyone will already spawn with one, making this pickup useless.
+-------- KEYS --------
+ammo_shells: initial shells of the weapon (if unset, g_pickup_shells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_shotgun.md3"
+*/
+
+/*QUAKED weapon_uzi (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Machine Gun
+-------- KEYS --------
+ammo_nails: initial bullets of the weapon (if unset, g_pickup_nails is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_uzi.md3"
+*/
+
+/*QUAKED worldspawn (0 0 0) ? 
+The world.
+If you see this, the currently selected brush is not of an entity.
+-------- KEYS --------
+fog: fog parameters of the map (density red green blue alpha mindist maxdist); works just like the "fog" console command
+author: name of the author of the map, if not specified in "message". Will get copied to the "author" entry of the mapinfo file when none is present.
+message: text to print at user logon. Used for name of level. Ideally: "NAMEOFLEVEL by AUTHOR". Will get copied to the "title" and "author" entries of the mapinfo file when none is present.
+_description: one-line description of the map. Will get copied to the "description" entry of the mapinfo file when none is present.
+-------- Q3MAP2 KEYS --------
+_blocksize: vector specifying the automatic vis subdivision block size (default: 1024 1024 1024)
+gridsize: lightgrid granularity vector (default: 64 64 128)
+_color: color of the global light parameters
+_ambient: light added to all surfaces
+_mingridlight: minimum grid light
+_minlight: minimum light value on both surfaces and lightgrid
+_keepLights: do not remove light entities from the map (useful e.g. for realtime lighting)
+_floodlight: flood light parameters (red green blue distance intensity), start with 240 240 255 1024 128
+_farplanedist: range after which everything is completely invisible by fog (when fog is being used)
+_noshadersun: turn off sun defined by shaders (useful if you defined your own light entity to be a sun)
+_ignoreleaks: ignore leaks when compiling
+_lightmapscale: light map resolution factor
+_castshadows: Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting.1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.
+_receiveshadows: Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. < 1 = receive shadows ONLY from corresponding keyed entities.
+_celshader: Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.
+*/
+
+/*QUAKED trigger_race_checkpoint (0 1 0) ? NOTOUCH STRICTTRIGGER CRUSH FINISH
+A checkpoint, for the race game mode. Be sure to make them quite long, so they actually catch a player reliably!
+-------- KEYS --------
+cnt: Number of the checkpoint. 0 for start/finish line, and at least two other checkpoints have to exist. They MUST be touched in sequential order!
+message: Death message, when touching checkpoints in the wrong order.
+message2: Death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+targetname: Name of the checkpoint. info_player_race can target this to assign a spawn to a checkpoint. Also used for triggering a checkpoint by an event.
+target: when the checkpoint is passed, these entities are triggered. Useful for forcing items in certain areas using trigger_items
+race_penalty: when set, this penalty time is given if passing this checkpoint, and the checkpoint does not show up with a sprite. Useful for invisible checkpoints to detect driving around the intended checkpoint
+race_penalty_reason: reason to display when the penalty time is imposed. Default: "missing a checkpoint"
+-------- SPAWNFLAGS --------
+NOTOUCH: the checkpoint will not become active when touched, it HAS to be targeted
+STRICTTRIGGER: only trigger the targets when the checkpoint actually was reached in a valid way (that is, not when going back)
+CRUSH: the checkpoint kills when used at the wrong time
+FINISH: when set on the last checkpoint (i.e. the one with highest cnt), it is marked as finish line and the CP with cnt=0 is the start line
+*/
+
+/*QUAKED trigger_race_penalty (0 1 0) ? NOTOUCH
+A penalty trigger.
+-------- KEYS --------
+race_penalty: this penalty time is given if passing this trigger
+race_penalty_reason: reason to display when the penalty time is imposed. Default: "leaving the track"
+-------- SPAWNFLAGS --------
+NOTOUCH: the trigger will not become active when touched, it HAS to be targeted
+*/
+
+/*QUAKED info_player_race (1 0.5 0) (-16 -16 -24) (16 16 45) 
+Race spawn point.
+NOTE for race_place: when the race starts after the qualifying, the player with the fastest lap ends up at the info_player_race with race_place 1, and so on. If there are too many players, or if someone comes in later, he will spawn at an info_player_race with highest race_place. If someone dies after reaching the the starting checkpoint, he will spawn at race_place 0. So for each trigger_race_checkpoint, there must be at least one corresponding info_player_race with race_place NOT set.
+-------- KEYS --------
+target: this should point to a trigger_race_checkpoint to decide when this spawning point is active. The checkpoint has to be AFTER this spawn.
+target2: trigger all entities with this targetname when someone spawns
+cnt: weight of spawn point for random selection. Set to a lower value if you have many spawn points close together. Default value is 1.
+race_place: if target points to the trigger_race_checkpoint with cnt 0 (finish line), this sets which place the spawn corresponds to; the special value 0 stands for spawns for players who died in game, and -1 marks the spawnpoint for qualifying mode only; any race map must have spawnpoints with race_place being 1, 2, 3 or it gets marked as a frustrating map
+restriction: when 1, only bots can spawn here; when 2, only humans can spawn here (be careful with these, or the game will crash because someone cannot spawn)
+*/
+
+/*QUAKED func_pointparticles (.5 .5 .5) ? START_ON IMPULSE
+A brush that emits particles.
+-------- KEYS --------
+mdl: particle effect name from effectinfo.txt
+impulse: when positive, number of particles to emit per second; when negative; number of particles to emit per second and 64^3 block
+velocity: particle direction and speed
+waterlevel: extra velocity jitter amount
+count: particle count multiplier (per spawned particle)
+movedir: when set, trace direction (particles will then be emitted from the surface the trace hits); the length of the vector is used as strength of taking the normal of the trace into account
+noise: sound to play when the particle is emitted
+atten: distance attenuation of the sound (a value from 0.1 to 3.9), default is 0.5; set to -1 for no attenuation (global sound)
+volume: volume of the sound
+targetname: name to target this (then its state is toggled)
+bgmscript: emitter class from the BGM script
+bgmscriptattack: attack time of the effect strength (0 to 3.9)
+bgmscriptdecay: decay time of the effect strength (0 to 3.9)
+bgmscriptsustain: sustain level of the effect strength (0.1 to 1, set to -1 to disable sustain)
+bgmscriptrelease: release time of the effect strength (0 to 3.9)
+-------- SPAWNFLAGS --------
+START_ON: when targeted, the particle emitter will start switched on
+IMPULSE: only send the full amount of impulse particles when the entity is triggered
+-------- NOTES --------
+Use trigger_monoflop if you want the particles to turn off for a while, then turn back on.
+A BGM script is a .bgs file named like the map, in the maps directory. Its format is lines of the form
+  <emitter class> <time since start of background music> <0 if the emitters are to be switched off, >0 and <=1 if they are to be switched on>
+e.g.
+  smokers 4.7 1
+  smokers 4.9 0
+The lines MUST be sorted by emitter class as primary key, and by the time since start of the BGM as secondary key.
+*/
+
+/*QUAKED trigger_flipflop (.5 .5 .5) (-8 -8 -8) (8 8 8) START_ON
+"Flip-flop" trigger gate... lets only every second trigger event through
+-------- KEYS --------
+target: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+-------- SPAWNFLAGS --------
+START_ON: assume it is already turned on (so the first event is NOT passed through)
+*/
+
+/*QUAKED trigger_monoflop (.5 .5 .5) (-8 -8 -8) (8 8 8) FIXED
+"Mono-flop" trigger gate... turns trigger events into pairs of events
+-------- KEYS --------
+target: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+wait: time to wait until the "off" event is fired
+-------- SPAWNFLAGS --------
+FIXED: do pulses of fixed length (so the "off" delay is NOT extended as usual and new events are just ignored)
+*/
+
+/*QUAKED trigger_multivibrator (.5 .5 .5) (-8 -8 -8) (8 8 8) START_ON
+"Multivibrator" trigger gate... repeatedly sends trigger events. When triggered, turns on or off.
+-------- KEYS --------
+target: trigger all entities with this targetname when it goes off
+targetname: name that identifies this entity so it can be triggered
+phase: phase of the multivibrator (it is added to the time)
+wait: "on" cycle time (default: 1)
+respawntime: "off" cycle time (default: same as wait)
+-------- SPAWNFLAGS --------
+START_ON: assume it is already turned on (when targeted)
+*/
+
+/*QUAKED trigger_gamestart (.5 .5 .5) (-8 -8 -8) (8 8 8)
+Triggers once when the game starts, then no longer does anything.
+-------- KEYS --------
+target: trigger all entities with this targetname when starting the game
+target2: trigger all entities with this targetname when starting the game
+target3: trigger all entities with this targetname when starting the game
+target4: trigger all entities with this targetname when starting the game
+wait: wait so many seconds before triggering
+*/
+
+/*QUAKED misc_follow (.5 .5 .5) (-8 -8 -8) (8 8 8) ATTACH LOCAL
+Makes one entity follow another. Will not work with all entities.
+-------- KEYS --------
+target: points to the entity to move (e.g. something that won't move by itself)
+killtarget: points to the entity that is to be used as the source (e.g. a func_plat)
+message: tag name to attach to (if ATTACH is used)
+punchangle: angle modifier (if LOCAL is used, and ATTACH is not)
+-------- SPAWNFLAGS --------
+ATTACH: attachment will be used instead of MOVETYPE_FOLLOW (mostly useful for attaching stuff to ZYM models)
+LOCAL: do not untransform the coordinates (that is, the map specifies local coordinates, not global ones). Mostly useful with ATTACH.
+*/
+
+/*QUAKED weapon_minstanex (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+Placing this entity on a map kills your cat, voids the warranty on your toaster, and makes your map an unenjoyable campers' paradise.
+the MinstaGib Nex. Always kills with one shot.
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_minstanex.md3"
+*/
+
+/*QUAKED weapon_porto (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Port-O-Launch. Only can be shot once.
+Portals cannot be made on noimpact surfaces, and the portal missile will bounce on slick surfaces.
+-------- KEYS --------
+respawntime: time till it respawns (default: 120)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_porto.md3"
+*/
+
+/*QUAKED target_items (0 0 1) (-8 -8 -8) (8 8 8) AND OR ANDNOT
+Sets the items of any player who triggers this.
+For the number fields, not specifying a value means not changing it. To clear armor, you need to explicitly set "armor" to "-1".
+You may want to target this by a race checkpoint, a teleporter, or a trigger_multiple with ALLENTS set (so it removes weapons thrown through the field to avoid getting a weapon through it).
+-------- KEYS --------
+targetname: used to trigger this
+netname: space separated list of items (either weapon short names (like in g_start_weapon_* cvars), or item short names "unlimited_ammo", "unlimited_weapon_ammo", "unlimited_superweapons", "invincible", "strength", "jetpack" and "fuel_regen"
+message: message to print
+ammo_shells: amount of shells
+ammo_nails: amount of bullets
+ammo_rockets: amount of rockets
+ammo_cells: amount of cells
+ammo_fuel: amount of fuel
+health: amount of health
+armorvalue: amount of armor
+strength_finished: if "strength" is specified, the time in seconds for which the strength will hold
+invincible_finished: if "invincible" is specified, the time in seconds for which the invincibility will hold
+-------- SPAWNFLAGS --------
+AND: any items not listed will get removed, and none will get added
+OR: the player may keep items not listed
+ANDNOT: the items listed will get removed from the player
+*/
+
+/*QUAKED target_spawn (1 0 1) (-8 -8 -8) (8 8 8) - ONLOAD
+Spawns or modifies an entity when triggered.
+The entity field list is a single string of the form:
+'field' 'value' 'field' 'value' ... 'classname' 'item_bullets' ... 'field' 'value'
+The special "field" name $ calls a void(void) function, for example a spawn function.
+Special function names available are _setmodel and _setsize.
+Field values can use various variable replacements:
+$E
+$E.field
+$E.field+offset
+$E.field+offset+randomoffset
+where "E" can be self, activator, target (the entity being created/modified), killtarget, target2, target3, target4 and pusher.
+Example is a Mario-style question mark block which could throw a new weapon_nex when activated like this:
+{
+"classname" "func_button"
+"angle" "-1"
+"wait" "5"
+"target" "makenex"
+"speed" "1000"
+"lip" "64"
+...
+}
+{
+"classname" "target_spawn"
+"origin" "0 0 448"
+"targetname" "makenex"
+"message" "origin $self.origin owner $activator flags 65536 colormap $activator.colormap classname droppedweapon $ spawnfunc_weapon_nex think thrown_wep_think nextthink $time+0.5 velocity $activator.velocity velocity_z 512 movetype 3"
+}
+-------- KEYS --------
+targetname: used to trigger this
+message: entity field list
+target: when set, target_spawn edits entities, instead of creating new ones
+count: make sure no more than count entities have been created by this (refuse to spawn new ones if exceeded)
+killtarget: reference entity (can be used as $killtarget)
+target2: reference entity (can be used as $target2)
+target3: reference entity (can be used as $target3)
+target4: reference entity (can be used as $target4)
+-------- SPAWNFLAGS --------
+ONLOAD: create a first entity on map load
+*/
+
+/*QUAKED func_breakable (1 0 0) ? DISABLED INDICATE - - - - - - NOSPLASH
+This is a brush model which can be damaged.
+Once all health is consumed it'll disappear and trigger the targeted entity/entities.
+When triggered, it resets to full health, and unbreaks.
+-------- KEYS --------
+health: The damage this trigger can take
+target: The entity/entities to be triggered once this entity gets invisible
+targetname: The name other entities can use to target this entity
+mdl: particle effect name to show when destroyed
+count: particle effect multiplier
+mdl_dead: optional replacement model to show when destroyed
+debris: names of debris models to show when destroyed, separated by spaces
+noise: sound to play when destroyed
+dmg: damage to deal to the environment when destroyed
+dmg_edge: edge damage to deal to the environment when destroyed
+dmg_radius: damage radius
+dmg_force: damage force
+message: death message when a player gets hit by the explosion
+message2: death message when someone gets pushed into this (default: "was pushed into an explosion by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+debrismovetype: way in which the debris moves: one of 1 = ANGLENOCLIP, 2 = ANGLECLIP, 3 = WALK, 4 = STEP, 5 = FLY, 6 = TOSS, 7 = PUSH, 8 = NOCLIP, 9 = FLYMISSILE, 10 = BOUNCE, 11 = BOUNCEMISSILE
+debrissolid: solidity of the debris: one of 0 = NOT, 1 = TRIGGER, 2 = BBOX, 3 = SLIDEBOX, 4 = BSP, 5 = CORPSE
+debrisvelocity: initial velocity vector of the debris (static part)
+debrisvelocityjitter: initial velocity vector of the debris (random part)
+debrisavelocityjitter: initial angular velocity vector of the debris (random part)
+debristime: time till the debris fades (average)
+debristimejitter: time till the debris fades (random part)
+debrisfadetime: how long debris takes to fade
+debrisdamageforcescale: how much debris is affected by damage force (e.g. explosions)
+debrisskin: skin number of debris
+-------- SPAWNFLAGS --------
+DISABLED: do not allow damaging this until it is first activated
+INDICATE: indicate amount of damage already taken by coloring
+NOSPLASH: if set, splash damage cannot activate the door, only direct damage can (requires health to be set)
+*/
+
+/*QUAKED trigger_relay_if (0 1 0) (-8 -8 -8) (8 8 8) NEGATE
+Relays the trigger event if a cvar is set to a specified value.
+-------- KEYS --------
+target: The entity/entities to relay the trigger events to
+targetname: The name other entities can use to target this entity
+netname: The name of the cvar to check
+message: The value of the cvar to check
+count: The count of entities that must be found
+-------- SPAWNFLAGS --------
+NEGATE: trigger if the cvar does NOT match the value.
+*/
+
+/*QUAKED weapon_hlac (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Heavy Laser Assault Cannon.
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 30)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_hlac.md3"
+*/
+
+/*QUAKED weapon_hook (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the on-hand Grappling Hook.
+-------- KEYS --------
+ammo_cells: initial cells of the weapon (if unset, g_pickup_cells is used)
+respawntime: time till it respawns (default: 30)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_hookgun.md3"
+*/
+
+/*QUAKED trigger_heal (.5 .5 .5) ?
+Any object touching this will be healed.
+-------- KEYS --------
+health: health to give per second (default 10)
+max_health: max health this trigger will give (default 200)
+noise: sound file to play (use misc/null.wav to make it silent), default = item_health_medium sound
+*/
+
+/*QUAKED weapon_campingrifle (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Camping Rifle.
+-------- KEYS --------
+ammo_nails: initial bullets of the weapon (if unset, g_pickup_nails is used)
+respawntime: time till it respawns (default: 30)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_campingrifle.md3"
+*/
+
+/*QUAKED func_fourier (0 .5 .8) ?
+Solid entity that oscillates according to a sum of sine waves.
+-------- KEYS --------
+speed: amount of time in seconds for one complete oscillation cycle in the base frequency (default 4).
+height: sets the amount of travel of the oscillation movement (default 32). 
+phase: sets the start offset of the oscillation cycle. Values must be 0 < phase < 1. Any integer phase value is the same as no offset (default 0).
+noise: path/name of .wav or .ogg file to play. Use looping sounds only (e.g. sound/world/drone6.wav - See Notes).
+dmg: damage a player who gets crushed by it receives
+dmgtime: interval to apply dmg to a player who is s in the way
+message: death message when a player gets crushed
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+netname: list of <frequencymultiplier> <phase> <x> <y> <z> quadruples, separated by spaces; note that phase 0 represents a sine wave, and phase 0.25 a cosine wave (by default, it uses 1 0 0 0 1, to match func_bobbing's defaults
+*/
+
+/*QUAKED func_vectormamamam (0 .5 .8) ? PROJECT_ON_TARGETNORMAL TARGET2NORMAL_IS_DIRECTION TARGET3NORMAL_IS_DIRECTION TARGET4NORMAL_IS_DIRECTION
+Solid entity that moves according to the movement of multiple given entities (max 4)
+-------- KEYS --------
+target: first reference entity
+targetfactor: factor by which to take the first reference entity (default 1).
+targetnormal: if set, the first reference entity's location is first projected onto a plane with that normal
+target2: second reference entity
+target2factor: factor by which to take the second reference entity (default 1).
+target2normal: if set, the second reference entity's location is first projected onto a plane with that normal
+target3: third reference entity (optional)
+target3factor: factor by which to take the third reference entity (default 1).
+target3normal: if set, the third reference entity's location is first projected onto a plane with that normal
+target4: fourth reference entity (optional)
+target4factor: factor by which to take the fourth reference entity (default 1).
+target4normal: if set, the fourth reference entity's location is first projected onto a plane with that normal
+noise: path/name of .wav or .ogg file to play. Use looping sounds only (e.g. sound/world/drone6.wav - See Notes).
+dmg: damage a player who gets crushed by it receives
+dmgtime: interval to apply dmg to a player who is s in the way
+message: death message when a player gets crushed
+message2: death message when someone gets pushed into this (default: "was thrown into a world of hurt by"). The # character is replaced by the attacker name if present (and it instead does not get appended to the end)
+-------- SPAWNFLAGS --------
+PROJECT_ON_TARGETNORMAL: target's origin is projected onto the given direction vector, not on the plane perpendicular to it
+PROJECT_ON_TARGET2NORMAL: target2's origin is projected onto the given direction vector, not on the plane perpendicular to it
+PROJECT_ON_TARGET3NORMAL: target3's origin is projected onto the given direction vector, not on the plane perpendicular to it
+PROJECT_ON_TARGET4NORMAL: target4's origin is projected onto the given direction vector, not on the plane perpendicular to it
+*/
+
+/*QUAKED trigger_relay_teamcheck (.5 .5 .5) (-8 -8 -8) (8 8 8) NOTEAM_TOO INVERT
+Works similar to trigger_relay, but only relays trigger events if the team of the activator matches this entity's team
+-------- KEYS --------
+target: trigger all entities with this targetname when triggered
+target2: trigger all entities with this targetname when triggered
+target3: trigger all entities with this targetname when triggered
+target4: trigger all entities with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+delay: delay the triggering by the given time
+message: print this message to the player who activated the trigger
+killtarget: remove all entities with this targetname when triggered
+team: 5 for red, 14 for blue, 13 for yellow, 10 for pink team
+-------- SPAWNFLAGS --------
+NOTEAM_TOO: also relay events if the activator has no team set
+INVERT: only relay the event if this entity has the matching team
+*/
+
+/*QUAKED trigger_disablerelay (.5 .5 .5) (-8 -8 -8) (8 8 8) 
+Disables a trigger_relay temporarily (until triggered again)
+-------- KEYS --------
+target: disable/enable all relays with this targetname when triggered
+targetname: name that identifies this entity so it can be triggered
+*/
+
+/*QUAKED nexball_redgoal (1 0 0) ?
+Red goal. Defended by the red team.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+/*QUAKED nexball_bluegoal (0 0 1) ?
+Blue goal. Defended by the blue team.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+/*QUAKED nexball_yellowgoal (1 1 0) ?
+Yellow goal. Defended by the yellow team. Needs both red and blue goals on the map to work.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+/*QUAKED nexball_pinkgoal (1 0 1) ?
+Pink goal. Defended by the pink team. Needs red, blue and yellow goals on the map to work.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+
+/*QUAKED nexball_fault (0.6 0.1 0) ?
+This acts as a goal that always gives points to the opposing team.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+/*QUAKED nexball_out (0.1 0.6 0) ?
+When the ball touches this, it is returned.
+-------- KEYS --------
+noise: sound played when a point is scored
+-------- SPAWNFLAGS --------
+GOAL_TOUCHPLAYER: The trigger also affects ball-carrying players (the ball is then auto-dropped)
+*/
+
+/*QUAKED nexball_football (.9 .9 .9) (-16 -16 -16) (16 16 16)
+The soccer type Nexball.
+-------- KEYS --------
+model: set this if you want to use your own model
+scale: if you're using your own model, change this to scale it to 32*32*32
+noise: played when the ball bounces
+noise1: played when the ball is dropped on the map
+*/
+
+/*QUAKED nexball_basketball (.5 .2 0) (-16 -16 -16) (16 16 16)
+The basket ball type Nexball.
+-------- KEYS --------
+model: set this if you want to use your own model
+scale: if you're using your own model, change this to scale it to 32*32*32
+noise: played when the ball bounces
+noise1: played when the ball is dropped on the map
+noise2: played when the ball is stolen from the enemy
+*/
+
+/*QUAKED item_fuel (.3 .3 1) (-30 -30 0) (30 30 32) FLOATING
+Jetpack fuel
+-------- KEYS --------
+ammo_fuel: fuel units gained by this item (if unset, g_pickup_fuel is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_fuel.md3"
+*/
+
+/*QUAKED item_fuel_regen (1 .3 1) (-30 -30 0) (30 30 48) FLOATING
+Fuel regenerator
+-------- KEYS --------
+respawntime: time till it respawns (default: 120)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_fuelregen.md3"
+*/
+
+/*QUAKED item_jetpack (.3 .3 1) (-30 -30 0) (30 30 48) FLOATING
+Jetpack
+-------- KEYS --------
+ammo_fuel: fuel units gained by this item (if unset, g_pickup_fuel_jetpack is used)
+respawntime: time till it respawns (default: 120)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/items/g_jetpack.md3"
+*/
+
+/*QUAKED trigger_magicear (0 0 1) (-8 -8 -8) (8 8 8) IGNORE_SAY IGNORE_TEAMSAY IGNORE_TELL IGNORE_INVALIDTELL REPLACE_WHOLE_MESSAGE REPLACE_OUTSIDE CONTINUE NODECOLORIZE
+Triggers targets when a given magic word has been said
+-------- KEYS --------
+message: message to wait for (can start or end with * for wildcards)
+netname: replacement text (by default, no replacement is performed if empty)
+radius: radius in which the player has to be for this to match
+target: all entities with a matching targetname will be triggered.
+target2: all entities with a matching targetname will be triggered.
+target3: all entities with a matching targetname will be triggered.
+target4: all entities with a matching targetname will be triggered.
+-------- SPAWNFLAGS --------
+IGNORE_SAY: do not respond to "say" messages
+IGNORE_TEAMSAY: do not respond to "say_team" messages
+IGNORE_TELL: do not respond to "tell" messages
+IGNORE_INVALIDTELL: do not respond to "tell" messages of invalid syntax
+REPLACE_WHOLE_MESSAGE: replace the whole message by netname, or drop the message if netname is empty
+REPLACE_OUTSIDE: also perform the replacement when outside the radius (to hide the "secret word")
+CONTINUE: even if this magic ear matched, continue looking for further matches/replacements (useful for swear word filters)
+NODECOLORIZE: do not decolorize the input string before matching
+*/
+
+/*QUAKED weapon_fireball (1 0 .5) (-30 -30 0) (30 30 32) FLOATING
+the Fireball
+-------- KEYS --------
+ammo_rockets: initial rockets of the weapon (if unset, g_pickup_rockets is used)
+respawntime: time till it respawns (default: 15)
+team: out of items with the same value here, only one (random one) will spawn. Useful to put multiple items on one spot.
+cnt: weight of this item for random selection using "team". Set to a lower value for items you want to see less likely.
+-------- SPAWNFLAGS --------
+FLOATING: the item will float in air, instead of aligning to the floor by falling
+-------- MODEL FOR RADIANT ONLY - DO NOT SET THIS AS A KEY --------
+model="models/weapons/g_fireball.md3"
+*/
+
+/*QUAKED trigger_warpzone (1 .5 1) ?
+A warp zone, i.e. seamlessly connecting two parts of the map.
+One surface of this entity must have the common/warpzone shader - this will be the warp plane - the others should be common/trigger.
+Must target, or be targeted by, another trigger_warpzone with a congruent common/warpzone surface.
+Should target a target_position, or be targeted by a misc_warpzone_position.
+Should be thick enough to fit a player entity (i.e. 32 units), preferably even thicker.
+-------- KEYS --------
+target: must point to another trigger_warpzone, or...
+targetname: must be pointed to by another trigger_warpzone. Should be pointed to by a misc_warpzone_position entity, or...
+killtarget: should point to a target_position entity, or
+*/
+
+/*QUAKED misc_warpzone_position (1 .5 .25) (-8 -8 -8) (8 8 8) 
+Orientation specification for a trigger_warpzone
+-------- KEYS --------
+target: must point to a trigger_warpzone
+angles: must point perpendicular to the common/warpzone surface of the trigger_warpzone, and away from the trigger brush
+origin: must be on the common/warpzone surface of the trigger_warpzone
+*/
+
+/*QUAKED func_camera (1 .5 1) ?
+A camera, i.e. a surface that shows a view from another part of the map.
+One surface of this entity must have the common/camera shader, the others should be common/caulk.
+Must target a target_position that indicates the view to be shown (and whose angles also indicate the orientation of the view)
+-------- KEYS --------
+target: must point to a target_position
+*/
+

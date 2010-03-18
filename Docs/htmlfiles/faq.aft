@@ -1,0 +1,174 @@
+#--- AFT (Almost Free Text) source file for Nexuiz FAQ
+#--- WARNING: ALWAYS RUN AFT TWICE! (otherwise the toc is missing/not up to date)
+#--- use AFT v5.096 or later (http://www.maplefish.com/todd/aft.html)
+
+#---SET nexversion=2.5
+#---SET zipname=nexuiz-<version>.zip
+
+*Title: Nexuiz %nexversion% FAQ
+			http://nexuiz.com	http://alientrap.org
+
+------
+
+*TOC
+
+------
+
+* Troubleshooting
+
+** How do I install Nexuiz?
+Just unzip the |%zipname%| file.  You can do this with any archive program (like [7zip (http://7zip.org)]).  It's very important to keep the directory structure while unpacking (in WinZip this option is called "Use folder names").  The directory structure should look like this afterwards:
+^<<
+Nexuiz/
+|-- Docs/
+|-- data/
+|   |-- common-spog.pk3
+|   `-- data*.pk3
+|-- havoc/
+|   `-- data*.pk3
+|-- Nexuiz.app/
+|-- Nexuiz-SDL.app/
+|-- server/
+|   `-- *
+|-- sources/
+|-- *.exe
+|-- *.dll
+`-- nexuiz-linux-*
+^>>
+
+** When I start Nexuiz all I see is a black screen or a black screen with some checkered squares
+This happens when the engine can't load the data*.pk3 file or has trouble to initialize OpenGL.  The reasons could be:
+	1. you unpacked the zip file without folder names (see [How do I install Nexuiz?])
+	2. on Linux: the current directory is not your Nexuiz/ folder.  See [How can I place a shortcut to Nexuiz on my Linux desktop?] on how to fix this
+	3. on Mac: you tried to extract and move the files from a Nexuiz update and it deleted the old files.  When using the mac GUI please be sure to move only the files not the folders as that will delete the old files or use the mv console command which will not delete the old files
+	4. the engine could not initialize OpenGL.  Please install the latest drivers for your graphic card.  You will probably find one for your card there: [intel (http://intel.com)] [ati (http://ati.com)] [nvidia (http://nvidia.com)]
+	5. your download might be corrupted, please download Nexuiz again
+
+** Using Linux I only see the map but no players and items
+This happens when the engine has trouble to initialize OpenGL.  The reasons could be:
+	1. the engine could not initialize OpenGL.  Please install the latest drivers for your graphic card.  You will probably find one for your card there: [intel (http://intel.com)] [ati (http://ati.com)] [nvidia (http://nvidia.com)]
+	2. You do not have permissions needed for 3d acceleration.  Usually you need to add yourself to the group |video|, you can do that via console as root like this: |usermod -a -G video YOURUSERNAME|.  You need to logoff/in afterwards.
+
+** When I start Nexuiz my screen is flickering
+This is known to happen on Windows with Intel graphic chips and is a bug in the graphics drivers.  A workaround is to set |Flip-Policiy| to |blit|.  Open the control panel, there should be an icon called |Intel(R) GMA driver| (or something like that), double click it. Click on |3D Settings| to find the screen with those settings.
+
+** How can I speed up my frame rate?
+You can choose predefined performance settings in the |Settings / Video| menu.  |Normal| is the default, |Medium| and |Low| run faster while |High|, |Ultra| and |Ultimate| enable more features you might want to test if you have a high end graphic card.  Or you can enable/disable single features.  The greatest performance boost can be achieved by turning off dynamic lights and shadows in the |Settings / Effects| menu.  Bloom is also quite resource intensive.  Other fps boots include disabling |Deluxemapping| and |Coronas|.  On older graphics cards or on-board/notebook chips with little video ram you can try to lower the texture quality in the |Settings / Video| menu.
+Some graphic cards (mostly ATI or quite old cards) run A LOT faster if you disable the |Vertex Buffer Objects| in the |Settings / Video| menu.  An other thing that can greatly help on such cards is to disable the |OpenGL 2.0 Shaders|.  Having that option enabled is faster on most cards however that is why both are active by default.
+
+** The sound is broken, it crackles and stutters
+Try run |nexuiz-sdl.exe| instead of |nexuiz.exe| (on Windows).  Adding the command line options |-sndspeed 48000| and/or |-sndstereo| can also help on some systems (on Linux, Mac, Windows).
+
+** Mouse is too slow and sensitivity is at top (on Mac / Linux)
+Mac: The default mouse acceleration on Mac is very high and strange.  The Nexuiz defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Nexuiz defaults.  Try to disable the option |Turn off OS mouse acceleration| in the |Settings / Input| menu.  Or the same via console: |apple__mouse__noaccel 0; vid__restart| ([How do I open the console?])
+Linux: A similar problem can arise on Linux.  Its also |Turn off OS mouse acceleration| in the |Settings / Input| menu but the console command is different: |vid__dga 0; vid__restart| ([How do I open the console?])
+
+** I can't switch to 32 bit color depth (on Windows)
+Check if your desktop color depth is set to 32 bits per pixel.  If it's just set to 16, Nexuiz can't switch to 32 bit mode.
+
+** When I join a server or after a map change I see nothing but a black screen, but I can still move and shoot
+This is probably because you don't have the map that's running on the server.  As Nexuiz supports map/content download the server might not be be setup (correctly) to support this and you will have to get the map the old fashioned way.  Those servers should have a download URL in their name or welcome message.  There is also a [wiki page (http://alientrap.org/wiki/pmwiki.php?n=Main.CustomMaps)] dedicated to new maps.
+For Linux users: you need to have libcurl installed, otherwise you won't be able to download any maps.  libcurl should be available in any Linux distribution, just search for "libcurl" and install it in your distribution's package manager.
+
+** How to report crashes
+Alientrap wants to ensure everyone has a pleasant time playing Nexuiz, so if you have problems we would like to ask you to report them and thus help solve them.  Especially crash reports can be very helpful.  See below for how to contact Alientrap ([Where can i get more help?])
+
+On Mac: IS THERE AN EASY WAY?
+
+On Linux: In a xterm, |cd| into your Nexuiz installation directory, start |catchsegv ./nexuiz-linux-686-sdl -condebug -developer > crash.txt 2>&1| and give the file crash.txt to the developers.  Note that you can also use |./nexuiz-linux-686-glx| or if you have a 64bit system |./nexuiz-linux-x86__64-sdl| and |./nexuiz-linux-x86__64-glx|
+
+On Windows: Click Start->Run, and enter drwtsn32, click Ok in the next window, run Nexuiz and wait for the crash.  Then go to |C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson| there should be a file called "drwtsn32.log", give that file along with the engine's build date to the developers.  You'll see that date when you open the ingame console ([How do I open the console?]).  Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
+
+** Where can I get more help?
+Visit [the official Nexuiz forum (http://alientrap.org/forum)] there is a [support and bug report area (http://alientrap.org/forum/viewforum.php?f=3)].  Or get on [IRC (http://en.wikipedia.org/wiki/Internet__Relay__Chat)] to chat with other or ask for help.  There is the normal users channel (irc://irc.quakenet.org/nexuiz) and the developers channel (irc://irc.anynet.org/alientrap)
+
+* General questions
+
+** How do I install new maps?
+Maps usually ship as *.pk3 file.  All you have to do is to copy this file to the |Nexuiz/data/| (on Linux, Mac, Windows) OR |~/.nexuiz/data/| (on Linux, Mac) directory.
+Map packages that were downloaded from a server during playing end up in |Nexuiz/data/dlcache/| or |~/.nexuiz/data/dlcache/| and are only used till you exit Nexuiz. If you want to play them locally or use them to setup a server of your own you can "accept" the packages by moving it one level up - right next to your config.cfg.
+
+** How can I place a shortcut to Nexuiz on my Linux desktop?
+Use the script |nexuiz-linux-sdl.sh| or |nexuiz-linux-glx.sh| instead of the binaries.  The scripts will use the correct |working directory|,choose the right version (32 or 64 bit) and also allow you to start a extra X server.
+
+** How do I open the console?
+Press |\[shift]+\[escape]|.  To close it press |\[escape]|.  While playing ` or ^ will also open the console.
+
+** What console commands/variables are there?
+You can get a list of variables by entering |cvarlist| on the console ([How do I open the console?]).  |cmdlist| will give you a list of available commands.  An annotated version of that output can be found at the [Nexuiz wiki (http://alientrap.org/wiki/pmwiki.php?n=Main.ConsoleCommands)].
+
+** How can I use colors in my nickname and messages?
+Colors can be used in nicknames and chat messages via two ways: Either the simple way by typing ^ followed by a number between 0 and 9 or by typing ^x followed by three hexadecimal numbers (0-F) representing red, green and blue components of the color before the text. The second way allows for much more colors. For example if you type ^xF00message the text "message" will be displayed in red color. Simple examples:
+
+	!        !            !                        !
+	! code   ! rgb code   ! color                  !
+	!--------!-------------------------------------!
+	! ^0     ! ^x000      ! black                  !
+	!--------!-------------------------------------!
+	! ^1     ! ^xF00      ! red                    !
+	!--------!-------------------------------------!
+	! ^2     ! ^x0F0      ! green                  !
+	!--------!-------------------------------------!
+	! ^3     ! ^xFF0      ! yellow                 !
+	!--------!-------------------------------------!
+	! ^4     ! ^x00F      ! blue                   !
+	!--------!-------------------------------------!
+	! ^5     ! ^x0FF      ! cyan                   !
+	!--------!-------------------------------------!
+	! ^6     ! ^xF0F      ! magenta                !
+	!--------!-------------------------------------!
+	! ^7     ! ^xFFF      ! white                  !
+	!--------!-------------------------------------!
+	! ^8     !            ! half-transparent black !
+	!--------!-------------------------------------!
+	! ^9     ! ^x888      ! grey                   !
+	!--------!-------------------------------------!
+	!        ! ^x800      ! dark red               !
+	!--------!-------------------------------------!
+	!        ! ^x080      ! dark green             !
+	!--------!-------------------------------------!
+	!        ! ^x880      ! dark yellow            !
+	!--------!-------------------------------------!
+	!        ! ^x008      ! dark blue              !
+	!--------!-------------------------------------!
+	!        ! ^x088      ! dark cyan              !
+	!--------!-------------------------------------!
+	!        ! ^x808      ! dark magenta           !
+	!--------!-------------------------------------!
+
+** How do I watch/record demos?
+Demos are recordings of matches that you have played. To automatically record a demo each time you play enable the option |Record demos while playing| in the |Multiplayer / Demos| menu. Or if you just want to record some matches open the console and type |rec <demos/name>| before playing. That is before starting a game or connecting to a server. The demo file will then be stored in |Nexuiz/data/demos/<name>.dem| (on Windows) or |~/.nexuiz/data/demos/<name>.dem| (on Linux, Mac).
+If you downloaded a demo, copy it to |Nexuiz/data/demos/<name>.dem| (on Linux, Mac, Windows) or |~/.nexuiz/data/demos/<name>.dem| (on Linux, Mac).  You might have to create this directory if you have never recorded a demo before.
+To watch demos you can choose a demo file in the |Multiplayer / Demos| and click the play button. Also you can watch demos typing |ply <demos/name>| in the console ([How do I open the console?]). You can list all your demo files by typing |dem| on the console.  Some useful key bindings for viewing demos and making videos are listed [here (http://www.alientrap.org/forum/viewtopic.php?p=357#357)].  A simple way to automatically record demos can be found [here (http://www.alientrap.org/forum/viewtopic.php?t=90)].
+
+* Server setup
+
+** How do I start a server?
+Use the |Multiplayer / Create| menu to start a |listen server|.  You will always have to play yourself in a |listen server|.
+If you want to create a server without being forced to play yourself please take a look at the file |readme.txt| in the |Nexuiz/server/| directory where the |dedicated server| is explained.
+
+** Which ports do I have to open in firewall/forward from my router to run a server?
+The default port is 26000 UDP.  You can change that in the |Multiplayer / Create| menu or by starting Nexuiz with the parameter |-port <port>| or having a line |port <port>| in the server config file.
+If you follow the tutorial mentioned above you do not need this command line argument as it will be done in the config file created for the server.  To add the command line argument on Windows, create a new shortcut to |nexuiz.exe| or |nexuiz-dedicated.exe| and right click on it.  Select properties and |-port <port>| in the "Target:" line.  Be sure that the "Start in:" line contains the full path to your Nexuiz folder and click "OK".  The parameter will be used if you start Nexuiz via that new shortcut.
+
+** Is there some kind of rcon?
+Yes starting with Nexuiz 2.0 there is rcon (QuakeWorld compatible).  To use it you must enter |rcon__password <password>| in the server console or server config file.  The Nexuiz client has to set the same password in the same fashion.  You can then issue commands with |rcon <command>| if you are connected to the server or will have to set |rcon__address <ip/hostname>| or |rcon__address <ip/hostname>:<port>| to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
+
+** How can I kick people who are using special characters in their names?
+Enter |status| at the server console.  You will see a list of all players.  In front of their names you will see a number (the player id).  You can kick the player you don't like with |kick # <player id> <reason>| (notice the space after #).
+
+* Development
+
+** How can I create or edit Nexuiz maps?
+You need [NetRadiant (http://icculus.org/netradiant/)], a stabilized Q3 map editor. For convenience, a snapshot configured for Nexuiz is included in |extra/| for Windows and MAC-Intel, but the program is not officially supported by Alientrap.
+
+** Where can I get latest development versions of the source code?
+_Engine:_ instructions are available at http://icculus.org/twilight/darkplaces/download.html look for |Accessing the SVN server| (you will need a [svn client (http://subversion.tigris.org/project_packages.html)], beta builds are available [here (http://icculus.org/twilight/darkplaces/files/)])
+
+_Game data:_ to check out the Nexuiz svn, you'll need a [svn client (http://subversion.tigris.org/project_packages.html)].  To check out the repository with a command line svn client, do
+
+^<<
+svn co svn://svn.icculus.org/nexuiz/trunk/
+^>>
+
+To compile the game code you need [fteqcc (http://sourceforge.net/project/showfiles.php?group\_id=116842&package\_id=129507)].  Just download it and run it 3 times, once in |data/qcsrc/menu|, once in |data/qcsrc/server| and once in |data/qcsrc/client|.  Alternatively a Makefile is available in |data/| to perform directly the operation.

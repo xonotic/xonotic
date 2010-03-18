@@ -1,0 +1,56 @@
+//**********************************************************************//
+//	shaderlist.txt modified for Q3Radiant				//
+//	by Eutectic - 13 May 2000					//
+//                                                                      //
+//      Rev history:                                                    //
+//      08/11/2000
+//      TTimo - changed liquid to liquids and sky to skies for better   //
+//      consistency with the directories and actual shader names        //
+//									//
+//	Added the names of the new shader files created as a result	//
+//	of the cleanup of the old shader files so Q3Radiant will read	//
+//	and display all the shaders in the texture window.		//
+//									//
+//	SHADER FILE NAMES ADDED:					//
+//	base_door							//
+//	gothic_button							//
+//	gothic_door							//
+//**********************************************************************//
+
+// this file lists all the separate shader files
+
+common
+dsi
+e7
+el3dm1
+evil3
+evil4_techtrims
+evil5
+evil6
+evil6_floors
+evil6_lights
+evil6_support
+evil6_trims
+evil6_walls
+evil8_base
+gfx
+harlequin_sky
+hell
+kaznexctf2
+liquids
+models
+museum
+official_cmp1
+organics
+reaper
+sav-graysky1
+sav-liquids
+savdm6ish
+sfx
+skies
+skin
+stralenex1
+terrademoQ3
+test
+tznex01
+tznex03

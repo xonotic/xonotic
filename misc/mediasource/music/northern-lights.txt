@@ -1,0 +1,1 @@
+.lso file is the project file format of "logic pro"
