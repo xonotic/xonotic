@@ -1,0 +1,78 @@
+#!/bin/sh
+
+set -e
+
+repos="
+	data/xonotic-data.pk3dir
+	data/xonotic-maps.pk3dir
+	data/xonotic-music.pk3dir
+	darkplaces
+"
+
+cmd=$1
+shift
+
+d0=`pwd`
+case "$cmd" in
+	update)
+		base=`git config remote.origin.url`
+		base=${base%/xonotic.git}
+		for d in $repos; do
+			if [ -d "$d0/$d" ]; then
+				cd "$d0/$d"
+				git config remote.origin.url "$base/${d##*/}.git"
+				git pull
+				cd "$d0"
+			else
+				git clone "$base/${d##*/}.git" "$d0/$d"
+			fi
+		done
+		;;
+	checkout)
+		remote=$1
+		branch=$2
+		if [ -z "$branch" ]; then
+			branch=$remote
+			remote=origin
+		fi
+		exists=false
+		for d in $repos; do
+			cd "$d0/$d"
+			if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
+				exists=true
+				git checkout "$branch"
+			elif git rev-parse "refs/remotes/$remote/$branch" >/dev/null 2>&1; then
+				exists=true
+				git checkout --track -b "$branch" "$remote/$branch"
+			else
+				git checkout master
+			fi
+			cd "$d0"
+		done
+		"$0" branch
+		;;
+	branch)
+		for d in $repos; do
+			cd "$d0/$d"
+			r=`git symbolic-ref HEAD`
+			r=${r#refs/heads/}
+			echo "$d is at $r"
+			cd "$d0"
+		done
+		;;
+	branches)
+		for d in $repos; do
+			cd "$d0/$d"
+			echo "In $d:"
+			git branch -a | sed 's/^/  /'
+			cd "$d0"
+		done
+		;;
+	*)
+		echo "Usage:"
+		echo "  $0 update"
+		echo "  $0 branch"
+		echo "  $0 branches"
+		echo "  $0 checkout"
+		;;
+esac
