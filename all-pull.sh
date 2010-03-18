@@ -2,7 +2,7 @@
 
 set -ex
 git pull
-for x in "`pwd`/data"/*.pk3dir; do
-	cd "$x"
+for x in "`pwd`/data"/*.pk3dir/.git; do
+	cd "${x%/.git}"
 	git pull
 done
