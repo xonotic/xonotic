@@ -9,6 +9,9 @@ repos="
 	darkplaces
 "
 
+if [ "$#" = 0 ]; then
+	set -- help
+fi
 cmd=$1
 shift
 
