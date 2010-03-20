@@ -3,6 +3,7 @@
 set -e
 
 repos="
+	.
 	data/xonotic-data.pk3dir
 	data/xonotic-maps.pk3dir
 	data/xonotic-music.pk3dir
@@ -55,7 +56,13 @@ case "$cmd" in
 		"$0" branch
 		;;
 	branch)
-		if [ $# = 0 ]; then
+		remote=$1
+		branch=$2
+		if [ -z "$branch" ]; then
+			branch=$remote
+			remote=origin
+		fi
+		if [ -z "$branch" ]; then
 			for d in $repos; do
 				cd "$d0/$d"
 				r=`git symbolic-ref HEAD`
@@ -71,8 +78,9 @@ case "$cmd" in
 					echo "Branch in $d?"
 					read -r a
 				done
-				if [ x"$a" = "y" ]; then
-					git branch "$1"
+				if [ x"$a" = x"y" ]; then
+					git push "$remote" HEAD:"$branch"
+					git checkout --track -b "$branch" "$remote/$branch"
 				fi
 				cd "$d0"
 			done
@@ -93,13 +101,14 @@ case "$cmd" in
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			a=
-			while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-				git log "origin/$r".."$r"
-				echo "Push $r in $d?"
-				read -r a
-			done
-			if [ x"$a" = "y" ]; then
-				git push -u origin HEAD
+			if git log "origin/$r".."$r" | grep .; then
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Push $r in $d?"
+					read -r a
+				done
+				if [ x"$a" = x"y" ]; then
+					git push `git config "branch.$r.remote" || echo origin` HEAD
+				fi
 			fi
 			cd "$d0"
 		done
