@@ -55,13 +55,29 @@ case "$cmd" in
 		"$0" branch
 		;;
 	branch)
-		for d in $repos; do
-			cd "$d0/$d"
-			r=`git symbolic-ref HEAD`
-			r=${r#refs/heads/}
-			echo "$d is at $r"
-			cd "$d0"
-		done
+		if [ $# = 0 ]; then
+			for d in $repos; do
+				cd "$d0/$d"
+				r=`git symbolic-ref HEAD`
+				r=${r#refs/heads/}
+				echo "$d is at $r"
+				cd "$d0"
+			done
+		else
+			for d in $repos; do
+				cd "$d0/$d"
+				a=
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Branch in $d?"
+					read -r a
+				done
+				if [ x"$a" = "y" ]; then
+					git branch "$1"
+				fi
+				cd "$d0"
+			done
+			"$0" branch
+		fi
 		;;
 	branches)
 		for d in $repos; do
