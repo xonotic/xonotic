@@ -1,17 +1,14 @@
 This subdirectory contains scripts and a config file that can be used
-to start a dedicated Nexuiz (default) or Nexuiz Havoc server (differs
-in movement, weapon and other settings) on linux, mac or windows
-systems and also some tools that help with maintaining your server.
+to start a dedicated Nexuiz on linux, mac or windows systems and also 
+some tools that help with maintaining your server.
 
 You will need to copy the right script into your Nexuiz main
-directory, where the normal binaries are.  There are two scrips for
-each sytems, one to start a normal Nexuiz server and one to start a
-Nexuiz 'Havoc' server.  You then need to copy and ADJUST the config
-file which is called server.cfg.  You can copy it either into the
-Nexuiz/data directory where the big data*.pk3 file is or when running
-on linux or mac you can as well copy it into a special directory
-called '~/.nexuiz/data'.  After you have setup everything and have
-adjusted the config file you can start the server by running the
+directory, where the normal binaries are. You then need to copy and 
+ADJUST the config file which is called server.cfg.  You can copy it 
+either into the Nexuiz/data directory where the big data*.pk3 file is 
+or when running on linux or mac you can as well copy it into a special 
+directory called '~/.nexuiz/data'.  After you have setup everything and 
+have adjusted the config file you can start the server by running the
 server script.
 
 Please make sure your server is always uptodate!  Just signup the
