@@ -17,7 +17,7 @@ shift
 
 d0=`pwd`
 case "$cmd" in
-	update)
+	update|pull)
 		base=`git config remote.origin.url`
 		base=${base%/xonotic.git}
 		for d in $repos; do
@@ -87,11 +87,29 @@ case "$cmd" in
 			cd "$d0"
 		done
 		;;
+	push)
+		for d in $repos; do
+			cd "$d0/$d"
+			r=`git symbolic-ref HEAD`
+			r=${r#refs/heads/}
+			a=
+			while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+				git log "origin/$r".."$r"
+				echo "Push $r in $d?"
+				read -r a
+			done
+			if [ x"$a" = "y" ]; then
+				git push -u origin HEAD
+			fi
+			cd "$d0"
+		done
+		;;
 	*)
 		echo "Usage:"
-		echo "  $0 update"
-		echo "  $0 branch"
+		echo "  $0 pull"
+		echo "  $0 push"
 		echo "  $0 branches"
+		echo "  $0 branch"
 		echo "  $0 checkout"
 		;;
 esac
