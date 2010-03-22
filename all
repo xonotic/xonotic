@@ -20,7 +20,7 @@ d0=`pwd`
 case "$cmd" in
 	update|pull)
 		base=`git config remote.origin.url`
-		base=${base%/xonotic.git}
+		base=${base%xonotic.git}
 		for d in $repos; do
 			if [ -d "$d0/$d" ]; then
 				cd "$d0/$d"
@@ -28,13 +28,13 @@ case "$cmd" in
 					.)
 						;;
 					*)
-						git config remote.origin.url "$base/${d##*/}.git"
+						git config remote.origin.url "$base${d##*/}.git"
 						;;
 				esac
 				git pull
 				cd "$d0"
 			else
-				git clone "$base/${d##*/}.git" "$d0/$d"
+				git clone "$base${d##*/}.git" "$d0/$d"
 			fi
 		done
 		;;
