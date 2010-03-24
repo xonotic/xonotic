@@ -135,7 +135,7 @@ case "$cmd" in
 		echo "  $0 pull"
 		echo "  $0 push"
 		echo "  $0 branches"
-		echo "  $0 branch"
+		echo "  $0 branch <remote> <branchname>"
 		echo "  $0 checkout"
 		echo "  $0 compile"
 		;;
