@@ -98,7 +98,7 @@ case "$cmd" in
 		for d in $repos; do
 			cd "$d0/$d"
 			echo "In $d:"
-			git branch -a | sed 's/^/  /'
+			git branch -a | sed 's/^/  /; /->/d'
 			cd "$d0"
 		done
 		;;
@@ -119,6 +119,16 @@ case "$cmd" in
 			fi
 			cd "$d0"
 		done
+		;;
+	compile)
+		(
+			cd darkplaces
+			make nexuiz
+		)
+		(
+			cd data/xonotic-data.pk3dir
+			make
+		)
 		;;
 	*)
 		echo "Usage:"
