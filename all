@@ -39,7 +39,7 @@ case "$cmd" in
 			fi
 		done
 		;;
-	checkout)
+	checkout|switch)
 		remote=$1
 		branch=$2
 		if [ -z "$branch" ]; then
