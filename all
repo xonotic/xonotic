@@ -137,5 +137,6 @@ case "$cmd" in
 		echo "  $0 branches"
 		echo "  $0 branch"
 		echo "  $0 checkout"
+		echo "  $0 compile"
 		;;
 esac
