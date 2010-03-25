@@ -122,13 +122,45 @@ case "$cmd" in
 		;;
 	compile)
 		(
-			cd darkplaces
-			make nexuiz
-		)
-		(
 			cd data/xonotic-data.pk3dir
-			make
-		)
+			make $MAKEFLAGS
+		) || exit $?
+		(
+			if [ -z "$MAKEFLAGS" ]; then
+				if [ -f /proc/cpuinfo ]; then
+					ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
+					if [ $ncpus -gt 1 ]; then
+						MAKEFLAGS=-j$ncpus
+					fi
+				fi
+			fi
+			cd darkplaces
+			make $MAKEFLAGS sv-debug
+			make $MAKEFLAGS cl-debug
+			make $MAKEFLAGS sdl-debug
+		) || exit $?
+		;;
+	run)
+		client=-sdl
+		case "$1" in
+			sdl|glx|agl|dedicated)
+				client=-$1
+				shift
+				;;
+			wgl)
+				client=
+				shift
+				;;
+		esac
+		if ! [ -x "darkplaces/darkplaces$client" ]; then
+			if [ -x "darkplaces/darkplaces$client.exe" ]; then
+				client=$client.exe
+			else
+				echo "Client darkplaces/darkplaces$client not found, aborting"
+				exit 1
+			fi
+		fi
+		exec "darkplaces/darkplaces$client" -xonotic $@
 		;;
 	*)
 		echo "Usage:"
@@ -138,5 +170,6 @@ case "$cmd" in
 		echo "  $0 branch <remote> <branchname>"
 		echo "  $0 checkout"
 		echo "  $0 compile"
+		echo "  $0 run <client> <options>"
 		;;
 esac
