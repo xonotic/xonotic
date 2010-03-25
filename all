@@ -162,7 +162,7 @@ case "$cmd" in
 		fi
 		exec "darkplaces/darkplaces$client" -xonotic $@
 		;;
-	each)
+	each|foreach)
 		for d in $repos; do
 			cd "$d0/$d"
 			"$@"
