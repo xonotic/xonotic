@@ -162,6 +162,13 @@ case "$cmd" in
 		fi
 		exec "darkplaces/darkplaces$client" -xonotic $@
 		;;
+	each)
+		for d in $repos; do
+			cd "$d0/$d"
+			"$@"
+			cd "$d0"
+		done
+		;;
 	*)
 		echo "Usage:"
 		echo "  $0 pull"
@@ -171,5 +178,6 @@ case "$cmd" in
 		echo "  $0 checkout"
 		echo "  $0 compile"
 		echo "  $0 run <client> <options>"
+		echo "  $0 each <command>"
 		;;
 esac
