@@ -2,14 +2,17 @@
 
 set -e
 
-repos="
+repos_urls="
 	.
 	data/xonotic-data.pk3dir
 	data/xonotic-maps.pk3dir
 	data/xonotic-music.pk3dir
 	data/xonotic-nexcompat.pk3dir
 	darkplaces
+	fteqcc@git://github.com/Blub/qclib.git
 "
+
+repos=`for X in $repos_urls; do echo "${X%%@*}"; done`
 
 if [ "$#" = 0 ]; then
 	set -- help
@@ -22,14 +25,28 @@ case "$cmd" in
 	update|pull)
 		base=`git config remote.origin.url`
 		base=${base%xonotic.git}
-		for d in $repos; do
+		for dcomplete in $repos_urls; do
+			case "$dcomplete" in
+				*@*)
+					d=${dcomplete%%@*}
+					url=${dcomplete#*@}
+					switch=false
+					;;
+				*)
+					d=${dcomplete%%@*}
+					url=$base${d##*/}.git
+					switch=true
+					;;
+			esac
 			if [ -d "$d0/$d" ]; then
 				cd "$d0/$d"
 				case "$d" in
 					.)
 						;;
 					*)
-						git config remote.origin.url "$base${d##*/}.git"
+						if $switch; then
+							git config remote.origin.url "$base${d##*/}.git"
+						fi
 						;;
 				esac
 				git pull
