@@ -2,6 +2,12 @@
 
 set -e
 
+verbose()
+{
+	echo "[1m+ $@[m"
+	"$@"
+}
+
 repos_urls="
 	.
 	data/xonotic-data.pk3dir
@@ -39,20 +45,20 @@ case "$cmd" in
 					;;
 			esac
 			if [ -d "$d0/$d" ]; then
-				cd "$d0/$d"
+				verbose cd "$d0/$d"
 				case "$d" in
 					.)
 						;;
 					*)
 						if $switch; then
-							git config remote.origin.url "$base${d##*/}.git"
+							verbose git config remote.origin.url "$url"
 						fi
 						;;
 				esac
-				git pull
+				verbose git pull
 				cd "$d0"
 			else
-				git clone "$base${d##*/}.git" "$d0/$d"
+				verbose git clone "$url" "$d0/$d"
 			fi
 		done
 		;;
@@ -65,18 +71,21 @@ case "$cmd" in
 		fi
 		exists=false
 		for d in $repos; do
-			cd "$d0/$d"
+			verbose cd "$d0/$d"
 			if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
 				exists=true
-				git checkout "$branch"
+				verbose git checkout "$branch"
 			elif git rev-parse "refs/remotes/$remote/$branch" >/dev/null 2>&1; then
 				exists=true
-				git checkout --track -b "$branch" "$remote/$branch"
+				verbose git checkout --track -b "$branch" "$remote/$branch"
 			else
-				git checkout master
+				verbose git checkout master
 			fi
 			cd "$d0"
 		done
+		if ! $exists; then
+			echo "The requested branch was not found in any repository."
+		fi
 		"$0" branch
 		;;
 	branch)
@@ -103,8 +112,8 @@ case "$cmd" in
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					git push "$remote" HEAD:"$branch"
-					git checkout --track -b "$branch" "$remote/$branch"
+					verbose git push "$remote" HEAD:"$branch"
+					verbose git checkout --track -b "$branch" "$remote/$branch"
 				fi
 				cd "$d0"
 			done
@@ -131,31 +140,29 @@ case "$cmd" in
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					git push `git config "branch.$r.remote" || echo origin` HEAD
+					verbose git push `git config "branch.$r.remote" || echo origin` HEAD
 				fi
 			fi
 			cd "$d0"
 		done
 		;;
 	compile)
-		(
-			cd data/xonotic-data.pk3dir
-			make $MAKEFLAGS
-		) || exit $?
-		(
-			if [ -z "$MAKEFLAGS" ]; then
-				if [ -f /proc/cpuinfo ]; then
-					ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
-					if [ $ncpus -gt 1 ]; then
-						MAKEFLAGS=-j$ncpus
-					fi
+		if [ -z "$MAKEFLAGS" ]; then
+			if [ -f /proc/cpuinfo ]; then
+				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
+				if [ $ncpus -gt 1 ]; then
+					MAKEFLAGS=-j$ncpus
 				fi
 			fi
-			cd darkplaces
-			make $MAKEFLAGS sv-debug
-			make $MAKEFLAGS cl-debug
-			make $MAKEFLAGS sdl-debug
-		) || exit $?
+		fi
+		verbose cd "$d0/fteqcc"
+		verbose make $MAKEFLAGS
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" $MAKEFLAGS
+		verbose cd "$d0/darkplaces"
+		verbose make $MAKEFLAGS sv-debug
+		verbose make $MAKEFLAGS cl-debug
+		verbose make $MAKEFLAGS sdl-debug
 		;;
 	run)
 		client=-sdl
@@ -177,12 +184,12 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		exec "darkplaces/darkplaces$client" -xonotic $@
+		verbose "darkplaces/darkplaces$client" -xonotic $@
 		;;
 	each|foreach)
 		for d in $repos; do
-			cd "$d0/$d"
-			"$@"
+			verbose cd "$d0/$d"
+			verbose "$@"
 			cd "$d0"
 		done
 		;;
