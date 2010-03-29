@@ -184,7 +184,8 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		verbose "darkplaces/darkplaces$client" -xonotic $@
+		#verbose "darkplaces/darkplaces$client" -xonotic "$@"
+		verbose "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
 		;;
 	each|foreach)
 		for d in $repos; do
