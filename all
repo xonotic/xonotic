@@ -16,13 +16,13 @@ checkself()
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
 			msg "Rerunning the requested operation to make sure."
 			export XONOTIC_FORBID_RERUN_ALL=1
-			"$0" update
-			exec "$0" "$@"
+			exec "$@"
 		else
 			msg "Please try $0 update, and then retry your requested operation."
 			exit 1
 		fi
 	fi
+	return 0
 }
 
 verbose()
@@ -80,7 +80,7 @@ case "$cmd" in
 				esac
 				verbose git pull
 				cd "$d0"
-				checkself
+				checkself "$0" "$@"
 				cd "$d0/$d"
 				verbose git remote prune origin
 				cd "$d0"
@@ -109,7 +109,7 @@ case "$cmd" in
 				verbose git checkout master
 			fi
 			cd "$d0"
-			checkself
+			checkself "$0" "$@"
 		done
 		if ! $exists; then
 			echo "The requested branch was not found in any repository."
