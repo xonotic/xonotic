@@ -2,11 +2,32 @@
 
 set -e
 
-self=`cat "$0"`
+msg()
+{
+	echo "[1m$*"
+}
+
+self=`md5sum "$0"`
+checkself()
+{
+	self_new=`md5sum "$0"`
+	if [ x"$self" != x"$self_new" ]; then
+		msg "./all has changed."
+		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
+			msg "Rerunning the requested operation to make sure."
+			export XONOTIC_FORBID_RERUN_ALL=1
+			"$0" update
+			exec "$0" "$@"
+		else
+			msg "Please try $0 update, and then retry your requested operation."
+			exit 1
+		fi
+	fi
+}
 
 verbose()
 {
-	echo "[1m+ $@[m"
+	msg "+ $*"
 	"$@"
 }
 
@@ -58,6 +79,9 @@ case "$cmd" in
 						;;
 				esac
 				verbose git pull
+				cd "$d0"
+				checkself
+				cd "$d0/$d"
 				verbose git remote prune origin
 				cd "$d0"
 			else
@@ -85,6 +109,7 @@ case "$cmd" in
 				verbose git checkout master
 			fi
 			cd "$d0"
+			checkself
 		done
 		if ! $exists; then
 			echo "The requested branch was not found in any repository."
@@ -122,7 +147,6 @@ case "$cmd" in
 			done
 			"$0" branch
 		fi
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	branches)
 		for d in $repos; do
@@ -131,7 +155,6 @@ case "$cmd" in
 			git branch -a | sed 's/^/  /; /->/d'
 			cd "$d0"
 		done
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	push)
 		for d in $repos; do
@@ -150,7 +173,6 @@ case "$cmd" in
 			fi
 			cd "$d0"
 		done
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	compile)
 		if [ -z "$MAKEFLAGS" ]; then
@@ -169,7 +191,6 @@ case "$cmd" in
 		verbose make $MAKEFLAGS sv-debug
 		verbose make $MAKEFLAGS cl-debug
 		verbose make $MAKEFLAGS sdl-debug
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	run)
 		client=-sdl
@@ -193,7 +214,6 @@ case "$cmd" in
 		fi
 		#verbose "darkplaces/darkplaces$client" -xonotic "$@"
 		verbose "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	each|foreach)
 		for d in $repos; do
@@ -201,7 +221,6 @@ case "$cmd" in
 			verbose "$@"
 			cd "$d0"
 		done
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 	*)
 		echo "Usage:"
@@ -213,20 +232,5 @@ case "$cmd" in
 		echo "  $0 compile"
 		echo "  $0 run <client> <options>"
 		echo "  $0 each <command>"
-		export XONOTIC_FORBID_RERUN_ALL=1
 		;;
 esac
-
-self_new=`cat "$0"`
-if [ x"$self" != x"$self_new" ]; then
-	echo "./all has changed."
-	if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
-		echo "Rerunning the requested operation to make sure."
-		export XONOTIC_FORBID_RERUN_ALL=1
-		"$0" update
-		"$0" "$@"
-	else
-		echo "Please try $0 update, and then retry your requested operation."
-		exit 1
-	fi
-fi
