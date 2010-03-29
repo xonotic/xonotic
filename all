@@ -7,10 +7,10 @@ msg()
 	echo "[1m$*[m"
 }
 
-self=`md5sum "$0"`
+self=`cksum "$0"`
 checkself()
 {
-	self_new=`md5sum "$0"`
+	self_new=`cksum "$0"`
 	if [ x"$self" != x"$self_new" ]; then
 		msg "./all has changed."
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
