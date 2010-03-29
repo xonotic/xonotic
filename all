@@ -56,6 +56,7 @@ case "$cmd" in
 						;;
 				esac
 				verbose git pull
+				verbose git remote prune origin
 				cd "$d0"
 			else
 				verbose git clone "$url" "$d0/$d"
