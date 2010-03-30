@@ -3,7 +3,7 @@ sub out($$@);
 sub markmap($$$$;$)
 {
 	my ($state, $map, $pro, $total, $who) = @_;
-	open my $fh, '>>', "$ENV{HOME}/.nexuiz/__votelog.$config{irc_nick}.txt"
+	open my $fh, '>>', "$ENV{HOME}/.xonotic/__votelog.$config{irc_nick}.txt"
 		or die "votelog open: $!";
 	print $fh "@{[time()]} $config{irc_nick} $state $map $pro $total" . (defined $who ? " $who" : "") . "\n";
 	close $fh;
@@ -104,12 +104,12 @@ sub markmap($$$$;$)
 	my $ip = $store{"playerip_byid_$id"};
 	my $slot = $store{"playerslot_byid_$id"};
 	my $name = $config{irc_nick};
-	$name =~ s/Nex//; # haggerNexCTF -> haggerCTF
+	$name =~ s/Xon//; # haggerXonCTF -> haggerCTF
 	$name =~ s/^rm/hagger/g; # rmRace -> haggerRace
 	my $map = $store{map};
 	$map =~ s/^[a-z]*_//;
 	$ip =~ s/\./-/g;
-	my $pattern = "/home/nexuiz/home-$name/data/sv_autodemos/????-??-??_??-??_${map}_${slot}_${ip}-*.dem";
+	my $pattern = "/home/xonotic/home-$name/data/sv_autodemos/????-??-??_??-??_${map}_${slot}_${ip}-*.dem";
 	if(my @result = glob $pattern)
 	{
 		for(@result)
@@ -133,8 +133,8 @@ sub markmap($$$$;$)
 # delete demos at the end of the match
 [ dp => q{:end} => sub {
 	my $name = $config{irc_nick};
-	$name =~ s/Nex//; # haggerNexCTF -> haggerCTF
-	my $pattern = "/home/nexuiz/data/home-$name/data/sv_autodemos/*.dem";
+	$name =~ s/Xon//; # haggerXonCTF -> haggerCTF
+	my $pattern = "/home/xonotic/data/home-$name/data/sv_autodemos/*.dem";
 	print "Checking $pattern...\n";
 	for(glob $pattern)
 	{

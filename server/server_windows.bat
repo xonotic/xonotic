@@ -1,7 +1,7 @@
 @echo off
 
 setlocal
-set executable=nexuiz -dedicated
+set executable=xonotic -dedicated
 
 %~d0
 cd "%~p0"
@@ -16,7 +16,7 @@ echo This script is not properly set up yet.
 echo Please refer to the instructions in readme.txt.
 echo In short:
 echo - copy server.cfg to the data directory and adjust its settings
-echo - move this file to the main directory of your Nexuiz installation
+echo - move this file to the main directory of your Xonotic installation
 pause
 exit
 

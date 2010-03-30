@@ -16,9 +16,9 @@ case "$(uname -m)" in
   *)		arch="686" ;;
 esac
 
-nexuiz="nexuiz-linux-${arch}-${mode}"
+xonotic="xonotic-linux-${arch}-${mode}"
 
-set -- ./${nexuiz} "${@}"
+set -- ./${xonotic} "${@}"
 
 xserver=
 xlayout=
@@ -43,14 +43,14 @@ setdisplay()
 }
 
 # now how do we execute it?
-if [ -r ~/.nexuiz/data/config.cfg ]; then
+if [ -r ~/.xonotic/data/config.cfg ]; then
 	while read -r CMD KEY VALUE; do
 		case "$CMD:$KEY" in
 			seta:vid_x11_display)
 				setdisplay "$VALUE"
 				;;
 		esac
-	done < ~/.nexuiz/data/config.cfg
+	done < ~/.xonotic/data/config.cfg
 fi
 
 m=0
@@ -88,10 +88,10 @@ case "$xserver" in
 			# X server already exists
 			export DISPLAY=:$xserver
 			prefix="DISPLAY=:$xserver "
-			msg=$msg$lf"- Running Nexuiz on already existing display :$xserver"
+			msg=$msg$lf"- Running Xonotic on already existing display :$xserver"
 		else
 			set -- startx "$@" -fullscreen -- ":$xserver"
-			msg=$msg$lf"- Running Nexuiz on a newly created X server :$xserver."
+			msg=$msg$lf"- Running Xonotic on a newly created X server :$xserver."
 			case "$xlayout" in
 				'')
 					;;
@@ -111,7 +111,7 @@ case "$xserver" in
 		echo "Resulting command line:"
 		echo "  $prefix$*"
 		echo
-		echo "To undo these overrides, edit ~/.nexuiz/data/config.cfg and remove the line"
+		echo "To undo these overrides, edit ~/.xonotic/data/config.cfg and remove the line"
 		echo "starting with 'seta vid_x11_display'."
 		echo
 		echo

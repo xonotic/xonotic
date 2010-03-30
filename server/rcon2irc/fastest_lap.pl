@@ -1,6 +1,6 @@
 sub out($$@);
 
-# chat: Nexuiz server -> IRC channel, fastest record in race and ctf
+# chat: Xonotic server -> IRC channel, fastest record in race and ctf
 [ dp => q{:recordset:(\d+):(.*)} => sub {
 	my ($id, $record) = @_;
 	my $nick = $store{"playernick_byid_$id"};

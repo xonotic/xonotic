@@ -1,11 +1,11 @@
-# Nexuiz rcon2irc plugin by Merlijn Hofstra licensed under GPL - raw.pl
+# Xonotic rcon2irc plugin by Merlijn Hofstra licensed under GPL - raw.pl
 # Place this file inside the same directory as rcon2irc.pl and add the full filename to the plugins.
 
 # Use this plugin with extreme caution, it allows irc-admins to modify ANYTHING on your server.
 
 # Usage: In query with the bot the raw command directs commands to the server or irc connection.
 # Example: raw dp exec server.cfg
-# Example: raw irc PRIVMSG #nexuiz: YaY!
+# Example: raw irc PRIVMSG #xonotic: YaY!
 
 sub out($$@);
 

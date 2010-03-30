@@ -1,5 +1,5 @@
 sub out($$@);
-	# chat: IRC channel -> Nexuiz server, nick change
+	# chat: IRC channel -> Xonotic server, nick change
  	[ irc => q{:([^! ]*)![^ ]* (?i:NICK) :(.*)} => sub {
  		my ($nick, $newnick) = @_;
  		$nick = color_dpfix $nick;

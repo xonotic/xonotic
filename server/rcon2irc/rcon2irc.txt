@@ -1,9 +1,9 @@
-rcon2irc - IRC gateway for Nexuiz servers, using rcon authorization
+rcon2irc - IRC gateway for Xonotic servers, using rcon authorization
 
 
 Quick installation guide:
 
-1. Set up rcon access on your Nexuiz server, by adding some line like
+1. Set up rcon access on your Xonotic server, by adding some line like
      rcon_password hackme
    in your server.cfg. This password gives anyone FULL access to your server,
    so do not give it away! This IRC gateway does not work with a
@@ -11,7 +11,7 @@ Quick installation guide:
 
 2. Copy rcon2irc-example.conf to another name (e.g. rcon2irc.conf), and edit
    the settings to match your setup. At the very least:
-   - change dp_server to the IP (or IP:port) of your Nexuiz server
+   - change dp_server to the IP (or IP:port) of your Xonotic server
    - change dp_password to the rcon password set above
    - change irc_server to the IRC server to connect to
    - change irc_nick to the nick name to use
@@ -30,29 +30,29 @@ Features:
 
 - Show results of matches in the IRC channel
 
-- Act as a gateway to allow chat between Nexuiz server and IRC users, useful
+- Act as a gateway to allow chat between Xonotic server and IRC users, useful
   for making the server more interesting to the public, but also useful as a
   mere helper for the server admin to watch what's happening in game (like, if
   people complain about a problem):
   - Any line written in game using say (not say_team) goes to the IRC channel.
   - Any line written in the channel, prefixed by the bot's nick name and a :,
-    goes into the Nexuiz game.
+    goes into the Xonotic game.
   - Example:
     View in game:
       XSAX LTU: GREAT WIN AHAHAHAHAHAHAHAHAH))
       (RedAlert) stop teamkilling!
       .ThreeHeadedMonkey.: I am behind you!
-    View on IRC, assuming the IRC gateway has the nick noobNex and is voiced:
-      <+noobNex> <XSAX LTU> GREAT WIN AHAHAHAHAHAHAHAHAH))
-      <+noobNex> <.ThreeHeadedMonkey.> I am behind you!
+    View on IRC, assuming the IRC gateway has the nick noobXon and is voiced:
+      <+noobXon> <XSAX LTU> GREAT WIN AHAHAHAHAHAHAHAHAH))
+      <+noobXon> <.ThreeHeadedMonkey.> I am behind you!
 
 - Notify about free slots on the server. Example:
-    * noobNex is full!
-    * noobNex can be joined again (2 free slots); join now: nexuiz +connect 172.23.42.54!
-    <+noobNex> ctf_capturecity_v2r1 has begun (2 free slots); join now: nexuiz +connect 172.23.42.54
+    * noobXon is full!
+    * noobXon can be joined again (2 free slots); join now: xonotic +connect 172.23.42.54!
+    <+noobXon> ctf_capturecity_v2r1 has begun (2 free slots); join now: xonotic +connect 172.23.42.54
 
 - Display scores at the end of a match in the IRC channel. Example:
-    <+noobNex> ctf_capturecity_v2r1 ended: 301:78 Nicole 115, elsteer BLD {Y} 77,
+    <+noobXon> ctf_capturecity_v2r1 ended: 301:78 Nicole 115, elsteer BLD {Y} 77,
                CensoredNickname 57, 0grueN# 29, Bigus 23, ZeroA 36, ricer 22,
                Treey@suse8 12, cZaR6RUSS7 8, BrightDev1l 0
 
