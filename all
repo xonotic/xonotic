@@ -39,6 +39,7 @@ repos_urls="
 	data/xonotic-nexcompat.pk3dir
 	darkplaces
 	fteqcc@git://github.com/Blub/qclib.git
+	div0-gittools@git://git.icculus.org/divverent/div0-gittools.git
 "
 
 repos=`for X in $repos_urls; do echo "${X%%@*}"; done`
