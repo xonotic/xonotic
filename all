@@ -16,7 +16,7 @@ checkself()
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
 			msg "Rerunning the requested operation to make sure."
 			export XONOTIC_FORBID_RERUN_ALL=1
-			exec "$@"
+			exec "$0" "$@"
 		else
 			msg "Please try $0 update, and then retry your requested operation."
 			exit 1
