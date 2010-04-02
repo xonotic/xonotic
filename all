@@ -33,10 +33,23 @@ msg()
 	echo "[1m$*[m"
 }
 
-self=`cksum "$SELF"`
+checksum()
+{
+	if [ -x /usr/bin/md5sum ]; then
+		/usr/bin/md5sum "$@"
+	elif [ -x /bin/md5sum ]; then
+		/bin/md5sum "$@"
+	elif [ -x /usr/bin/cksum ]; then
+		/usr/bin/cksum "$@"
+	else
+		echo "NOCHECKSUM"
+	fi
+}
+
+self=`checksum "$SELF"`
 checkself()
 {
-	self_new=`cksum "$SELF"`
+	self_new=`checksum "$SELF"`
 	if [ x"$self" != x"$self_new" ]; then
 		msg "./all has changed."
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
@@ -105,7 +118,7 @@ case "$cmd" in
 						fi
 						;;
 				esac
-				verbose git pull
+				verbose git pull || true # errors if the branch is not tracking anything
 				cd "$d00"
 				checkself "$SELF" "$@"
 				cd "$d0/$d"
