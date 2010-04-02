@@ -158,7 +158,7 @@ case "$cmd" in
 					# do not exit, as this may also mean we are tracking something else
 				fi
 				cd "$d00"
-				checkself "$SELF" "$@"
+				checkself "$@"
 				cd "$d0/$d"
 				verbose git remote prune origin
 				cd "$d0"
@@ -187,7 +187,7 @@ case "$cmd" in
 				verbose git checkout master
 			fi
 			cd "$d00"
-			checkself "$SELF" "$@"
+			checkself "$@"
 			cd "$d0"
 		done
 		if ! $exists; then
