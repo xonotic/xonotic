@@ -2,23 +2,49 @@
 
 set -e
 
+d00=`pwd`
+while ! [ -f ./all ]; do
+	if [ x"`pwd`" = x"/" ]; then
+		echo "Cannot find myself."
+		echo "Please run this script with the working directory inside a Xonotic checkout."
+		exit 1
+	fi
+	cd ..
+done
+d0=`pwd`
+SELF="$d0/all"
+
+# If we are on WINDOWS:
+case "$0" in
+	all|*/all)
+		case "`uname`" in
+			MINGW*)
+				# Windows hates users. So this script has to copy itself elsewhere first...
+				tname=
+				cp "$0" ../all.xonotic.sh
+				exec ../all.xonotic.sh "$@"
+				;;
+		esac
+		;;
+esac
+
 msg()
 {
 	echo "[1m$*[m"
 }
 
-self=`cksum "$0"`
+self=`cksum "$SELF"`
 checkself()
 {
-	self_new=`cksum "$0"`
+	self_new=`cksum "$SELF"`
 	if [ x"$self" != x"$self_new" ]; then
 		msg "./all has changed."
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
 			msg "Rerunning the requested operation to make sure."
 			export XONOTIC_FORBID_RERUN_ALL=1
-			exec "$0" "$@"
+			exec "$SELF" "$@"
 		else
-			msg "Please try $0 update, and then retry your requested operation."
+			msg "Please try $SELF update, and then retry your requested operation."
 			exit 1
 		fi
 	fi
@@ -51,14 +77,6 @@ fi
 cmd=$1
 shift
 
-d00=`pwd`
-case "$0" in
-	*/*)
-		cd "${0%/*}"
-		;;
-esac
-
-d0=`pwd`
 case "$cmd" in
 	update|pull)
 		base=`git config remote.origin.url`
@@ -89,7 +107,7 @@ case "$cmd" in
 				esac
 				verbose git pull
 				cd "$d00"
-				checkself "$0" "$@"
+				checkself "$SELF" "$@"
 				cd "$d0/$d"
 				verbose git remote prune origin
 				cd "$d0"
@@ -118,13 +136,13 @@ case "$cmd" in
 				verbose git checkout master
 			fi
 			cd "$d00"
-			checkself "$0" "$@"
+			checkself "$SELF" "$@"
 			cd "$d0"
 		done
 		if ! $exists; then
 			echo "The requested branch was not found in any repository."
 		fi
-		"$0" branch
+		exec "$SELF" branch
 		;;
 	branch)
 		remote=$1
@@ -155,7 +173,7 @@ case "$cmd" in
 				fi
 				cd "$d0"
 			done
-			"$0" branch
+			"$SELF" branch
 		fi
 		;;
 	branches)
@@ -245,13 +263,13 @@ case "$cmd" in
 		;;
 	*)
 		echo "Usage:"
-		echo "  $0 pull"
-		echo "  $0 push"
-		echo "  $0 branches"
-		echo "  $0 branch <remote> <branchname>"
-		echo "  $0 checkout"
-		echo "  $0 compile"
-		echo "  $0 run <client> <options>"
-		echo "  $0 each <command>"
+		echo "  $SELF pull"
+		echo "  $SELF push"
+		echo "  $SELF branches"
+		echo "  $SELF branch <remote> <branchname>"
+		echo "  $SELF checkout"
+		echo "  $SELF compile"
+		echo "  $SELF run <client> <options>"
+		echo "  $SELF each <command>"
 		;;
 esac
