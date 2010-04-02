@@ -138,7 +138,7 @@ case "$cmd" in
 				cd "$d0/$d"
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Branch in $d?"
+					echo "Branch in \"$d\"?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
@@ -164,9 +164,19 @@ case "$cmd" in
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			a=
+			if git diff HEAD | grep .; then
+				# we have uncommitted changes
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Uncommitted changes in \"$r\" in \"$d\". Commit?"
+					read -r a
+				done
+				if [ x"$a" = x"y" ]; then
+					verbose git commit -a
+				fi
+			fi
 			if git log "origin/$r".."$r" | grep .; then
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Push $r in $d?"
+					echo "Push \"$r\" in \"$d\"?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
