@@ -21,7 +21,7 @@ case "$0" in
 			MINGW*)
 				# Windows hates users. So this script has to copy itself elsewhere first...
 				tname=
-				cp "$0" ../all.xonotic.sh
+				cp "$SELF" ../all.xonotic.sh
 				exec ../all.xonotic.sh "$@"
 				;;
 		esac
