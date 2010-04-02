@@ -51,6 +51,12 @@ fi
 cmd=$1
 shift
 
+case "$0" in
+	*/*)
+		cd "${0%/*}"
+		;;
+esac
+
 d0=`pwd`
 case "$cmd" in
 	update|pull)
