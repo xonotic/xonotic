@@ -1,9 +1,9 @@
-# Nexuiz rcon2irc plugin by Merlijn Hofstra licensed under GPL - joinmessage.pl
+# Xonotic rcon2irc plugin by Merlijn Hofstra licensed under GPL - joinmessage.pl
 # Place this file inside the same directory as rcon2irc.pl and add the full filename to the plugins.
 
 # Do not use more than 5 lines here, as they will be cut off by the client.
 my @jmtext = (
-	"Welcome to this Nexuiz server",
+	"Welcome to this Xonotic server",
 	"Have fun but please behave.",
 );
 

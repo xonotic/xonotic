@@ -1,1 +1,0 @@
-nexuiz-linux-glx.sh

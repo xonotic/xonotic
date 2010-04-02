@@ -729,9 +729,9 @@ our %config = (
 
 
 
-# Nexuiz specific parsing of some server messages
+# Xonotic specific parsing of some server messages
 
-sub nex_slotsstring()
+sub xon_slotsstring()
 {
 	my $slotsstr = "";
 	if(defined $store{slots_max})
@@ -740,7 +740,7 @@ sub nex_slotsstring()
 		my $slots_s = ($slots == 1) ? '' : 's';
 		$slotsstr = " ($slots free slot$slots_s)";
 		my $s = $config{dp_server_from_wan} || $config{dp_server};
-		$slotsstr .= "; join now: \002nexuiz +connect $s"
+		$slotsstr .= "; join now: \002xonotic +connect $s"
 			if $slots >= 1 and not $store{lms_blocked};
 	}
 	return $slotsstr;
@@ -1104,7 +1104,7 @@ sub cond($)
 			}
 			else
 			{
-				my $slotsstr = nex_slotsstring();
+				my $slotsstr = xon_slotsstring();
 				out irc => 0, "PRIVMSG $config{irc_channel} :\001ACTION can be joined again$slotsstr!\001";
 			}
 		}
@@ -1391,14 +1391,14 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel
+	# chat: Xonotic server -> IRC channel
 	[ dp => q{\001(.*?)\^7: (.*)} => sub {
 		my ($nick, $message) = map { color_dp2irc $_ } @_;
 		out irc => 0, "PRIVMSG $config{irc_channel} :<$nick\017> $message";
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, nick set
+	# chat: Xonotic server -> IRC channel, nick set
 	[ dp => q{:join:(\d+):(\d+):([^:]*):(.*)} => sub {
 		my ($id, $slot, $ip, $nick) = @_;
 		$store{"playernickraw_byid_$id"} = $nick;
@@ -1410,7 +1410,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, nick change/set
+	# chat: Xonotic server -> IRC channel, nick change/set
 	[ dp => q{:name:(\d+):(.*)} => sub {
 		my ($id, $nick) = @_;
 		$store{"playernickraw_byid_$id"} = $nick;
@@ -1421,7 +1421,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, vote call
+	# chat: Xonotic server -> IRC channel, vote call
 	[ dp => q{:vote:vcall:(\d+):(.*)} => sub {
 		my ($id, $command) = @_;
 		$command = color_dp2irc $command;
@@ -1430,7 +1430,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, vote stop
+	# chat: Xonotic server -> IRC channel, vote stop
 	[ dp => q{:vote:vstop:(\d+)} => sub {
 		my ($id) = @_;
 		my $oldnick = $id ? $store{"playernick_byid_$id"} : "(console)";
@@ -1438,7 +1438,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, master login
+	# chat: Xonotic server -> IRC channel, master login
 	[ dp => q{:vote:vlogin:(\d+)} => sub {
 		my ($id) = @_;
 		my $oldnick = $id ? $store{"playernick_byid_$id"} : "(console)";
@@ -1446,7 +1446,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, master do
+	# chat: Xonotic server -> IRC channel, master do
 	[ dp => q{:vote:vdo:(\d+):(.*)} => sub {
 		my ($id, $command) = @_;
 		$command = color_dp2irc $command;
@@ -1455,7 +1455,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: Nexuiz server -> IRC channel, result
+	# chat: Xonotic server -> IRC channel, result
 	[ dp => q{:vote:v(yes|no|timeout):(\d+):(\d+):(\d+):(\d+):(-?\d+)} => sub {
 		my ($result, $yes, $no, $abstain, $not, $min) = @_;
 		my $spam = "$yes:$no" . (($min >= 0) ? " ($min needed)" : "") . ", $abstain didn't care, $not didn't vote";
@@ -1463,7 +1463,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# chat: IRC channel -> Nexuiz server
+	# chat: IRC channel -> Xonotic server
 	[ irc => q{:([^! ]*)![^ ]* (?i:PRIVMSG) (?i:(??{$config{irc_channel}})) :(?i:(??{$store{irc_nick}}))(?: |: ?|, ?)(.*)} => sub {
 		my ($nick, $message) = @_;
 		$nick = color_dpfix $nick;
@@ -1505,7 +1505,7 @@ sub cond($)
 		$store{map} = $map;
 		$store{map_starttime} = time();
 		if ($config{irc_announce_mapchange} eq 'always' || ($config{irc_announce_mapchange} eq 'notempty' && $store{slots_active} > 0)) {
-			my $slotsstr = nex_slotsstring();
+			my $slotsstr = xon_slotsstring();
 			out irc => 0, "PRIVMSG $config{irc_channel} :\00304" . $map . "\017 has begun$slotsstr";
 		}
 		delete $store{lms_blocked};
@@ -1518,7 +1518,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel (start)
+	# scores: Xonotic server -> IRC channel (start)
 	[ dp => q{:scores:(.*):(\d+)} => sub {
 		my ($map, $time) = @_;
 		$store{scores} = {};
@@ -1529,7 +1529,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel, legacy format
+	# scores: Xonotic server -> IRC channel, legacy format
 	[ dp => q{:player:(-?\d+):(\d+):(\d+):(\d+):(\d+):(.*)} => sub {
 		my ($frags, $deaths, $time, $team, $id, $name) = @_;
 		return if not exists $store{scores};
@@ -1538,7 +1538,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel (CTF), legacy format
+	# scores: Xonotic server -> IRC channel (CTF), legacy format
 	[ dp => q{:teamscores:(\d+:-?\d*(?::\d+:-?\d*)*)} => sub {
 		my ($teams) = @_;
 		return if not exists $store{scores};
@@ -1546,7 +1546,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel, new format
+	# scores: Xonotic server -> IRC channel, new format
 	[ dp => q{:player:see-labels:(-?\d+)[-0-9,]*:(\d+):(\d+):(\d+):(.*)} => sub {
 		my ($frags, $time, $team, $id, $name) = @_;
 		return if not exists $store{scores};
@@ -1554,7 +1554,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel (CTF), new format
+	# scores: Xonotic server -> IRC channel (CTF), new format
 	[ dp => q{:teamscores:see-labels:(-?\d+)[-0-9,]*:(\d+)} => sub {
 		my ($frags, $team) = @_;
 		return if not exists $store{scores};
@@ -1562,7 +1562,7 @@ sub cond($)
 		return 0;
 	} ],
 
-	# scores: Nexuiz server -> IRC channel
+	# scores: Xonotic server -> IRC channel
 	[ dp => q{:end} => sub {
 		return if not exists $store{scores};
 		my $s = $store{scores};
