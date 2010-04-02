@@ -70,6 +70,18 @@ verbose()
 	"$@"
 }
 
+visible_repo_name()
+{
+	case "$1" in
+		.)
+			echo "the root directory"
+			;;
+		*)
+			echo "\"$1\""
+			;;
+	esac
+}
+
 check_mergeconflict()
 {
 	if git ls-files -u | grep ' 1	'; then
@@ -200,10 +212,11 @@ case "$cmd" in
 			done
 		else
 			for d in $repos; do
+				dv=`visible_repo_name "$d"`
 				enter "$d0/$d"
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Branch in \"$d\"?"
+					echo "Branch in $dv?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
@@ -225,6 +238,7 @@ case "$cmd" in
 		;;
 	merge)
 		for d in $repos; do
+			dv=`visible_repo_name "$d"`
 			enter "$d0/$d"
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
@@ -232,7 +246,7 @@ case "$cmd" in
 				# we have uncommitted changes
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Could merge from \"master\" into \"$r\" in \"$d\". Do it?"
+					echo "Could merge from \"master\" into \"$r\" in $dv. Do it?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
@@ -247,6 +261,7 @@ case "$cmd" in
 		;;
 	push)
 		for d in $repos; do
+			dv=`visible_repo_name "$d"`
 			enter "$d0/$d"
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
@@ -254,7 +269,7 @@ case "$cmd" in
 				# we have uncommitted changes
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Uncommitted changes in \"$r\" in \"$d\". Commit?"
+					echo "Uncommitted changes in \"$r\" in $dv. Commit?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
@@ -264,7 +279,7 @@ case "$cmd" in
 			if git log "origin/$r".."$r" | grep .; then
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Push \"$r\" in \"$d\"?"
+					echo "Push \"$r\" in $dv?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
