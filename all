@@ -51,6 +51,7 @@ fi
 cmd=$1
 shift
 
+d00=`pwd`
 case "$0" in
 	*/*)
 		cd "${0%/*}"
@@ -87,7 +88,7 @@ case "$cmd" in
 						;;
 				esac
 				verbose git pull
-				cd "$d0"
+				cd "$d00"
 				checkself "$0" "$@"
 				cd "$d0/$d"
 				verbose git remote prune origin
@@ -116,8 +117,9 @@ case "$cmd" in
 			else
 				verbose git checkout master
 			fi
-			cd "$d0"
+			cd "$d00"
 			checkself "$0" "$@"
+			cd "$d0"
 		done
 		if ! $exists; then
 			echo "The requested branch was not found in any repository."
