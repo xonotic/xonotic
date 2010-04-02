@@ -197,6 +197,34 @@ case "$cmd" in
 			cd "$d0"
 		done
 		;;
+	merge)
+		for d in $repos; do
+			cd "$d0/$d"
+			r=`git symbolic-ref HEAD`
+			r=${r#refs/heads/}
+			if git log HEAD..origin/master | grep .; then
+				# we have uncommitted changes
+				a=
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Could merge from \"master\" into \"$r\" in \"$d\". Do it?"
+					read -r a
+				done
+				if [ x"$a" = x"y" ]; then
+					if ! verbose git merge origin/master; then
+						echo
+						echo "MERGE CONFLICT."
+						echo "change into the \"$d\" project directory, and then:"
+						echo "- edit the files mentioned above with your favorite editor,"
+						echo "  and fix the conflicts (marked with <<<<<<< blocks)"
+						echo "- when done with a file, 'git add' the file"
+						echo "- when done, 'git commit'"
+						exit 1
+					fi
+				fi
+			fi
+			cd "$d0"
+		done
+		;;
 	push)
 		for d in $repos; do
 			cd "$d0/$d"
@@ -277,10 +305,11 @@ case "$cmd" in
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
+		echo "  $SELF merge"
 		echo "  $SELF push"
 		echo "  $SELF branches"
-		echo "  $SELF branch <remote> <branchname>"
-		echo "  $SELF checkout"
+		echo "  $SELF branch [<remote>] <branchname>"
+		echo "  $SELF checkout [<remote>] <branchname>"
 		echo "  $SELF compile"
 		echo "  $SELF run <client> <options>"
 		echo "  $SELF each <command>"
