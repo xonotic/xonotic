@@ -70,6 +70,29 @@ verbose()
 	"$@"
 }
 
+check_mergeconflict()
+{
+	if git ls-files -u | grep ' 1	'; then
+		echo
+		echo "MERGE CONFLICT."
+		echo "change into the \"$1\" project directory, and then:"
+		echo "- edit the files mentioned above with your favorite editor,"
+		echo "  and fix the conflicts (marked with <<<<<<< blocks)"
+		echo "- for binary files, you can select the files using"
+		echo "  git checkout --ours or git checkout --theirs"
+		echo "- when done with a file, 'git add' the file"
+		echo "- when done, 'git commit'"
+		echo
+		exit 1
+	fi
+}
+
+enter()
+{
+	verbose cd "$1"
+	check_mergeconflict "$1"
+}
+
 repos_urls="
 	.
 	data/xonotic-data.pk3dir
@@ -108,7 +131,7 @@ case "$cmd" in
 					;;
 			esac
 			if [ -d "$d0/$d" ]; then
-				verbose cd "$d0/$d"
+				enter "$d0/$d"
 				case "$d" in
 					.)
 						;;
@@ -118,7 +141,10 @@ case "$cmd" in
 						fi
 						;;
 				esac
-				verbose git pull || true # errors if the branch is not tracking anything
+				if ! verbose git pull; then
+					check_mergeconflict "$d"
+					# do not exit, as this may also mean we are tracking something else
+				fi
 				cd "$d00"
 				checkself "$SELF" "$@"
 				cd "$d0/$d"
@@ -138,7 +164,7 @@ case "$cmd" in
 		fi
 		exists=false
 		for d in $repos; do
-			verbose cd "$d0/$d"
+			enter "$d0/$d"
 			if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
 				exists=true
 				verbose git checkout "$branch"
@@ -166,7 +192,7 @@ case "$cmd" in
 		fi
 		if [ -z "$branch" ]; then
 			for d in $repos; do
-				cd "$d0/$d"
+				enter "$d0/$d"
 				r=`git symbolic-ref HEAD`
 				r=${r#refs/heads/}
 				echo "$d is at $r"
@@ -174,7 +200,7 @@ case "$cmd" in
 			done
 		else
 			for d in $repos; do
-				cd "$d0/$d"
+				enter "$d0/$d"
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Branch in \"$d\"?"
@@ -191,7 +217,7 @@ case "$cmd" in
 		;;
 	branches)
 		for d in $repos; do
-			cd "$d0/$d"
+			enter "$d0/$d"
 			echo "In $d:"
 			git branch -a | sed 's/^/  /; /->/d'
 			cd "$d0"
@@ -199,7 +225,7 @@ case "$cmd" in
 		;;
 	merge)
 		for d in $repos; do
-			cd "$d0/$d"
+			enter "$d0/$d"
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			if git log HEAD..origin/master | grep .; then
@@ -211,14 +237,8 @@ case "$cmd" in
 				done
 				if [ x"$a" = x"y" ]; then
 					if ! verbose git merge origin/master; then
-						echo
-						echo "MERGE CONFLICT."
-						echo "change into the \"$d\" project directory, and then:"
-						echo "- edit the files mentioned above with your favorite editor,"
-						echo "  and fix the conflicts (marked with <<<<<<< blocks)"
-						echo "- when done with a file, 'git add' the file"
-						echo "- when done, 'git commit'"
-						exit 1
+						check_mergeconflict "$d"
+						exit 1 # this should ALWAYS be fatal
 					fi
 				fi
 			fi
@@ -227,7 +247,7 @@ case "$cmd" in
 		;;
 	push)
 		for d in $repos; do
-			cd "$d0/$d"
+			enter "$d0/$d"
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			if git diff HEAD | grep .; then
@@ -263,11 +283,11 @@ case "$cmd" in
 				fi
 			fi
 		fi
-		verbose cd "$d0/fteqcc"
+		enter "$d0/fteqcc"
 		verbose make $MAKEFLAGS
-		verbose cd "$d0/data/xonotic-data.pk3dir"
+		enter "$d0/data/xonotic-data.pk3dir"
 		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" $MAKEFLAGS
-		verbose cd "$d0/darkplaces"
+		enter "$d0/darkplaces"
 		verbose make $MAKEFLAGS sv-debug
 		verbose make $MAKEFLAGS cl-debug
 		verbose make $MAKEFLAGS sdl-debug
@@ -297,7 +317,7 @@ case "$cmd" in
 		;;
 	each|foreach)
 		for d in $repos; do
-			verbose cd "$d0/$d"
+			enter "$d0/$d"
 			verbose "$@"
 			cd "$d0"
 		done
