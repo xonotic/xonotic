@@ -198,9 +198,13 @@ case "$cmd" in
 	branch)
 		remote=$1
 		branch=$2
+		srcbranch=$3
 		if [ -z "$branch" ]; then
 			branch=$remote
 			remote=origin
+		fi
+		if [ -z "$srcbranch" ]; then
+			srcbranch=master
 		fi
 		if [ -z "$branch" ]; then
 			for d in $repos; do
@@ -220,7 +224,7 @@ case "$cmd" in
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					verbose git push "$remote" HEAD:"$branch"
+					verbose git push "$remote" "$srcbranch":"$branch"
 					verbose git checkout --track -b "$branch" "$remote/$branch"
 				fi
 				cd "$d0"
@@ -344,6 +348,7 @@ case "$cmd" in
 		echo "  $SELF push"
 		echo "  $SELF branches"
 		echo "  $SELF branch [<remote>] <branchname>"
+		echo "  $SELF branch <remote> <branchname> <srcbranchname>"
 		echo "  $SELF checkout [<remote>] <branchname>"
 		echo "  $SELF compile"
 		echo "  $SELF run <client> <options>"
