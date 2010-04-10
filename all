@@ -153,10 +153,17 @@ case "$cmd" in
 						fi
 						;;
 				esac
-				if ! verbose git pull; then
-					check_mergeconflict "$d"
-					# do not exit, as this may also mean we are tracking something else
+				verbose git config remote.origin.fetch "refs/heads/*:refs/remotes/origin/*"
+
+				r=`git symbolic-ref HEAD`
+				r=${r#refs/heads/}
+				if git config branch.$r.remote >/dev/null 2>&1; then
+					if ! verbose git pull; then
+						check_mergeconflict "$d"
+						exit 1 # FATAL
+					fi
 				fi
+
 				cd "$d00"
 				checkself "$cmd" "$@"
 				cd "$d0/$d"
