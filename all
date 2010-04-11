@@ -18,7 +18,7 @@ SELF="$d0/all"
 case "$0" in
 	all|*/all)
 		case "`uname`" in
-			MINGW*)
+			MINGW*|Win*)
 				# Windows hates users. So this script has to copy itself elsewhere first...
 				tname=
 				cp "$SELF" ../all.xonotic.sh
