@@ -270,7 +270,7 @@ case "$cmd" in
 			cd "$d0"
 		done
 		;;
-	push)
+	push|commit)
 		for d in $repos; do
 			dv=`visible_repo_name "$d"`
 			enter "$d0/$d"
