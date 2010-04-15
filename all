@@ -392,9 +392,9 @@ case "$cmd" in
 					if [ x"$REV" = x"->" ]; then
 						continue
 					fi
-					if git format-patch -o "$patchdir/$i" "$UPSTREAM".."$BRANCH" | grep .; then
+					if git format-patch -o "$patchdir/$i" "$UPSTREAM".."$BRANCH"; then
 						echo "$d" > "$patchdir/$i/info.txt"
-						echo "$BRANCH" > "$patchdir/$i/info.txt"
+						echo "$BRANCH" >> "$patchdir/$i/info.txt"
 						echo "$UPSTREAM" >> "$patchdir/$i/info.txt"
 						echo "$TRACK" >> "$patchdir/$i/info.txt"
 						i=$(($i+1))
