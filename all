@@ -153,7 +153,8 @@ case "$cmd" in
 						fi
 						;;
 				esac
-				verbose git config remote.origin.fetch "refs/heads/*:refs/remotes/origin/*"
+				verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+					# TODO remove this line later
 
 				r=`git symbolic-ref HEAD`
 				r=${r#refs/heads/}
