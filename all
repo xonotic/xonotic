@@ -312,14 +312,15 @@ case "$cmd" in
 					verbose git commit -a
 				fi
 			fi
-			if git log "origin/$r".."$r" | grep .; then
+			rem=`git config "branch.$r.remote" || echo origin`
+			if git log "$rem/$r".."$r" | grep .; then
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Push \"$r\" in $dv?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					verbose git push `git config "branch.$r.remote" || echo origin` HEAD
+					verbose git push "$rem" HEAD
 				fi
 			fi
 			cd "$d0"
