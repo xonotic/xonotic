@@ -9,7 +9,7 @@ ISTEXT=" crlf=input"
 LF="
 "
 eol=`cat .gitattributes`
-find . -type f | {
+find . -name .git -prune -o \( -type f -print \) | {
 	unseen=`echo "$eol" | cut -d ' ' -f 1 | grep .`
 	neweol=
 	while IFS= read -r LINE; do
