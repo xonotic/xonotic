@@ -42,7 +42,7 @@ DoxyConfig crlf=input
 Doxyfile crlf=input
 *.doxygen crlf=input
 *.dpm -crlf -diff
-*.dsp crlf=input
+*.dsp -crlf
 *.dsw -crlf
 *.dtd crlf=input
 *.dylib -crlf -diff
@@ -55,6 +55,7 @@ gendox crlf=input
 gendoxfunctions crlf=input
 genDoxyfile crlf=input
 *.gif -crlf -diff
+*.gitattributes crlf=input
 git-branch-manager crlf=input
 git-filter-index crlf=input
 git-filter-repository crlf=input
@@ -120,7 +121,7 @@ pangorc crlf=input
 *.pk3 -crlf -diff
 PkgInfo crlf=input
 *.pl crlf=input
-*.plist -crlf
+*.plist crlf=input
 *.pm crlf=input
 *.png -crlf -diff
 POSITIONS -crlf -diff
@@ -134,7 +135,7 @@ POSITIONS -crlf -diff
 *.qh crlf=input
 *.rb crlf=input
 *.rc2 crlf=input
-*.rc crlf=input
+*.rc -crlf
 *.readme crlf=input
 README crlf=input
 *.rtlights -crlf -diff
