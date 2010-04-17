@@ -1,0 +1,178 @@
+*.7z -crlf -diff
+*.aft crlf=input
+*.aliases crlf=input
+all crlf=input
+*.animinfo crlf=input
+*.aps -crlf -diff
+*.ase -crlf
+*.bat -crlf
+*.bgs crlf=input
+*.blend -crlf -diff
+*.bmp -crlf -diff
+branch-manager crlf=input
+BSDmakefile crlf=input
+bsp2ent crlf=input
+*.bsp -crlf -diff
+*.cache -crlf -diff
+*.cbp -crlf
+*.cbp -crlf -diff
+*.c crlf=input
+*.cfg crlf=input
+*.cg crlf=input
+ChangeLog crlf=input
+CHANGES crlf=input
+COMPILING crlf=input
+*.conf crlf=input
+CONTRIBUTORS crlf=input
+COPYING crlf=input
+*.cpp crlf=input
+*.css crlf=input
+Current -crlf -diff
+*.cvsignore crlf=input
+*.cvswrappers crlf=input
+*.db -crlf -diff
+*.default crlf=input
+*.def crlf=input
+*.dem -crlf -diff
+*.dev -crlf
+*.dll -crlf -diff
+DOCS -crlf -diff
+*.dot crlf=input
+DoxyConfig crlf=input
+Doxyfile crlf=input
+*.doxygen crlf=input
+*.dpm -crlf -diff
+*.dsp crlf=input
+*.dsw -crlf
+*.dtd crlf=input
+*.dylib -crlf -diff
+*.EncoderPlugin crlf=input
+*.ent -crlf
+*.form crlf=input
+*.framegroups crlf=input
+*.game crlf=input
+gendox crlf=input
+gendoxfunctions crlf=input
+genDoxyfile crlf=input
+*.gif -crlf -diff
+git-branch-manager crlf=input
+git-filter-index crlf=input
+git-filter-repository crlf=input
+*.gitignore crlf=input
+git-pullall crlf=input
+git-split-repository crlf=input
+git-svn-checkout crlf=input
+git-svn-update crlf=input
+git-update-octopus crlf=input
+*.glp crlf=input
+*.glsl crlf=input
+GPL crlf=input
+*.hardwired crlf=input
+*.h crlf=input
+*.hs crlf=input
+*.html crlf=input
+*.html-part crlf=input
+*.icns -crlf -diff
+*.ico -crlf -diff
+*.idsoftware crlf=input
+*.inc crlf=input
+*.instantaction crlf=input
+*.java crlf=input
+*.jhm crlf=input
+*.jnlp crlf=input
+*.jpg -crlf -diff
+*.jsmooth crlf=input
+LGPL crlf=input
+LICENSE crlf=input
+*.lmp -crlf -diff
+*.loaders crlf=input
+*.lso -crlf -diff
+makefile crlf=input
+Makefile crlf=input
+*.makespr32 crlf=input
+makespr32 crlf=input
+*.map -crlf
+*.mapinfo crlf=input
+*.m crlf=input
+*.md3 -crlf -diff
+*.md5anim crlf=input
+*.md5mesh crlf=input
+*.mdl -crlf -diff
+*.med crlf=input
+*.mf crlf=input
+*.mid -crlf -diff
+*.mk crlf=input
+*.mmpz -crlf -diff
+*.modinfo crlf=input
+*.modules crlf=input
+nexuiz-map-compiler crlf=input
+nexuiz-osx-agl crlf=input
+nexuiz-osx-sdl crlf=input
+*.nib -crlf
+*.obj -crlf
+OFFSETS -crlf -diff
+*.ogg -crlf -diff
+*.options crlf=input
+pangorc crlf=input
+*.patch crlf=input
+*.patchsets crlf=input
+*.pcx -crlf -diff
+*.pk3 -crlf -diff
+PkgInfo crlf=input
+*.pl crlf=input
+*.plist -crlf
+*.pm crlf=input
+*.png -crlf -diff
+POSITIONS -crlf -diff
+*.proj crlf=input
+*.properties crlf=input
+*.psd -crlf -diff
+*.py crlf=input
+*.q3map1 crlf=input
+*.qc crlf=input
+*.qdt crlf=input
+*.qh crlf=input
+*.rb crlf=input
+*.rc2 crlf=input
+*.rc crlf=input
+*.readme crlf=input
+README crlf=input
+*.rtlights -crlf -diff
+SCHEMA crlf=input
+*.scm crlf=input
+SDL -crlf -diff
+SDLMain.m crlf=input
+*.shader crlf=input
+*.sh crlf=input
+*.skin crlf=input
+*.sln -crlf
+*.sounds crlf=input
+*.sp2 -crlf -diff
+*.spr32 -crlf -diff
+*.spr -crlf -diff
+*.src crlf=input
+*.strings crlf=input
+*.strip crlf=input
+strip crlf=input
+*.svg -crlf -diff
+*.TAB -crlf -diff
+*.tga -crlf -diff
+TMAP -crlf -diff
+todo crlf=input
+TODO crlf=input
+*.ttf -crlf -diff
+*.TTF -crlf -diff
+*.txt crlf=input
+*.TXT crlf=input
+*.vcproj -crlf
+*.wav -crlf -diff
+*.waypoints -crlf -diff
+*.width crlf=input
+*.workspace -crlf
+*.xcf -crlf -diff
+*.xlink crlf=input
+*.xml crlf=input
+*.xpm crlf=input
+*.zip -crlf -diff
+zipdiff crlf=input
+*.zym -crlf -diff
