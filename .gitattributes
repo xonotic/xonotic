@@ -95,8 +95,8 @@ makespr32 crlf=input
 *.mapinfo crlf=input
 *.m crlf=input
 *.md3 -crlf -diff
-*.md5anim crlf=input
-*.md5mesh crlf=input
+*.md5anim -crlf
+*.md5mesh -crlf
 *.mdl -crlf -diff
 *.med crlf=input
 *.mf crlf=input
@@ -124,7 +124,7 @@ PkgInfo crlf=input
 *.pm crlf=input
 *.png -crlf -diff
 POSITIONS -crlf -diff
-*.proj crlf=input
+*.proj -crlf
 *.properties crlf=input
 *.psd -crlf -diff
 *.py crlf=input
