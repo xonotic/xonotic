@@ -461,10 +461,21 @@ case "$cmd" in
 			if [ x"$a" = x"y" ]; then
 				git merge "$1/$2"
 				cd "$d0"
-				"$SELF" compile
+				a=
+				if ! "$SELF" compile; then
+					a=n
+				fi
 				cd "$d0/d"
-				git push origin HEAD
-				git push "$1" :"$2"
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."
+					read -r a
+				done
+				if [ x"$a" = x"y" ]; then
+					git push origin HEAD
+					git push "$1" :"$2"
+				else
+					git reset --hard HEAD@{1}
+				fi
 			fi
 		done
 		;;
