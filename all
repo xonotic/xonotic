@@ -465,7 +465,7 @@ case "$cmd" in
 				if ! "$SELF" compile; then
 					a=n
 				fi
-				cd "$d0/d"
+				cd "$d0/$d"
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."
 					read -r a
