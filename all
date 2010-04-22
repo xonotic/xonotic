@@ -444,6 +444,27 @@ case "$cmd" in
 		done
 		rm -rf "$patchdir"
 		;;
+	admin-merge)
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			git rev-parse "$1/$2" || continue
+			# 1. review
+			{
+				git log HEAD.."$1/$2"
+				git diff HEAD..."$1/$2"
+			} | less
+			a=
+			while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+				echo "Merge \"$1/$2\" into `git symbolic-ref HEAD` of $d?"
+				read -r a
+			done
+			if [ x"$a" = x"y" ]; then
+				git merge "$1/$2"
+				git push origin HEAD
+				git push "$1" :"$2"
+			fi
+		done
+		;;
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
