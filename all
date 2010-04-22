@@ -460,6 +460,9 @@ case "$cmd" in
 			done
 			if [ x"$a" = x"y" ]; then
 				git merge "$1/$2"
+				cd "$d0"
+				"$SELF" compile
+				cd "$d0/d"
 				git push origin HEAD
 				git push "$1" :"$2"
 			fi
