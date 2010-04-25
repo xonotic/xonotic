@@ -23,6 +23,7 @@ case "$0" in
 				# Windows hates users. So this script has to copy itself elsewhere first...
 				tname=
 				cp "$SELF" ../all.xonotic.sh
+				export WE_HATE_OUR_USERS=1
 				exec ../all.xonotic.sh "$@"
 				;;
 		esac
@@ -157,8 +158,8 @@ case "$cmd" in
 				verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 					# TODO remove this line later
 
-				verbose git config core.autocrlf input
-				verbose git config core.safecrlf true
+				verbose git config core.autocrlf false
+				verbose git config core.safecrlf false # we don't NEED that...
 
 				r=`git symbolic-ref HEAD`
 				r=${r#refs/heads/}
@@ -351,10 +352,16 @@ case "$cmd" in
 		enter "$d0/darkplaces" verbose
 		verbose make $MAKEFLAGS sv-debug
 		verbose make $MAKEFLAGS cl-debug
-		verbose make $MAKEFLAGS sdl-debug
+		if ! [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose make $MAKEFLAGS sdl-debug
+		fi
 		;;
 	run)
-		client=-sdl
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			client=
+		else
+			client=-sdl
+		fi
 		case "$1" in
 			sdl|glx|agl|dedicated)
 				client=-$1
