@@ -166,7 +166,8 @@ case "$cmd" in
 				if git config branch.$r.remote >/dev/null 2>&1; then
 					if ! verbose git pull; then
 						check_mergeconflict "$d"
-						exit 1 # FATAL
+						echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
+						read -r DUMMY
 					fi
 				fi
 
