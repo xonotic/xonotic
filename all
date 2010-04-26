@@ -1,4 +1,5 @@
 #!/bin/sh
+# vim: filetype=zsh
 
 set -e
 
@@ -22,6 +23,7 @@ case "$0" in
 				# Windows hates users. So this script has to copy itself elsewhere first...
 				tname=
 				cp "$SELF" ../all.xonotic.sh
+				export WE_HATE_OUR_USERS=1
 				exec ../all.xonotic.sh "$@"
 				;;
 		esac
@@ -101,7 +103,7 @@ check_mergeconflict()
 
 enter()
 {
-	verbose cd "$1"
+	$2 cd "$1"
 	check_mergeconflict "$1"
 }
 
@@ -143,7 +145,7 @@ case "$cmd" in
 					;;
 			esac
 			if [ -d "$d0/$d" ]; then
-				enter "$d0/$d"
+				enter "$d0/$d" verbose
 				case "$d" in
 					.)
 						;;
@@ -153,14 +155,19 @@ case "$cmd" in
 						fi
 						;;
 				esac
-				verbose git config remote.origin.fetch "refs/heads/*:refs/remotes/origin/*"
+				verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+					# TODO remove this line later
+
+				verbose git config core.autocrlf false
+				verbose git config core.safecrlf false # we don't NEED that...
 
 				r=`git symbolic-ref HEAD`
 				r=${r#refs/heads/}
 				if git config branch.$r.remote >/dev/null 2>&1; then
 					if ! verbose git pull; then
 						check_mergeconflict "$d"
-						exit 1 # FATAL
+						echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
+						read -r DUMMY
 					fi
 				fi
 
@@ -183,7 +190,7 @@ case "$cmd" in
 		fi
 		exists=false
 		for d in $repos; do
-			enter "$d0/$d"
+			enter "$d0/$d" verbose
 			if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
 				exists=true
 				verbose git checkout "$branch"
@@ -224,7 +231,7 @@ case "$cmd" in
 		else
 			for d in $repos; do
 				dv=`visible_repo_name "$d"`
-				enter "$d0/$d"
+				enter "$d0/$d" verbose
 				a=
 				if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
 					echo "Already having this branch in $dv."
@@ -247,14 +254,35 @@ case "$cmd" in
 		for d in $repos; do
 			enter "$d0/$d"
 			echo "In $d:"
-			git branch -a | sed 's/^/  /; /->/d'
-			cd "$d0"
+			git branch -a -v -v | cut -c 3- | while read -r BRANCH REV UPSTREAM TEXT; do
+				case "$UPSTREAM" in
+					\[*)
+						UPSTREAM=${UPSTREAM#\[}
+						UPSTREAM=${UPSTREAM%\]}
+						UPSTREAM=${UPSTREAM%:*}
+						;;
+					*)
+						TEXT="$UPSTREAM $TEXT"
+						UPSTREAM=
+						;;
+				esac
+				if [ x"$REV" = x"->" ]; then
+					continue
+				fi
+				BRANCH=${BRANCH#remotes/}
+				echo -n "  $BRANCH"
+				if [ -n "$UPSTREAM" ]; then
+					echo -n " (tracking $UPSTREAM)"
+				fi
+				#echo " $TEXT"
+				echo
+			done
 		done
 		;;
 	merge)
 		for d in $repos; do
 			dv=`visible_repo_name "$d"`
-			enter "$d0/$d"
+			enter "$d0/$d" verbose
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			if git log HEAD..origin/master | grep .; then
@@ -275,9 +303,10 @@ case "$cmd" in
 		done
 		;;
 	push|commit)
+		submit=$1
 		for d in $repos; do
 			dv=`visible_repo_name "$d"`
-			enter "$d0/$d"
+			enter "$d0/$d" verbose
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
 			if git diff HEAD | grep .; then
@@ -291,15 +320,23 @@ case "$cmd" in
 					verbose git commit -a
 				fi
 			fi
-			if git log "origin/$r".."$r" | grep .; then
+			rem=`git config "branch.$r.remote" || echo origin`
+			if git log "$rem/$r".."$r" | grep .; then
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Push \"$r\" in $dv?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					verbose git push `git config "branch.$r.remote" || echo origin` HEAD
+					verbose git push "$rem" HEAD
 				fi
+			fi
+			if [ x"$submit" = x"-s" ]; then
+				case "$r" in
+					*/*)
+						verbose git push "$rem" HEAD:"${r%%/*}/finished/${r#*/}"
+						;;
+				esac
 			fi
 			cd "$d0"
 		done
@@ -313,17 +350,23 @@ case "$cmd" in
 				fi
 			fi
 		fi
-		enter "$d0/fteqcc"
+		enter "$d0/fteqcc" verbose
 		verbose make $MAKEFLAGS
-		enter "$d0/data/xonotic-data.pk3dir"
+		enter "$d0/data/xonotic-data.pk3dir" verbose
 		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" $MAKEFLAGS
-		enter "$d0/darkplaces"
+		enter "$d0/darkplaces" verbose
 		verbose make $MAKEFLAGS sv-debug
 		verbose make $MAKEFLAGS cl-debug
-		verbose make $MAKEFLAGS sdl-debug
+		if ! [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose make $MAKEFLAGS sdl-debug
+		fi
 		;;
 	run)
-		client=-sdl
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			client=
+		else
+			client=-sdl
+		fi
 		case "$1" in
 			sdl|glx|agl|dedicated)
 				client=-$1
@@ -347,16 +390,112 @@ case "$cmd" in
 		;;
 	each|foreach)
 		for d in $repos; do
-			enter "$d0/$d"
+			enter "$d0/$d" verbose
 			verbose "$@"
 			cd "$d0"
+		done
+		;;
+	save-patches)
+		outfile=$1
+		patchdir=`mktemp -d -t save-patches.XXXXXX`
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			git branch -v -v | cut -c 3- | {
+				i=0
+				while read -r BRANCH REV UPSTREAM TEXT; do
+					case "$UPSTREAM" in
+						\[*)
+							UPSTREAM=${UPSTREAM#\[}
+							UPSTREAM=${UPSTREAM%\]}
+							UPSTREAM=${UPSTREAM%:*}
+							TRACK=true
+							;;
+						*)
+							UPSTREAM=origin/master
+							TRACK=false
+							;;
+					esac
+					if [ x"$REV" = x"->" ]; then
+						continue
+					fi
+					if git format-patch -o "$patchdir/$i" "$UPSTREAM".."$BRANCH"; then
+						echo "$d" > "$patchdir/$i/info.txt"
+						echo "$BRANCH" >> "$patchdir/$i/info.txt"
+						echo "$UPSTREAM" >> "$patchdir/$i/info.txt"
+						echo "$TRACK" >> "$patchdir/$i/info.txt"
+						i=$(($i+1))
+					else
+						rm -rf "$patchdir/$i"
+					fi
+				done
+			}
+		done
+		( cd "$patchdir" && tar cvzf - . ) > "$outfile"
+		rm -rf "$patchdir"
+		;;
+	restore-patches)
+		infile=$1
+		patchdir=`mktemp -d -t restore-patches.XXXXXX`
+		( cd "$patchdir" && tar xvzf - ) < "$infile"
+		# detach the head
+		for P in "$patchdir"/*/info.txt; do
+			D=${P%/info.txt}
+			exec 3<"$P"
+			read -r d <&3
+			read -r BRANCH <&3
+			read -r UPSTREAM <&3
+			read -r TRACK <&3
+			verbose git checkout HEAD^0
+			verbose git branch -D "$BRANCH"
+			if [ x"$TRACK" = x"true" ]; then
+				verbose git checkout --track -b "$BRANCH" "$UPSTREAM"
+			else
+				verbose git branch -b "$BRANCH" "$UPSTREAM"
+			fi
+			verbose git am "$D"
+		done
+		rm -rf "$patchdir"
+		;;
+	admin-merge)
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			git rev-parse "$1/$2" || continue
+			# 1. review
+			{
+				git log HEAD.."$1/$2"
+				git diff HEAD..."$1/$2"
+			} | less
+			a=
+			while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+				echo "Merge \"$1/$2\" into `git symbolic-ref HEAD` of $d?"
+				read -r a
+			done
+			if [ x"$a" = x"y" ]; then
+				git merge "$1/$2"
+				cd "$d0"
+				a=
+				if ! "$SELF" compile; then
+					a=n
+				fi
+				cd "$d0/$d"
+				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+					echo "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."
+					read -r a
+				done
+				if [ x"$a" = x"y" ]; then
+					git push origin HEAD
+					git push "$1" :"$2"
+				else
+					git reset --hard HEAD@{1}
+				fi
+			fi
 		done
 		;;
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
 		echo "  $SELF merge"
-		echo "  $SELF push"
+		echo "  $SELF push [-s]"
 		echo "  $SELF branches"
 		echo "  $SELF branch [<remote>] <branchname>"
 		echo "  $SELF branch <remote> <branchname> <srcbranchname>"
