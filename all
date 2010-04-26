@@ -374,6 +374,7 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
+			export PATH="$d0/misc/buildfiles/w32:$PATH"
 		else
 			client=-sdl
 		fi
