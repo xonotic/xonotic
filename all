@@ -226,13 +226,17 @@ case "$cmd" in
 				dv=`visible_repo_name "$d"`
 				enter "$d0/$d"
 				a=
-				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Branch in $dv?"
-					read -r a
-				done
-				if [ x"$a" = x"y" ]; then
-					verbose git push "$remote" "$srcbranch":"$branch"
-					verbose git checkout --track -b "$branch" "$remote/$branch"
+				if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
+					echo "Already having this branch in $dv."
+				else
+					while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
+						echo "Branch in $dv?"
+						read -r a
+					done
+					if [ x"$a" = x"y" ]; then
+						verbose git push "$remote" "$srcbranch":"$branch"
+						verbose git checkout --track -b "$branch" "$remote/$branch"
+					fi
 				fi
 				cd "$d0"
 			done
