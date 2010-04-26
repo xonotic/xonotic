@@ -119,6 +119,16 @@ repos_urls="
 	netradiant
 "
 
+repos_urls=`
+	for X in $repos_urls; do 
+		d="${X%%@*}"
+		p="${d%dir}"
+		if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! [ -f "$p" ]; then
+			echo "$X"
+		fi
+	done
+`
+
 repos=`for X in $repos_urls; do echo "${X%%@*}"; done`
 
 if [ "$#" = 0 ]; then
