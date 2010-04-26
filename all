@@ -352,6 +352,25 @@ case "$cmd" in
 		done
 		;;
 	compile)
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			TARGETS="sv-debug cl-debug"
+		else
+			TARGETS="sv-debug cl-debug sdl-debug"
+		fi
+		case "$1" in
+			sdl)
+				TARGETS="sdl-debug"
+				shift
+				;;
+			glx|agl|wgl)
+				TARGETS="cl-debug"
+				shift
+				;;
+			dedicated)
+				TARGETS="sv-debug"
+				shift
+				;;
+		esac
 		if [ -z "$MAKEFLAGS" ]; then
 			if [ -f /proc/cpuinfo ]; then
 				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
@@ -365,11 +384,9 @@ case "$cmd" in
 		enter "$d0/data/xonotic-data.pk3dir" verbose
 		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" $MAKEFLAGS
 		enter "$d0/darkplaces" verbose
-		verbose make $MAKEFLAGS sv-debug
-		verbose make $MAKEFLAGS cl-debug
-		if ! [ -n "$WE_HATE_OUR_USERS" ]; then
-			verbose make $MAKEFLAGS sdl-debug
-		fi
+		for T in $TARGETS; do
+			verbose make $MAKEFLAGS "$T"
+		done
 		;;
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
