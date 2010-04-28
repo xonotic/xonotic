@@ -331,7 +331,7 @@ case "$cmd" in
 				fi
 			fi
 			rem=`git config "branch.$r.remote" || echo origin`
-			if git log "$rem/$r".."$r" | grep .; then
+			if { git log "$rem/$r".."$r" || git log origin/master.."$r"; } | grep .; then
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Push \"$r\" in $dv?"
