@@ -108,28 +108,53 @@ enter()
 }
 
 repos_urls="
-	.
-	data/xonotic-data.pk3dir
-	data/xonotic-maps.pk3dir
-	data/xonotic-music.pk3dir
-	data/xonotic-nexcompat.pk3dir
-	darkplaces
-	fteqcc@git://github.com/Blub/qclib.git
-	div0-gittools@git://git.icculus.org/divverent/div0-gittools.git
-	netradiant
+.                             |                                                   | master
+data/xonotic-data.pk3dir      |                                                   | master
+data/xonotic-maps.pk3dir      |                                                   | master
+data/xonotic-music.pk3dir     |                                                   | master
+data/xonotic-nexcompat.pk3dir |                                                   | master
+darkplaces                    |                                                   | div0-stable
+fteqcc                        | git://github.com/Blub/qclib.git                   | master
+div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master
+netradiant                    |                                                   | master
 "
+# todo: in darkplaces, change repobranch to div0-stable
 
-repos_urls=`
-	for X in $repos_urls; do 
-		d="${X%%@*}"
-		p="${d%dir}"
-		if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! [ -f "$p" ]; then
-			echo "$X"
+repos=`echo "$repos_urls" | grep . | cut -d '|' -f 1 | tr -d ' '`
+
+base=`git config remote.origin.url`
+base=${base%xonotic.git}
+
+repourl()
+{
+	t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	if [ -n "$t" ]; then
+		echo "$t"
+	else
+		if [ x"$1" = x"." ]; then
+			echo "$base""xonotic.git"
+		else
+			echo "$base${1##*/}.git"
 		fi
-	done
-`
+	fi
+}
 
-repos=`for X in $repos_urls; do echo "${X%%@*}"; done`
+repobranch()
+{
+	t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
+	if [ -n "$t" ]; then
+		echo "$t"
+	else
+		echo "master"
+	fi
+}
+
+repos=`for d in $repos; do
+	p="${d%dir}"
+	if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! [ -f "$p" ]; then
+		echo "$d"
+	fi
+done`
 
 if [ "$#" = 0 ]; then
 	set -- help
@@ -139,32 +164,12 @@ shift
 
 case "$cmd" in
 	update|pull)
-		base=`git config remote.origin.url`
-		base=${base%xonotic.git}
-		for dcomplete in $repos_urls; do
-			case "$dcomplete" in
-				*@*)
-					d=${dcomplete%%@*}
-					url=${dcomplete#*@}
-					switch=false
-					;;
-				*)
-					d=${dcomplete%%@*}
-					url=$base${d##*/}.git
-					switch=true
-					;;
-			esac
+		for d in $repos; do
+			url=`repourl "$d"`
+			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
 				enter "$d0/$d" verbose
-				case "$d" in
-					.)
-						;;
-					*)
-						if $switch; then
-							verbose git config remote.origin.url "$url"
-						fi
-						;;
-				esac
+				verbose git config remote.origin.url "$url"
 				verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 					# TODO remove this line later
 
@@ -188,6 +193,9 @@ case "$cmd" in
 				cd "$d0"
 			else
 				verbose git clone "$url" "$d0/$d"
+				enter "$d0/$d" verbose
+				verbose git checkout "$branch"
+				cd "$d0"
 			fi
 		done
 		;;
@@ -208,7 +216,7 @@ case "$cmd" in
 				exists=true
 				verbose git checkout --track -b "$branch" "$remote/$branch"
 			else
-				verbose git checkout master
+				verbose git checkout "`repobranch "$d"`"
 			fi
 			cd "$d00"
 			checkself "$cmd" "$@"
@@ -226,9 +234,6 @@ case "$cmd" in
 		if [ -z "$branch" ]; then
 			branch=$remote
 			remote=origin
-		fi
-		if [ -z "$srcbranch" ]; then
-			srcbranch=master
 		fi
 		if [ -z "$branch" ]; then
 			for d in $repos; do
@@ -251,7 +256,12 @@ case "$cmd" in
 						read -r a
 					done
 					if [ x"$a" = x"y" ]; then
-						verbose git push "$remote" "$srcbranch":"$branch"
+						if [ -n "$srcbranch" ]; then
+							b=$srcbranch
+						else
+							b="`repobranch "$d"`"
+						fi
+						verbose git push "$remote" "$b":"$branch"
 						verbose git checkout --track -b "$branch" "$remote/$branch"
 					fi
 				fi
@@ -295,15 +305,15 @@ case "$cmd" in
 			enter "$d0/$d" verbose
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
-			if git log HEAD..origin/master | grep .; then
+			if git log HEAD..origin/"`repobranch "$d"`" | grep .; then
 				# we have uncommitted changes
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Could merge from \"master\" into \"$r\" in $dv. Do it?"
+					echo "Could merge from \"`repobranch "$d"`\" into \"$r\" in $dv. Do it?"
 					read -r a
 				done
 				if [ x"$a" = x"y" ]; then
-					if ! verbose git merge origin/master; then
+					if ! verbose git merge origin/"`repobranch "$d"`"; then
 						check_mergeconflict "$d"
 						exit 1 # this should ALWAYS be fatal
 					fi
@@ -331,7 +341,7 @@ case "$cmd" in
 				fi
 			fi
 			rem=`git config "branch.$r.remote" || echo origin`
-			if { git log "$rem/$r".."$r" || git log origin/master.."$r"; } | grep .; then
+			if { git log "$rem/$r".."$r" || git log origin/"`repobranch "$d"`".."$r"; } | grep .; then
 				a=
 				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
 					echo "Push \"$r\" in $dv?"
@@ -413,8 +423,11 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		#verbose "darkplaces/darkplaces$client" -xonotic "$@"
-		verbose "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
+		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
+		if [ -n "$USE_GDB" ]; then
+			set -- gdb --args "$@"
+		fi
+		"$@"
 		;;
 	each|foreach)
 		for d in $repos; do
@@ -439,7 +452,7 @@ case "$cmd" in
 							TRACK=true
 							;;
 						*)
-							UPSTREAM=origin/master
+							UPSTREAM=origin/"`repobranch "$d"`"
 							TRACK=false
 							;;
 					esac
