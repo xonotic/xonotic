@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="128"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="closebutton_f.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/sev/.xonotic/data/wickedx/svg/closebutton_f.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 64 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="128 : 64 : 1"
+       inkscape:persp3d-origin="64 : 42.666667 : 1"
+       id="perspective28" />
+    <linearGradient
+       id="linearGradient3197">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop3199" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop3201" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3197"
+       id="linearGradient2447"
+       gradientUnits="userSpaceOnUse"
+       x1="62"
+       y1="14.839343"
+       x2="62"
+       y2="70.772141"
+       gradientTransform="matrix(0.9411765,0,0,0.9725958,17.647056,-7.2326824)" />
+    <pattern
+       id="ColorFBright"
+       height="64"
+       width="64"
+       patternUnits="userSpaceOnUse">
+      <image
+         y="0"
+         x="0"
+         id="image2408"
+         height="64"
+         width="64"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/color_f.png"
+         xlink:href="textures/color_f.png" />
+    </pattern>
+    <pattern
+       id="ColorFBack"
+       height="64"
+       width="64"
+       patternUnits="userSpaceOnUse">
+      <image
+         y="0"
+         x="0"
+         id="image2390"
+         height="64"
+         width="64"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/color_f_back.png"
+         xlink:href="textures/color_f_back.png" />
+    </pattern>
+    <filter
+       inkscape:collect="always"
+       id="filter3893"
+       x="-0.288"
+       width="1.576"
+       y="-0.288"
+       height="1.576">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="4.8"
+         id="feGaussianBlur3895" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3897"
+       x="-0.192"
+       width="1.384"
+       y="-0.192"
+       height="1.384">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="5.12"
+         id="feGaussianBlur3899" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3901">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.2"
+         id="feGaussianBlur3903" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3905">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.53170537"
+         id="feGaussianBlur3907" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="110.26816"
+     inkscape:cy="59.703548"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:showpageshadow="false"
+     inkscape:snap-bbox="true"
+     gridtolerance="8"
+     inkscape:window-width="1280"
+     inkscape:window-height="961"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     guidecolor="#00007f"
+     guideopacity="0.49803922"
+     guidehicolor="#ff0000"
+     guidehiopacity="0.49803922">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2389"
+       visible="true"
+       enabled="true"
+       empspacing="4"
+       color="#003fff"
+       opacity="0.1254902"
+       empcolor="#007eff"
+       empopacity="0.25098039" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3901)"
+       d="M 76,12 C 53.92,12 36,29.92 36,52 C 36,74.08 53.92,92.000001 76,92 C 98.08,92 116,74.080001 116,52 C 116,29.92 98.080001,12 76,12 z"
+       id="GlassBlack" />
+    <path
+       style="opacity:1;fill:url(#ColorFBack);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3897)"
+       d="M 76,20 C 58.336001,20 44,34.336 44,52 C 44,69.663999 58.336,83.999998 76,84 C 93.663999,84 108,69.663999 108,52 C 108,34.336001 93.663999,20.000001 76,20 z"
+       id="GlassBack" />
+    <path
+       style="opacity:1;fill:url(#ColorFBright);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3893)"
+       d="M 76 32 C 64.96 32 55.999999 40.96 56 52 C 56 63.04 64.959999 71.999999 76 72 C 87.04 72 96 63.039999 96 52 C 96 40.96 87.039999 32 76 32 z "
+       id="GlassColour" />
+    <path
+       style="fill:url(#linearGradient2447);fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1;filter:url(#filter3905);opacity:0.75"
+       d="M 76 20 C 58.335999 20 44.000002 34.335997 44 52 C 44 60.832 50.399999 48.793751 60 45.59375 C 79.2 39.19375 82.412496 48.787501 88.8125 55.1875 C 92.0125 58.387501 108 71.199999 108 52 C 108 34.335998 93.664 20 76 20 z "
+       id="GlassReflection" />
+  </g>
+</svg>

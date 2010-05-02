@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="512"
+   height="512"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="border.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/sev/.xonotic/data/wickedx/svg/border.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 256 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="512 : 256 : 1"
+       inkscape:persp3d-origin="256 : 170.66667 : 1"
+       id="perspective34" />
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="512"
+       height="512"
+       id="ImgMetal1">
+      <image
+         xlink:href="textures/metal1.png"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal1.png"
+         width="512"
+         height="512"
+         id="image2401"
+         x="0"
+         y="0" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="512"
+       height="512"
+       id="ImgMetal1_90">
+      <image
+         transform="matrix(0,-1,1,0,0,0)"
+         xlink:href="textures/metal1.png"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal1.png"
+         width="512"
+         height="512"
+         id="image3906"
+         x="0"
+         y="0" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="512"
+       height="512"
+       id="ImgMetal2">
+      <image
+         xlink:href="textures/metal2.png"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal2.png"
+         width="512"
+         height="512"
+         id="image3903"
+         x="0"
+         y="0" />
+    </pattern>
+    <filter
+       inkscape:collect="always"
+       id="filter3892">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.028"
+         id="feGaussianBlur3894" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3890">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.03"
+         id="feGaussianBlur3892" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3898">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.512"
+         id="feGaussianBlur3900" />
+    </filter>
+    <pattern
+       id="ImgMetal1Border"
+       height="512"
+       width="512"
+       patternUnits="userSpaceOnUse">
+      <image
+         y="0"
+         x="0"
+         id="image2516"
+         height="512"
+         width="512"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal1_border.png"
+         xlink:href="textures/metal1_border.png" />
+    </pattern>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="81.1135"
+     inkscape:cy="269.53147"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:showpageshadow="false"
+     inkscape:snap-bbox="true"
+     gridtolerance="8"
+     inkscape:window-width="1280"
+     inkscape:window-height="963"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     guidecolor="#00007f"
+     guideopacity="0.49803922"
+     guidehicolor="#ff0000"
+     guidehiopacity="0.49803922">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2389"
+       visible="true"
+       enabled="true"
+       empspacing="4"
+       color="#003fff"
+       opacity="0.1254902"
+       empcolor="#007eff"
+       empopacity="0.25098039" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="128,0"
+       id="guide3220" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="384,0"
+       id="guide3224" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="0,128"
+       id="guide2407" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="0,384"
+       id="guide2409" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       style="fill:#000000;fill-opacity:0.96862745;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 24 104 L 24 488 L 488 488 L 488 104 L 24 104 z "
+       id="Field"
+       inkscape:export-xdpi="45"
+       inkscape:export-ydpi="45" />
+    <path
+       style="fill:url(#ImgMetal1);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 36,456 L 60,480 L 452,480 L 476,456 L 500,480 L 476,504 L 36,504 L 12,480 L 36,456 z"
+       id="FrameBottom" />
+    <path
+       style="fill:url(#ImgMetal1_90);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 408,112 L 424,96 L 508,96 L 508,472 L 500,480 L 476,456 L 480,452 L 480,128 L 464,112 L 408,112 z"
+       id="FrameRight" />
+    <path
+       id="FrameLeft"
+       d="M 104,112 L 88,96 L 24,96 L 4,116 L 4,472 L 12,480 L 36,456 L 32,452 L 32,128 L 48,112 L 104,112 z"
+       style="fill:url(#ImgMetal1_90);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:url(#ImgMetal1);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 24,32 L 48,8 L 480,8 L 508,36 L 508,96 L 424,96 L 408,112 L 104,112 L 88,96 L 24,96 L 24,32 z"
+       id="FrameTop" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:url(#ImgMetal1Border);stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3890)"
+       d="M 32,128 L 48,112 L 464,112 L 480,128 L 480,452 L 452,480 L 60,480 L 32,452 L 32,128 z"
+       id="FrameBorder" />
+    <path
+       style="fill:url(#ImgMetal2);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter3898)"
+       d="M 32,0 L 0,32 L 0,480 L 32,512 L 480,512 L 512,480 L 512,32 L 480,0 L 32,0 z M 56,16 L 72,16 L 56,32 L 56,88 L 48,88 L 40,80 L 40,32 L 56,16 z M 88,16 L 104,16 L 88,32 L 88,88 L 80,88 L 72,80 L 72,32 L 88,16 z M 120,16 L 392,16 L 408,32 L 408,88 L 392,104 L 120,104 L 104,88 L 104,32 L 120,16 z M 24,104 L 72,104 L 88,120 L 424,120 L 440,104 L 488,104 L 504,120 L 504,392 L 496,400 L 496,456 L 492,460 L 484,460 L 476,452 L 452,476 L 460,484 L 460,492 L 456,496 L 56,496 L 52,492 L 52,484 L 60,476 L 36,452 L 28,460 L 20,460 L 16,456 L 16,400 L 8,392 L 8,120 L 24,104 z M 36,468 L 44,476 L 32,488 L 28,488 L 24,484 L 24,480 L 36,468 z M 476,468 L 488,480 L 488,484 L 484,488 L 480,488 L 468,476 L 476,468 z"
+       id="Att" />
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3892)"
+       d="M 32,0 L 0,32 L 0,480 L 32,512 L 480,512 L 512,480 L 512,32 L 480,0 L 32,0 z M 56,16 L 72,16 L 56,32 L 56,88 L 48,88 L 40,80 L 40,32 L 56,16 z M 88,16 L 104,16 L 88,32 L 88,88 L 80,88 L 72,80 L 72,32 L 88,16 z M 120,16 L 392,16 L 408,32 L 408,88 L 392,104 L 120,104 L 104,88 L 104,32 L 120,16 z M 24,104 L 72,104 L 88,120 L 424,120 L 440,104 L 488,104 L 504,120 L 504,392 L 496,400 L 496,456 L 492,460 L 484,460 L 476,452 L 452,476 L 460,484 L 460,492 L 456,496 L 56,496 L 52,492 L 52,484 L 60,476 L 36,452 L 28,460 L 20,460 L 16,456 L 16,400 L 8,392 L 8,120 L 24,104 z M 36,468 L 44,476 L 32,488 L 28,488 L 24,484 L 24,480 L 36,468 z M 476,468 L 488,480 L 488,484 L 484,488 L 480,488 L 468,476 L 476,468 z"
+       id="AttShadow" />
+  </g>
+</svg>
