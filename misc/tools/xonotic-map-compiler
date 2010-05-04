@@ -5,15 +5,15 @@ use warnings;
 use POSIX;
 use File::Temp;
 
-# change these to match your system, or define them in ~/.nexuiz-map-compiler
-# (just copy paste this part to the file ~/.nexuiz-map-compiler)
+# change these to match your system, or define them in ~/.xonotic-map-compiler
+# (just copy paste this part to the file ~/.xonotic-map-compiler)
 
-	# Path to Nexuiz (where the data directory is in)
-	our $NEXUIZDIR   = '/home/polzer/Nexvn/nexuiz';
+	# Path to Xonotic (where the data directory is in)
+	our $XONOTICDIR   = '/home/rpolzer/Games/Xonotic';
 
 	# Path to your q3map2 program. You find it in your GtkRadiant/install
 	# directory.
-	our $Q3MAP2      = '/home/users4/ommz/polzer/bin/q3map2.x86';
+	our $Q3MAP2      = '/home/rpolzer/Games/Xonotic/netradiant/install/q3map2.x86';
 
 	# General flags for q3map2 (for example -threads 4)
 	our $Q3MAP2FLAGS = '';
@@ -35,7 +35,7 @@ use File::Temp;
 
 # end of user changable part
 
-do "$ENV{HOME}/.nexuiz-map-compiler";
+do "$ENV{HOME}/.xonotic-map-compiler";
 
 sub Usage()
 {
@@ -134,11 +134,11 @@ while(@ARGV)
 	}
 }
 
-my $linkdir = File::Temp::tempdir("nexuiz-map-compiler.XXXXXX", TMPDIR => 1, CLEANUP => 1);
+my $linkdir = File::Temp::tempdir("xonotic-map-compiler.XXXXXX", TMPDIR => 1, CLEANUP => 1);
 
 sub q3map2(@)
 {
-	my @args = ($Q3MAP2, split(/\s+/, $Q3MAP2FLAGS), '-game', 'nexuiz', '-fs_basepath', $NEXUIZDIR, '-fs_basepath', $linkdir, '-v', @_);
+	my @args = ($Q3MAP2, split(/\s+/, $Q3MAP2FLAGS), '-game', 'xonotic', '-fs_basepath', $XONOTICDIR, '-fs_basepath', $linkdir, '-v', @_);
 	print "\$ @args\n";
 	return !system @args;
 }
@@ -173,7 +173,7 @@ for my $m(@{$options->{maps}})
 
 	my $previous_shaderlist = undef;
 	my $shaderlist = "";
-	if(open my $fh, "<", "$NEXUIZDIR/scripts/shaderlist.txt")
+	if(open my $fh, "<", "$XONOTICDIR/data/xonotic-maps.pk3dir/scripts/shaderlist.txt")
 	{
 		while(<$fh>)
 		{
@@ -182,12 +182,12 @@ for my $m(@{$options->{maps}})
 
 		# we may have to restore the file on exit
 		$previous_shaderlist = $shaderlist
-			if "$NEXUIZDIR/data" eq $mapdir;
+			if "$XONOTICDIR/data" eq $mapdir;
 	}
 	else
 	{
 		# possibly extract the shader list from a pk3?
-		local $ENV{N} = $NEXUIZDIR;
+		local $ENV{N} = $XONOTICDIR;
 		$shaderlist = `cd "\$N" && for X in "\$N"/data/data*.pk3; do Y=\$X; done; unzip -p "\$Y" scripts/shaderlist.txt`;
 	}
 
