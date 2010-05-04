@@ -261,6 +261,7 @@ case "$cmd" in
 						else
 							b="`repobranch "$d"`"
 						fi
+						# TODO do this without pushing
 						verbose git push "$remote" "$b":"$branch"
 						verbose git checkout --track -b "$branch" "$remote/$branch"
 					fi
@@ -298,6 +299,43 @@ case "$cmd" in
 				echo
 			done
 		done
+		;;
+	branches_short)
+		for d in $repos; do
+			cd "$d0/$d" # am in a pipe, shouldn't use enter
+			git branch -a -v -v | cut -c 3- | sed "s,^,$d ,"
+			cd "$d0"
+		done | {
+			branches_list=
+			# branches_repos_*=
+			while read -r d BRANCH REV UPSTREAM TEXT; do
+				case "$UPSTREAM" in
+					\[*)
+						UPSTREAM=${UPSTREAM#\[}
+						UPSTREAM=${UPSTREAM%\]}
+						UPSTREAM=${UPSTREAM%:*}
+						;;
+					*)
+						TEXT="$UPSTREAM $TEXT"
+						UPSTREAM=
+						;;
+				esac
+				if [ x"$REV" = x"->" ]; then
+					continue
+				fi
+				BRANCH=${BRANCH#remotes/}
+				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
+				branches_list="$branches_list $BRANCH" # TEH SORT MAKEZ IT UNIEQ
+				eval "r=\$branches_repos_$ID"
+				r="$r $d:$UPSTREAM"
+				eval "branches_repos_$ID=\$r"
+			done
+			echo -n "$branches_list" | xargs -n 1 echo | sort -u | while IFS= read -r BRANCH; do
+				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
+				eval "r=\$branches_repos_$ID"
+				echo "$BRANCH: $r"
+			done
+		}
 		;;
 	merge)
 		for d in $repos; do
