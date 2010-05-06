@@ -406,6 +406,15 @@ case "$cmd" in
 			TARGETS="sv-debug cl-debug sdl-debug"
 		fi
 		case "$1" in
+			-c)
+				clean=true
+				shift
+				;;
+			*)
+				clean=false
+				;;
+		esac
+		case "$1" in
 			sdl)
 				TARGETS="sdl-debug"
 				shift
@@ -426,14 +435,28 @@ case "$cmd" in
 					MAKEFLAGS=-j$ncpus
 				fi
 			fi
+			case "`uname`" in
+				Linux|*BSD)
+					MAKEFLAGS="$MAKEFLAGS DP_LINK_TO_LIBJPEG=1"
+					;;
+			esac
 		fi
 		enter "$d0/fteqcc" verbose
+		if $clean; then
+			verbose make $MAKEFLAGS clean
+		fi
 		verbose make $MAKEFLAGS
 		enter "$d0/data/xonotic-data.pk3dir" verbose
-		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" $MAKEFLAGS
+		if $clean; then
+			verbose make $MAKEFLAGS clean
+		fi
+		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
 		enter "$d0/darkplaces" verbose
+		if $clean; then
+			verbose make $MAKEFLAGS clean
+		fi
 		for T in $TARGETS; do
-			verbose make $MAKEFLAGS "$T"
+			verbose make $MAKEFLAGS "$@" "$T"
 		done
 		;;
 	run)
@@ -579,8 +602,8 @@ case "$cmd" in
 		echo "  $SELF branch [<remote>] <branchname>"
 		echo "  $SELF branch <remote> <branchname> <srcbranchname>"
 		echo "  $SELF checkout [<remote>] <branchname>"
-		echo "  $SELF compile"
-		echo "  $SELF run <client> <options>"
+		echo "  $SELF compile [-c] [<client>] <options>"
+		echo "  $SELF run [<client>] <options>"
 		echo "  $SELF each <command>"
 		;;
 esac
