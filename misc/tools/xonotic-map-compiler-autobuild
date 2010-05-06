@@ -24,7 +24,7 @@ git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 			cd maps
 			../../../misc/tools/xonotic-map-compiler "$M" -noshaderlist `head -n 1 "../$F"` 2>&1 | tee "$M.log"
 		)
-		zip -9r "$bspdir/$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "gfx/${M}_mini.tga"
+		zip -9r "$bspdir/$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	done
 done
 git checkout master
