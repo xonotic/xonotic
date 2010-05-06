@@ -99,6 +99,10 @@ while(@ARGV)
 	{
 		$options->{minimap} = undef;
 	}
+	elsif($_ eq '-noshaderlist')
+	{
+		$options->{noshaderlist} = 1;
+	}
 	elsif($_ eq '-order')
 	{
 		$options->{order} = [split /\s*,\s*/, shift @ARGV];
@@ -171,60 +175,65 @@ for my $m(@{$options->{maps}})
 
 	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "../scripts/*.shader";
 
-	my $previous_shaderlist = undef;
-	my $shaderlist = "";
-	if(open my $fh, "<", "$XONOTICDIR/data/xonotic-maps.pk3dir/scripts/shaderlist.txt")
+	my $restore_shaderlist = sub { };
+	if(!$options->{noshaderlist})
 	{
-		while(<$fh>)
+		my $previous_shaderlist = undef;
+		my $shaderlist = "";
+		if(open my $fh, "<", "$XONOTICDIR/data/xonotic-maps.pk3dir/scripts/shaderlist.txt")
 		{
-			$shaderlist .= $_;
+			while(<$fh>)
+			{
+				$shaderlist .= $_;
+			}
+
+			# we may have to restore the file on exit
+			$previous_shaderlist = $shaderlist
+				if "$XONOTICDIR/data" eq $mapdir;
+		}
+		else
+		{
+			# possibly extract the shader list from a pk3?
+			local $ENV{N} = $XONOTICDIR;
+			$shaderlist = `cd "\$N" && for X in "\$N"/data/data*.pk3; do Y=\$X; done; unzip -p "\$Y" scripts/shaderlist.txt`;
 		}
 
-		# we may have to restore the file on exit
-		$previous_shaderlist = $shaderlist
-			if "$XONOTICDIR/data" eq $mapdir;
-	}
-	else
-	{
-		# possibly extract the shader list from a pk3?
-		local $ENV{N} = $XONOTICDIR;
-		$shaderlist = `cd "\$N" && for X in "\$N"/data/data*.pk3; do Y=\$X; done; unzip -p "\$Y" scripts/shaderlist.txt`;
-	}
-
-	my $shaderlist_new = "";
-	for(split /\r?\n|\r/, $shaderlist)
-	{
-		delete $shaders{$_};
-		$shaderlist_new .= "$_\n";
-	}
-	if(%shaders)
-	{
-		for(sort keys %shaders)
+		my $shaderlist_new = "";
+		for(split /\r?\n|\r/, $shaderlist)
 		{
+			delete $shaders{$_};
 			$shaderlist_new .= "$_\n";
 		}
-	}
-	else
-	{
-		$shaderlist_new = undef;
-	}
-
-	my $restore_shaderlist = sub
-	{
-		if(defined $shaderlist_new)
+		if(%shaders)
 		{
-			if(defined $previous_shaderlist)
+			for(sort keys %shaders)
 			{
-				open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
-				print $fh $previous_shaderlist;
-				close $fh;
-			}
-			else
-			{
-				unlink "$mapdir/scripts/shaderlist.txt";
+				$shaderlist_new .= "$_\n";
 			}
 		}
-	};
+		else
+		{
+			$shaderlist_new = undef;
+		}
+
+		$restore_shaderlist = sub
+		{
+			if(defined $shaderlist_new)
+			{
+				if(defined $previous_shaderlist)
+				{
+					open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
+					print $fh $previous_shaderlist;
+					close $fh;
+				}
+				else
+				{
+					unlink "$mapdir/scripts/shaderlist.txt";
+				}
+			}
+		};
+	}
+
 	local $SIG{INT} = sub
 	{
 		print "SIGINT caught, cleaning up...\n";
