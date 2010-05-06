@@ -232,6 +232,14 @@ for my $m(@{$options->{maps}})
 				}
 			}
 		};
+
+		if(defined $shaderlist_new)
+		{
+			mkdir "$mapdir/scripts";
+			open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
+			print $fh $shaderlist_new;
+			close $fh;
+		}
 	}
 
 	local $SIG{INT} = sub
@@ -243,14 +251,6 @@ for my $m(@{$options->{maps}})
 
 	eval
 	{
-		if(defined $shaderlist_new)
-		{
-			mkdir "$mapdir/scripts";
-			open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
-			print $fh $shaderlist_new;
-			close $fh;
-		}
-
 		unlink <$m/lm_*>; # delete old external lightmaps
 		q3map2 '-bsp', @{$options->{bsp}},   "$m.map"
 			or die "-bsp: $?";

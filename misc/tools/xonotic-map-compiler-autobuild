@@ -4,6 +4,8 @@ bspdir="$PWD/bspfiles"
 mkdir -p "$bspdir"
 cd data/xonotic-maps.pk3dir
 git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+	git reset --hard
+	git clean -xfd
 	git checkout "$HASH"
 	for F in maps/*.map.options; do
 		if ! [ -f "$F" ]; then
