@@ -463,6 +463,9 @@ case "$cmd" in
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
 			export PATH="$d0/misc/buildfiles/w32:$PATH"
+		elif [ x"`uname`" = x"Darwin" ]; then
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Nexuiz.app/Contents/MacOS"
+			client=-sdl
 		else
 			client=-sdl
 		fi
