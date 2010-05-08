@@ -113,6 +113,7 @@ data/xonotic-data.pk3dir      |                                                 
 data/xonotic-maps.pk3dir      |                                                   | master
 data/xonotic-music.pk3dir     |                                                   | master
 data/xonotic-nexcompat.pk3dir |                                                   | master
+mediasource                   |                                                   | master
 darkplaces                    |                                                   | div0-stable
 fteqcc                        | git://github.com/Blub/qclib.git                   | master
 div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master
@@ -129,7 +130,14 @@ repourl()
 {
 	t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
 	if [ -n "$t" ]; then
-		echo "$t"
+		case "$t" in
+			*://*)
+				echo "$t"
+				;;
+			*)
+				echo "$base$t"
+				;;
+		esac
 	else
 		if [ x"$1" = x"." ]; then
 			echo "$base""xonotic.git"
