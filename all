@@ -448,6 +448,9 @@ case "$cmd" in
 					MAKEFLAGS="$MAKEFLAGS DP_LINK_TO_LIBJPEG=1"
 					;;
 			esac
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
+			fi
 		fi
 		enter "$d0/fteqcc" verbose
 		if $clean; then
