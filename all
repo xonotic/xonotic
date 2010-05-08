@@ -562,6 +562,9 @@ case "$cmd" in
 		rm -rf "$patchdir"
 		;;
 	admin-merge)
+		if [ "$#" = 2 ]; then
+			set -- "${1%%/*}" "${1#*/}"
+		fi
 		for d in $repos; do
 			enter "$d0/$d" verbose
 			git rev-parse "$1/$2" || continue
