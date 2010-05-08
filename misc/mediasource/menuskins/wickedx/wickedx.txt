@@ -1,0 +1,45 @@
+================================================================================
+WickedX Menu Skins
+================================================================================
+
+Released : April 2010
+Author   : Severin "sev" Meyer
+EMail    : sev.ch(at)web.de
+
+================================================================================
+Info
+================================================================================
+
+Since Inkscape can't link entities between svg files,
+I had to use colour images (/textures).
+
+To batch export tga images from the svg files,
+I wrote the export.sh, export_newversion.sh and png-tga.scm scripts.
+(Requires vi, Inkscape and Gimp. Put the Gimp script in ~/.gimp*/scripts/)
+
+================================================================================
+Credits
+================================================================================
+
+The programs I used:
+    vi, Inkscape 0.46, Gimp 2.6.2
+
+The Xonotic textures I used:
+    gfx/hud/sb_scoreboard_bg.tga
+    textures/eX/eXmetalBase03.tga
+
+The people who have given me helpful feedback:
+    sputnik, merlijn, Samual, -z-, tZork, C.Brutail
+
+================================================================================
+GNU General Public License
+================================================================================
+
+I release the files I created for the WickedX project under the terms of the
+GNU General Public License as published by the Free Software Foundation, either
+version 2 of the License, or any later version. <http://www.gnu.org/licenses/>
+
+All the files that are part of this project are distributed in the hope
+that they will be useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

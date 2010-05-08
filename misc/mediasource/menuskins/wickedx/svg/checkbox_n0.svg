@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="128"
+   height="128"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docname="checkbox_n0.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/sev/.xonotic/data/wickedx/svg/checkbox_n0.png"
+   inkscape:export-xdpi="45"
+   inkscape:export-ydpi="45">
+  <defs
+     id="defs4">
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="512"
+       height="512"
+       id="ImgMetal1">
+      <image
+         xlink:href="textures/metal1.png"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal1.png"
+         width="512"
+         height="512"
+         id="image2422"
+         x="0"
+         y="0" />
+    </pattern>
+    <pattern
+       id="ImgMetal1Border"
+       height="512"
+       width="512"
+       patternUnits="userSpaceOnUse">
+      <image
+         y="0"
+         x="0"
+         id="image2516"
+         height="512"
+         width="512"
+         sodipodi:absref="/home/sev/.xonotic/data/wickedx/svg/textures/metal1_border.png"
+         xlink:href="textures/metal1_border.png" />
+    </pattern>
+    <filter
+       inkscape:collect="always"
+       id="filter3872">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.45"
+         id="feGaussianBlur3874" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="75.104144"
+     inkscape:cy="53.962538"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:showpageshadow="false"
+     inkscape:snap-bbox="true"
+     gridtolerance="8"
+     inkscape:window-width="1280"
+     inkscape:window-height="961"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     guidecolor="#00007f"
+     guideopacity="0.49803922"
+     guidehicolor="#ff0000"
+     guidehiopacity="0.49803922">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2389"
+       visible="true"
+       enabled="true"
+       empspacing="4"
+       color="#003fff"
+       opacity="0.1254902"
+       empcolor="#007eff"
+       empopacity="0.25098039" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       style="fill:url(#ImgMetal1);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 8,104 L 8,24 L 24,8 L 104,8 L 120,24 L 120,104 L 104,120 L 24,120 L 8,104 z"
+       id="Frame" />
+    <path
+       id="FrameBorder"
+       d="M 8,104 L 8,24 L 24,8 L 104,8 L 120,24 L 120,104 L 104,120 L 24,120 L 8,104 z"
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:url(#ImgMetal1Border);stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;filter:url(#filter3872)" />
+  </g>
+</svg>
