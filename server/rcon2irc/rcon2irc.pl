@@ -1293,6 +1293,18 @@ sub cond($)
 	[ irc => q{:[^ ]* 001 .*} => sub {
 		$store{irc_seen_welcome} = 1;
 		$store{irc_nick} = $store{irc_nick_requested};
+		
+		# If users for quakenet are listed, parse them into a hash and schedule a sub to query information
+		if ($config{irc_quakenet_authusers} ne '') {
+			$store{irc_quakenet_users} = { map { $_ => 1 } split / /, $config{irc_quakenet_authusers} };
+	
+			schedule sub {
+				my ($timer) = @_;
+				out irc => 0, "PRIVMSG Q :users " . $config{irc_channel};
+				schedule $timer => 300;;
+			} => 1;
+		}
+
 		return irc_joinstage(0);
 	} ],
 
@@ -1687,17 +1699,6 @@ for my $p(split ' ', $config{plugins})
 	}
 }
 
-
-# If users for quakenet are listed, parse them into a hash and schedule a sub to query information
-if ($config{irc_quakenet_authusers} ne '') {
-	$store{irc_quakenet_users} = { map { $_ => 1 } split / /, $config{irc_quakenet_authusers} };
-	
-	schedule sub {
-		my ($timer) = @_;
-		out irc => 0, "PRIVMSG Q :users " . $config{irc_channel};
-		schedule $timer => 300;;
-	} => 1;
-}
 
 
 # verify that the server is up by letting it echo back a string that causes
