@@ -101,6 +101,16 @@ check_mergeconflict()
 	fi
 }
 
+yesno()
+{
+	yesno=
+	while [ x"$yesno" != x"y" -a x"$yesno" != x"n" ]; do
+		echo "$1"
+		IFS= read -r yesno
+	done
+	[ x"$yesno" = x"y" ]
+}
+
 enter()
 {
 	$2 cd "$1"
@@ -261,15 +271,10 @@ case "$cmd" in
 			for d in $repos; do
 				dv=`visible_repo_name "$d"`
 				enter "$d0/$d" verbose
-				a=
 				if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
 					echo "Already having this branch in $dv."
 				else
-					while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-						echo "Branch in $dv?"
-						read -r a
-					done
-					if [ x"$a" = x"y" ]; then
+					if yesno "Branch in $dv?"; then
 						if [ -n "$srcbranch" ]; then
 							b=$srcbranch
 						else
@@ -359,12 +364,7 @@ case "$cmd" in
 			r=${r#refs/heads/}
 			if git log HEAD..origin/"`repobranch "$d"`" | grep .; then
 				# we have uncommitted changes
-				a=
-				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Could merge from \"`repobranch "$d"`\" into \"$r\" in $dv. Do it?"
-					read -r a
-				done
-				if [ x"$a" = x"y" ]; then
+				if yesno "Could merge from \"`repobranch "$d"`\" into \"$r\" in $dv. Do it?"; then
 					if ! verbose git merge origin/"`repobranch "$d"`"; then
 						check_mergeconflict "$d"
 						exit 1 # this should ALWAYS be fatal
@@ -383,23 +383,13 @@ case "$cmd" in
 			r=${r#refs/heads/}
 			if git diff HEAD | grep .; then
 				# we have uncommitted changes
-				a=
-				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Uncommitted changes in \"$r\" in $dv. Commit?"
-					read -r a
-				done
-				if [ x"$a" = x"y" ]; then
+				if yesno "Uncommitted changes in \"$r\" in $dv. Commit?"; then
 					verbose git commit -a
 				fi
 			fi
 			rem=`git config "branch.$r.remote" || echo origin`
 			if { git log "$rem/$r".."$r" || git log origin/"`repobranch "$d"`".."$r"; } | grep .; then
-				a=
-				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Push \"$r\" in $dv?"
-					read -r a
-				done
-				if [ x"$a" = x"y" ]; then
+				if yesno "Push \"$r\" in $dv?"; then
 					verbose git push "$rem" HEAD
 				fi
 			fi
@@ -591,24 +581,9 @@ case "$cmd" in
 				git log HEAD.."$1/$2"
 				git diff HEAD..."$1/$2"
 			} | less
-			a=
-			while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-				echo "Merge \"$1/$2\" into `git symbolic-ref HEAD` of $d?"
-				read -r a
-			done
-			if [ x"$a" = x"y" ]; then
+			if yesno "Merge \"$1/$2\" into `git symbolic-ref HEAD` of $d?"; then
 				git merge "$1/$2"
-				cd "$d0"
-				a=
-				if ! "$SELF" compile; then
-					a=n
-				fi
-				cd "$d0/$d"
-				while [ x"$a" != x"y" -a x"$a" != x"n" ]; do
-					echo "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."
-					read -r a
-				done
-				if [ x"$a" = x"y" ]; then
+				if "$SELF" compile && yesno "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
 					git push origin HEAD
 					git push "$1" :"$2"
 				else
@@ -616,6 +591,47 @@ case "$cmd" in
 				fi
 			fi
 		done
+		;;
+	admin-merge-2)
+		t=`mktemp`
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			for ref in `git for-each-ref --format='%(refname)' refs/remotes/origin/`; do
+				case "${ref#refs/remotes/origin/}" in
+					"`repobranch "$d"`")
+						continue
+						;;
+					HEAD|master)
+						continue
+						;;
+				esac
+				echo "$ref"
+				if git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null; then
+					echo "Not merging, already had this one"
+				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log HEAD.."$ref"; git diff HEAD.."$ref"; } | less'; then
+					org=`git rev-parse HEAD`
+					if ! git merge "$ref" 2>&1 | tee "$t"; then
+						git reset --hard "$org"
+						git notes --ref "refs/notes/admin-merge" add -m "Merge failed:
+`cat "$t"`" "$ref"
+					elif ! "$SELF" compile 2>&1 | tee "$t"; then
+						git reset --hard "$org"
+						git notes --ref "refs/notes/admin-merge" add -m "Compile failed:
+`cat "$t"`" "$ref"
+					elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
+						git reset --hard HEAD@{1}
+						git notes --ref "refs/notes/admin-merge" add "$ref"
+					else
+						git push origin HEAD
+						git push origin :"${ref#refs/remotes/origin/}"
+					fi
+				else
+					git reset --hard HEAD@{1}
+					git notes --ref "refs/notes/admin-merge" add "$ref"
+				fi
+			done
+		done
+		rm -f "$t"
 		;;
 	*)
 		echo "Usage:"
