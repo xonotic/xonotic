@@ -172,33 +172,39 @@ shift
 
 case "$cmd" in
 	update|pull)
+		allow_pull=true
+		if [ x"$1" = x"-N" ]; then
+			allow_pull=false
+		fi
 		for d in $repos; do
 			url=`repourl "$d"`
 			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
-				enter "$d0/$d" verbose
-				verbose git config remote.origin.url "$url"
-				verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-					# TODO remove this line later
+				if $allow_pull; then
+					enter "$d0/$d" verbose
+					verbose git config remote.origin.url "$url"
+					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+						# TODO remove this line later
 
-				verbose git config core.autocrlf false
-				verbose git config core.safecrlf false # we don't NEED that...
+					verbose git config core.autocrlf false
+					verbose git config core.safecrlf false # we don't NEED that...
 
-				r=`git symbolic-ref HEAD`
-				r=${r#refs/heads/}
-				if git config branch.$r.remote >/dev/null 2>&1; then
-					if ! verbose git pull; then
-						check_mergeconflict "$d"
-						echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
-						read -r DUMMY
+					r=`git symbolic-ref HEAD`
+					r=${r#refs/heads/}
+					if git config branch.$r.remote >/dev/null 2>&1; then
+						if ! verbose git pull; then
+							check_mergeconflict "$d"
+							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
+							read -r DUMMY
+						fi
 					fi
-				fi
 
-				cd "$d00"
-				checkself "$cmd" "$@"
-				cd "$d0/$d"
-				verbose git remote prune origin
-				cd "$d0"
+					cd "$d00"
+					checkself "$cmd" "$@"
+					cd "$d0/$d"
+					verbose git remote prune origin
+					cd "$d0"
+				fi
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
@@ -506,9 +512,10 @@ case "$cmd" in
 		;;
 	each|foreach)
 		for d in $repos; do
-			enter "$d0/$d" verbose
-			verbose "$@"
-			cd "$d0"
+			if verbose cd "$d0/$d"; then
+				verbose "$@"
+				cd "$d0"
+			fi
 		done
 		;;
 	save-patches)
