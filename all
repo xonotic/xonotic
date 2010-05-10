@@ -134,7 +134,15 @@ netradiant                    |                                                 
 repos=`echo "$repos_urls" | grep . | cut -d '|' -f 1 | tr -d ' '`
 
 base=`git config remote.origin.url`
-base=${base%xonotic.git}
+case "$base" in
+	*/xonotic.git)
+		base=${base%xonotic.git}
+		;;
+	*)
+		echo "The main repo is not xonotic.git, what have you done?"
+		exit 1
+		;;
+esac
 
 repourl()
 {
