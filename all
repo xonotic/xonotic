@@ -503,6 +503,14 @@ case "$cmd" in
 			fi
 		fi
 		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
+
+		# if pulseaudio is running: USE IT
+		if ps -C pulseaudio >/dev/null; then
+			if ldd /usr/lib/libSDL.so 2>/dev/null | grep pulse >/dev/null; then
+				export SDL_AUDIODRIVER=pulse
+			fi
+		fi
+
 		if [ -n "$USE_GDB" ]; then
 			set -- gdb --args "$@"
 		fi
