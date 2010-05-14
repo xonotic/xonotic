@@ -465,6 +465,7 @@ case "$cmd" in
 		if $clean; then
 			verbose make $MAKEFLAGS clean
 		fi
+		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
 		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
 		enter "$d0/darkplaces" verbose
 		if $clean; then
