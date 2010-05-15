@@ -119,16 +119,16 @@ enter()
 }
 
 repos_urls="
-.                             |                                                   | master
-data/xonotic-data.pk3dir      |                                                   | master
-data/xonotic-maps.pk3dir      |                                                   | master
-data/xonotic-music.pk3dir     |                                                   | master
-data/xonotic-nexcompat.pk3dir |                                                   | master
-mediasource                   |                                                   | master
-darkplaces                    |                                                   | div0-stable
-fteqcc                        | git://github.com/Blub/qclib.git                   | master
-div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master
-netradiant                    |                                                   | master
+.                             |                                                   | master      |
+data/xonotic-data.pk3dir      |                                                   | master      |
+data/xonotic-maps.pk3dir      |                                                   | master      |
+data/xonotic-music.pk3dir     |                                                   | master      |
+data/xonotic-nexcompat.pk3dir |                                                   | master      |
+mediasource                   |                                                   | master      |
+darkplaces                    |                                                   | div0-stable | svn
+fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
+div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master      |
+netradiant                    |                                                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
@@ -174,6 +174,12 @@ repobranch()
 	else
 		echo "master"
 	fi
+}
+
+repoflags()
+{
+	echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
+	echo "$t"
 }
 
 repos=`for d in $repos; do
@@ -627,6 +633,7 @@ case "$cmd" in
 				if git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null; then
 					echo "Not merging, already had this one"
 				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log HEAD.."$ref"; git diff HEAD..."$ref"; } | less'; then
+					git checkout master
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
 						git reset --hard "$org"
@@ -640,7 +647,16 @@ case "$cmd" in
 						git reset --hard "$org"
 						git notes --ref "refs/notes/admin-merge" add "$ref"
 					else
-						git push origin HEAD
+						case ",`repoflags "$d"`," in
+							*,svn,*)
+								git pull
+								git rebase -i "$org"
+								git svn dcommit --add-author-from
+								;;
+							*)
+								git push origin HEAD
+								;;
+						esac
 						if yesno "Delete original branch \"$ref\"?"; then
 							git push origin :"${ref#refs/remotes/origin/}"
 						fi
