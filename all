@@ -3,6 +3,10 @@
 
 set -e
 
+# I use this in EVERY shell script ;)
+LF="
+"
+
 d00=`pwd`
 while ! [ -f ./all ]; do
 	if [ x"`pwd`" = x"/" ]; then
@@ -618,8 +622,25 @@ case "$cmd" in
 		;;
 	admin-merge-2)
 		t=`mktemp`
+		report=""
+		reportecho()
+		{
+			report=$report"$*$LF"
+			echo "$*"
+		}
+		reportecho4()
+		{
+			report=$report"    $*$LF"
+			echo "    $*"
+		}
+		reportdo4()
+		{
+			o=`"$@" | sed 's/^/    /' || true`
+			reportecho "$o"
+		}
 		for d in $repos; do
 			enter "$d0/$d" verbose
+			reportecho "In $d:"
 			for ref in `git for-each-ref --format='%(refname)' refs/remotes/origin/`; do
 				case "${ref#refs/remotes/origin/}" in
 					"`repobranch "$d"`")
@@ -629,23 +650,30 @@ case "$cmd" in
 						continue
 						;;
 				esac
-				echo "$ref"
-				if git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null; then
-					echo "Not merging, already had this one"
+				reportecho "  Branch $ref:"
+				note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+				if [ -n "$note" ]; then
+					reportdo4 echo "$note"
+					reportecho4 "--> not merging, already had this one rejected before"
 				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log HEAD.."$ref"; git diff HEAD..."$ref"; } | less'; then
 					git checkout master
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
 						git reset --hard "$org"
-						git notes --ref "refs/notes/admin-merge" add -m "Merge failed:
-`cat "$t"`" "$ref"
+						git notes --ref "refs/notes/admin-merge" add -m "Merge failed:$LF`cat "$t"`" "$ref"
+						reportdo4 cat "$t"
+						reportecho4 "--> merge failed"
 					elif ! "$SELF" compile 2>&1 | tee "$t"; then
 						git reset --hard "$org"
-						git notes --ref "refs/notes/admin-merge" add -m "Compile failed:
-`cat "$t"`" "$ref"
+						git notes --ref "refs/notes/admin-merge" add -m "Compile failed:$LF`cat "$t"`" "$ref"
+						reportdo4 cat "$t"
+						reportecho4 "--> compile failed"
 					elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
 						git reset --hard "$org"
 						git notes --ref "refs/notes/admin-merge" add "$ref"
+						note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+						reportdo4 echo "$note"
+						reportecho4 "--> test failed"
 					else
 						case ",`repoflags "$d"`," in
 							*,svn,*)
@@ -657,16 +685,28 @@ case "$cmd" in
 								git push origin HEAD
 								;;
 						esac
+						reportecho4 "--> MERGED"
 						if yesno "Delete original branch \"$ref\"?"; then
 							git push origin :"${ref#refs/remotes/origin/}"
+							reportecho4 "--> branch deleted"
 						fi
 					fi
 				else
 					git notes --ref "refs/notes/admin-merge" add "$ref"
+					note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+					if [ -n "$note" ]; then
+						reportdo4 echo "$note"
+						reportecho4 "--> rejected"
+					else
+						reportecho4 "--> postponed"
+					fi
 				fi
+				reportecho ""
 			done
+			reportecho ""
 		done
 		rm -f "$t"
+		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
 	*)
 		echo "Usage:"
