@@ -105,6 +105,7 @@ yesno()
 {
 	yesno=
 	while [ x"$yesno" != x"y" -a x"$yesno" != x"n" ]; do
+		eval "$2"
 		echo "$1"
 		IFS= read -r yesno
 	done
@@ -625,7 +626,7 @@ case "$cmd" in
 				echo "$ref"
 				if git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null; then
 					echo "Not merging, already had this one"
-				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log HEAD.."$ref"; git diff HEAD.."$ref"; } | less'; then
+				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log HEAD.."$ref"; git diff HEAD..."$ref"; } | less'; then
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
 						git reset --hard "$org"
@@ -636,14 +637,15 @@ case "$cmd" in
 						git notes --ref "refs/notes/admin-merge" add -m "Compile failed:
 `cat "$t"`" "$ref"
 					elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
-						git reset --hard HEAD@{1}
+						git reset --hard "$org"
 						git notes --ref "refs/notes/admin-merge" add "$ref"
 					else
 						git push origin HEAD
-						git push origin :"${ref#refs/remotes/origin/}"
+						if yesno "Delete original branch \"$ref\"?"; then
+							git push origin :"${ref#refs/remotes/origin/}"
+						fi
 					fi
 				else
-					git reset --hard HEAD@{1}
 					git notes --ref "refs/notes/admin-merge" add "$ref"
 				fi
 			done
