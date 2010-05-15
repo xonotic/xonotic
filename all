@@ -252,12 +252,17 @@ case "$cmd" in
 		exists=false
 		for d in $repos; do
 			enter "$d0/$d" verbose
-			if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
+			if [ -z "$branch" ]; then
+				b=`repobranch "$d"`
+			else
+				b=$branch
+			fi
+			if git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout "$branch"
-			elif git rev-parse "refs/remotes/$remote/$branch" >/dev/null 2>&1; then
+				verbose git checkout "$b"
+			elif git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout --track -b "$branch" "$remote/$branch"
+				verbose git checkout --track -b "$b" "$remote/$b"
 			else
 				verbose git checkout "`repobranch "$d"`"
 			fi
