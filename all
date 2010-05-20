@@ -522,9 +522,11 @@ case "$cmd" in
 		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
 
 		# if pulseaudio is running: USE IT
-		if ps -C pulseaudio >/dev/null; then
-			if ldd /usr/lib/libSDL.so 2>/dev/null | grep pulse >/dev/null; then
-				export SDL_AUDIODRIVER=pulse
+		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ]; then
+			if ps -C pulseaudio >/dev/null; then
+				if ldd /usr/lib/libSDL.so 2>/dev/null | grep pulse >/dev/null; then
+					export SDL_AUDIODRIVER=pulse
+				fi
 			fi
 		fi
 
