@@ -306,8 +306,10 @@ case "$cmd" in
 							verbose git fetch origin || true
 						fi
 						# TODO do this without pushing
-						verbose git push "$remote" "$b":"$branch"
-						verbose git checkout --track -b "$branch" "$remote/$branch"
+						verbose git checkout -b "$branch" "$b"
+						verbose git config "branch.$branch.remote" "$remote"
+						verbose git config "branch.$branch.merge" "refs/heads/$b"
+						verbose git push origin "$branch"
 					fi
 				fi
 				cd "$d0"
