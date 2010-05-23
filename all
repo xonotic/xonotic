@@ -665,7 +665,7 @@ case "$cmd" in
 				if [ -n "$note" ]; then
 					reportdo4 echo "$note"
 					reportecho4 "--> not merging, already had this one rejected before"
-				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log --color HEAD.."$ref"; git diff --color --find-copies-harder --ignore-space-change HEAD..."$ref"; } | less -r'; then
+				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log --color master.."$ref"; git diff --color --find-copies-harder --ignore-space-change master..."$ref"; } | less -r'; then
 					git checkout master
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
