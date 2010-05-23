@@ -302,7 +302,8 @@ case "$cmd" in
 						if [ -n "$srcbranch" ]; then
 							b=$srcbranch
 						else
-							b="`repobranch "$d"`"
+							b=origin/"`repobranch "$d"`"
+							verbose git fetch origin || true
 						fi
 						# TODO do this without pushing
 						verbose git push "$remote" "$b":"$branch"
