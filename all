@@ -308,7 +308,7 @@ case "$cmd" in
 						# TODO do this without pushing
 						verbose git checkout -b "$branch" "$b"
 						verbose git config "branch.$branch.remote" "$remote"
-						verbose git config "branch.$branch.merge" "refs/heads/$b"
+						verbose git config "branch.$branch.merge" "refs/heads/$branch"
 						verbose git push origin "$branch"
 					fi
 				fi
