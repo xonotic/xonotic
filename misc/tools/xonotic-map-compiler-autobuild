@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 bspdir="$PWD/bspfiles"
 url=http://141.2.16.23/~xonotic/bsp-autobuilds/
