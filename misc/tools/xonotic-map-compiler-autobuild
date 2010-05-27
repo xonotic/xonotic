@@ -46,7 +46,7 @@ getthemap()
 	bspdir=$3
 	M=$4
 	blobhash=$5
-	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-blobhash.pk3"; then
+	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3"; then
 		continue
 	fi
 	if ! wget -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
