@@ -33,7 +33,7 @@ buildthemap()
 	fi
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" -noshaderlist `head -n 1 "$M.map.options"` 2>&1 | tee "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `head -n 1 "$M.map.options"` 2>&1 | tee "$M.log"
 	)
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
