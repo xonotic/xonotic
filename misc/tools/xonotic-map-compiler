@@ -180,7 +180,7 @@ for my $m(@{$options->{maps}})
 	{
 		my $previous_shaderlist = undef;
 		my $shaderlist = "";
-		if(open my $fh, "<", "$XONOTICDIR/data/xonotic-maps.pk3dir/scripts/shaderlist.txt")
+		if(open my $fh, "<", "$XONOTICDIR/data/scripts/shaderlist.txt")
 		{
 			while(<$fh>)
 			{
