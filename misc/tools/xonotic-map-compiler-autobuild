@@ -42,10 +42,11 @@ buildthemap()
 getthemap()
 {
 	url=$1
-	bspdir=$2
-	M=$3
-	blobhash=$4
-	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
+	bspdir_old=$2
+	bspdir=$3
+	M=$4
+	blobhash=$5
+	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-blobhash.pk3"; then
 		continue
 	fi
 	if ! wget -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
@@ -74,8 +75,18 @@ case "$1" in
 		git checkout master
 		;;
 	download)
+		rm -rf "$bspdir.old"
+		mv "$bspdir" "$bspdir.old" || true
 		mkdir -p "$bspdir"
 		cd data/xonotic-maps.pk3dir
-		allmaps getthemap "$url" "$bspdir"
+		allmaps getthemap "$url" "$bspdir.old" "$bspdir"
+		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
+		ls -l "$bspdir.old"
+		;;
+	download-latest)
+		mkdir -p "$bspdir"
+		cd "$bspdir"
+		rm -f *-????????????????????????????????????????-????????????????????????????????????????.pk3
+		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url/latest"
 		;;
 esac
