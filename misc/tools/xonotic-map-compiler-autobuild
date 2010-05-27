@@ -1,12 +1,14 @@
 #!/bin/sh
 
+set -ex
+
 bspdir="$PWD/bspfiles"
-mkdir -p "$bspdir"
-cd data/xonotic-maps.pk3dir
-git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
-	git reset --hard
-	git clean -xfd
-	git checkout "$HASH"
+url=http://141.2.16.23/~xonotic/bsp-autobuilds/
+
+bspoutdir="$HOME/public_html/bsp-autobuilds/"
+
+allmaps()
+{
 	for F in maps/*.map.options; do
 		if ! [ -f "$F" ]; then
 			continue
@@ -16,15 +18,64 @@ git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 		fi
 		M=${F#maps/}
 		M=${M%.map.options}
-		blobhash="$M"-`git ls-files -s -- "$F" | cut -d ' ' -f 2`-`git ls-files -s -- "${F%.options}" | cut -d ' ' -f 2`
-		if [ -f "$bspdir/$blobhash.pk3" ]; then
-			continue
-		fi
-		(
-			cd maps
-			../../../misc/tools/xonotic-map-compiler "$M" -noshaderlist `head -n 1 "../$F"` 2>&1 | tee "$M.log"
-		)
-		zip -9r "$bspdir/$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
+		blobhash=`git ls-files -s -- "$F" | cut -d ' ' -f 2`-`git ls-files -s -- "${F%.options}" | cut -d ' ' -f 2`
+		"$@" "$M" "$blobhash"
 	done
-done
-git checkout master
+}
+
+buildthemap()
+{
+	bspdir=$1
+	M=$2
+	blobhash=$3
+	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
+		continue
+	fi
+	(
+		cd maps
+		../../../misc/tools/xonotic-map-compiler "$M" -noshaderlist `head -n 1 "$M.map.options"` 2>&1 | tee "$M.log"
+	)
+	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
+	ln -snf "../$M-blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
+}
+
+getthemap()
+{
+	url=$1
+	bspdir=$2
+	M=$3
+	blobhash=$4
+	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
+		continue
+	fi
+	if ! wget -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
+		rm -f "$bspdir/$M-$blobhash.pk3"
+		echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
+		return 1
+	fi
+	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
+		rm -f "$bspdir/$M-$blobhash.pk3"
+		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
+		return 1
+	fi
+}
+
+case "$1" in
+	build)
+		mkdir -p "$bspoutdir"
+		mkdir -p "$bspoutdir/latest"
+		cd data/xonotic-maps.pk3dir
+		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			git reset --hard
+			git clean -xfd
+			git checkout "$HASH"
+			allmaps buildthemap "$bspoutdir"
+		done
+		git checkout master
+		;;
+	download)
+		mkdir -p "$bspdir"
+		cd data/xonotic-maps.pk3dir
+		allmaps getthemap "$url" "$bspdir"
+		;;
+esac
