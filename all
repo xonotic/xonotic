@@ -213,10 +213,6 @@ case "$cmd" in
 					enter "$d0/$d" verbose
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-						# TODO remove this line later
-
-					verbose git config core.autocrlf false
-					verbose git config core.safecrlf false # we don't NEED that...
 
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
