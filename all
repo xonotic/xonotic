@@ -433,6 +433,9 @@ case "$cmd" in
 	compile)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-debug cl-debug"
+			if [ -z "$CC" ]; then
+				export CC=gcc
+			fi
 		else
 			TARGETS="sv-debug cl-debug sdl-debug"
 		fi
