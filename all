@@ -233,7 +233,9 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
-				verbose git checkout "$branch"
+				if [ "$branch" != "master" ]; then
+					verbose git checkout --track -b "$branch" origin/"$branch"
+				fi
 				cd "$d0"
 			fi
 		done
