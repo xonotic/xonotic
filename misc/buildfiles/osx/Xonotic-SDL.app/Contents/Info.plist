@@ -5,9 +5,9 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>nexuiz-osx-sdl</string>
+	<string>xonotic-osx-sdl</string>
 	<key>CFBundleIconFile</key>
-	<string>Nexuiz</string>
+	<string>Xonotic</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
