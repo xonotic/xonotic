@@ -507,7 +507,7 @@ case "$cmd" in
 			client=
 			export PATH="$d0/misc/buildfiles/w32:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
-			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Nexuiz-SDL.app/Contents/MacOS"
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS"
 			client=-sdl
 		else
 			client=-sdl
