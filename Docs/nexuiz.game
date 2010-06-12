@@ -2,9 +2,9 @@
 <game
   name="Nexuiz"
   basegame="data"
-  enginepath="/home/havoc/nexuizsvn/trunk"
+  enginepath="~/nexuizsvn/trunk"
   engine="nexuiz-linux-sdl"
-  gametools="/home/havoc/ZeroRadiant/install/games"
+  gametools="~/ZeroRadiant/install/games"
   gamename="nexuiz"
   prefix=".nexuiz"
   shaderpath="scripts/"
