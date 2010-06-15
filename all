@@ -671,10 +671,20 @@ case "$cmd" in
 				esac
 				reportecho "  Branch $ref:"
 				note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
-				if [ -n "$note" ]; then
+				logdata=`git log --color "$base".."$ref"`
+				diffdata=`git diff --color --find-copies-harder --ignore-space-change "$base"..."$ref"`
+				if [ -z "$logdata" ]; then
+					reportecho4 "--> not merging, no changes vs master"
+				elif [ -z "$diffdata" ]; then
+					reportecho4 "--> not merging, no changes vs master, branch contains redundant history"
+					if yesno "Branch \"$ref\" probably should get deleted. Do it?" '{ echo "$logdata"; } | less -r'; then
+						git push origin :"${ref#refs/remotes/origin/}"
+						reportecho4 "--> branch deleted"
+					fi
+				elif [ -n "$note" ]; then
 					reportdo4 echo "$note"
 					reportecho4 "--> not merging, already had this one rejected before"
-				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ git log --color "$base".."$ref"; git diff --color --find-copies-harder --ignore-space-change "$base"..."$ref"; } | less -r'; then
+				elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
 					git checkout "$base"
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
