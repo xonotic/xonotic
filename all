@@ -713,7 +713,7 @@ case "$cmd" in
 						fi
 					fi
 				else
-					git notes --ref "refs/notes/admin-merge" add "$ref"
+					GIT_NOTES_REF=refs/notes/admin-merge git notes edit "$ref"
 					note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 					if [ -n "$note" ]; then
 						reportdo4 echo "$note"
