@@ -65,6 +65,7 @@ log2spam()
 				;;
 		esac
 	done
+	s_failshaders=`echo "$s_failshaders" | sed "s, textures/, ,g"`
 	s_failshaders=${s_failshaders# }
 	if [ -n "$s_error" ]; then
 		echo -n "[$branch] 4failed"
