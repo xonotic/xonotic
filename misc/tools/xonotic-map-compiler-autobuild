@@ -110,7 +110,7 @@ buildthemap()
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
 	if [ -n "$IRCSPAM" ]; then
-		cat "$M.log" | log2spam "$M" "$url/$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
+		cat "maps/$M.log" | log2spam "$M" "$url/$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
 }
 
