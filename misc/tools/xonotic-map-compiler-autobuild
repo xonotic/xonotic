@@ -110,7 +110,7 @@ buildthemap()
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
 	if [ -n "$IRCSPAM" ]; then
-		cat "maps/$M.log" | log2spam "$M" "$url/$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
 }
 
@@ -162,7 +162,7 @@ case "$1" in
 		mkdir -p "$bspdir"
 		cd "$bspdir"
 		rm -f *-????????????????????????????????????????-????????????????????????????????????????.pk3
-		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url/latest"
+		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url""latest"
 		;;
 	log2spam-test)
 		log2spam "mapname" "http://mapurl" "branch" "commit"
