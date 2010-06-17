@@ -676,7 +676,7 @@ case "$cmd" in
 						;;
 				esac
 				reportecho "  Branch $ref:"
-				note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+				note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 				if [ -n "$note" ]; then
 					reportdo4 echo "$note"
 					reportecho4 "--> not merging, already had this one rejected before"
@@ -685,18 +685,18 @@ case "$cmd" in
 					org=`git rev-parse HEAD`
 					if ! git merge "$ref" 2>&1 | tee "$t"; then
 						git reset --hard "$org"
-						git notes --ref "refs/notes/admin-merge" add -m "Merge failed:$LF`cat "$t"`" "$ref"
+						GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 						reportdo4 cat "$t"
 						reportecho4 "--> merge failed"
 					elif ! "$SELF" compile 2>&1 | tee "$t"; then
 						git reset --hard "$org"
-						git notes --ref "refs/notes/admin-merge" add -m "Compile failed:$LF`cat "$t"`" "$ref"
+						GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Compile failed:$LF`cat "$t"`" "$ref"
 						reportdo4 cat "$t"
 						reportecho4 "--> compile failed"
 					elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
 						git reset --hard "$org"
-						git notes --ref "refs/notes/admin-merge" add "$ref"
-						note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+						git notes edit "$ref"
+						note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 						reportdo4 echo "$note"
 						reportecho4 "--> test failed"
 					else
@@ -720,7 +720,7 @@ case "$cmd" in
 					fi
 				else
 					git notes --ref "refs/notes/admin-merge" add "$ref"
-					note=`git notes --ref "refs/notes/admin-merge" show "$ref" 2>/dev/null || true`
+					note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 					if [ -n "$note" ]; then
 						reportdo4 echo "$note"
 						reportecho4 "--> rejected"
