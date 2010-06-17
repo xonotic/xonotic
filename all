@@ -240,6 +240,9 @@ case "$cmd" in
 			fi
 		done
 		;;
+	update-maps)
+		misc/tools/xonotic-map-compiler-autobuild download
+		;;
 	checkout|switch)
 		remote=$1
 		branch=$2
@@ -501,6 +504,7 @@ case "$cmd" in
 		for T in $TARGETS; do
 			verbose make $MAKEFLAGS "$@" "$T"
 		done
+		verbose "$SELF" update-maps
 		;;
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
