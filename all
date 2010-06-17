@@ -502,6 +502,9 @@ case "$cmd" in
 		done
 		verbose "$SELF" update-maps
 		;;
+	makebuild)
+		
+		;;
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
@@ -748,6 +751,52 @@ case "$cmd" in
 		rm -f "$t"
 		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
+
+	# release building goes here
+	release-mkdir)
+		mkdir -p Xonotic/"$1"
+		;;
+	release-prepare)
+		"$SELF" each git clean -fxd
+		mkdir -p Xonotic
+		"$SELF" release-copy Docs/
+		"$SELF" release-copy misc/
+		"$SELF" release-copy server/
+		"$SELF" release-copy xonotic-linux-glx.sh
+		"$SELF" release-copy xonotic-linux-sdl.sh
+		"$SELF" release-mkdir data
+		;;
+	release-gamedata)
+		"$SELF" release-copy data/font-dejavu.pk3dir/
+		"$SELF" release-copy data/xonotic-data.pk3dir/
+		"$SELF" release-copy data/xonotic-maps.pk3dir/
+		"$SELF" release-copy data/xonotic-music.pk3dir/
+		"$SELF" release-copy data/xonotic-nexcompat.pk3dir/
+		;;
+	release-copy)
+		rsync --exclude=.git -vaSHPAX "$1" Xonotic/"$1"
+		;;
+	release-engine)
+		mv Xonotic/misc/buildfiles/w32/* Xonotic/
+		mv Xonotic/misc/buildfiles/osx/* Xonotic/
+		;;
+	release-pack)
+		# recompress, and edit
+		;;
+	release-maps)
+		"$SELF" update-maps
+		;;
+	release-finish)
+		;;
+	release)
+		"$SELF" release-prepare
+		"$SELF" release-engine
+		"$SELF" release-gamedata
+		"$SELF" release-maps
+		"$SELF" release-finish
+		"$SELF" release-pack
+		;;
+
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
