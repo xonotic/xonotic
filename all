@@ -547,9 +547,18 @@ case "$cmd" in
 		"$@"
 		;;
 	each|foreach)
+		keep_going=false
+		if [ x"$1" = x"-k" ]; then
+			keep_going=true
+			shift
+		fi
 		for d in $repos; do
 			if verbose cd "$d0/$d"; then
-				verbose "$@"
+				if $keep_going; then
+					verbose "$@" || true
+				else
+					verbose "$@"
+				fi
 				cd "$d0"
 			fi
 		done
