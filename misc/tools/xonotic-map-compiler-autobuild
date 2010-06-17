@@ -23,11 +23,83 @@ allmaps()
 	done
 }
 
+log2spam()
+{
+	map=$1
+	url=$2
+	branch=$3
+	hash=$4
+
+	branch=${branch##refs/heads/}
+	branch=${branch##refs/remotes/}
+	branch=${branch##origin/}
+
+	s_time=
+	s_samplesize=
+	s_failshaders=
+	s_leaked=
+	s_error=
+
+	while IFS= read -r L; do
+		case "$L" in
+			*\ seconds\ elapsed)
+				s_time=$(($s_time + ${L%% seconds elapsed}))
+				;;
+			WARNING:\ surface\ at\ *\ too\ large\ for\ desired\ samplesize*)
+				s=${L##* }
+				if [ -z "$s_samplesize" ] || [ "$s" -gt "$s_samplesize" ]; then
+					s_samplesize=$s
+				fi
+				;;
+			WARNING:\ Couldn\'t\ find\ image\ for\ shader\ textures/NULL)
+				# radiant stupid
+				;;
+			WARNING:\ Couldn\'t\ find\ image\ for\ shader\ *)
+				s_failshaders="$s_failshaders ${L##* }"
+				;;
+			'******* leaked *******')
+				s_leaked=1
+				;;
+			'************ ERROR ************')
+				IFS= read -r s_error
+				;;
+		esac
+	done
+	s_failshaders=`echo "$s_failshaders" | sed "s, textures/, ,g"`
+	s_failshaders=${s_failshaders# }
+	if [ -n "$s_error" ]; then
+		echo -n "[$branch] 4failed"
+	else
+		echo -n "[$branch] finished"
+	fi
+	echo -n " map compile of $map ($url): $s_time sec"
+	if [ -n "$s_samplesize" ]; then
+		echo -n ", FIX samplesize >= $s_samplesize"
+	fi
+	if [ -n "$s_failshaders" ]; then
+		if [ -n "`echo "$s_failshaders" | cut -d ' ' -f 4-`" ]; then
+			s_failshaders="`echo "$s_failshaders" | cut -d ' ' -f 1-3`..."
+		fi
+		echo -n ", FIX shaders $s_failshaders"
+	fi
+	if [ -n "$s_leaked" ]; then
+		echo -n ", FIX LEAK"
+	fi
+	if [ -n "$s_error" ]; then
+		s_error=`echo "$s_error" | sed "s,$PWD/\?,,g"`
+		echo -n ", ERROR: $s_error"
+	fi
+	echo
+}
+
 buildthemap()
 {
-	bspdir=$1
-	M=$2
-	blobhash=$3
+	REFNAME=$1
+	HASH=$2
+	url=$3
+	bspdir=$4
+	M=$5
+	blobhash=$6
 	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
 		continue
 	fi
@@ -37,6 +109,9 @@ buildthemap()
 	)
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
+	if [ -n "$IRCSPAM" ]; then
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
+	fi
 }
 
 getthemap()
@@ -70,7 +145,7 @@ case "$1" in
 			git reset --hard
 			git clean -xfd
 			git checkout "$HASH"
-			allmaps buildthemap "$bspoutdir"
+			allmaps buildthemap "$REFNAME" "$HASH" "$url" "$bspoutdir"
 		done
 		git checkout master
 		;;
@@ -87,6 +162,9 @@ case "$1" in
 		mkdir -p "$bspdir"
 		cd "$bspdir"
 		rm -f *-????????????????????????????????????????-????????????????????????????????????????.pk3
-		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url/latest"
+		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url""latest"
+		;;
+	log2spam-test)
+		log2spam "mapname" "http://mapurl" "branch" "commit"
 		;;
 esac
