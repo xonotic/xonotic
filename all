@@ -247,8 +247,16 @@ case "$cmd" in
 		remote=$1
 		branch=$2
 		if [ -z "$branch" ]; then
-			branch=$remote
-			remote=origin
+			case "$remote" in
+				origin/*)
+					branch=${remote#origin/}
+					remote=origin
+					;;
+				*)
+					branch=$remote
+					remote=origin
+					;;
+			esac
 		fi
 		exists=false
 		for d in $repos; do
@@ -325,35 +333,6 @@ case "$cmd" in
 		;;
 	branches)
 		for d in $repos; do
-			enter "$d0/$d"
-			echo "In $d:"
-			git branch -a -v -v | cut -c 3- | while read -r BRANCH REV UPSTREAM TEXT; do
-				case "$UPSTREAM" in
-					\[*)
-						UPSTREAM=${UPSTREAM#\[}
-						UPSTREAM=${UPSTREAM%\]}
-						UPSTREAM=${UPSTREAM%:*}
-						;;
-					*)
-						TEXT="$UPSTREAM $TEXT"
-						UPSTREAM=
-						;;
-				esac
-				if [ x"$REV" = x"->" ]; then
-					continue
-				fi
-				BRANCH=${BRANCH#remotes/}
-				echo -n "  $BRANCH"
-				if [ -n "$UPSTREAM" ]; then
-					echo -n " (tracking $UPSTREAM)"
-				fi
-				#echo " $TEXT"
-				echo
-			done
-		done
-		;;
-	branches_short)
-		for d in $repos; do
 			cd "$d0/$d" # am in a pipe, shouldn't use enter
 			git branch -a -v -v | cut -c 3- | sed "s,^,$d ,"
 			cd "$d0"
@@ -361,6 +340,9 @@ case "$cmd" in
 			branches_list=
 			# branches_repos_*=
 			while read -r d BRANCH REV UPSTREAM TEXT; do
+				if [ x"$BRANCH" = x"`repobranch "$d"`" ]; then
+					continue
+				fi
 				case "$UPSTREAM" in
 					\[*)
 						UPSTREAM=${UPSTREAM#\[}
@@ -379,13 +361,21 @@ case "$cmd" in
 				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
 				branches_list="$branches_list $BRANCH" # TEH SORT MAKEZ IT UNIEQ
 				eval "r=\$branches_repos_$ID"
-				r="$r $d:$UPSTREAM"
+				case "$UPSTREAM" in
+					'')
+						r="$r $d"
+						;;
+					*)
+						r="$r $d:$UPSTREAM"
+						;;
+				esac
 				eval "branches_repos_$ID=\$r"
 			done
 			echo -n "$branches_list" | xargs -n 1 echo | sort -u | while IFS= read -r BRANCH; do
 				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
 				eval "r=\$branches_repos_$ID"
-				echo "$BRANCH: $r"
+				printf "%-60s %s\n" "$BRANCH" "$r"
+				#echo "$BRANCH: $r"
 			done
 		}
 		;;
