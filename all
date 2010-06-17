@@ -757,7 +757,7 @@ case "$cmd" in
 		mkdir -p Xonotic/"$1"
 		;;
 	release-prepare)
-		"$SELF" each git clean -fxd
+#"$SELF" each git clean -fxd
 		mkdir -p Xonotic
 		"$SELF" release-copy Docs/
 		"$SELF" release-copy misc/
@@ -766,27 +766,78 @@ case "$cmd" in
 		"$SELF" release-copy xonotic-linux-sdl.sh
 		"$SELF" release-mkdir data
 		;;
-	release-gamedata)
-		"$SELF" release-copy data/font-dejavu.pk3dir/
-		"$SELF" release-copy data/xonotic-data.pk3dir/
-		"$SELF" release-copy data/xonotic-maps.pk3dir/
-		"$SELF" release-copy data/xonotic-music.pk3dir/
-		"$SELF" release-copy data/xonotic-nexcompat.pk3dir/
-		;;
 	release-copy)
 		rsync --exclude=.git -vaSHPAX "$1" Xonotic/"$1"
 		;;
-	release-engine)
-		mv Xonotic/misc/buildfiles/w32/* Xonotic/
-		mv Xonotic/misc/buildfiles/osx/* Xonotic/
+	release-engine-win32)
+		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/w32/* Xonotic/
 		;;
-	release-pack)
-		# recompress, and edit
+	release-engine-osx)
+		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/osx/* Xonotic/
+		;;
+	release-engine-linux32)
+		;;
+	release-engine-linux64)
+		;;
+	release-engine)
+		"$SELF" release-engine-win32
+		"$SELF" release-engine-osx
+		"$SELF" release-engine-linux32
+		"$SELF" release-engine-linux64
 		;;
 	release-maps)
 		"$SELF" update-maps
+		for X in data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
+			if [ -f "$X" ]; then
+				cd Xonotic/data/xonotic-maps.pk3dir
+				unzip ../../../"$X"
+				cd ../../..
+			fi
+		done
 		;;
 	release-finish)
+		# version numnber and stuff like that
+		;;
+	release-buildpk3-transform-raw)
+		;;
+	release-buildpk3-transform-normal)
+		# texture: convert to jpeg
+		;;
+	release-buildpk3-transform-low)
+		# texture: convert to jpeg and downscale
+		# music: reduce bitrate
+		;;
+	release-buildpk3)
+		src=$1
+		dst=$2
+		transform=$3
+		case "$dst" in
+			/*)
+				;;
+			*/
+				dst="$PWD/$dst"
+				;;
+		esac
+		rm -rf Xonotic/temp
+		rsync --exclude=.git -vaSHPAX "$src"/ "Xonotic/temp"
+		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
+		7za a -tzip -mx=9 "$dst" .
+		rm -rf Xonotic/temp
+		;;
+	release-buildpk3s)
+		src=$1
+		shift
+		while [ "$#" -gt 1 ]; do
+			"$SELF" release-buildpk3 "$src" "Xonotic/${src%.pk3dir}$2.pk3" "$1"
+		done
+		rm -rf "$src"
+		;;
+	release-pack)
+		"$SELF" release-buildpk3s  data/font-dejavu.pk3dir                  raw ''
+		"$SELF" release-buildpk3s  data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s  data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s  data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                        low ''
 		;;
 	release)
 		"$SELF" release-prepare
