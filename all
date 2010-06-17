@@ -188,7 +188,7 @@ repoflags()
 
 repos=`for d in $repos; do
 	p="${d%dir}"
-	if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! [ -f "$p" ]; then
+	if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! { [ -f "$d.no" ] || [ -f "$p" ]; }; then
 		echo "$d"
 	fi
 done`
