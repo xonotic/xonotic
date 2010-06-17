@@ -765,19 +765,59 @@ case "$cmd" in
 		"$SELF" release-copy xonotic-linux-glx.sh
 		"$SELF" release-copy xonotic-linux-sdl.sh
 		"$SELF" release-mkdir data
+		"$SELF" release-mkdir fteqcc
 		;;
 	release-copy)
 		rsync --exclude=.git -vaSHPAX "$1" Xonotic/"$1"
 		;;
+	release-compile-run)
+		host=$1
+		buildpath=$2
+		maketargets=$3
+		makeflags=$4
+		srcdir=$5
+		targetfiles=$6
+		rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
+		ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+        for f in $targetfiles; do
+			rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+		done
+		;;
+	release-compile)
+		suffix=$1
+		makeflags=$2
+		fteqcc_maketargets=$3
+		fteqcc_files=$4
+		darkplaces_maketargets=$5
+		darkplaces_files=$6
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "fteqcc" "$fteqcc_files"
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "fteqcc" "$darkplaces_files"
+		;;
 	release-engine-win32)
 		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/w32/* Xonotic/
+		"$SELF" release-compile win32 \
+			'"DP_MAKE_TARGET=mingw CC="$HOME/mingw32/bin/i386-mingw32-gcc -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dxheaders" WINDRES="$HOME/mingw32/bin/i386-mingw32-windres" SDL_CONFIG="$HOME/sdl-win32/SDL-1.2.13/bin/sdl-config"' \
+			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
+			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
 		;;
 	release-engine-osx)
 		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/osx/* Xonotic/
+		"$SELF" release-compile osx \
+			'CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"' \
+			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
+			sdl-debug 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin'
 		;;
 	release-engine-linux32)
+		"$SELF" release-compile linux32 \
+			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/modplug-i386/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/jpeg7/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/jpeg7/include"' \
+			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
+			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux32-dedicated'
 		;;
 	release-engine-linux64)
+		"$SELF" release-compile linux64 \
+			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/modplug-x86_64/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/jpeg7/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/jpeg7/include"' \
+			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
+			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux64-dedicated'
 		;;
 	release-engine)
 		"$SELF" release-engine-win32
@@ -833,11 +873,16 @@ case "$cmd" in
 		rm -rf "$src"
 		;;
 	release-pack)
-		"$SELF" release-buildpk3s  data/font-dejavu.pk3dir                  raw ''
-		"$SELF" release-buildpk3s  data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s  data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s  data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                        low ''
+#"$SELF" release-buildpk3s data/font-dejavu.pk3dir                  raw ''
+#"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
+#"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
+#"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
+#"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
+		"$SELF" release-buildpk3s data/font-dejavu.pk3dir        raw ''
+		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       raw ''
+		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       raw ''
+		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      raw ''
+		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir  raw ''
 		;;
 	release)
 		"$SELF" release-prepare
@@ -847,7 +892,6 @@ case "$cmd" in
 		"$SELF" release-finish
 		"$SELF" release-pack
 		;;
-
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
