@@ -803,7 +803,7 @@ case "$cmd" in
 	release-engine-osx)
 		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/osx/* Xonotic/
 		"$SELF" release-compile osx \
-			'CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4"' \
+			'CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			sdl-debug 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin'
 		;;
