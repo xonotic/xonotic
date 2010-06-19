@@ -23,6 +23,21 @@ allmaps()
 	done
 }
 
+pre2spam()
+{
+	map=$1
+	url=$2
+	branch=$3
+	hash=$4
+
+	branch=${branch##refs/heads/}
+	branch=${branch##refs/remotes/}
+	branch=${branch##origin/}
+	hash=`echo "$hash" | cut -c 1-7`
+
+	echo "[$branch $hash] starting map compile of $map"
+}
+
 log2spam()
 {
 	map=$1
@@ -68,7 +83,7 @@ log2spam()
 	s_failshaders=`echo "$s_failshaders" | sed "s, textures/, ,g"`
 	s_failshaders=${s_failshaders# }
 	if [ -n "$s_error" ]; then
-		echo -n "[$branch] 4failed"
+		echo -n "[$branch $hash] 4failed"
 	else
 		echo -n "[$branch] finished"
 	fi
@@ -102,6 +117,9 @@ buildthemap()
 	blobhash=$6
 	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
 		continue
+	fi
+	if [ -n "$IRCSPAM" ]; then
+		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
 	(
 		cd maps
