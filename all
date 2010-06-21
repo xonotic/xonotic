@@ -839,13 +839,32 @@ case "$cmd" in
 		# version numnber and stuff like that
 		;;
 	release-buildpk3-transform-raw)
+		dir=$1
 		;;
 	release-buildpk3-transform-normal)
-		# texture: convert to jpeg
+		dir=$1
+		cd "$dir"
+		# texture: convert to jpeg and dds
+		export do_jpeg=true
+		export jpeg_qual_rgb=95
+		export jpeg_qual_a=99
+		export do_dds=true
+		export dds_flags=
+		export do_ogg=false
+		find textures -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3-transform-low)
-		# texture: convert to jpeg and downscale
+		dir=$1
+		cd "$dir"
+		# texture: convert to jpeg and dds
 		# music: reduce bitrate
+		export do_jpeg=true
+		export jpeg_qual_rgb=95
+		export jpeg_qual_a=99
+		export do_dds=false
+		export do_ogg=true
+		export ogg_qual=1
+		find textures sound/cdtracks -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3)
 		src=$1
@@ -861,7 +880,9 @@ case "$cmd" in
 		rm -rf Xonotic/temp
 		rsync --exclude=.git -vaSHPAX "$src"/ "Xonotic/temp"
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		7za a -tzip -mx=9 "$dst" .
+		cd Xonotic/temp
+		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
+		cd ../..
 		rm -rf Xonotic/temp
 		;;
 	release-buildpk3s)
@@ -869,28 +890,23 @@ case "$cmd" in
 		shift
 		while [ "$#" -gt 1 ]; do
 			"$SELF" release-buildpk3 "$src" "Xonotic/${src%.pk3dir}$2.pk3" "$1"
+			shift
+			shift
 		done
-		rm -rf "$src"
 		;;
 	release-pack)
-#"$SELF" release-buildpk3s data/font-dejavu.pk3dir                  raw ''
-#"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
-#"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
-#"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
-#"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
-		"$SELF" release-buildpk3s data/font-dejavu.pk3dir        raw ''
-		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       raw ''
-		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       raw ''
-		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      raw ''
-		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir  raw ''
+		"$SELF" release-buildpk3s data/font-dejavu.pk3dir                  raw ''
+		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
+		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
 		;;
 	release)
 		"$SELF" release-prepare
-		"$SELF" release-engine
-		"$SELF" release-gamedata
 		"$SELF" release-maps
 		"$SELF" release-finish
 		"$SELF" release-pack
+		"$SELF" release-engine
 		;;
 	*)
 		echo "Usage:"
