@@ -74,7 +74,7 @@ reduce_jpeg2_jpeg2()
 	cp "$ia" "$oa" && jpegoptim --strip-all -m"$2" "$oa"
 }
 
-reduce_jpeg2_jpeg2()
+reduce_jpeg_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
