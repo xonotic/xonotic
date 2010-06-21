@@ -37,13 +37,9 @@ cached()
 	tempfile1="${name1%/*}/new-${name1##*/}"
 	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
 	if [ -f "$name1" ]; then
-		echo "$name1 already there, caching"
-		sleep 10
 		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
 		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
 	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
-		echo "$name1 not there, making"
-		sleep 10
 		mv "$tempfile1" "$name1"
 		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
 		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
