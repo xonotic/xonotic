@@ -42,8 +42,8 @@ cached()
 	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
 		mv "$tempfile1" "$name1"
 		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
-		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
-		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
+		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"; }
+		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"; }; }
 	else
 		rm -f "$tempfile1"
 		rm -f "$tempfile2"
@@ -97,8 +97,8 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	convert "$X" -alpha extract -quality 100 "$o" && \
-	convert "$X" -alpha off     -quality 100 "$oa" && \
+	convert "$i" -alpha extract -quality 100 "$o" && \
+	convert "$i" -alpha off     -quality 100 "$oa" && \
 	jpegoptim --strip-all -m"$1" "$o" && \
 	jpegoptim --strip-all -m"$2" "$oa"
 }
@@ -114,7 +114,7 @@ reduce_rgb_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$X" "$o" && \
+	convert "$i" "$o" && \
 	jpegoptim --strip-all -m"$1" "$o"
 }
 
@@ -126,20 +126,22 @@ for F in "$@"; do
 		;;
 	*.jpg)
 		if [ -f "${F%.jpg}_alpha.jpg" ]; then
+			cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
 			cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb"
-			cached "$do_jpeg" reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb"
 		else                                   
-			cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
 			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+			cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
 		fi
 		;;
 	*.png|*.tga)
-		if convert "$X" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; ++$pix; } exit not $pix;'; then
-			cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+		if convert "$F" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
 			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+			cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+			rm -f "$F"
 		else                                                             
-			cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+			cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+			rm -f "$F"
 		fi
 		;;
 	*.ogg)
