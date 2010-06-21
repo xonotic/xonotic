@@ -17,29 +17,40 @@ trap 'rm -rf "$tmpdir"' EXIT
 
 cached()
 {
+	flag=$1; shift
 	method=$1; shift
 	infile1=$1; shift
 	infile2=$1; shift
 	outfile1=$1; shift
 	outfile2=$1; shift
+	if ! $flag; then
+		return 0
+	fi
 	options=`echo "$*" | git hash-object --stdin`
 	sum=`git hash-object "$infile1"`
 	if [ -n "$infile2" ]; then
-	sum=$sum`git hash-object "$infile2"`
+		sum=$sum`git hash-object "$infile2"`
 	fi
 	mkdir -p "$CACHEDIR/$method-$options"
-	name1="$CACHEDIR/$method/$sum-1.${outfile1##*.}"
-	[ -z "$outfile2" ] || name2="$CACHEDIR/$method/$sum-2.${outfile2##*.}"
-	tempfile1="$name1.new"
-	[ -z "$outfile2" ] || tempfile2="$name2.new"
-	if "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
-	mv "$tempfile1" "$name1"
-	[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
-	ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
-	[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
+	name1="$CACHEDIR/$method-$options/$sum-1.${outfile1##*.}"
+	[ -z "$outfile2" ] || name2="$CACHEDIR/$method-$options/$sum-2.${outfile2##*.}"
+	tempfile1="${name1%/*}/new-${name1##*/}"
+	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
+	if [ -f "$name1" ]; then
+		echo "$name1 already there, caching"
+		sleep 10
+		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
+		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
+	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
+		echo "$name1 not there, making"
+		sleep 10
+		mv "$tempfile1" "$name1"
+		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
+		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
+		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
 	else
-	rm -f "$tempfile1"
-	rm -f "$tempfile2"
+		rm -f "$tempfile1"
+		rm -f "$tempfile2"
 	exit 1
 	fi
 }
