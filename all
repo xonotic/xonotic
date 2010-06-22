@@ -39,23 +39,10 @@ msg()
 	echo "[1m$*[m"
 }
 
-checksum()
-{
-	if [ -x /usr/bin/md5sum ]; then
-		/usr/bin/md5sum "$@"
-	elif [ -x /bin/md5sum ]; then
-		/bin/md5sum "$@"
-	elif [ -x /usr/bin/cksum ]; then
-		/usr/bin/cksum "$@"
-	else
-		echo "NOCHECKSUM"
-	fi
-}
-
-self=`checksum "$SELF"`
+self=`git hash-object "$SELF"`
 checkself()
 {
-	self_new=`checksum "$SELF"`
+	self_new=`git hash-object "$SELF"`
 	if [ x"$self" != x"$self_new" ]; then
 		msg "./all has changed."
 		if [ -z "$XONOTIC_FORBID_RERUN_ALL" ]; then
