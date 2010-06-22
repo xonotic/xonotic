@@ -405,8 +405,10 @@ case "$cmd" in
 				upstream="`repobranch "$d"`"
 			fi
 			logdata=`git log --color "$upstream".."$r"`
-			if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
-				verbose git push "$rem" HEAD
+			if [ -n "$logdata" ]; then
+				if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
+					verbose git push "$rem" HEAD
+				fi
 			fi
 			if [ x"$submit" = x"-s" ]; then
 				case "$r" in
