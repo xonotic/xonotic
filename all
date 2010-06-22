@@ -404,7 +404,7 @@ case "$cmd" in
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="origin/`repobranch "$d"`"
 			fi
-			logdata=`echo git log --color "$upstream".."$r"`
+			logdata=`git log --color "$upstream".."$r"`
 			if [ -n "$logdata" ]; then
 				if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
 					verbose git push "$rem" HEAD
