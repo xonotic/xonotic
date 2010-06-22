@@ -400,7 +400,7 @@ case "$cmd" in
 			rem=`git config "branch.$r.remote" || echo origin`
 			bra=`git config "branch.$r.merge" || echo "$r"`
 			upstream="$rem/$bra"
-			if ! [ git rev-parse "$upstream" ]; then
+			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="`repobranch "$d"`"
 			fi
 			if git log "$upstream".."$r" | grep .; then
