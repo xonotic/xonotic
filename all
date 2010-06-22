@@ -391,9 +391,10 @@ case "$cmd" in
 			enter "$d0/$d" verbose
 			r=`git symbolic-ref HEAD`
 			r=${r#refs/heads/}
-			if git diff HEAD | grep .; then
+			diffdata=`git diff --color HEAD`
+			if [ -n "$diffdata" ]; then
 				# we have uncommitted changes
-				if yesno "Uncommitted changes in \"$r\" in $dv. Commit?"; then
+				if yesno "Uncommitted changes in \"$r\" in $dv. Commit?" 'echo "$diffdata" | less -r'; then
 					verbose git commit -a
 				fi
 			fi
@@ -403,10 +404,9 @@ case "$cmd" in
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="`repobranch "$d"`"
 			fi
-			if git log "$upstream".."$r" | grep .; then
-				if yesno "Push \"$r\" in $dv?"; then
-					verbose git push "$rem" HEAD
-				fi
+			logdata=`git log --color "$upstream".."$r"`
+			if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
+				verbose git push "$rem" HEAD
 			fi
 			if [ x"$submit" = x"-s" ]; then
 				case "$r" in
