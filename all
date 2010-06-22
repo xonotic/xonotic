@@ -402,9 +402,9 @@ case "$cmd" in
 			bra=`git config "branch.$r.merge" || echo "$r"`
 			upstream="$rem/$bra"
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
-				upstream="`repobranch "$d"`"
+				upstream="origin/`repobranch "$d"`"
 			fi
-			logdata=`git log --color "$upstream".."$r"`
+			logdata=`echo git log --color "$upstream".."$r"`
 			if [ -n "$logdata" ]; then
 				if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
 					verbose git push "$rem" HEAD
