@@ -617,29 +617,7 @@ case "$cmd" in
 		rm -rf "$patchdir"
 		;;
 	admin-merge)
-		if [ "$#" = 1 ]; then
-			set -- "${1%%/*}" "${1#*/}"
-		fi
-		for d in $repos; do
-			enter "$d0/$d" verbose
-			git rev-parse "$1/$2" || continue
-			# 1. review
-			{
-				git log HEAD.."$1/$2"
-				git diff HEAD..."$1/$2"
-			} | less
-			if yesno "Merge \"$1/$2\" into `git symbolic-ref HEAD` of $d?"; then
-				git merge "$1/$2"
-				if "$SELF" compile && yesno "Still merge \"$1/$2\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
-					git push origin HEAD
-					git push "$1" :"$2"
-				else
-					git reset --hard HEAD@{1}
-				fi
-			fi
-		done
-		;;
-	admin-merge-2)
+		branch=$1
 		t=`mktemp`
 		report=""
 		reportecho()
@@ -670,6 +648,11 @@ case "$cmd" in
 						continue
 						;;
 				esac
+				if [ -n "$branch" ]; then
+					if [ x"$branch" != x"${ref#refs/remotes/origin/}" ]; then
+						continue
+					fi
+				fi
 				reportecho "  Branch $ref:"
 				note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 				logdata=`git log --color "$base".."$ref"`
