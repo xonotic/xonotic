@@ -1,0 +1,12 @@
+#!/bin/sh
+
+for X in "$PWD"/data/*/scripts; do
+	cd "$X"
+	for X in *.shader; do
+		if [ -f "$X" ]; then
+			ls *.shader | sed 's/\.shader$//' > shaderlist.txt
+			git add shaderlist.txt
+			break
+		fi
+	done
+done
