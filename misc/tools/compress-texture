@@ -8,9 +8,14 @@ format=$1; shift
 src=$1; shift
 dst=$1; shift
 
+c=
 f=
 case "$tool" in
-	compressonator)
+	compressonator-dxtc|compressor-atic)
+		case "$tool" in
+			*-dxtc) c="-codec DXTC.dll" ;;
+			*-atic) c="-codec ATICompressor.dll" ;;
+		esac
 		case "$format" in
 			dxt1) f="+fourCC DXT1" ;;
 			dxt3) f="+fourCC DXT3" ;;
@@ -21,7 +26,7 @@ case "$tool" in
 		dir_dos="C:/${dir##*/}"
 		ext=${src##*.}
 		cp "$src" "$dir/src.$ext"
-		wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" -codec DXTC.dll $f "$@"
+		wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" $c $f "$@"
 		mv "$dir/dst.dds" "$dst"
 		rm -rf "$dir"
 		;;

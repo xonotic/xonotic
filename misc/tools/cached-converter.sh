@@ -7,7 +7,7 @@ set -e
 : ${jpeg_qual_rgb:=95}
 : ${jpeg_qual_a:=99}
 : ${do_dds:=true}
-: ${dds_tool:=compressonator}
+: ${dds_tool:=compressonator-dxtc}
 : ${do_ogg:=false}
 : ${ogg_qual:=1}
 
