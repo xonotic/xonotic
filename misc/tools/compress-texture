@@ -11,7 +11,7 @@ dst=$1; shift
 c=
 f=
 case "$tool" in
-	compressonator-dxtc|compressor-atic)
+	compressonator-dxtc|compressonator-atic)
 		case "$tool" in
 			*-dxtc) c="-codec DXTC.dll" ;;
 			*-atic) c="-codec ATICompressor.dll" ;;
@@ -21,7 +21,6 @@ case "$tool" in
 			dxt3) f="+fourCC DXT3" ;;
 			dxt5) f="+fourCC DXT5" ;;
 		esac
-		echo ">> $f ($format)"
 		dir=`mktemp -d "$HOME/.wine/drive_c/compressonator.XXXXXX"`
 		dir_dos="C:/${dir##*/}"
 		ext=${src##*.}
