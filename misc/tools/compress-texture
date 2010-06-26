@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# usage: compress-texture tool compression in.png out.dds
+# example: compress-texture compressonator dxt1 foo.jpg foo.dds
+
+tool=$1; shift
+format=$1; shift
+src=$1; shift
+dst=$1; shift
+
+f=
+case "$tool" in
+	compressonator)
+		case "$format" in
+			dxt1) f="+fourCC DXT1" ;;
+			dxt3) f="+fourCC DXT3" ;;
+			dxt5) f="+fourCC DXT5" ;;
+		esac
+		echo ">> $f ($format)"
+		dir=`mktemp -d "$HOME/.wine/drive_c/compressonator.XXXXXX"`
+		dir_dos="C:/${dir##*/}"
+		ext=${src##*.}
+		cp "$src" "$dir/src.$ext"
+		wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" -codec DXTC.dll $f "$@"
+		mv "$dir/dst.dds" "$dst"
+		rm -rf "$dir"
+		;;
+	nvcompress)
+		case "$format" in
+			dxt1) f="-bc1" ;;
+			dxt3) f="-alpha -bc3" ;;
+			dxt5) f="-alpha -bc5" ;;
+		esac
+		nvcompress $f "$@" "$src" "$dst"
+		;;
+esac

@@ -7,9 +7,19 @@ set -e
 : ${jpeg_qual_rgb:=95}
 : ${jpeg_qual_a:=99}
 : ${do_dds:=true}
-: ${dds_flags:=}
+: ${dds_tool:=compressonator}
 : ${do_ogg:=false}
 : ${ogg_qual:=1}
+
+me=$0
+case "$me" in
+	*/*)
+		meprefix=${me%/*}/
+		;;
+	*)
+		meprefix=
+		;;
+esac
 
 tmpdir=`mktemp -d -t cached-converter.XXXXXX`
 trap 'exit 1' INT
@@ -47,7 +57,7 @@ cached()
 	else
 		rm -f "$tempfile1"
 		rm -f "$tempfile2"
-	exit 1
+		exit 1
 	fi
 }
 
@@ -57,7 +67,7 @@ reduce_jpeg2_dds()
 	ia=$1; shift
 	o=$1; shift; shift 
 	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.png" && \
-	nvcompress -alpha -bc3 $1 "$tmpdir/x.png" "$o"
+	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.png" "$o" $1
 }
 
 reduce_jpeg2_jpeg2()
@@ -89,7 +99,7 @@ reduce_rgba_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	nvcompress -alpha -bc3 $1 "$i" "$o"
+	"$meprefix"compress-texture "$dds_tool" dxt5 "$i" "$o" $1
 }
 
 reduce_rgba_jpeg2()
@@ -107,7 +117,7 @@ reduce_rgb_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	nvcompress -bc1 $1 "$i" "$o"
+	"$meprefix"compress-texture "$dds_tool" dxt1 "$i" "$o" $1
 }
 
 reduce_rgb_jpeg()
