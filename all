@@ -819,13 +819,13 @@ case "$cmd" in
 		;;
 	release-engine-linux32)
 		"$SELF" release-compile linux32 \
-			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/modplug-i386/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/jpeg7/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/jpeg7/include"' \
+			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/darkplaces-deps/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/darkplaces-deps/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/darkplaces-deps/include"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		"$SELF" release-compile linux64 \
-			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/modplug-x86_64/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/jpeg7/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/jpeg7/include"' \
+			'CC="gcc -g -Wl,--hash-style=sysv" DP_MODPLUG_STATIC_LIBDIR=$HOME/darkplaces-deps/lib DP_LINK_TO_LIBJPEG=1 LDFLAGS_LIBJPEG="$HOME/darkplaces-deps/lib/libjpeg.a" CFLAGS_LIBJPEG="-I$HOME/darkplaces-deps/include"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux64-dedicated'
 		;;
@@ -847,6 +847,9 @@ case "$cmd" in
 		;;
 	release-finish)
 		# version numnber and stuff like that
+		;;
+	release-qc)
+		verbose make -C Xonotic/data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
 		;;
 	release-buildpk3-transform-raw)
 		dir=$1
@@ -915,6 +918,7 @@ case "$cmd" in
 		"$SELF" release-prepare
 		"$SELF" release-maps
 		"$SELF" release-finish
+		"$SELF" release-qc
 		"$SELF" release-pack
 		"$SELF" release-engine
 		;;
