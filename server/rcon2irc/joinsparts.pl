@@ -6,6 +6,7 @@
 	irc_announce_joins => 1,
 	irc_announce_parts => 1,
 	irc_show_playerip => 0,
+	irc_show_statusnumber => 0,
 	irc_show_mapname => 0,
 	irc_show_amount_of_players => 0,
 	irc_show_country => 0,
@@ -59,6 +60,7 @@ sub get_player_count
 	if ($pj->{irc_announce_joins} && !$store{"playerid_byslot_$slot"}) {
 		out irc => 0, "PRIVMSG $config{irc_channel} :\00309+ join\017: $nick\017" . 
 			($pj->{irc_show_playerip} ? " (\00304$ip\017)" : '') .
+			($pj->{irc_show_statusnumber} ? " #\00304$slot\017 " : '') .
 			($pj->{irc_show_country} && $cn ? " CN: \00304$cn\017" : '') .
 			($clonenicks ? " Clone of:$clonenicks" : '') .
 			($pj->{irc_show_mapname} ? " playing on \00304$store{map}\017" : '') .
