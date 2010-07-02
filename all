@@ -673,8 +673,8 @@ case "$cmd" in
 						realbase=$base
 						;;
 					*)
-						l0=`git rev-parse "$base".."$ref" | wc -l`
-						l1=`git rev-parse master.."$ref" | wc -l`
+						l0=`git rev-list "$base".."$ref" | wc -l`
+						l1=`git rev-list master.."$ref" | wc -l`
 						if [ $l0 -gt $l1 ]; then
 							realbase=master
 						else
