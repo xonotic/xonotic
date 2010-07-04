@@ -451,20 +451,25 @@ case "$cmd" in
 				cleanqc=true # version info
 				;;
 		esac
-		case "$1" in
-			sdl)
-				TARGETS="sdl-debug"
-				shift
-				;;
-			glx|agl|wgl)
-				TARGETS="cl-debug"
-				shift
-				;;
-			dedicated)
-				TARGETS="sv-debug"
-				shift
-				;;
-		esac
+		if [ -n "$1" ]; then
+			TARGETS=
+			for X in $1; do
+				case "$X" in
+					sdl)
+						TARGETS="sdl-debug $TARGETS"
+						shift
+						;;
+					glx|agl|wgl)
+						TARGETS="cl-debug $TARGETS"
+						shift
+						;;
+					dedicated)
+						TARGETS="sv-debug $TARGETS"
+						shift
+						;;
+				esac
+			done
+		fi
 		if [ -z "$MAKEFLAGS" ]; then
 			if [ -f /proc/cpuinfo ]; then
 				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
