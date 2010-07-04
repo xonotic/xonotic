@@ -138,14 +138,14 @@ esac
 
 repourl()
 {
-	t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
-	if [ -n "$t" ]; then
-		case "$t" in
+	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	if [ -n "$repo_t" ]; then
+		case "$repo_t" in
 			*://*)
-				echo "$t"
+				echo "$repo_t"
 				;;
 			*)
-				echo "$base$t"
+				echo "$base$repo_t"
 				;;
 		esac
 	else
@@ -159,9 +159,9 @@ repourl()
 
 repobranch()
 {
-	t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
-	if [ -n "$t" ]; then
-		echo "$t"
+	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
+	if [ -n "$repo_t" ]; then
+		echo "$repo_t"
 	else
 		echo "master"
 	fi
@@ -170,7 +170,6 @@ repobranch()
 repoflags()
 {
 	echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
-	echo "$t"
 }
 
 repos=`for d in $repos; do
@@ -732,6 +731,7 @@ case "$cmd" in
 								reportecho4 "--> test failed, postponed"
 							fi
 						else
+							echo "MERGING"
 							case ",`repoflags "$d"`," in
 								*,svn,*)
 									# we do quite a mess here... luckily we know $org
