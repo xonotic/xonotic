@@ -457,18 +457,16 @@ case "$cmd" in
 				case "$X" in
 					sdl)
 						TARGETS="sdl-debug $TARGETS"
-						shift
 						;;
 					glx|agl|wgl)
 						TARGETS="cl-debug $TARGETS"
-						shift
 						;;
 					dedicated)
 						TARGETS="sv-debug $TARGETS"
-						shift
 						;;
 				esac
 			done
+			shift
 		fi
 		if [ -z "$MAKEFLAGS" ]; then
 			if [ -f /proc/cpuinfo ]; then
