@@ -41,7 +41,7 @@ sub Usage()
 {
 	print <<EOF;
 Usage:
-$0 mapname [-bsp bspflags...] [-vis visflags...] [-light lightflags...]
+$0 mapname [-bsp bspflags...] [-vis visflags...] [-light lightflags...] [-minimap minimapflags]
 EOF
 	exit 1;
 }
@@ -52,6 +52,7 @@ my $options =
 	vis => [split /\s+/, $VISFLAGS],
 	light => [split /\s+/, $LIGHTFLAGS],
 	minimap => [split /\s+/, $MINIMAPFLAGS],
+	scale => [], # can't have defaults atm
 	order => [split /\s*,\s*/, $ORDER],
 	maps => [],
 	scale => 1
@@ -86,6 +87,7 @@ while(@ARGV)
 	elsif($_ eq '-scale')
 	{
 		$options->{scale} = (shift @ARGV) || 1;
+		$enterflags = 'scale';
 	}
 	elsif($_ eq '-novis')
 	{
@@ -256,7 +258,7 @@ for my $m(@{$options->{maps}})
 			or die "-bsp: $?";
 		if($prescale != 1)
 		{
-			q3map2 '-scale', $prescale, "$m.bsp"
+			q3map2 '-scale', @{$options->{scale}}, $prescale, "$m.bsp"
 				or die "-scale: $?";
 			rename "${m}_s.bsp", "$m.bsp"
 				or die "rename ${m}_s.bsp $m.bsp: $!";
@@ -296,7 +298,7 @@ for my $m(@{$options->{maps}})
 
 		if($postscale != 1)
 		{
-			q3map2 '-scale', $postscale, "$m.bsp"
+			q3map2 '-scale', @{$options->{scale}}, $postscale, "$m.bsp"
 				or die "-scale: $?";
 			rename "${m}_s.bsp", "$m.bsp"
 				or die "rename ${m}_s.bsp $m.bsp: $!";
