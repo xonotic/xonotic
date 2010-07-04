@@ -426,7 +426,7 @@ case "$cmd" in
 			if [ -z "$CC" ]; then
 				export CC=gcc
 			fi
-		elif [ x"`uname`" = x"Darwin" ] && ( [ -d /Library/Frameworks/SDL.framework ] || [ -d $(HOME)/Library/Frameworks/SDL.framework ] ); then
+		elif [ x"`uname`" = x"Darwin" ] && { [ -d /Library/Frameworks/SDL.framework ] || [ -d "$HOME/Library/Frameworks/SDL.framework" ]; }; then
 			# AGL is broken in Snow Leopard, so let's default to SDL if it is available.
 			TARGETS="sv-debug sdl-debug"
 		else
