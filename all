@@ -120,6 +120,7 @@ darkplaces                    |                                                 
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
 div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master      |
 netradiant                    |                                                   | master      |
+d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
