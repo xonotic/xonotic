@@ -25,7 +25,6 @@ case "$0" in
 		case "`uname`" in
 			MINGW*|Win*)
 				# Windows hates users. So this script has to copy itself elsewhere first...
-				tname=
 				cp "$SELF" ../all.xonotic.sh
 				export WE_HATE_OUR_USERS=1
 				exec ../all.xonotic.sh "$@"
