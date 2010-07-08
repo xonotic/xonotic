@@ -424,9 +424,13 @@ case "$cmd" in
 			if [ -z "$CC" ]; then
 				export CC=gcc
 			fi
-		elif [ x"`uname`" = x"Darwin" ] && { [ -d /Library/Frameworks/SDL.framework ] || [ -d "$HOME/Library/Frameworks/SDL.framework" ]; }; then
-			# AGL is broken in Snow Leopard, so let's default to SDL if it is available.
+		elif [ x"`uname`" = x"Darwin" ] && [ x"`uname -r`" = x"10.3.0" ]; then
 			TARGETS="sv-debug sdl-debug"
+			# AGL is broken in Snow Leopard, so default to SDL.
+			if  [ x"`uname -r`" != x"10.3.0" ]; then
+				TARGETS="$TARGETS cl-debug"
+			fi
+			export CC="gcc -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
 			TARGETS="sv-debug cl-debug sdl-debug"
 		fi
@@ -511,6 +515,7 @@ case "$cmd" in
 			export PATH="$d0/misc/buildfiles/w32:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS"
+			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 			client=-sdl
 		else
 			client=-sdl
