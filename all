@@ -424,12 +424,16 @@ case "$cmd" in
 			if [ -z "$CC" ]; then
 				export CC=gcc
 			fi
-		elif [ x"`uname`" = x"Darwin" ] && [ x"`uname -r`" = x"10.3.0" ]; then
-			TARGETS="sv-debug sdl-debug"
-			# AGL is broken in Snow Leopard, so default to SDL.
-			if  [ x"`uname -r`" != x"10.3.0" ]; then
-				TARGETS="$TARGETS cl-debug"
-			fi
+		elif [ x"`uname`" = x"Darwin" ]; then
+			case "`uname -r`" in
+				?.*)
+					TARGETS="sv-debug cl-debug sdl-debug"
+					;;
+				*)
+					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
+					TARGETS="sv-debug sdl-debug"
+					;;
+			esac
 			export CC="gcc -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
 			TARGETS="sv-debug cl-debug sdl-debug"
