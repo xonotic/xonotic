@@ -398,7 +398,7 @@ case "$cmd" in
 			fi
 			rem=`git config "branch.$r.remote" || echo origin`
 			bra=`git config "branch.$r.merge" || echo "$r"`
-			upstream="$rem/$bra"
+			upstream="$rem/${bra#refs/heads/}"
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="origin/`repobranch "$d"`"
 			fi
