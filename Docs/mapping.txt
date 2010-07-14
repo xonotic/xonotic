@@ -107,20 +107,22 @@ have weapon entities placed.
 
 There's much more power in a mapinfo file. See Appendix A for more details.
 
-Gametype        | Syntax                                                                              | Notes
-----------------+-------------------------------------------------------------------------------------+-------------------------------------------------------
-Deathmatch      | type dm    <fraglimit>  <timelimit>                                                 |
-Team Deathmatch | type tdm   <fraglimit>  <timelimit> <teams>                                         | 2, 3, or 4 teams
-Domination      | type dom   <pointlimit> <timelimit>                                                 | teams are set by the map's entities
-CTF             | type ctf   <pointlimit> <timelimit> <caplimit>                                      | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
-Runematch       | type rune  <pointlimit> <timelimit>                                                 |
-LMS             | type lms   <lives>      <timelimit>                                                 |
-Arena           | type arena <fraglimit>  <timelimit>                                                 |
-Key Hunt        | type kh    <pointlimit> <timelimit> <teams>                                         | 2, 3, or 4 teams
-Assault         | type as                 <timelimit>                                                 | never uses points
-Onslaught       | type ons                <timelimit>                                                 | never uses points
-Race            | type rc                 <timelimit> <qualifyingtimelimit> <laplimit> <teamlaplimit> | g_race_teams: teamlaplimit is used instead of laplimit
-CTS             | type cts                <timelimit> <skill>                                         | never uses points
+Gametype        | Syntax                                                                                            | Notes
+----------------+---------------------------------------------------------------------------------------------------+-------------------------------------------------------
+Deathmatch      | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
+Team Deathmatch | type tdm     <fraglimit>  <timelimit> <teams>                                         <leadlimit> | 2, 3, or 4 teams
+Domination      | type dom     <pointlimit> <timelimit>                                                 <leadlimit> | teams are set by the map's entities
+CTF             | type ctf     <pointlimit> <timelimit> <caplimit>                                      <leadlimit> | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
+Runematch       | type rune    <pointlimit> <timelimit>                                                 <leadlimit> |
+LMS             | type lms     <lives>      <timelimit>                                                 <leadlimit> |
+Arena           | type arena   <fraglimit>  <timelimit>                                                 <leadlimit> |
+Key Hunt        | type kh      <pointlimit> <timelimit> <teams>                                         <leadlimit> | 2, 3, or 4 teams
+Assault         | type as                   <timelimit>                                                             | never uses points
+Onslaught       | type ons                  <timelimit>                                                             | never uses points
+Race            | type rc                   <timelimit> <qualifyingtimelimit> <laplimit> <teamlaplimit> <leadlimit> | g_race_teams: teamlaplimit is used instead of laplimit
+CTS             | type cts                  <timelimit> <skill>                                                     | never uses points
+CA              | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
+Nexball         | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
 
 
 ===============
