@@ -434,18 +434,21 @@ case "$cmd" in
 		fi
 		case "$1" in
 			-c)
+				cleand0=true
 				cleandp=true
 				cleanqcc=true
 				cleanqc=true
 				shift
 				;;
 			-n)
+				cleand0=false
 				cleandp=false
 				cleanqcc=false
 				cleanqc=false
 				shift
 				;;
 			*)
+				cleand0=false
 				cleandp=false
 				cleanqcc=false
 				cleanqc=true # version info
@@ -485,6 +488,16 @@ case "$cmd" in
 			fi
 		fi
 
+		enter "$d0/d0_blind_id" verbose
+		if ! [ -f Makefile ]; then
+			verbose sh autogen.sh
+			verbose ./configure
+		fi
+		if $cleand0; then
+			verbose make $MAKEFLAGS clean
+		fi
+		verbose make $MAKEFLAGS
+
 		enter "$d0/fteqcc" verbose
 		if $cleanqcc; then
 			verbose make $MAKEFLAGS clean
@@ -510,11 +523,12 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
-			export PATH="$d0/misc/buildfiles/w32:$PATH"
+			export PATH="$d0/misc/buildfiles/w32:$d0/d0_blind_id/.libs/$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
-			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS"
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			client=-sdl
 		else
+			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
 			client=-sdl
 		fi
 		case "$1" in
