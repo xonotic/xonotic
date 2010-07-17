@@ -319,7 +319,7 @@ case "$cmd" in
 	branches)
 		for d in $repos; do
 			cd "$d0/$d" # am in a pipe, shouldn't use enter
-			git branch -a -v -v | cut -c 3- | sed "s,^,$d ,"
+			git branch -a -v -v | cut -c 3- | sed "s/^(no branch)/(no_branch)/" | sed "s,^,$d ,"
 			cd "$d0"
 		done | {
 			branches_list=
