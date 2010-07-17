@@ -25,7 +25,6 @@ case "$0" in
 		case "`uname`" in
 			MINGW*|Win*)
 				# Windows hates users. So this script has to copy itself elsewhere first...
-				tname=
 				cp "$SELF" ../all.xonotic.sh
 				export WE_HATE_OUR_USERS=1
 				exec ../all.xonotic.sh "$@"
@@ -400,7 +399,7 @@ case "$cmd" in
 			fi
 			rem=`git config "branch.$r.remote" || echo origin`
 			bra=`git config "branch.$r.merge" || echo "$r"`
-			upstream="$rem/$bra"
+			upstream="$rem/${bra#refs/heads/}"
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="origin/`repobranch "$d"`"
 			fi
@@ -426,9 +425,17 @@ case "$cmd" in
 			if [ -z "$CC" ]; then
 				export CC=gcc
 			fi
-		elif [ x"`uname`" = x"Darwin" ] && { [ -d /Library/Frameworks/SDL.framework ] || [ -d "$HOME/Library/Frameworks/SDL.framework" ]; }; then
-			# AGL is broken in Snow Leopard, so let's default to SDL if it is available.
-			TARGETS="sv-debug sdl-debug"
+		elif [ x"`uname`" = x"Darwin" ]; then
+			case "`uname -r`" in
+				?.*)
+					TARGETS="sv-debug cl-debug sdl-debug"
+					;;
+				*)
+					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
+					TARGETS="sv-debug sdl-debug"
+					;;
+			esac
+			export CC="gcc -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
 			TARGETS="sv-debug cl-debug sdl-debug"
 		fi
@@ -526,6 +533,7 @@ case "$cmd" in
 			export PATH="$d0/misc/buildfiles/w32:$d0/d0_blind_id/.libs/$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
+			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 			client=-sdl
 		else
 			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
@@ -549,7 +557,7 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic "$@"
+		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic -mygames "$@"
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
@@ -716,13 +724,13 @@ case "$cmd" in
 							git push origin :"${ref#refs/remotes/origin/}"
 							reportecho4 "--> branch deleted"
 						fi
-					elif [ -n "$note" ]; then
+					elif [ -z "$branch" ] && [ -n "$note" ]; then
 						reportdo4 echo "$note"
 						reportecho4 "--> not merging, already had this one rejected before"
 					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
 						git checkout "$realbase"
 						org=`git rev-parse HEAD`
-						if ! git merge "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1   ' >/dev/null; }; then
+						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1   ' >/dev/null; }; then
 							git reset --hard "$org"
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
