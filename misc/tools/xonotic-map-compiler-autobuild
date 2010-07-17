@@ -44,6 +44,7 @@ log2spam()
 	url=$2
 	branch=$3
 	hash=$4
+	status=$5
 
 	branch=${branch##refs/heads/}
 	branch=${branch##refs/remotes/}
@@ -55,6 +56,9 @@ log2spam()
 	s_leaked=
 	s_error=
 
+	if [ "$status" -ne 0 ]; then
+		s_error="exited with status $status"
+	fi
 	while IFS= read -r L; do
 		case "$L" in
 			*\ seconds\ elapsed)
@@ -85,7 +89,7 @@ log2spam()
 	if [ -n "$s_error" ]; then
 		echo -n "[$branch $hash] 4failed"
 	else
-		echo -n "[$branch] finished"
+		echo -n "[$branch $hash] finished"
 	fi
 	echo -n " map compile of $map ($url): $s_time sec"
 	if [ -n "$s_samplesize" ]; then
@@ -125,10 +129,11 @@ buildthemap()
 		cd maps
 		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` 2>&1 | tee "$M.log"
 	)
+	status=$?
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
 	if [ -n "$IRCSPAM" ]; then
-		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" | $IRCSPAM
 	fi
 }
 
@@ -182,6 +187,6 @@ case "$1" in
 		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url""latest"
 		;;
 	log2spam-test)
-		log2spam "mapname" "http://mapurl" "branch" "commit"
+		log2spam "mapname" "http://mapurl" "branch" "commit" "0"
 		;;
 esac

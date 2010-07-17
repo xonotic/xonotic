@@ -709,7 +709,7 @@ case "$cmd" in
 							git push origin :"${ref#refs/remotes/origin/}"
 							reportecho4 "--> branch deleted"
 						fi
-					elif [ -n "$note" ]; then
+					elif [ -z "$branch" ] && [ -n "$note" ]; then
 						reportdo4 echo "$note"
 						reportecho4 "--> not merging, already had this one rejected before"
 					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
