@@ -130,10 +130,13 @@ buildthemap()
 		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` 2>&1 | tee "$M.log"
 	)
 	status=$?
-	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
+	if [ -n "$IRCSPAM" ]; then
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" > "maps/$M.irc"
+	fi
+	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
 	if [ -n "$IRCSPAM" ]; then
-		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" | $IRCSPAM
+		$IRCSPAM < "maps/$M.irc"
 	fi
 }
 
