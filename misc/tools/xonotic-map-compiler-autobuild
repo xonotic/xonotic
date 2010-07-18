@@ -153,12 +153,12 @@ getthemap()
 	if ! wget -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
-		return 1
+		return 0
 	fi
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
-		return 1
+		return 0
 	fi
 }
 
