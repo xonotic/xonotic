@@ -104,7 +104,7 @@ yesno()
 
 enter()
 {
-	$2 cd "$1"
+	$2 cd "$1" || exit 1
 	check_mergeconflict "$1"
 }
 
