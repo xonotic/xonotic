@@ -127,7 +127,7 @@ buildthemap()
 	fi
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` 2>&1 | tee "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` > "$M.log"
 	)
 	status=$?
 	if [ -n "$IRCSPAM" ]; then
