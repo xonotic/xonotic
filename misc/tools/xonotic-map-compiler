@@ -186,11 +186,12 @@ sub q3map2(@)
 		local $SIG{ALRM} = sub { kill $pid; };
 		alarm $timeout
 			if $timeout;
-		if(waitpid $pid, 0 != $pid)
+		if(waitpid($pid, 0) != $pid)
 		{
 			die "waitpid: did not return our child process $pid: $!";
 		}
-		return !$?;
+		alarm 0;
+		return $? == 0;
 	}
 	else # child
 	{
