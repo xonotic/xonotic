@@ -46,6 +46,7 @@ log2spam()
 	branch=$3
 	hash=$4
 	status=$5
+	time=$6
 
 	hash=`echo "$hash" | cut -c 1-7`
 
@@ -53,7 +54,6 @@ log2spam()
 	branch=${branch##refs/remotes/}
 	branch=${branch##origin/}
 
-	s_time=
 	s_samplesize=
 	s_failshaders=
 	s_leaked=
@@ -64,9 +64,6 @@ log2spam()
 	fi
 	while IFS= read -r L; do
 		case "$L" in
-			*\ seconds\ elapsed)
-				s_time=$(($s_time + ${L%% seconds elapsed}))
-				;;
 			WARNING:\ surface\ at\ *\ too\ large\ for\ desired\ samplesize*)
 				s=${L##* }
 				if [ -z "$s_samplesize" ] || [ "$s" -gt "$s_samplesize" ]; then
@@ -94,7 +91,7 @@ log2spam()
 	else
 		echo -n "[$branch $hash] finished"
 	fi
-	echo -n " map compile of $map ($url): $s_time sec"
+	echo -n " map compile of $map ($url): $time sec"
 	if [ -n "$s_samplesize" ]; then
 		echo -n ", FIX samplesize >= $s_samplesize"
 	fi
@@ -128,13 +125,16 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
+	t0=`date +$s`
 	(
 		cd maps
 		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $override > "$M.log"
 	)
+	t1=`date +$s`
+	dt=$(($t1 - $t0))
 	status=$?
 	if [ -n "$IRCSPAM" ]; then
-		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" > "maps/$M.irc"
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" "$dt" > "maps/$M.irc"
 	fi
 	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
