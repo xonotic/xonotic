@@ -47,6 +47,8 @@ log2spam()
 	hash=$4
 	status=$5
 
+	hash=`echo "$hash" | cut -c 1-7`
+
 	branch=${branch##refs/heads/}
 	branch=${branch##refs/remotes/}
 	branch=${branch##origin/}
