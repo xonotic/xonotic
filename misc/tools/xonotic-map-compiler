@@ -183,7 +183,7 @@ sub q3map2(@)
 		or die "fork: $!";
 	if($pid) # parent
 	{
-		local $SIG{ALRM} = sub { kill $pid; };
+		local $SIG{ALRM} = sub { warn "SIGALRM caught\n"; kill $pid; };
 		alarm $timeout
 			if $timeout;
 		if(waitpid($pid, 0) != $pid)
@@ -191,7 +191,7 @@ sub q3map2(@)
 			die "waitpid: did not return our child process $pid: $!";
 		}
 		alarm 0;
-		return $? == 0;
+		return ($? == 0);
 	}
 	else # child
 	{
