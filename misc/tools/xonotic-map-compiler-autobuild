@@ -4,6 +4,7 @@ set -e
 
 bspdir="$PWD/data"
 url=http://141.2.16.23/~xonotic/bsp-autobuilds/
+override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 
 bspoutdir="$HOME/public_html/bsp-autobuilds/"
 
@@ -127,7 +128,7 @@ buildthemap()
 	fi
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` > "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $override > "$M.log"
 	)
 	status=$?
 	if [ -n "$IRCSPAM" ]; then
