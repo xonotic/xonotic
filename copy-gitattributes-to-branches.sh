@@ -26,6 +26,7 @@ case "$1" in
 			git update-index --refresh
 			git commit -a -m"CRLF fixes, .gitattributes file updated"
 		done
+		true
 		;;
 	*)
 		attr=`cat .gitattributes`
