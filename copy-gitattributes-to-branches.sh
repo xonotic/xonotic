@@ -22,7 +22,7 @@ case "$1" in
 			esac
 			git checkout -t "${REFNAME#refs/remotes/}" || git checkout "${REFNAME#refs/remotes/origin/}"
 			git reset --hard "$REFNAME"
-			echo "$attr" > "${me%/*}/.gitattributes"
+			echo "$attr" > ".gitattributes"
 			git update-index --refresh
 			git add .gitattributes
 			git commit -a -m"CRLF fixes, .gitattributes file updated"
