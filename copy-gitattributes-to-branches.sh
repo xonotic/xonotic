@@ -24,6 +24,7 @@ case "$1" in
 			git reset --hard "$REFNAME"
 			echo "$attr" > "${me%/*}/.gitattributes"
 			git update-index --refresh
+			git add .gitattributes
 			git commit -a -m"CRLF fixes, .gitattributes file updated"
 		done
 		git checkout master
