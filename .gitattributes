@@ -1,3 +1,5 @@
+* -crlf
+
 *.7z -crlf -diff
 *.ac crlf=input
 *.afm crlf=input
@@ -31,7 +33,6 @@ CONTRIBUTORS crlf=input
 COPYING crlf=input
 *.cpp crlf=input
 create crlf=input
-* -crlf
 *.css crlf=input
 Current -crlf -diff
 *.cvsignore crlf=input
