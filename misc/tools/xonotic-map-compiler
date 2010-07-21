@@ -25,7 +25,7 @@ use File::Temp;
 	our $VISFLAGS    = '';
 
 	# Default flags for the -light stage
-	our $LIGHTFLAGS  = '-deluxe -patchshadows -samples 3 -lightmapsize 512 -fast -dirty';
+	our $LIGHTFLAGS  = '-deluxe -patchshadows -samples 3 -lightmapsize 512 -fast -fastbounce -dirty';
 
 	# Default flags for the -minimap stage
 	our $MINIMAPFLAGS = '';
