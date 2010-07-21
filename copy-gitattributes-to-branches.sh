@@ -15,11 +15,16 @@ case "$1" in
 		git config core.autocrlf input
 		git reset --hard
 		git for-each-ref 'refs/remotes/origin' | while read -r HASH TYPE REFNAME; do
+			case "$REFNAME" in
+				refs/remotes/origin/HEAD)
+					continue
+					;;
+			esac
 			git checkout -t "${REFNAME#refs/remotes/}" || git checkout "${REFNAME#refs/remotes/origin/}"
 			git reset --hard "$REFNAME"
 			echo "$attr" > "${me%/*}/.gitattributes"
 			git update-index --refresh
-			git commit -a -m"CRLF"
+			git commit -a -m"CRLF fixes, .gitattributes file updated"
 		done
 		;;
 	*)
