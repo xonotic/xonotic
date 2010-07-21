@@ -484,7 +484,7 @@ case "$cmd" in
 						;;
 				esac
 			done
-			if [ "$TARGETS" ]; then # at least a valid client
+			if [ -n "$TARGETS" ]; then # at least a valid client
 				shift
 			else # no valid client, let's assume this option is not meant to be a client then
 				TARGETS=$TARGETS_SAVE
