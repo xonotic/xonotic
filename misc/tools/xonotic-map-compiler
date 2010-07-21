@@ -134,6 +134,16 @@ while(@ARGV)
 	{
 		$options->{order} = [split /\s*,\s*/, shift @ARGV];
 	}
+	elsif($_ =~ /^--no(-.*)/)
+	{
+		if($curmode eq 'maps')
+		{
+			$curmode = 'bsp';
+		}
+		my $flag = $1;
+		@{$options->{$curmode}} = grep { (($_ eq $flag) ... /^-/) !~ /^[0-9]+$/ } @{$options->{$curmode}};
+			# so, e.g. --no-samplesize removes "-samplesize" and a following "3"
+	}
 	elsif($_ =~ /^-(-.*)/)
 	{
 		if($curmode eq 'maps')
