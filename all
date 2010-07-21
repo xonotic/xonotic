@@ -750,7 +750,7 @@ case "$cmd" in
 							reportecho4 "--> compile failed"
 						elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
 							git reset --hard "$org"
-							git notes edit "$ref"
+							GIT_NOTES_REF=refs/notes/admin-merge git notes edit "$ref"
 							note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 							if [ x"$note" = x"del" ]; then
 								git push origin :"${ref#refs/remotes/origin/}"
