@@ -1,3 +1,4 @@
+* -crlf
 *.7z -crlf -diff
 *.aft crlf=input
 *.aliases crlf=input
