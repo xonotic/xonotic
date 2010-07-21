@@ -199,6 +199,8 @@ case "$cmd" in
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
+					verbose git config remote.origin.autocrlf input
+
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
