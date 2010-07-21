@@ -23,6 +23,7 @@ case "$1" in
 			git checkout -t "${REFNAME#refs/remotes/}" || git checkout "${REFNAME#refs/remotes/origin/}"
 			git reset --hard "$REFNAME"
 			echo "$attr" > ".gitattributes"
+			find . -type f -exec touch {} \+
 			git update-index --refresh
 			git add .gitattributes
 			git commit -a -m"CRLF fixes, .gitattributes file updated"
