@@ -1,8 +1,10 @@
-* -crlf
 *.7z -crlf -diff
+*.ac crlf=input
+*.afm crlf=input
 *.aft crlf=input
 *.aliases crlf=input
 all crlf=input
+*.am crlf=input
 *.animinfo crlf=input
 *.aps -crlf -diff
 *.ase -crlf
@@ -23,14 +25,18 @@ bsp2ent crlf=input
 ChangeLog crlf=input
 CHANGES crlf=input
 COMPILING crlf=input
+compress-texture crlf=input
 *.conf crlf=input
 CONTRIBUTORS crlf=input
 COPYING crlf=input
 *.cpp crlf=input
+create crlf=input
+* -crlf
 *.css crlf=input
 Current -crlf -diff
 *.cvsignore crlf=input
 *.cvswrappers crlf=input
+*.dat -crlf -diff
 *.db -crlf -diff
 *.default crlf=input
 *.def crlf=input
@@ -78,7 +84,9 @@ GPL crlf=input
 *.ico -crlf -diff
 *.idsoftware crlf=input
 *.inc crlf=input
+*.in crlf=input
 *.instantaction crlf=input
+*.iqm -crlf -diff
 *.java crlf=input
 *.jhm crlf=input
 *.jnlp crlf=input
@@ -104,12 +112,11 @@ makespr32 crlf=input
 *.mf crlf=input
 *.mid -crlf -diff
 *.mk crlf=input
+*.mkdir -crlf -diff
 *.mmpz -crlf -diff
 *.modinfo crlf=input
 *.modules crlf=input
 nexuiz-map-compiler crlf=input
-nexuiz-osx-agl crlf=input
-nexuiz-osx-sdl crlf=input
 *.nib -crlf
 *.obj -crlf
 OFFSETS -crlf -diff
@@ -119,6 +126,8 @@ pangorc crlf=input
 *.patch crlf=input
 *.patchsets crlf=input
 *.pcx -crlf -diff
+*.pfb -crlf -diff
+*.pfm -crlf -diff
 *.pk3 -crlf -diff
 PkgInfo crlf=input
 *.pl crlf=input
@@ -166,14 +175,18 @@ TODO crlf=input
 *.TTF -crlf -diff
 *.txt crlf=input
 *.TXT crlf=input
+update-shaderlists crlf=input
 *.vcproj -crlf
 *.wav -crlf -diff
 *.waypoints -crlf -diff
+w crlf=input
 *.width crlf=input
 *.workspace -crlf
 *.xcf -crlf -diff
 *.xlink crlf=input
 *.xml crlf=input
+xonotic-map-compiler-autobuild crlf=input
+xonotic-map-compiler crlf=input
 *.xpm crlf=input
 *.zip -crlf -diff
 zipdiff crlf=input
