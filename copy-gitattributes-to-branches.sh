@@ -17,12 +17,15 @@ case "$1" in
 		git for-each-ref 'refs/remotes/origin' | while read -r HASH TYPE REFNAME; do
 			git checkout -t "${REFNAME#refs/remotes/}" || git checkout "${REFNAME#refs/remotes/origin/}"
 			git reset --hard "$REFNAME"
-			cp "${me%/*}/.gitattributes" .
+			echo "$attr" > "${me%/*}/.gitattributes"
 			git update-index --refresh
 			git commit -a -m"CRLF"
 		done
 		;;
 	*)
+		attr=`cat .gitattributes`
+		export attr
 		./all each "$me" inner
+		./all checkout
 		;;
 esac
