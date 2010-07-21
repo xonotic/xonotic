@@ -125,12 +125,12 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
-	t0=`date +$s`
+	t0=`date +%s`
 	(
 		cd maps
 		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $override > "$M.log"
 	)
-	t1=`date +$s`
+	t1=`date +%s`
 	dt=$(($t1 - $t0))
 	status=$?
 	if [ -n "$IRCSPAM" ]; then
