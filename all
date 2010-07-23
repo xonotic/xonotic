@@ -104,7 +104,7 @@ yesno()
 
 enter()
 {
-	$2 cd "$1"
+	$2 cd "$1" || exit 1
 	check_mergeconflict "$1"
 }
 
@@ -199,6 +199,8 @@ case "$cmd" in
 					enter "$d0/$d" verbose
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+					verbose git config remote.origin.autocrlf input
 
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
@@ -320,7 +322,7 @@ case "$cmd" in
 	branches)
 		for d in $repos; do
 			cd "$d0/$d" # am in a pipe, shouldn't use enter
-			git branch -a -v -v | cut -c 3- | sed "s,^,$d ,"
+			git branch -a -v -v | cut -c 3- | sed "s/^(no branch)/(no_branch)/" | sed "s,^,$d ,"
 			cd "$d0"
 		done | {
 			branches_list=
@@ -461,22 +463,37 @@ case "$cmd" in
 				cleanqc=true # version info
 				;;
 		esac
-		if [ -n "$1" ]; then
+		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
+			# if we give the command make the arg "", it will surely fail (invalid filename),
+			# so better handle it as an empty client option
+			BAD_TARGETS=" "
+			shift
+		elif [ -n "$1" ]; then
+			BAD_TARGETS=
+			TARGETS_SAVE=$TARGETS
 			TARGETS=
 			for X in $1; do
 				case "$X" in
 					sdl)
-						TARGETS="sdl-debug $TARGETS"
+						TARGETS="$TARGETS sdl-debug"
 						;;
 					glx|agl|wgl)
-						TARGETS="cl-debug $TARGETS"
+						TARGETS="$TARGETS cl-debug"
 						;;
 					dedicated)
-						TARGETS="sv-debug $TARGETS"
+						TARGETS="$TARGETS sv-debug"
+						;;
+					*)
+						BAD_TARGETS="$BAD_TARGETS $X"
 						;;
 				esac
 			done
-			shift
+			if [ -n "$TARGETS" ]; then # at least a valid client
+				shift
+			else # no valid client, let's assume this option is not meant to be a client then
+				TARGETS=$TARGETS_SAVE
+				BAD_TARGETS=
+			fi
 		fi
 		if [ -z "$MAKEFLAGS" ]; then
 			if [ -f /proc/cpuinfo ]; then
@@ -518,11 +535,17 @@ case "$cmd" in
 		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
 
 		enter "$d0/darkplaces" verbose
+		if [ x"$BAD_TARGETS" = x" " ]; then
+			echo "Warning: invalid empty client, default clients will be used."
+		fi
 		if $cleandp; then
 			verbose make $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
 			verbose make $MAKEFLAGS "$@" "$T"
+		done
+		for T in $BAD_TARGETS; do
+			echo "Warning: discarded invalid client $T."
 		done
 
 		verbose "$SELF" update-maps
@@ -742,7 +765,7 @@ case "$cmd" in
 							reportecho4 "--> compile failed"
 						elif ! yesno "Still merge \"$ref\" into `git symbolic-ref HEAD` of $d? Maybe you want to test first."; then
 							git reset --hard "$org"
-							git notes edit "$ref"
+							GIT_NOTES_REF=refs/notes/admin-merge git notes edit "$ref"
 							note=`GIT_NOTES_REF=refs/notes/admin-merge git notes show "$ref" 2>/dev/null || true`
 							if [ x"$note" = x"del" ]; then
 								git push origin :"${ref#refs/remotes/origin/}"

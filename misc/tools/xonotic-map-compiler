@@ -25,7 +25,7 @@ use File::Temp;
 	our $VISFLAGS    = '';
 
 	# Default flags for the -light stage
-	our $LIGHTFLAGS  = '-deluxe -patchshadows -samples 3 -lightmapsize 512';
+	our $LIGHTFLAGS  = '-deluxe -patchshadows -samples 3 -lightmapsize 512 -fast -fastbounce -dirty';
 
 	# Default flags for the -minimap stage
 	our $MINIMAPFLAGS = '';
@@ -55,7 +55,12 @@ my $options =
 	scale => [], # can't have defaults atm
 	order => [split /\s*,\s*/, $ORDER],
 	maps => [],
-	scale => 1
+	scale => 1,
+	bsp_timeout => 0,
+	vis_timeout => 0,
+	light_timeout => 0,
+	minimap_timeout => 0,
+	scale_timeout => 0
 };
 
 my $curmode = 'maps';
@@ -105,9 +110,39 @@ while(@ARGV)
 	{
 		$options->{noshaderlist} = 1;
 	}
+	elsif($_ eq '-bsp_timeout')
+	{
+		$options->{bsp_timeout} = shift @ARGV;
+	}
+	elsif($_ eq '-vis_timeout')
+	{
+		$options->{vis_timeout} = shift @ARGV;
+	}
+	elsif($_ eq '-light_timeout')
+	{
+		$options->{light_timeout} = shift @ARGV;
+	}
+	elsif($_ eq '-minimap_timeout')
+	{
+		$options->{minimap_timeout} = shift @ARGV;
+	}
+	elsif($_ eq '-scale_timeout')
+	{
+		$options->{minimap_timeout} = shift @ARGV;
+	}
 	elsif($_ eq '-order')
 	{
 		$options->{order} = [split /\s*,\s*/, shift @ARGV];
+	}
+	elsif($_ =~ /^--no(-.*)/)
+	{
+		if($curmode eq 'maps')
+		{
+			$curmode = 'bsp';
+		}
+		my $flag = $1;
+		@{$options->{$curmode}} = grep { (($_ eq $flag) ... /^-/) !~ /^[0-9]+$/ } @{$options->{$curmode}};
+			# so, e.g. --no-samplesize removes "-samplesize" and a following "3"
 	}
 	elsif($_ =~ /^-(-.*)/)
 	{
@@ -144,9 +179,35 @@ my $linkdir = File::Temp::tempdir("xonotic-map-compiler.XXXXXX", TMPDIR => 1, CL
 
 sub q3map2(@)
 {
+	my $mode = $_[0];
+	my $timeout = undef;
+	$timeout = $options->{bsp_timeout} if $mode eq '-bsp';
+	$timeout = $options->{vis_timeout} if $mode eq '-vis';
+	$timeout = $options->{light_timeout} if $mode eq '-light';
+	$timeout = $options->{minimap_timeout} if $mode eq '-minimap';
+	$timeout = $options->{scale_timeout} if $mode eq '-scale';
+	die "Invalid call: not a standard q3map2 stage" if not defined $timeout;
 	my @args = ($Q3MAP2, split(/\s+/, $Q3MAP2FLAGS), '-game', 'xonotic', '-fs_basepath', $XONOTICDIR, '-fs_basepath', $linkdir, '-v', @_);
 	print "\$ @args\n";
-	return !system @args;
+	defined(my $pid = fork())
+		or die "fork: $!";
+	if($pid) # parent
+	{
+		local $SIG{ALRM} = sub { warn "SIGALRM caught\n"; kill TERM => $pid; };
+		alarm $timeout
+			if $timeout;
+		if(waitpid($pid, 0) != $pid)
+		{
+			die "waitpid: did not return our child process $pid: $!";
+		}
+		alarm 0;
+		return ($? == 0);
+	}
+	else # child
+	{
+		exec @args
+			or die "exec: $!";
+	}
 }
 
 (my $mapdir = getcwd()) =~ s!/[^/]*(?:$)!!;
