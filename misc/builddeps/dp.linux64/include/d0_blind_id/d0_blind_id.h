@@ -40,4 +40,6 @@ EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_sessionkey_public_id(const d0_blind_i
 EXPORT void d0_blind_id_INITIALIZE(void);
 EXPORT void d0_blind_id_SHUTDOWN(void);
 
+EXPORT void d0_blind_id_util_sha256(char *out, const char *in, size_t n);
+
 #endif
