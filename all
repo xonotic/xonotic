@@ -553,7 +553,7 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
-			export PATH="$d0/misc/buildfiles/w32:$d0/d0_blind_id/.libs/$PATH"
+			export PATH="$d0/misc/buildfiles/win64:$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
@@ -860,17 +860,17 @@ case "$cmd" in
 		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "fteqcc" "$darkplaces_files"
 		;;
 	release-engine-win32)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/w32/* Xonotic/
+		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win32/* Xonotic/
 		"$SELF" release-compile win32 \
-			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/db.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/w32/* Xonotic/
+		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win64/* Xonotic/
 		"$SELF" release-compile win32 \
-			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/db.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config"' \
-			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
+			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config"' \
+			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-64.exe' \
 			debug 'darkplaces.exe:xonotic-64.exe darkplaces-sdl.exe:xonotic-sdl-64.exe darkplaces-dedicated.exe:xonotic-dedicated-64.exe'
 		;;
 	release-engine-osx)
@@ -884,13 +884,13 @@ case "$cmd" in
 		"$SELF" release-compile linux32 \
 			'CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib DP_LINK_TO_LIBJPEG=1' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
-			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux32-dedicated'
+			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		"$SELF" release-compile linux64 \
 			'CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib DP_LINK_TO_LIBJPEG=1' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
-			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux-linux64-dedicated'
+			debug 'darkplaces-glx:Xonotic/xonotic-linux-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
 		"$SELF" release-engine-win32 &
