@@ -808,11 +808,15 @@ case "$cmd" in
 		#"$SELF" each git clean -fxd
 		rm -rf Xonotic
 		mkdir -p Xonotic
-		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh | {
+		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
 			cd Xonotic
 			mkdir data fteqcc
 			tar xvf -
-			rm -rf misc/builddeps misc/buildfiles
+			rm -rf misc/builddeps
+			mv misc/buildfiles/win32/* .
+			mv misc/buildfiles/win64/* .
+			mv misc/buildfiles/osx/* .
+			rm -rf misc/buildfiles
 		}
 		;;
 	release-compile-run)
@@ -839,21 +843,18 @@ case "$cmd" in
 		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "fteqcc" "$darkplaces_files"
 		;;
 	release-engine-win32)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win32/* Xonotic/
 		"$SELF" release-compile win32 \
 			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win64/* Xonotic/
 		"$SELF" release-compile win32 \
 			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-64.exe' \
 			debug 'darkplaces.exe:xonotic-64.exe darkplaces-sdl.exe:xonotic-sdl-64.exe darkplaces-dedicated.exe:xonotic-dedicated-64.exe'
 		;;
 	release-engine-osx)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/osx/* Xonotic/
 		"$SELF" release-compile osx \
 			'CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
@@ -978,6 +979,7 @@ case "$cmd" in
 		"$SELF" release-qc
 		"$SELF" release-pack
 		;;
+
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
