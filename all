@@ -804,22 +804,16 @@ case "$cmd" in
 		;;
 
 	# release building goes here
-	release-mkdir)
-		mkdir -p Xonotic/"$1"
-		;;
 	release-prepare)
-#"$SELF" each git clean -fxd
+		#"$SELF" each git clean -fxd
+		rm -rf Xonotic
 		mkdir -p Xonotic
-		"$SELF" release-copy Docs/
-		"$SELF" release-copy misc/
-		"$SELF" release-copy server/
-		"$SELF" release-copy xonotic-linux-glx.sh
-		"$SELF" release-copy xonotic-linux-sdl.sh
-		"$SELF" release-mkdir data
-		"$SELF" release-mkdir fteqcc
-		;;
-	release-copy)
-		rsync --exclude=.git -vaSHPAX "$1" Xonotic/"$1"
+		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh | {
+			cd Xonotic
+			mkdir data fteqcc
+			tar xvf -
+			rm -rf misc/builddeps misc/buildfiles
+		}
 		;;
 	release-compile-run)
 		host=$1
@@ -899,7 +893,7 @@ case "$cmd" in
 		# version numnber and stuff like that
 		;;
 	release-qc)
-		verbose make -C Xonotic/data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
+		verbose make -C data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
 		;;
 	release-buildpk3-transform-raw)
 		dir=$1
@@ -941,7 +935,19 @@ case "$cmd" in
 				;;
 		esac
 		rm -rf Xonotic/temp
-		rsync --exclude=.git -vaSHPAX "$src"/ "Xonotic/temp"
+		mkdir -p Xonotic/temp
+		{
+			cd "$src"
+			git archive --format=tar HEAD
+		} | {
+			cd Xonotic/temp
+			tar xvf -
+		}
+		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
+			cp "$src"/progs.dat Xonotic/temp/
+			cp "$src"/csprogs.dat Xonotic/temp/
+			cp "$src"/menu.dat Xonotic/temp/
+		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		cd Xonotic/temp
 		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
@@ -966,11 +972,11 @@ case "$cmd" in
 		;;
 	release)
 		"$SELF" release-prepare
+		"$SELF" release-engine
 		"$SELF" release-maps
 		"$SELF" release-finish
 		"$SELF" release-qc
 		"$SELF" release-pack
-		"$SELF" release-engine
 		;;
 	*)
 		echo "Usage:"
