@@ -826,11 +826,25 @@ case "$cmd" in
 		makeflags=$4
 		srcdir=$5
 		targetfiles=$6
-		rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
-		ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
-        for f in $targetfiles; do
-			rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
-		done
+		case " $HOSTS_THAT_ARE_MYSELF " in
+			*\ $host\ *)
+				rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
+				(
+					cd $buildpath
+					eval make clean $maketargets $makeflags
+				)
+				for f in $targetfiles; do
+					mv "$buildpath/${f%:*}" "${f##*:}"
+				done
+				;;
+			*)
+				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
+				ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+				for f in $targetfiles; do
+					rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+				done
+				;;
+		esac
 		;;
 	release-compile)
 		suffix=$1
@@ -840,7 +854,7 @@ case "$cmd" in
 		darkplaces_maketargets=$5
 		darkplaces_files=$6
 		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "fteqcc" "$fteqcc_files"
-		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "fteqcc" "$darkplaces_files"
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "darkplaces" "$darkplaces_files"
 		;;
 	release-engine-win32)
 		"$SELF" release-compile win32 \
