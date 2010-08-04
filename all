@@ -184,7 +184,58 @@ fi
 cmd=$1
 shift
 
+fix_upstream_rebase()
+{
+	if [ -z "$r_me" ] || [ -z "$r_other" ]; then
+		return
+	fi
+	r_base=`git merge-base "$r_me" "$r_other"`
+
+	# no merge-base? upstream did filter-branch
+	if [ -n "$r_base" ]; then
+		# otherwise, check if the two histories are "similar"
+		r_l_me=`git log --pretty="format:%s" "$r_other".."$r_me" | grep -v "^Merge" | sort -u`
+		r_l_other=`git log --pretty="format:%s" "$r_me".."$r_other" | grep -v "^Merge" | sort -u`
+
+		# heuristics: upstream rebase/filter-branch if more than 50% of the commits of one of the sides are in the other too
+		r_lc_me=`echo "$r_l_me" | wc -l`
+		r_lc_other=`echo "$r_l_other" | wc -l`
+		r_lc_together=`{ echo "$r_l_me"; echo "$r_l_other"; } | sort -u | wc -l`
+		r_lc_same=$(($r_lc_me + $r_lc_other - $r_lc_together))
+
+		if [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_me )) ] || [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_other )) ]; then
+			if yesno "Probable upstream rebase detected, automatically fix?" 'git log --oneline --graph --date-order --left-right "$r_other"..."$r_me"'; then
+				git reset --hard "$r_me"
+				git pull --rebase
+				return 1
+			fi
+		fi
+	fi
+
+	return 0
+}
+
+fix_upstream_rebase_mergeok()
+{
+	r_me=`git rev-parse --revs-only HEAD^1 2>/dev/null || true`
+	r_other=`git rev-parse --revs-only HEAD^2 2>/dev/null || true`
+	fix_upstream_rebase
+}
+
+fix_upstream_rebase_mergefail()
+{
+	r_me=`git rev-parse --revs-only HEAD 2>/dev/null || true`
+	r_other=`git rev-parse --revs-only MERGE_HEAD 2>/dev/null || true`
+	fix_upstream_rebase
+}
+
 case "$cmd" in
+	fix_upstream_rebase)
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			verbose fix_upstream_rebase_mergefail && verbose fix_upstream_rebase_mergeok
+		done
+		;;
 	update|pull)
 		allow_pull=true
 		if [ x"$1" = x"-N" ]; then
@@ -205,9 +256,12 @@ case "$cmd" in
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
 						if ! verbose git pull; then
+							fix_upstream_rebase_mergefailed || true
 							check_mergeconflict "$d"
 							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
 							read -r DUMMY
+						else
+							fix_upstream_rebase_mergeok || true
 						fi
 					fi
 
@@ -804,22 +858,20 @@ case "$cmd" in
 		;;
 
 	# release building goes here
-	release-mkdir)
-		mkdir -p Xonotic/"$1"
-		;;
 	release-prepare)
-#"$SELF" each git clean -fxd
+		#"$SELF" each git clean -fxd
+		rm -rf Xonotic
 		mkdir -p Xonotic
-		"$SELF" release-copy Docs/
-		"$SELF" release-copy misc/
-		"$SELF" release-copy server/
-		"$SELF" release-copy xonotic-linux-glx.sh
-		"$SELF" release-copy xonotic-linux-sdl.sh
-		"$SELF" release-mkdir data
-		"$SELF" release-mkdir fteqcc
-		;;
-	release-copy)
-		rsync --exclude=.git -vaSHPAX "$1" Xonotic/"$1"
+		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
+			cd Xonotic
+			mkdir data fteqcc
+			tar xvf -
+			rm -rf misc/builddeps
+			mv misc/buildfiles/win32/* .
+			mv misc/buildfiles/win64/* .
+			mv misc/buildfiles/osx/* .
+			rm -rf misc/buildfiles
+		}
 		;;
 	release-compile-run)
 		host=$1
@@ -828,11 +880,25 @@ case "$cmd" in
 		makeflags=$4
 		srcdir=$5
 		targetfiles=$6
-		rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
-		ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
-        for f in $targetfiles; do
-			rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
-		done
+		case " $HOSTS_THAT_ARE_MYSELF " in
+			*\ $host\ *)
+				rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
+				(
+					cd $buildpath
+					eval make clean $maketargets $makeflags
+				)
+				for f in $targetfiles; do
+					mv "$buildpath/${f%:*}" "${f##*:}"
+				done
+				;;
+			*)
+				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
+				ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+				for f in $targetfiles; do
+					rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+				done
+				;;
+		esac
 		;;
 	release-compile)
 		suffix=$1
@@ -842,24 +908,21 @@ case "$cmd" in
 		darkplaces_maketargets=$5
 		darkplaces_files=$6
 		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "fteqcc" "$fteqcc_files"
-		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "fteqcc" "$darkplaces_files"
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "darkplaces" "$darkplaces_files"
 		;;
 	release-engine-win32)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win32/* Xonotic/
 		"$SELF" release-compile win32 \
 			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/win64/* Xonotic/
-		"$SELF" release-compile win32 \
-			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config"' \
+		"$SELF" release-compile win64 \
+			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-64.exe' \
 			debug 'darkplaces.exe:xonotic-64.exe darkplaces-sdl.exe:xonotic-sdl-64.exe darkplaces-dedicated.exe:xonotic-dedicated-64.exe'
 		;;
 	release-engine-osx)
-		rsync --exclude=.git -vaSHPAX Xonotic/misc/buildfiles/osx/* Xonotic/
 		"$SELF" release-compile osx \
 			'CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
@@ -899,7 +962,7 @@ case "$cmd" in
 		# version numnber and stuff like that
 		;;
 	release-qc)
-		verbose make -C Xonotic/data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
+		verbose make -C data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
 		;;
 	release-buildpk3-transform-raw)
 		dir=$1
@@ -941,7 +1004,19 @@ case "$cmd" in
 				;;
 		esac
 		rm -rf Xonotic/temp
-		rsync --exclude=.git -vaSHPAX "$src"/ "Xonotic/temp"
+		mkdir -p Xonotic/temp
+		{
+			cd "$src"
+			git archive --format=tar HEAD
+		} | {
+			cd Xonotic/temp
+			tar xvf -
+		}
+		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
+			cp "$src"/progs.dat Xonotic/temp/
+			cp "$src"/csprogs.dat Xonotic/temp/
+			cp "$src"/menu.dat Xonotic/temp/
+		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		cd Xonotic/temp
 		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
@@ -966,12 +1041,13 @@ case "$cmd" in
 		;;
 	release)
 		"$SELF" release-prepare
+		"$SELF" release-engine
 		"$SELF" release-maps
 		"$SELF" release-finish
 		"$SELF" release-qc
 		"$SELF" release-pack
-		"$SELF" release-engine
 		;;
+
 	*)
 		echo "Usage:"
 		echo "  $SELF pull"
