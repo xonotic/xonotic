@@ -256,7 +256,7 @@ case "$cmd" in
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
 						if ! verbose git pull; then
-							fix_upstream_rebase_mergefailed || true
+							fix_upstream_rebase_mergefail || true
 							check_mergeconflict "$d"
 							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
 							read -r DUMMY
