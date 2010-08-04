@@ -117,7 +117,7 @@ data/xonotic-nexcompat.pk3dir |                                                 
 mediasource                   |                                                   | master      |
 darkplaces                    |                                                   | div0-stable | svn
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master      |
+div0-gittools                 |                                                   | master      |
 netradiant                    |                                                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
