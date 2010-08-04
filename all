@@ -232,7 +232,8 @@ fix_upstream_rebase_mergefail()
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
-			fix_upstream_rebase_mergefail && fix_upstream_rebase_mergeok
+			enter "$d0/$d" verbose
+			verbose fix_upstream_rebase_mergefail && verbose fix_upstream_rebase_mergeok
 		done
 		;;
 	update|pull)
