@@ -184,7 +184,57 @@ fi
 cmd=$1
 shift
 
+fix_upstream_rebase()
+{
+	if [ -z "$r_me" ] || [ -z "$r_other" ]; then
+		return
+	fi
+	r_base=`git merge-base "$r_me" "$r_other"`
+
+	# no merge-base? upstream did filter-branch
+	if [ -n "$r_base" ]; then
+		# otherwise, check if the two histories are "similar"
+		r_l_me=`git log --pretty="format:%s" "$r_other".."$r_me" | grep -v "^Merged" | sort -u`
+		r_l_other=`git log --pretty="format:%s" "$r_me".."$r_other" | grep -v "^Merged" | sort -u`
+
+		# heuristics: upstream rebase/filter-branch if more than 50% of the commits of one of the sides are in the other too
+		r_lc_me=`echo "$r_l_me" | wc -l`
+		r_lc_other=`echo "$r_l_other" | wc -l`
+		r_lc_together=`{ echo "$r_l_me"; echo "$r_l_other"; } | sort -u | wc -l`
+		r_lc_same=$(($r_lc_me + $r_lc_other - $r_lc_together))
+
+		if [ $(( $r_lc_same * 2 )) -le $(( $r_lc_me )) ] && [ $(( $r_lc_same * 2 )) -le $(( $r_lc_other )) ]; then
+			if yesno "Probable upstream rebase detected, automatically fix?" 'git log --oneline --graph --left-right "$r_l_other".."$r_l_me"'; then
+				git reset --hard "$r_me"
+				git pull --rebase
+				return 1
+			fi
+		fi
+	fi
+
+	return 0
+}
+
+fix_upstream_rebase_mergeok()
+{
+	r_me=`git rev-parse --revs-only HEAD^1 2>/dev/null || true`
+	r_other=`git rev-parse --revs-only HEAD^2 2>/dev/null || true`
+	fix_upstream_rebase
+}
+
+fix_upstream_rebase_mergefail()
+{
+	r_me=`git rev-parse --revs-only HEAD 2>/dev/null || true`
+	r_other=`git rev-parse --revs-only MERGE_HEAD 2>/dev/null || true`
+	fix_upstream_rebase
+}
+
 case "$cmd" in
+	fix_upstream_rebase)
+		for d in $repos; do
+			fix_upstream_rebase_mergefail && fix_upstream_rebase_mergeok
+		done
+		;;
 	update|pull)
 		allow_pull=true
 		if [ x"$1" = x"-N" ]; then
@@ -205,9 +255,12 @@ case "$cmd" in
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
 						if ! verbose git pull; then
+							fix_upstream_rebase_mergefailed || true
 							check_mergeconflict "$d"
 							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
 							read -r DUMMY
+						else
+							fix_upstream_rebase_mergeok || true
 						fi
 					fi
 
