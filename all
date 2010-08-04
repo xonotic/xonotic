@@ -194,8 +194,8 @@ fix_upstream_rebase()
 	# no merge-base? upstream did filter-branch
 	if [ -n "$r_base" ]; then
 		# otherwise, check if the two histories are "similar"
-		r_l_me=`git log --pretty="format:%s" "$r_other".."$r_me" | grep -v "^Merged" | sort -u`
-		r_l_other=`git log --pretty="format:%s" "$r_me".."$r_other" | grep -v "^Merged" | sort -u`
+		r_l_me=`git log --pretty="format:%s" "$r_other".."$r_me" | grep -v "^Merge" | sort -u`
+		r_l_other=`git log --pretty="format:%s" "$r_me".."$r_other" | grep -v "^Merge" | sort -u`
 
 		# heuristics: upstream rebase/filter-branch if more than 50% of the commits of one of the sides are in the other too
 		r_lc_me=`echo "$r_l_me" | wc -l`
