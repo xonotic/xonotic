@@ -867,9 +867,9 @@ case "$cmd" in
 			mkdir data fteqcc
 			tar xvf -
 			rm -rf misc/builddeps
-			mv misc/buildfiles/win32/* .
-			mv misc/buildfiles/win64/* .
-			mv misc/buildfiles/osx/* .
+			mv misc/buildfiles/win32/* . || true
+			mv misc/buildfiles/win64/* . || true
+			mv misc/buildfiles/osx/* . || true
 			rm -rf misc/buildfiles
 		}
 		;;
@@ -942,7 +942,7 @@ case "$cmd" in
 		;;
 	release-engine)
 		"$SELF" release-engine-win32 &
-		"$SELF" release-engine-win64 &
+		# "$SELF" release-engine-win64 &
 		"$SELF" release-engine-osx &
 		"$SELF" release-engine-linux32 &
 		"$SELF" release-engine-linux64 &
@@ -950,13 +950,6 @@ case "$cmd" in
 		;;
 	release-maps)
 		"$SELF" update-maps
-		for X in data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
-			if [ -f "$X" ]; then
-				cd Xonotic/data/xonotic-maps.pk3dir
-				unzip ../../../"$X"
-				cd ../../..
-			fi
-		done
 		;;
 	release-finish)
 		# version numnber and stuff like that
@@ -1017,6 +1010,16 @@ case "$cmd" in
 			cp "$src"/csprogs.dat Xonotic/temp/
 			cp "$src"/menu.dat Xonotic/temp/
 		fi
+		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
+			for X in data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
+				if [ -f "$X" ]; then
+					(
+						cd Xonotic/data/xonotic-maps.pk3dir
+						unzip ../../../"$X"
+					)
+				fi
+			done
+		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		cd Xonotic/temp
 		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
@@ -1033,7 +1036,7 @@ case "$cmd" in
 		done
 		;;
 	release-pack)
-		"$SELF" release-buildpk3s data/font-dejavu.pk3dir                  raw ''
+		"$SELF" release-buildpk3s data/font-nimbussansl.pk3dir             raw ''
 		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
 		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
 		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
@@ -1041,9 +1044,9 @@ case "$cmd" in
 		;;
 	release)
 		"$SELF" release-prepare
-		"$SELF" release-engine
 		"$SELF" release-maps
 		"$SELF" release-finish
+		"$SELF" release-engine
 		"$SELF" release-qc
 		"$SELF" release-pack
 		;;
