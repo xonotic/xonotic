@@ -1044,10 +1044,11 @@ case "$cmd" in
 		;;
 	release)
 		"$SELF" release-prepare
-		"$SELF" release-maps
-		"$SELF" release-finish
-		"$SELF" release-engine
-		"$SELF" release-qc
+		"$SELF" release-maps &
+		"$SELF" release-engine &
+		"$SELF" release-finish &
+		"$SELF" release-qc &
+		wait
 		"$SELF" release-pack
 		;;
 
