@@ -203,8 +203,8 @@ fix_upstream_rebase()
 		r_lc_together=`{ echo "$r_l_me"; echo "$r_l_other"; } | sort -u | wc -l`
 		r_lc_same=$(($r_lc_me + $r_lc_other - $r_lc_together))
 
-		if [ $(( $r_lc_same * 2 )) -le $(( $r_lc_me )) ] && [ $(( $r_lc_same * 2 )) -le $(( $r_lc_other )) ]; then
-			if yesno "Probable upstream rebase detected, automatically fix?" 'git log --oneline --graph --left-right "$r_l_other".."$r_l_me"'; then
+		if [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_me )) ] || [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_other )) ]; then
+			if yesno "Probable upstream rebase detected, automatically fix?" 'git log --oneline --graph --date-order --left-right "$r_other"..."$r_me"'; then
 				git reset --hard "$r_me"
 				git pull --rebase
 				return 1
