@@ -984,7 +984,7 @@ case "$cmd" in
 		export do_dds=true
 		export dds_flags=
 		export do_ogg=false
-		find textures -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		find models textures -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3-transform-low)
 		dir=$1
@@ -997,7 +997,7 @@ case "$cmd" in
 		export do_dds=false
 		export do_ogg=true
 		export ogg_qual=1
-		find textures sound/cdtracks -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		find models textures sound/cdtracks -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3)
 		src=$1
