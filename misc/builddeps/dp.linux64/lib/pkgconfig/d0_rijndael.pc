@@ -1,11 +1,11 @@
-prefix=/usr/local
+prefix=/home/rpolzer/Games/Xonotic/misc/builddeps/dp.linux64
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: Blind-ID
-Description: Library for user identification using RSA blind signatures
+Name: Rijndael
+Description: Library for Rijndael encryption
 Requires: 
 Version: 0.1
-Libs: -L${libdir} -ld0_blind_id
+Libs: -L${libdir} -ld0_rijndael
 Cflags: -I${includedir}/d0_blind_id
