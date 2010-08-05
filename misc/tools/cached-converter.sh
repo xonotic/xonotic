@@ -163,39 +163,53 @@ has_alpha()
 	fi
 }
 
+to_delete=
 for F in "$@"; do
 	echo >&2 "Handling $F..."
 	conv=false
 	keep=false
+	will_jpeg=$do_jpeg
+	will_dds=$do_dds
+	case "$F" in
+		textures/*) ;;
+		models/*) ;;
+		maps/*/*) ;;
+			;;
+		*)
+			# we can't DDS compress the 2D textures, sorry
+			# but JPEG is still fine
+			will_dds=false
+			;;
+	esac
 	case "$F" in
 		*_alpha.jpg)
 			# handle in *.jpg case
 
 			# they always got converted, I assume
-			if $do_dds || $do_jpeg; then
+			if $will_dds || $will_jpeg; then
 				conv=true
 			fi
-			keep=$do_jpeg
+			keep=$will_jpeg
 			;;
 		*.jpg)
 			if [ -f "${F%.jpg}_alpha.jpg" ]; then
-				cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			else                                   
-				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
 			fi
 			;;
 		*.png|*.tga)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
-				cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				cached "$will_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 				rm -f "$F" # TGA becomes useless after JPEGging
 			else                                                             
-				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
 				rm -f "$F" # TGA becomes useless after JPEGging
 			fi
 			rm -f "$F.hasalpha"
@@ -210,8 +224,12 @@ for F in "$@"; do
 	if $del_src; then
 		if $conv; then
 			if ! $keep; then
-				rm -f "$F"
+				# FIXME can't have spaces in filenames that way
+				to_delete="$to_delete $F"
 			fi
 		fi
 	fi
+done
+for F in $to_delete; do
+	rm -f "$F"
 done
