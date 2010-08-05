@@ -130,6 +130,18 @@ reduce_rgb_jpeg()
 	jpegoptim --strip-all -m"$1" "$o"
 }
 
+has_alpha()
+{
+	i=$1; shift; shift
+	o=$1; shift; shift
+	if convert "$F" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
+		# no alpha
+		: > "$o"
+	else
+		# has alpha
+		echo yes > "$o"
+	fi
+}
 
 for F in "$@"; do
 	echo >&2 "Handling $F..."
@@ -147,15 +159,17 @@ for F in "$@"; do
 		fi
 		;;
 	*.png|*.tga)
-		if convert "$F" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
-			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
-			rm -f "$F"
-		else                                                             
+		cached true has_alpha "$F" "" "$F.hasalpha" ""
+		if [ -s "$F.hasalpha" ]; then
 			cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
 			cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			rm -f "$F"
+		else                                                             
+			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+			cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+			rm -f "$F"
 		fi
+		rm -f "$F.hasalpha"
 		;;
 	*.ogg)
 		cached "$do_ogg" reduce_ogg "$F" "" "$F" "" "$ogg_qual"
