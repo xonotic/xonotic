@@ -3,6 +3,8 @@
 # usage: compress-texture tool compression in.png out.dds
 # example: compress-texture compressonator dxt1 foo.jpg foo.dds
 
+echo >&2 "$0 $*"
+
 tool=$1; shift
 format=$1; shift
 src=$1; shift

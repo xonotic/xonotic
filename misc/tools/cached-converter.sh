@@ -68,8 +68,8 @@ reduce_jpeg2_dds()
 	i=$1; shift
 	ia=$1; shift
 	o=$1; shift; shift 
-	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.png" && \
-	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.png" "$o" $1
+	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
+	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_jpeg2_jpeg2()
@@ -101,7 +101,8 @@ reduce_rgba_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	"$meprefix"compress-texture "$dds_tool" dxt5 "$i" "$o" $1
+	convert "$i" "$tmpdir/x.tga" && \
+	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgba_jpeg2()
@@ -119,7 +120,8 @@ reduce_rgb_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	"$meprefix"compress-texture "$dds_tool" dxt1 "$i" "$o" $1
+	convert "$i" "$tmpdir/x.tga" && \
+	"$meprefix"compress-texture "$dds_tool" dxt1 "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgb_jpeg()

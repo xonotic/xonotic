@@ -956,7 +956,7 @@ case "$cmd" in
 		;;
 	release-engine)
 		"$SELF" release-engine-win32 &
-		# "$SELF" release-engine-win64 &
+		"$SELF" release-engine-win64 &
 		"$SELF" release-engine-osx &
 		"$SELF" release-engine-linux32 &
 		"$SELF" release-engine-linux64 &
