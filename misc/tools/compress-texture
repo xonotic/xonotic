@@ -3,6 +3,8 @@
 # usage: compress-texture tool compression in.png out.dds
 # example: compress-texture compressonator dxt1 foo.jpg foo.dds
 
+echo >&2 "$0 $*"
+
 tool=$1; shift
 format=$1; shift
 src=$1; shift
@@ -25,9 +27,16 @@ case "$tool" in
 		dir_dos="C:/${dir##*/}"
 		ext=${src##*.}
 		cp "$src" "$dir/src.$ext"
-		DISPLAY= wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" $c $f "$@" -mipper BoxFilter.dll
-		mv "$dir/dst.dds" "$dst"
+
+		# compressonator and wine suck, so we sometimes have to retry :(
+		for retry in 1 2 3 4 5; do
+			wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" $c $f "$@" -mipper BoxFilter.dll
+			if mv "$dir/dst.dds" "$dst"; then
+				break
+			fi
+		done
 		rm -rf "$dir"
+		[ -f "$dst" ]
 		;;
 	nvcompress)
 		case "$format" in
