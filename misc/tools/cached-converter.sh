@@ -172,6 +172,7 @@ for F in "$@"; do
 			;;
 		*.png|*.tga)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
+			conv=false
 			if [ -s "$F.hasalpha" ]; then
 				cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
 				cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
