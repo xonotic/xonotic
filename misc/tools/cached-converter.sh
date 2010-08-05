@@ -46,8 +46,8 @@ cached()
 	[ -z "$outfile2" ] || name2="$CACHEDIR/$method-$options/$sum-2.${outfile2##*.}"
 	tempfile1="${name1%/*}/new-${name1##*/}"
 	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
-	[ -z "${outfile1##*/*}" && mkdir -p "${outfile1%/*}"
-	[ -z "$outfile2" ] || [ -z "${outfile2##*/*}" && mkdir -p "${outfile2%/*}"
+	[ -z "${outfile1##*/*}" ] && mkdir -p "${outfile1%/*}"
+	[ -z "$outfile2" ] || { [ -z "${outfile2##*/*}" ] && mkdir -p "${outfile2%/*}"; }
 	if [ -f "$name1" ]; then
 		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
 		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
