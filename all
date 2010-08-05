@@ -16,7 +16,7 @@ while ! [ -f ./all ]; do
 	fi
 	cd ..
 done
-d0=`pwd`
+export d0=`pwd`
 SELF="$d0/all"
 
 # If we are on WINDOWS:
@@ -117,7 +117,7 @@ data/xonotic-nexcompat.pk3dir |                                                 
 mediasource                   |                                                   | master      |
 darkplaces                    |                                                   | div0-stable | svn
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 | git://git.icculus.org/divverent/div0-gittools.git | master      |
+div0-gittools                 |                                                   | master      |
 netradiant                    |                                                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
@@ -256,7 +256,7 @@ case "$cmd" in
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
 						if ! verbose git pull; then
-							fix_upstream_rebase_mergefailed || true
+							fix_upstream_rebase_mergefail || true
 							check_mergeconflict "$d"
 							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
 							read -r DUMMY
@@ -864,13 +864,27 @@ case "$cmd" in
 		mkdir -p Xonotic
 		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
 			cd Xonotic
-			mkdir data fteqcc
+			mkdir data fteqcc darkplaces-src fteqcc-src
 			tar xvf -
 			rm -rf misc/builddeps
 			mv misc/buildfiles/win32/* . || true
 			mv misc/buildfiles/win64/* . || true
 			mv misc/buildfiles/osx/* . || true
 			rm -rf misc/buildfiles
+		}
+		{
+			cd darkplaces
+			git archive --format=tar HEAD
+		} | {
+			cd Xonotic/darkplaces-src
+			tar xvf -
+		}
+		{
+			cd fteqcc
+			git archive --format=tar HEAD
+		} | {
+			cd Xonotic/fteqcc-src
+			tar xvf -
 		}
 		;;
 	release-compile-run)
@@ -885,17 +899,17 @@ case "$cmd" in
 				rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
 				(
 					cd $buildpath
-					eval make clean $maketargets $makeflags
+					verbose eval make clean $maketargets $makeflags
 				)
 				for f in $targetfiles; do
-					mv "$buildpath/${f%:*}" "${f##*:}"
+					verbose mv "$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 			*)
 				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
-				ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
 				for f in $targetfiles; do
-					rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 		esac
@@ -907,20 +921,20 @@ case "$cmd" in
 		fteqcc_files=$4
 		darkplaces_maketargets=$5
 		darkplaces_files=$6
-		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "fteqcc" "$fteqcc_files"
-		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "darkplaces" "$darkplaces_files"
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/fteqcc-src" "$fteqcc_files"
+		"$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/darkplaces-src" "$darkplaces_files"
 		;;
 	release-engine-win32)
 		"$SELF" release-compile win32 \
-			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
-			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
+			debug 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		"$SELF" release-compile win64 \
-			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
+			'DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-64.exe' \
-			debug 'darkplaces.exe:xonotic-64.exe darkplaces-sdl.exe:xonotic-sdl-64.exe darkplaces-dedicated.exe:xonotic-dedicated-64.exe'
+			debug 'darkplaces.exe:Xonotic/xonotic-64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-64.exe'
 		;;
 	release-engine-osx)
 		"$SELF" release-compile osx \
