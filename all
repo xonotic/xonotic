@@ -1059,7 +1059,7 @@ case "$cmd" in
 	release-pack-needsx11)
 		case "$DISPLAY" in
 			'')
-				startx "$SELF" release-pack -- :7
+				startx "$SELF" release-pack -- /usr/bin/Xvfb :7
 				;;
 			*)
 				"$SELF" release-pack
