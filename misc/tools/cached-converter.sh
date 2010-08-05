@@ -26,6 +26,8 @@ tmpdir=`mktemp -d -t cached-converter.XXXXXX`
 trap 'exit 1' INT
 trap 'rm -rf "$tmpdir"' EXIT
 
+lastinfiles=
+lastinfileshash=
 cached()
 {
 	flag=$1; shift
@@ -41,9 +43,14 @@ cached()
 		keep=true
 	fi
 	options=`echo "$*" | git hash-object --stdin`
-	sum=`git hash-object "$infile1"`
-	if [ -n "$infile2" ]; then
-		sum=$sum`git hash-object "$infile2"`
+	if [ x"$infile1/../$infile2" = x"$lastinfiles" ]; then
+		sum=$lastinfileshash
+	else
+		sum=`git hash-object "$infile1"`
+		if [ -n "$infile2" ]; then
+			sum=$sum`git hash-object "$infile2"`
+		fi
+		lastinfileshash=$sum
 	fi
 	mkdir -p "$CACHEDIR/$method-$options"
 	name1="$CACHEDIR/$method-$options/$sum-1.${outfile1##*.}"
