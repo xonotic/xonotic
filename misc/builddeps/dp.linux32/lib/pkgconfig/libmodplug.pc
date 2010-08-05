@@ -1,4 +1,4 @@
-prefix=/home/rpolzer/dp.linux64
+prefix=/home/xonotic/dp.linux32
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

@@ -16,7 +16,7 @@ while ! [ -f ./all ]; do
 	fi
 	cd ..
 done
-d0=`pwd`
+export d0=`pwd`
 SELF="$d0/all"
 
 # If we are on WINDOWS:
@@ -900,17 +900,17 @@ case "$cmd" in
 				rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
 				(
 					cd $buildpath
-					eval make clean $maketargets $makeflags
+					verbose eval make clean $maketargets $makeflags
 				)
 				for f in $targetfiles; do
-					mv "$buildpath/${f%:*}" "${f##*:}"
+					verbose mv "$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 			*)
 				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
-				ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
 				for f in $targetfiles; do
-					rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 		esac
@@ -927,15 +927,15 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		"$SELF" release-compile win32 \
-			'"DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
-			debug 'darkplaces.exe:xonotic.exe darkplaces-sdl.exe:xonotic-sdl.exe darkplaces-dedicated.exe:xonotic-dedicated.exe'
+			debug 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		"$SELF" release-compile win64 \
-			'"DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
+			'DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-64.exe' \
-			debug 'darkplaces.exe:xonotic-64.exe darkplaces-sdl.exe:xonotic-sdl-64.exe darkplaces-dedicated.exe:xonotic-dedicated-64.exe'
+			debug 'darkplaces.exe:Xonotic/xonotic-64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-64.exe'
 		;;
 	release-engine-osx)
 		"$SELF" release-compile osx \
