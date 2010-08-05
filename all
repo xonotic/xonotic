@@ -999,6 +999,19 @@ case "$cmd" in
 		export ogg_qual=1
 		find models textures sound/cdtracks -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
+	release-buildpk3-transform-lowdds)
+		dir=$1
+		cd "$dir"
+		# texture: convert to jpeg and dds
+		# music: reduce bitrate
+		export do_jpeg=false
+		export do_dds=true
+		export dds_flags=
+		export do_ogg=true
+		export ogg_qual=1
+		export del_src=true
+		find models textures sound/cdtracks -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		;;
 	release-buildpk3)
 		src=$1
 		dst=$2
@@ -1051,10 +1064,10 @@ case "$cmd" in
 		;;
 	release-pack)
 		"$SELF" release-buildpk3s data/font-nimbussansl.pk3dir             raw ''
-		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low'
-		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
+		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
+		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
+		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low' lowdds '-lowdds'
+		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''     lowdds '-lowdds'
 		;;
 	release-pack-needsx11)
 		case "$DISPLAY" in

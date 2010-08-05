@@ -10,6 +10,7 @@ set -e
 : ${dds_tool:=compressonator-dxtc}
 : ${do_ogg:=false}
 : ${ogg_qual:=1}
+: ${del_src:=false}
 
 me=$0
 case "$me" in
@@ -36,6 +37,9 @@ cached()
 	if ! $flag; then
 		return 0
 	fi
+	if [ x"$infile1" = x"$outfile1" ]; then
+		keep=true
+	fi
 	options=`echo "$*" | git hash-object --stdin`
 	sum=`git hash-object "$infile1"`
 	if [ -n "$infile2" ]; then
@@ -49,11 +53,13 @@ cached()
 	if [ -f "$name1" ] && { [ -z "$outfile2" ] || [ -f "$name2" ]; }; then
 		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"; }
 		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"; }; }
+		conv=true
 	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
 		mv "$tempfile1" "$name1"
 		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
 		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"; }
 		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"; }; }
+		conv=true
 	else
 		rm -f "$tempfile1"
 		rm -f "$tempfile2"
@@ -145,34 +151,47 @@ has_alpha()
 
 for F in "$@"; do
 	echo >&2 "Handling $F..."
+	conv=false
+	keep=false
 	case "$F" in
-	*_alpha.jpg)
-		# handle in *.jpg case
-		;;
-	*.jpg)
-		if [ -f "${F%.jpg}_alpha.jpg" ]; then
-			cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
-		else                                   
-			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
-		fi
-		;;
-	*.png|*.tga)
-		cached true has_alpha "$F" "" "$F.hasalpha" ""
-		if [ -s "$F.hasalpha" ]; then
-			cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
-			rm -f "$F"
-		else                                                             
-			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
-			rm -f "$F"
-		fi
-		rm -f "$F.hasalpha"
-		;;
-	*.ogg)
-		cached "$do_ogg" reduce_ogg "$F" "" "$F" "" "$ogg_qual"
-		;;
+		*_alpha.jpg)
+			# handle in *.jpg case
+
+			# they always got converted, I assume
+			conv=true
+			keep=$do_jpeg
+			;;
+		*.jpg)
+			if [ -f "${F%.jpg}_alpha.jpg" ]; then
+				cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+			else                                   
+				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
+			fi
+			;;
+		*.png|*.tga)
+			cached true has_alpha "$F" "" "$F.hasalpha" ""
+			if [ -s "$F.hasalpha" ]; then
+				cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				rm -f "$F" # TGA becomes useless after JPEGging
+			else                                                             
+				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
+				cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+				rm -f "$F" # TGA becomes useless after JPEGging
+			fi
+			rm -f "$F.hasalpha"
+			;;
+		*.ogg)
+			cached "$do_ogg" reduce_ogg "$F" "" "$F" "" "$ogg_qual"
+			;;
 	esac
+	if $del_src; then
+		if $conv; then
+			if ! $keep; then
+				rm -f "$F"
+			fi
+		fi
+	fi
 done
