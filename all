@@ -1066,7 +1066,7 @@ case "$cmd" in
 		"$SELF" release-buildpk3s data/font-nimbussansl.pk3dir             raw ''
 		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
 		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
-		"$SELF" release-buildpk3s data/xonotic-music.pk3dir      normal '' raw '-raw' low '-low' lowdds '-lowdds'
+		"$SELF" release-buildpk3s data/xonotic-music.pk3dir                raw ''     low '-low'
 		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''     lowdds '-lowdds'
 		;;
 	release-pack-needsx11)
