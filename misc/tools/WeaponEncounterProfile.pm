@@ -114,6 +114,7 @@ our %WeaponMap = (
         14 => ["Tuba", "tuba"],
         15 => ["Camping Rifle", "campingrifle"],
         16 => ["Fireball", "fireball"],
+        17 => ["Seeker", "seeker"],
 );
 
 sub weaponid_valid($$)
