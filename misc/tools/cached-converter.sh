@@ -46,11 +46,9 @@ cached()
 	[ -z "$outfile2" ] || name2="$CACHEDIR/$method-$options/$sum-2.${outfile2##*.}"
 	tempfile1="${name1%/*}/new-${name1##*/}"
 	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
-	[ -z "${outfile1##*/*}" ] && mkdir -p "${outfile1%/*}"
-	[ -z "$outfile2" ] || { [ -z "${outfile2##*/*}" ] && mkdir -p "${outfile2%/*}"; }
-	if [ -f "$name1" ]; then
-		ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"
-		[ -z "$outfile2" ] || ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"
+	if [ -f "$name1" ] && { [ -z "$outfile2" ] || [ -f "$name2" ]; }; then
+		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln "$name1" "$outfile1" 2>/dev/null || cp "$name1" "$outfile1"; }
+		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln "$name2" "$outfile2" 2>/dev/null || cp "$name2" "$outfile2"; }; }
 	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
 		mv "$tempfile1" "$name1"
 		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
