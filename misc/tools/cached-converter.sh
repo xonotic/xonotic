@@ -141,7 +141,7 @@ for F in "$@"; do
 	*.jpg)
 		if [ -f "${F%.jpg}_alpha.jpg" ]; then
 			cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
-			cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb"
+			cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 		else                                   
 			cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
 			cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
