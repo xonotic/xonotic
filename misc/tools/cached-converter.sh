@@ -132,6 +132,7 @@ reduce_rgb_jpeg()
 
 
 for F in "$@"; do
+	echo >&2 "Handling $F..."
 	case "$F" in
 	*_alpha.jpg)
 		# handle in *.jpg case
