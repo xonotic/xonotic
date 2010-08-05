@@ -966,9 +966,6 @@ case "$cmd" in
 	release-maps)
 		"$SELF" update-maps
 		;;
-	release-finish)
-		# version number and stuff like that
-		;;
 	release-qc)
 		verbose make -C data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
 		;;
@@ -1149,9 +1146,8 @@ case "$cmd" in
 		"$SELF" release-prepare
 		"$SELF" release-maps &
 		"$SELF" release-engine &
-		"$SELF" release-finish &
-		"$SELF" release-qc &
 		wait
+		"$SELF" release-qc
 		"$SELF" release-pack-needsx11
 		"$SELF" release-zip
 		;;
