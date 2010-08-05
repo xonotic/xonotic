@@ -992,8 +992,8 @@ case "$cmd" in
 		# texture: convert to jpeg and dds
 		# music: reduce bitrate
 		export do_jpeg=true
-		export jpeg_qual_rgb=95
-		export jpeg_qual_a=99
+		export jpeg_qual_rgb=85
+		export jpeg_qual_a=95
 		export do_dds=false
 		export do_ogg=true
 		export ogg_qual=1
