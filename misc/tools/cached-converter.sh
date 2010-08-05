@@ -172,9 +172,9 @@ for F in "$@"; do
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	case "$F" in
-		textures/*) ;;
-		models/*) ;;
-		maps/*/*) ;;
+		./textures/*) ;;
+		./models/*) ;;
+		./maps/*/*) ;;
 		*)
 			# we can't DDS compress the 2D textures, sorry
 			# but JPEG is still fine
