@@ -1075,7 +1075,7 @@ case "$cmd" in
 		dst=${src%.pk3dir}
 		case "$dst" in
 			data/xonotic-*)
-				dst="xonotic-$stamp-${dst#data/xonotic-}"
+				dst="data/xonotic-$stamp-${dst#data/xonotic-}"
 				;;
 			*)
 				dst="$dst-$stamp"

@@ -174,7 +174,6 @@ for F in "$@"; do
 		textures/*) ;;
 		models/*) ;;
 		maps/*/*) ;;
-			;;
 		*)
 			# we can't DDS compress the 2D textures, sorry
 			# but JPEG is still fine
