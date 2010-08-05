@@ -100,12 +100,19 @@ reduce_jpeg_jpeg()
 	cp "$i" "$o" && jpegoptim --strip-all -m"$1" "$o"
 }
 
-reduce_ogg()
+reduce_ogg_ogg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
 	oggdec -o "$tmpdir/x.wav" "$i" && \
 	oggenc -q"$1" -o "$o" "$tmpdir/x.wav"
+}
+
+reduce_wav_ogg()
+{
+	i=$1; shift; shift
+	o=$1; shift; shift
+	oggenc -q"$1" -o "$o" "$i"
 }
 
 reduce_rgba_dds()
@@ -165,7 +172,9 @@ for F in "$@"; do
 			# handle in *.jpg case
 
 			# they always got converted, I assume
-			conv=true
+			if $do_dds || $do_jpeg; then
+				conv=true
+			fi
 			keep=$do_jpeg
 			;;
 		*.jpg)
@@ -192,7 +201,10 @@ for F in "$@"; do
 			rm -f "$F.hasalpha"
 			;;
 		*.ogg)
-			cached "$do_ogg" reduce_ogg "$F" "" "$F" "" "$ogg_qual"
+			cached "$do_ogg" reduce_ogg_ogg "$F" "" "$F" "" "$ogg_qual"
+			;;
+		*.wav)
+			cached "$do_ogg" reduce_wav_ogg "$F" "" "$F" "" "$ogg_qual"
 			;;
 	esac
 	if $del_src; then
