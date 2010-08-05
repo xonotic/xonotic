@@ -168,6 +168,7 @@ for F in "$@"; do
 	echo >&2 "Handling $F..."
 	conv=false
 	keep=false
+
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	case "$F" in
@@ -180,6 +181,7 @@ for F in "$@"; do
 			will_dds=false
 			;;
 	esac
+
 	case "$F" in
 		*_alpha.jpg)
 			# handle in *.jpg case
@@ -205,11 +207,9 @@ for F in "$@"; do
 			if [ -s "$F.hasalpha" ]; then
 				cached "$will_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
 				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
-				rm -f "$F" # TGA becomes useless after JPEGging
 			else                                                             
 				cached "$will_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
 				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
-				rm -f "$F" # TGA becomes useless after JPEGging
 			fi
 			rm -f "$F.hasalpha"
 			;;
