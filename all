@@ -888,14 +888,14 @@ case "$cmd" in
 					verbose eval make clean $maketargets $makeflags
 				)
 				for f in $targetfiles; do
-					mv "$buildpath/${f%:*}" "${f##*:}"
+					verbose mv "$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 			*)
 				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
 				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
 				for f in $targetfiles; do
-					rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
 				done
 				;;
 		esac
