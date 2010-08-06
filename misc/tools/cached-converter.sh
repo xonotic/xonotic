@@ -175,9 +175,9 @@ for F in "$@"; do
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	case "$f" in
+		./models/player/*) will_dds=false ;;
 		./textures/*) ;;
 		./models/*) ;;
-		./maps/*/*) ;;
 		./particles/*) ;;
 		./progs/*) ;;
 		*)
