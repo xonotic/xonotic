@@ -12,11 +12,11 @@ case "${0##*/}" in
 esac
 
 case "$(uname -m)" in
-  x86_64)	arch="x86_64" ;;
-  *)		arch="686" ;;
+  x86_64)	arch="linux64" ;;
+  *)		arch="linux32" ;;
 esac
 
-xonotic="xonotic-linux-${arch}-${mode}"
+xonotic="xonotic-${arch}-${mode}"
 
 set -- ./${xonotic} "${@}"
 
