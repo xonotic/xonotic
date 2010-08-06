@@ -905,10 +905,7 @@ case "$cmd" in
 		case " $HOSTS_THAT_ARE_MYSELF " in
 			*\ $host\ *)
 				rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
-				(
-					cd $buildpath
-					verbose eval make clean $maketargets $makeflags
-				)
+				verbose eval make -C "$buildpath" clean $maketargets $makeflags
 				for f in $targetfiles; do
 					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
 				done
@@ -967,12 +964,11 @@ case "$cmd" in
 			debug 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
-		"$SELF" release-engine-win32 &
-		"$SELF" release-engine-win64 &
-		"$SELF" release-engine-osx &
-		"$SELF" release-engine-linux32 &
-		"$SELF" release-engine-linux64 &
-		wait
+		"$SELF" release-engine-win32
+		# "$SELF" release-engine-win64
+		# "$SELF" release-engine-osx
+		"$SELF" release-engine-linux32
+		"$SELF" release-engine-linux64
 		;;
 	release-maps)
 		"$SELF" update-maps
@@ -1049,10 +1045,11 @@ case "$cmd" in
 			cd Xonotic/temp
 			tar xvf -
 		}
+		cd Xonotic/temp
 		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
-			cp "$src"/progs.dat Xonotic/temp/
-			cp "$src"/csprogs.dat Xonotic/temp/
-			cp "$src"/menu.dat Xonotic/temp/
+			cp "$d0/$src"/progs.dat .
+			cp "$d0/$src"/csprogs.dat .
+			cp "$d0/$src"/menu.dat .
 			rm -rf qcsrc
 			gv=`grep "^gameversion " "defaultXonotic.cfg" | awk '{ print $2 }'`
 			major=$(($gv / 10000))
@@ -1063,21 +1060,16 @@ case "$cmd" in
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 			" defaultXonotic.cfg
-			echo "r_texture_dds_load 1" >> quake.rc
 		fi
 		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
-			for X in data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
+			for X in ../../data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
 				if [ -f "$X" ]; then
-					(
-						cd Xonotic/temp
-						unzip ../../"$X"
-					)
+					unzip "$X"
 				fi
 			done
 		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		cd Xonotic/temp
-		zip -9yr "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
+		zip -9yr "../../$dst" .
 		cd ../..
 		rm -rf Xonotic/temp
 		;;
@@ -1157,9 +1149,8 @@ case "$cmd" in
 		;;
 	release)
 		"$SELF" release-prepare
-		"$SELF" release-maps &
-		"$SELF" release-engine &
-		wait
+		"$SELF" release-maps
+		"$SELF" release-engine
 		"$SELF" release-qc
 		"$SELF" release-pack-needsx11
 		"$SELF" release-zip
