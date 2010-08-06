@@ -1041,9 +1041,6 @@ case "$cmd" in
 		verbose export ogg_qual=1
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
-		if [ -f "quake.rc" ]; then
-			verbose echo "r_texture_dds_load 1" >> quake.rc
-		fi
 		;;
 	release-buildpk3)
 		src=$1
