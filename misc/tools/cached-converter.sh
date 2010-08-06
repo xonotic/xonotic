@@ -4,6 +4,7 @@ set -e
 
 : ${CACHEDIR:=$HOME/.xonotic-cached-converter}
 : ${do_jpeg:=true}
+: ${do_jpeg_if_not_dds:=false}
 : ${jpeg_qual_rgb:=95}
 : ${jpeg_qual_a:=99}
 : ${do_dds:=true}
@@ -181,6 +182,14 @@ for F in "$@"; do
 			will_dds=false
 			;;
 	esac
+
+	if $do_jpeg_if_not_dds; then
+		if $will_dds; then
+			will_jpeg=false
+		else
+			will_jpeg=true
+		fi
+	fi
 
 	case "$F" in
 		*_alpha.jpg)

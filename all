@@ -1005,6 +1005,9 @@ case "$cmd" in
 		# texture: convert to jpeg and dds
 		# music: reduce bitrate
 		export do_jpeg=false
+		export do_jpeg_if_not_dds=true
+		export jpeg_qual_rgb=80
+		export jpeg_qual_a=95
 		export do_dds=true
 		export dds_flags=
 		export do_ogg=true
@@ -1105,6 +1108,7 @@ case "$cmd" in
 		esac
 		;;
 	release-zip)
+		stamp=`cat Xonotic/stamp.txt`
 		zip -9r Xonotic-common.zip \
 			Xonotic/*.dll \
 			Xonotic/darkplaces-src \
@@ -1115,31 +1119,31 @@ case "$cmd" in
 			Xonotic/server \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
-			Xonotic/data/font-nimbussansl.pk3
+			Xonotic/data/font-nimbussansl-$stamp.pk3
 		cp Xonotic-common.zip Xonotic.zip
 		zip -0r Xonotic.zip \
-			Xonotic/data/xonotic-data.pk3 \
-			Xonotic/data/xonotic-maps.pk3 \
-			Xonotic/data/xonotic-music.pk3 \
-			Xonotic/data/xonotic-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-data.pk3 \
+			Xonotic/data/xonotic-$stamp-maps.pk3 \
+			Xonotic/data/xonotic-$stamp-music.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		cp Xonotic-common.zip Xonotic-low.zip
 		zip -0r Xonotic-low.zip \
-			Xonotic/data/xonotic-data-low.pk3 \
-			Xonotic/data/xonotic-maps-low.pk3 \
-			Xonotic/data/xonotic-music-low.pk3 \
-			Xonotic/data/xonotic-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-data-low.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
+			Xonotic/data/xonotic-$stamp-music-low.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		cp Xonotic-common.zip Xonotic-lowdds.zip
 		zip -0r Xonotic-lowdds.zip \
-			Xonotic/data/xonotic-data-lowdds.pk3 \
-			Xonotic/data/xonotic-maps-lowdds.pk3 \
-			Xonotic/data/xonotic-music-low.pk3 \
-			Xonotic/data/xonotic-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
+			Xonotic/data/xonotic-$stamp-music-low.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		cp Xonotic-common.zip Xonotic-high.zip
 		zip -0r Xonotic-high.zip \
-			Xonotic/data/xonotic-data-raw.pk3 \
-			Xonotic/data/xonotic-maps-raw.pk3 \
-			Xonotic/data/xonotic-music.pk3 \
-			Xonotic/data/xonotic-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
+			Xonotic/data/xonotic-$stamp-music.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		rm -f Xonotic-common.zip
 		;;
 	release)
