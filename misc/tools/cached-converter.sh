@@ -4,6 +4,7 @@ set -e
 
 : ${CACHEDIR:=$HOME/.xonotic-cached-converter}
 : ${do_jpeg:=true}
+: ${do_jpeg_if_not_dds:=false}
 : ${jpeg_qual_rgb:=95}
 : ${jpeg_qual_a:=99}
 : ${do_dds:=true}
@@ -128,8 +129,8 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	convert "$i" -alpha extract -quality 100 "$o" && \
-	convert "$i" -alpha off     -quality 100 "$oa" && \
+	convert "$i" -alpha off     -quality 100 "$o" && \
+	convert "$i" -alpha extract -quality 100 "$oa" && \
 	jpegoptim --strip-all -m"$1" "$o" && \
 	jpegoptim --strip-all -m"$2" "$oa"
 }
@@ -163,40 +164,65 @@ has_alpha()
 	fi
 }
 
+to_delete=
 for F in "$@"; do
+	f=${F%.*}
+
 	echo >&2 "Handling $F..."
 	conv=false
 	keep=false
+
+	will_jpeg=$do_jpeg
+	will_dds=$do_dds
+	case "$f" in
+		./textures/*) ;;
+		./models/*) ;;
+		./maps/*/*) ;;
+		./particles/*) ;;
+		./progs/*) ;;
+		*)
+			# we can't DDS compress the 2D textures, sorry
+			# but JPEG is still fine
+			will_dds=false
+			;;
+	esac
+
+	if $do_jpeg_if_not_dds; then
+		if $will_dds; then
+			will_jpeg=false
+		else
+			will_jpeg=true
+		fi
+	fi
+
 	case "$F" in
 		*_alpha.jpg)
 			# handle in *.jpg case
 
 			# they always got converted, I assume
-			if $do_dds || $do_jpeg; then
+			if $will_dds || $will_jpeg; then
 				conv=true
 			fi
-			keep=$do_jpeg
+			keep=$will_jpeg
 			;;
 		*.jpg)
-			if [ -f "${F%.jpg}_alpha.jpg" ]; then
-				cached "$do_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+			if [ -f "${f}_alpha.jpg" ]; then
+				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			else                                   
-				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""               "$F"           ""               "$jpeg_qual_rgb"
 			fi
 			;;
 		*.png|*.tga)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
-				cached "$do_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
-				rm -f "$F" # TGA becomes useless after JPEGging
+				cached "$will_dds"  reduce_rgba_dds    "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			else                                                             
-				cached "$do_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$do_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
-				rm -f "$F" # TGA becomes useless after JPEGging
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""               "${f}.jpg"     ""               "$jpeg_qual_rgb"
 			fi
 			rm -f "$F.hasalpha"
 			;;
@@ -210,8 +236,20 @@ for F in "$@"; do
 	if $del_src; then
 		if $conv; then
 			if ! $keep; then
-				rm -f "$F"
+				# FIXME can't have spaces in filenames that way
+				to_delete="$to_delete $F"
 			fi
 		fi
 	fi
+	# fix up DDS paths by a symbolic link
+	if [ -f "dds/${f}.dds" ]; then
+		if [ -z "${f##./textures/*}" ]; then
+			if [ -n "${f##./textures/*/*}" ]; then
+				ln -snf "textures/${f%./textures/}.dds" "dds/${f%./textures/}.dds"
+			fi
+		fi
+	fi
+done
+for F in $to_delete; do
+	rm -f "$F"
 done

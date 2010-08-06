@@ -860,8 +860,9 @@ case "$cmd" in
 	# release building goes here
 	release-prepare)
 		#"$SELF" each git clean -fxd
-		rm -rf Xonotic
+		rm -rf Xonotic Xonotic*.zip
 		mkdir -p Xonotic
+		date +%Y%m%d > Xonotic/stamp.txt
 		git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
 			cd Xonotic
 			mkdir data fteqcc darkplaces-src fteqcc-src
@@ -965,9 +966,6 @@ case "$cmd" in
 	release-maps)
 		"$SELF" update-maps
 		;;
-	release-finish)
-		# version numnber and stuff like that
-		;;
 	release-qc)
 		verbose make -C data/xonotic-data.pk3dir FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" FTEQCCFLAGS_WATERMARK=
 		;;
@@ -984,7 +982,8 @@ case "$cmd" in
 		export do_dds=true
 		export dds_flags=
 		export do_ogg=false
-		find models textures maps/*/ -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		export del_src=true
+		find . -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3-transform-low)
 		dir=$1
@@ -992,12 +991,13 @@ case "$cmd" in
 		# texture: convert to jpeg and dds
 		# music: reduce bitrate
 		export do_jpeg=true
-		export jpeg_qual_rgb=85
+		export jpeg_qual_rgb=80
 		export jpeg_qual_a=95
 		export do_dds=false
 		export do_ogg=true
 		export ogg_qual=1
-		find models textures maps/*/ sound -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		export del_src=true
+		find . -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
 	release-buildpk3-transform-lowdds)
 		dir=$1
@@ -1005,12 +1005,18 @@ case "$cmd" in
 		# texture: convert to jpeg and dds
 		# music: reduce bitrate
 		export do_jpeg=false
+		export do_jpeg_if_not_dds=true
+		export jpeg_qual_rgb=80
+		export jpeg_qual_a=95
 		export do_dds=true
 		export dds_flags=
 		export do_ogg=true
 		export ogg_qual=1
 		export del_src=true
-		find models textures maps/*/ sound -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		find . -type f -print0 | xargs -0 "$d0"/misc/tools/cached-converter.sh
+		if [ -f "quake.rc" ]; then
+			echo "r_texture_dds_load 1" >> quake.rc
+		fi
 		;;
 	release-buildpk3)
 		src=$1
@@ -1047,6 +1053,18 @@ case "$cmd" in
 				fi
 			done
 		fi
+		if [ -f "defaultXonotic.cfg" ]; then
+			gv=`grep "^gameversion " "defaultXonotic.cfg" | awk '{ print $2 }'`
+			major=$(($gv / 10000))
+			minor=$(($gv / 100 - $major * 100))
+			patch=$(($gv - $major * 10000 - $minor * 100))
+			sed -i "
+				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $major.$minor.$patch /;
+				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
+				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
+			" defaultXonotic.cfg
+			echo "r_texture_dds_load 1" >> quake.rc
+		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		cd Xonotic/temp
 		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
@@ -1054,10 +1072,20 @@ case "$cmd" in
 		rm -rf Xonotic/temp
 		;;
 	release-buildpk3s)
+		stamp=`cat Xonotic/stamp.txt`
 		src=$1
 		shift
+		dst=${src%.pk3dir}
+		case "$dst" in
+			data/xonotic-*)
+				dst="data/xonotic-$stamp-${dst#data/xonotic-}"
+				;;
+			*)
+				dst="$dst-$stamp"
+				;;
+		esac
 		while [ "$#" -gt 1 ]; do
-			"$SELF" release-buildpk3 "$src" "Xonotic/${src%.pk3dir}$2.pk3" "$1"
+			"$SELF" release-buildpk3 "$src" "Xonotic/$dst$2.pk3" "$1"
 			shift
 			shift
 		done
@@ -1067,7 +1095,7 @@ case "$cmd" in
 		"$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
 		"$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
 		"$SELF" release-buildpk3s data/xonotic-music.pk3dir                raw ''     low '-low'
-		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''     lowdds '-lowdds'
+		"$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
 		;;
 	release-pack-needsx11)
 		case "$DISPLAY" in
@@ -1079,14 +1107,53 @@ case "$cmd" in
 				;;
 		esac
 		;;
+	release-zip)
+		stamp=`cat Xonotic/stamp.txt`
+		zip -9r Xonotic-common.zip \
+			Xonotic/*.dll \
+			Xonotic/darkplaces-src \
+			Xonotic/Docs \
+			Xonotic/fteqcc-src \
+			Xonotic/misc \
+			Xonotic/fteqcc \
+			Xonotic/server \
+			Xonotic/*.app \
+			Xonotic/xonotic-* \
+			Xonotic/data/font-nimbussansl-$stamp.pk3
+		cp Xonotic-common.zip Xonotic.zip
+		zip -0r Xonotic.zip \
+			Xonotic/data/xonotic-$stamp-data.pk3 \
+			Xonotic/data/xonotic-$stamp-maps.pk3 \
+			Xonotic/data/xonotic-$stamp-music.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+		cp Xonotic-common.zip Xonotic-low.zip
+		zip -0r Xonotic-low.zip \
+			Xonotic/data/xonotic-$stamp-data-low.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
+			Xonotic/data/xonotic-$stamp-music-low.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+		cp Xonotic-common.zip Xonotic-lowdds.zip
+		zip -0r Xonotic-lowdds.zip \
+			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
+			Xonotic/data/xonotic-$stamp-music-low.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+		cp Xonotic-common.zip Xonotic-high.zip
+		zip -0r Xonotic-high.zip \
+			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
+			Xonotic/data/xonotic-$stamp-music.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+		rm -f Xonotic-common.zip
+		;;
 	release)
 		"$SELF" release-prepare
 		"$SELF" release-maps &
 		"$SELF" release-engine &
-		"$SELF" release-finish &
-		"$SELF" release-qc &
 		wait
+		"$SELF" release-qc
 		"$SELF" release-pack-needsx11
+		"$SELF" release-zip
 		;;
 
 	*)
