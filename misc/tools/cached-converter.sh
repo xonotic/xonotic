@@ -166,16 +166,20 @@ has_alpha()
 
 to_delete=
 for F in "$@"; do
+	f=${F%.*}
+
 	echo >&2 "Handling $F..."
 	conv=false
 	keep=false
 
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
-	case "$F" in
+	case "$f" in
 		./textures/*) ;;
 		./models/*) ;;
 		./maps/*/*) ;;
+		./particles/*) ;;
+		./progs/*) ;;
 		*)
 			# we can't DDS compress the 2D textures, sorry
 			# but JPEG is still fine
@@ -202,23 +206,23 @@ for F in "$@"; do
 			keep=$will_jpeg
 			;;
 		*.jpg)
-			if [ -f "${F%.jpg}_alpha.jpg" ]; then
-				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${F%.*}_alpha.jpg" "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${F%.*}_alpha.jpg" "$F"              "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+			if [ -f "${f}_alpha.jpg" ]; then
+				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			else                                   
-				cached "$will_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""                  "$F"              ""                  "$jpeg_qual_rgb"
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""               "$F"           ""               "$jpeg_qual_rgb"
 			fi
 			;;
 		*.png|*.tga)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
-				cached "$will_dds"  reduce_rgba_dds    "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""                  "${F%.*}.jpg"     "${F%.*}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				cached "$will_dds"  reduce_rgba_dds    "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
 			else                                                             
-				cached "$will_dds"  reduce_rgb_dds     "$F" ""                  "dds/${F%.*}.dds" ""                  "$dds_flags"
-				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""                  "${F%.*}.jpg"     ""                  "$jpeg_qual_rgb"
+				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""               "${f}.jpg"     ""               "$jpeg_qual_rgb"
 			fi
 			rm -f "$F.hasalpha"
 			;;
@@ -234,6 +238,14 @@ for F in "$@"; do
 			if ! $keep; then
 				# FIXME can't have spaces in filenames that way
 				to_delete="$to_delete $F"
+			fi
+		fi
+	fi
+	# fix up DDS paths by a symbolic link
+	if [ -f "dds/${f}.dds" ]; then
+		if [ -z "${f##./textures/*}" ]; then
+			if [ -n "${f##./textures/*/*}" ]; then
+				ln -snf "textures/${f%./textures/}.dds" "dds/${f%./textures/}.dds"
 			fi
 		fi
 	fi
