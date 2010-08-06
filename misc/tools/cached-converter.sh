@@ -245,7 +245,7 @@ for F in "$@"; do
 	if [ -f "dds/${f}.dds" ]; then
 		if [ -z "${f##./textures/*}" ]; then
 			if [ -n "${f##./textures/*/*}" ]; then
-				ln -snf "textures/${f%./textures/}.dds" "dds/${f%./textures/}.dds"
+				ln -snf "textures/${f#./textures/}.dds" "dds/${f#./textures/}.dds"
 			fi
 		fi
 	fi
