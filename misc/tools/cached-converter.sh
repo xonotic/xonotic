@@ -175,9 +175,9 @@ for F in "$@"; do
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	case "$f" in
+		./models/player/*) will_dds=false ;;
 		./textures/*) ;;
 		./models/*) ;;
-		./maps/*/*) ;;
 		./particles/*) ;;
 		./progs/*) ;;
 		*)
@@ -245,7 +245,7 @@ for F in "$@"; do
 	if [ -f "dds/${f}.dds" ]; then
 		if [ -z "${f##./textures/*}" ]; then
 			if [ -n "${f##./textures/*/*}" ]; then
-				ln -snf "textures/${f%./textures/}.dds" "dds/${f%./textures/}.dds"
+				ln -snf "textures/${f#./textures/}.dds" "dds/${f#./textures/}.dds"
 			fi
 		fi
 	fi
