@@ -860,6 +860,18 @@ case "$cmd" in
 	# release building goes here
 	release-prepare)
 		#"$SELF" each git clean -fxd
+		case "$RELEASETYPE" in
+			beta)
+				msg "Building a BETA"
+				;;
+			release)
+				msg "Building a RELEASE"
+				;;
+			*)
+				msg "Must either set RELEASETYPE=beta or RELEASETYPE=release"
+				exit 1
+				;;
+		esac
 		verbose rm -rf Xonotic Xonotic*.zip
 		verbose mkdir -p Xonotic
 		verbose date +%Y%m%d > Xonotic/stamp.txt
