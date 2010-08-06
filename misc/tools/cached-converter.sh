@@ -129,8 +129,8 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	convert "$i" -alpha extract -quality 100 "$o" && \
-	convert "$i" -alpha off     -quality 100 "$oa" && \
+	convert "$i" -alpha off     -quality 100 "$o" && \
+	convert "$i" -alpha extract -quality 100 "$oa" && \
 	jpegoptim --strip-all -m"$1" "$o" && \
 	jpegoptim --strip-all -m"$2" "$oa"
 }
