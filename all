@@ -903,17 +903,21 @@ case "$cmd" in
 					verbose eval make clean $maketargets $makeflags
 				)
 				for f in $targetfiles; do
-					verbose mv "$buildpath/${f%:*}" "${f##*:}"
+					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
 				done
 				;;
 			*)
 				rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
 				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
 				for f in $targetfiles; do
-					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}"
+					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}" || true
 				done
 				;;
 		esac
+		# now rebrand the binaries...
+		for f in $targetfiles; do
+			verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "$d0/misc/tools/xonotic.brand" "${f##*:}" || true
+		done
 		;;
 	release-compile)
 		suffix=$1
