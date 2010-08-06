@@ -57,31 +57,31 @@ for EXECUTABLE in "$@"; do
 		rm -f darkplaces-icon.xpm
 	fi
 
-	if $uses_ico; then
-		e=$EXECUTABLE \
-		i=$icon_ico \
-		n=$name \
-		perl <<'EOF'
-		use strict;
-		use warnings;
-		use Win32::Exe;
-
-		my $n = $ENV{n};
-		my $i = $ENV{i};
-		my $e = $ENV{e};
-
-		my $exe = Win32::Exe->new($e)
-			or die "Win32::Exe->new: $!";
-		$exe = $exe->create_resource_section()
-			unless $exe->has_resource_section();
-		$exe->update(icon => $i);
-		$exe->update(info => ["InternalName=$e"]);
-		$exe->update(info => ["OriginalFilename=$e"]);
-		$exe->update(info => ["ProductName=$n"]);
-		$exe->write($e)
-			or die "Win32::Exe->write: $!";
-EOF
-	fi
+#	if $uses_ico; then
+#		e=$EXECUTABLE \
+#		i=$icon_ico \
+#		n=$name \
+#		perl <<'EOF'
+#		use strict;
+#		use warnings;
+#		use Win32::Exe;
+#
+#		my $n = $ENV{n};
+#		my $i = $ENV{i};
+#		my $e = $ENV{e};
+#
+#		my $exe = Win32::Exe->new($e)
+#			or die "Win32::Exe->new: $!";
+#		$exe = $exe->create_resource_section()
+#			unless $exe->has_resource_section();
+#		$exe->update(icon => $i);
+#		$exe->update(info => ["InternalName=$e"]);
+#		$exe->update(info => ["OriginalFilename=$e"]);
+#		$exe->update(info => ["ProductName=$n"]);
+#		$exe->write($e)
+#			or die "Win32::Exe->write: $!";
+#EOF
+#	fi
 
 	if $uses_icns; then
 		# OS X is special here
