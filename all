@@ -1071,7 +1071,7 @@ case "$cmd" in
 		fi
 		"$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		cd Xonotic/temp
-		zip -9r "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
+		zip -9yr "../../$dst" . ########### 7za a -tzip -mx=9 "../../$dst" .
 		cd ../..
 		rm -rf Xonotic/temp
 		;;
@@ -1113,7 +1113,7 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
-		zip -9r Xonotic-common.zip \
+		zip -9yr Xonotic-common.zip \
 			Xonotic/*.dll \
 			Xonotic/darkplaces-src \
 			Xonotic/Docs \
@@ -1126,30 +1126,29 @@ case "$cmd" in
 			Xonotic/xonotic.exe \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		cp Xonotic-common.zip Xonotic.zip
-		zip -0r Xonotic.zip \
+		zip -0yr Xonotic.zip \
 			Xonotic/data/xonotic-$stamp-data.pk3 \
 			Xonotic/data/xonotic-$stamp-maps.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		cp Xonotic-common.zip Xonotic-low.zip
-		zip -0r Xonotic-low.zip \
+		zip -0yr Xonotic-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		cp Xonotic-common.zip Xonotic-lowdds.zip
-		zip -0r Xonotic-lowdds.zip \
+		zip -0yr Xonotic-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		cp Xonotic-common.zip Xonotic-high.zip
-		zip -0r Xonotic-high.zip \
+		mv Xonotic-common.zip Xonotic-high.zip
+		zip -0yr Xonotic-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		rm -f Xonotic-common.zip
 		;;
 	release)
 		"$SELF" release-prepare
