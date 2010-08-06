@@ -13,7 +13,7 @@ icon_xpm=darkplaces.xpm
 
 . "$1"; shift
 
-flags="$flags -customgamename \"$name\" -customgamedirname1 \"$dirname1\" -customgamedirname2 \"$dirname2\" -customgamescreenshotname \"$screenshotname\" -customuserdirname \"$userdirname\""
+flags="$flags -customgamename \"$name\" -customgamedirname1 \"$dirname1\" -customgamedirname2 \"$dirname2\" -customgamescreenshotname \"$screenshotname\" -customgameuserdirname \"$userdirname\""
 echo "$flags" > darkplaces.opt
 
 for EXECUTABLE in "$@"; do
