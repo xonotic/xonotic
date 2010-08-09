@@ -856,6 +856,19 @@ case "$cmd" in
 		rm -f "$t"
 		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
+	clean)
+		for d in $repos; do
+			enter "$d0/$d" verbose
+			case "$d" in
+				.)
+					git clean -df
+					;;
+				*)
+					git clean -xdf
+					;;
+			esac
+		done
+		;;
 
 	# release building goes here
 	release-prepare)
