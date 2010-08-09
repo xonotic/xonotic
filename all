@@ -1128,7 +1128,7 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
-		verbose zip -9yr Xonotic-common.zip \
+		verbose zip -9yr Xonotic-$stamp-common.zip \
 			Xonotic/*.dll \
 			Xonotic/source/*/ \
 			Xonotic/Docs \
@@ -1139,26 +1139,26 @@ case "$cmd" in
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
-		verbose cp Xonotic-common.zip Xonotic.zip
-		verbose zip -0yr Xonotic.zip \
+		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
+		verbose zip -0yr Xonotic-$stamp.zip \
 			Xonotic/data/xonotic-$stamp-data.pk3 \
 			Xonotic/data/xonotic-$stamp-maps.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		verbose cp Xonotic-common.zip Xonotic-low.zip
-		verbose zip -0yr Xonotic-low.zip \
+		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
+		verbose zip -0yr Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		verbose cp Xonotic-common.zip Xonotic-lowdds.zip
-		verbose zip -0yr Xonotic-lowdds.zip \
+		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
+		verbose zip -0yr Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		verbose mv Xonotic-common.zip Xonotic-high.zip
-		verbose zip -0yr Xonotic-high.zip \
+		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
+		verbose zip -0yr Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
