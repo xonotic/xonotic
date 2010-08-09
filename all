@@ -857,8 +857,15 @@ case "$cmd" in
 		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
 	clean)
+		force=false
+		if [ x"$1" = x"-f" ]; then
+			force=true
+		fi
 		for d in $repos; do
 			enter "$d0/$d" verbose
+			if $force; then
+				git checkout-index -fa
+			fi
 			case "$d" in
 				.)
 					git clean -df
