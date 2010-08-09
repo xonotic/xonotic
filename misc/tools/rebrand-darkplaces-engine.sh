@@ -13,8 +13,16 @@ icon_xpm=darkplaces.xpm
 
 . "$1"; shift
 
+d=`pwd`
+t=`mktemp -d -t darkplaces-rebrand.XXXXXX`
+
 flags="$flags -customgamename \"$name\" -customgamedirname1 \"$dirname1\" -customgamedirname2 \"$dirname2\" -customgamescreenshotname \"$screenshotname\" -customgameuserdirname \"$userdirname\""
-echo "$flags" > darkplaces.opt
+echo "$flags" > "$t/darkplaces.opt"
+
+cd "$t"
+zip -9r darkplaces.zip darkplaces.opt
+rm -f darkplaces.opt
+cd "$d"
 
 for EXECUTABLE in "$@"; do
 	uses_xpm=false
@@ -48,22 +56,22 @@ for EXECUTABLE in "$@"; do
 	esac
 
 	# add a selfpack
-	rm -f darkplaces.zip
-	zip -9r darkplaces.zip darkplaces.opt
+	cp "$t/darkplaces.zip" "$t/darkplaces-this.zip"
 
 	if $uses_xpm; then
-		cp "$icon_xpm" darkplaces-icon.xpm
-		zip -9r darkplaces.zip darkplaces-icon.xpm
-		rm -f darkplaces-icon.xpm
+		cp "$icon_xpm" "$t/darkplaces-icon.xpm"
+		cd "$t"
+		zip -9r darkplaces-this.zip darkplaces-icon.xpm
+		cd "$d"
 	fi
 
 	if $uses_ico; then
-		cp "$icon_ico" darkplaces-rebrand.ico
-		cp "$EXECUTABLE" darkplaces-rebrand.exe
-		cat >darkplaces-rebrand.rc <<EOF
+		cp "$icon_ico" "$t/darkplaces-icon.ico"
+		cp "$EXECUTABLE" "$t/darkplaces.exe"
+		cat >"$t/darkplaces.rc" <<EOF
 #include <windows.h> // include for version info constants
 
-A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "darkplaces-rebrand.ico"
+A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "darkplaces-icon.ico"
 
 1 VERSIONINFO
 FILEVERSION 1,0,0,0
@@ -87,9 +95,10 @@ FILETYPE VFT_APP
 	 }
 }
 EOF
-		wine ~/ResEdit/ResEdit.exe -convert darkplaces-rebrand.rc darkplaces-rebrand.exe
-		rm -f darkplaces-rebrand.rc darkplaces-rebrand.ico
-		mv darkplaces-rebrand.exe "$EXECUTABLE"
+		cd "$t"
+		wine ~/ResEdit/ResEdit.exe -convert darkplaces.rc darkplaces.exe
+		cd "$d"
+		mv "$t/darkplaces.exe" "$EXECUTABLE"
 	fi
 
 	if $uses_icns; then
@@ -113,8 +122,7 @@ NSHumanReadableCopyright = "Copyright `date +%Y`";
 EOF
 	fi
 
-	cat darkplaces.zip >> "$EXECUTABLE"
-	rm -f darkplaces.zip
+	cat "$t/darkplaces-this.zip" >> "$EXECUTABLE"
 done
 
-rm -f darkplaces.opt
+rm -f "$t"
