@@ -125,4 +125,4 @@ EOF
 	cat "$t/darkplaces-this.zip" >> "$EXECUTABLE"
 done
 
-rm -f "$t"
+rm -rf "$t"
