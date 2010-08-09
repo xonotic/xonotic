@@ -864,14 +864,14 @@ case "$cmd" in
 		for d in $repos; do
 			enter "$d0/$d" verbose
 			if $force; then
-				git checkout-index -fa
+				verbose git checkout-index -fa
 			fi
 			case "$d" in
 				.)
-					git clean -df
+					verbose git clean -df
 					;;
 				*)
-					git clean -xdf
+					verbose git clean -xdf
 					;;
 			esac
 		done
