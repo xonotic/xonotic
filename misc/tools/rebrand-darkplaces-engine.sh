@@ -96,7 +96,7 @@ FILETYPE VFT_APP
 }
 EOF
 		cd "$t"
-		wine ~/ResEdit/ResEdit.exe -convert darkplaces.rc darkplaces.exe
+		wine "c:/Program Files/ResEdit/ResEdit.exe" -convert darkplaces.rc darkplaces.exe
 		cd "$d"
 		mv "$t/darkplaces.exe" "$EXECUTABLE"
 	fi

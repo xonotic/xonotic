@@ -30,7 +30,7 @@ case "$tool" in
 
 		# compressonator and wine suck, so we sometimes have to retry :(
 		for retry in 1 2 3 4 5; do
-			wine "$HOME/.wine/drive_c/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" $c $f "$@" -mipper BoxFilter.dll
+			wine "c:/Program Files/AMD/The Compressonator 1.50/TheCompressonator.exe" -convert -mipmaps "$dir_dos/src.$ext" "$dir_dos/dst.dds" $c $f "$@" -mipper BoxFilter.dll
 			if mv "$dir/dst.dds" "$dst"; then
 				break
 			fi
