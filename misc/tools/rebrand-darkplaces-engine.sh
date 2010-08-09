@@ -57,31 +57,40 @@ for EXECUTABLE in "$@"; do
 		rm -f darkplaces-icon.xpm
 	fi
 
-#	if $uses_ico; then
-#		e=$EXECUTABLE \
-#		i=$icon_ico \
-#		n=$name \
-#		perl <<'EOF'
-#		use strict;
-#		use warnings;
-#		use Win32::Exe;
-#
-#		my $n = $ENV{n};
-#		my $i = $ENV{i};
-#		my $e = $ENV{e};
-#
-#		my $exe = Win32::Exe->new($e)
-#			or die "Win32::Exe->new: $!";
-#		$exe = $exe->create_resource_section()
-#			unless $exe->has_resource_section();
-#		$exe->update(icon => $i);
-#		$exe->update(info => ["InternalName=$e"]);
-#		$exe->update(info => ["OriginalFilename=$e"]);
-#		$exe->update(info => ["ProductName=$n"]);
-#		$exe->write($e)
-#			or die "Win32::Exe->write: $!";
-#EOF
-#	fi
+	if $uses_ico; then
+		cp "$icon_ico" darkplaces-rebrand.ico
+		cp "$EXECUTABLE" darkplaces-rebrand.exe
+		cat >darkplaces-rebrand.rc <<EOF
+#include <windows.h> // include for version info constants
+
+A ICON MOVEABLE PURE LOADONCALL DISCARDABLE "darkplaces-rebrand.ico"
+
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILETYPE VFT_APP
+{
+  BLOCK "StringFileInfo"
+	 {
+		 BLOCK "040904E4"
+		 {
+			 VALUE "CompanyName", "Forest Hale Digital Services"
+			 VALUE "FileVersion", "1.0"
+			 VALUE "FileDescription", "$name"
+			 VALUE "InternalName", "${EXECUTABLE##*/}"
+			 VALUE "LegalCopyright", "id Software, Forest Hale, and contributors"
+			 VALUE "LegalTrademarks", ""
+			 VALUE "OriginalFilename", "${EXECUTABLE##*/}"
+			 VALUE "ProductName", "$name"
+			 VALUE "ProductVersion", "1.0"
+		 }
+	 }
+}
+EOF
+		wine ~/ResEdit/ResEdit.exe -convert darkplaces-rebrand.rc darkplaces-rebrand.exe
+		rm -f darkplaces-rebrand.rc darkplaces-rebrand.ico
+		mv darkplaces-rebrand.exe "$EXECUTABLE"
+	fi
 
 	if $uses_icns; then
 		# OS X is special here
