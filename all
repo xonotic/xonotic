@@ -936,17 +936,17 @@ case "$cmd" in
 		targetfiles=$6
 		case " $HOSTS_THAT_ARE_MYSELF " in
 			*\ $host\ *)
-				verbose rsync --delete -zvaSHPAX "$srcdir"/ "$buildpath/"
+				verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
 				verbose eval make -C "$buildpath" clean $maketargets $makeflags
 				for f in $targetfiles; do
 					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
 				done
 				;;
 			*)
-				verbose rsync --delete -zvaSHPAX "$srcdir"/ "$host:$buildpath/"
+				verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
 				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
 				for f in $targetfiles; do
-					verbose rsync -zvaSHPAX "$host:$buildpath/${f%:*}" "${f##*:}" || true
+					verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
 				done
 				;;
 		esac
