@@ -901,7 +901,7 @@ case "$cmd" in
 			verbose tar xvf -
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32/* . || true
-			verbose mv misc/buildfiles/win64/* . || true
+			verbose mv misc/buildfiles/win64 bin64 || true
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
 		}
@@ -967,38 +967,38 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
-			debug 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
+			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		verbose "$SELF" release-compile win64 \
-			'DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -g -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
-			debug 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 		;;
 	release-engine-osx)
 		verbose "$SELF" release-compile osx \
-			'CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -I$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
-			sdl-debug 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin'
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin' 'darkplaces-dedicated:xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib DP_LINK_TO_LIBJPEG=1' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
-			debug 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
+			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib DP_LINK_TO_LIBJPEG=1' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
-			debug 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
+			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
+		verbose "$SELF" release-engine-osx
 		verbose "$SELF" release-engine-win32
-		# "$SELF" release-engine-win64
-		# "$SELF" release-engine-osx
+		verbose "$SELF" release-engine-win64
 		verbose "$SELF" release-engine-linux32
 		verbose "$SELF" release-engine-linux64
 		;;
