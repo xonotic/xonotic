@@ -111,8 +111,9 @@ EOF
 				pkgdir=..
 				;;
 		esac
-		cp "$icon_icns" "$pkgdir/Resources/Darkplaces.icns"
-		cat <<EOF >"$pkgdir/Resources/English.lproj/InfoPlist.strings"
+		if [ -d "$pkgdir/Resources" ]; then
+			cp "$icon_icns" "$pkgdir/Resources/Darkplaces.icns"
+			cat <<EOF >"$pkgdir/Resources/English.lproj/InfoPlist.strings"
 /* Localized versions of Info.plist keys */
 
 CFBundleName = "$name";
@@ -120,6 +121,7 @@ CFBundleShortVersionString = "$name";
 CFBundleGetInfoString = "Darkplaces by Forest 'LordHavoc' Hale";
 NSHumanReadableCopyright = "Copyright `date +%Y`";
 EOF
+		fi
 	fi
 
 	cat "$t/darkplaces-this.zip" >> "$EXECUTABLE"
