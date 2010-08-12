@@ -919,6 +919,7 @@ case "$cmd" in
 			verbose mv misc/buildfiles/win64 bin64 || true
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
+			verbose rm -rf misc/pki
 		}
 		{
 			verbose cd darkplaces
@@ -941,6 +942,7 @@ case "$cmd" in
 			verbose cd Xonotic/source
 			verbose tar xvf -
 		}
+		rm -f Xonotic/key_15.d0pk
 		;;
 	release-compile-run)
 		host=$1
