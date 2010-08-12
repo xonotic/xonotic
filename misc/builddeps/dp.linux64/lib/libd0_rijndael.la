@@ -11,7 +11,7 @@ dlname='libd0_rijndael.so.0'
 library_names='libd0_rijndael.so.0.0.0 libd0_rijndael.so.0 libd0_rijndael.so'
 
 # The name of the static archive.
-old_library=''
+old_library='libd0_rijndael.a'
 
 # Linker flags that can not go in dependency_libs.
 inherited_linker_flags=''
