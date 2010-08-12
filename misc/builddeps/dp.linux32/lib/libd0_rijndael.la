@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname=''
+dlname='libd0_rijndael.so.0'
 
 # Names of this library.
-library_names=''
+library_names='libd0_rijndael.so.0.0.0 libd0_rijndael.so.0 libd0_rijndael.so'
 
 # The name of the static archive.
 old_library='libd0_rijndael.a'
@@ -32,4 +32,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/xonotic/dp.linux32/lib'
+libdir='/home/xonotic/xonotic.linux32/misc/builddeps/dp.linux32/lib'
