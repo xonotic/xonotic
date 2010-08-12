@@ -910,7 +910,7 @@ case "$cmd" in
 		verbose rm -rf Xonotic Xonotic*.zip
 		verbose mkdir -p Xonotic
 		verbose date +%Y%m%d > Xonotic/stamp.txt
-		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
+		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk | {
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc
 			verbose tar xvf -
