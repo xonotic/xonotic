@@ -1,0 +1,9 @@
+flags="-nexuiz"
+name=Xonotic
+dirname1=data
+dirname2=
+screenshotname=xonotic
+userdirname=xonotic
+icon_icns="$d0/misc/logos/icons_icns/xonotic.icns"
+icon_ico="$d0/misc/logos/icons_ico/xonotic_64.ico"
+icon_xpm="$d0/misc/logos/icons_xpm/xonotic_32.xpm"
