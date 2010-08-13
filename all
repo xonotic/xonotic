@@ -250,7 +250,7 @@ case "$cmd" in
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-					verbose git config remote.origin.autocrlf input
+					verbose git config core.autocrlf input
 
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
