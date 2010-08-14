@@ -1175,14 +1175,12 @@ case "$cmd" in
 		verbose zip -0yr Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
 		verbose zip -0yr Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
 		verbose zip -0yr Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
