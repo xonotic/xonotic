@@ -285,6 +285,11 @@ case "$cmd" in
 		misc/tools/xonotic-map-compiler-autobuild download
 		;;
 	checkout|switch)
+		checkoutflags=
+		if [ x"$1" = x"-f" ]; then
+			checkoutflags=-f
+			shift
+		fi
 		remote=$1
 		branch=$2
 		if [ -z "$branch" ]; then
@@ -305,18 +310,18 @@ case "$cmd" in
 			b=$branch
 			if [ -n "$b" ] && git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout "$b"
+				verbose git checkout $checkoutflags "$b"
 			elif [ -n "$b" ] && git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout --track -b "$b" "$remote/$b"
+				verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 			else
 				b=`repobranch "$d"`
 				if git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
 					exists=true
-					verbose git checkout "$b"
+					verbose git checkout $checkoutflags "$b"
 				elif git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
 					exists=true
-					verbose git checkout --track -b "$b" "$remote/$b"
+					verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 				else
 					echo "WTF? Not even branch $b doesn't exist in $d"
 					exit 1
