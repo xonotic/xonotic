@@ -980,7 +980,8 @@ case "$cmd" in
 		verbose "$SELF" release-compile win64 \
 			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
-			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 		;;
 	release-engine-osx)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
@@ -1002,9 +1003,9 @@ case "$cmd" in
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
+		verbose "$SELF" release-engine-win64
 		verbose "$SELF" release-engine-osx
 		verbose "$SELF" release-engine-win32
-		# verbose "$SELF" release-engine-win64
 		verbose "$SELF" release-engine-linux32
 		verbose "$SELF" release-engine-linux64
 		;;
