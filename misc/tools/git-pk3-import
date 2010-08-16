@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# git-import-pk3: Import a PK3 into a branch of a bare Git repo.
+# git-pk3-import: Import a PK3 into a branch of a bare Git repo.
 
 set -x
 
@@ -81,7 +81,7 @@ trap cleanup EXIT
 
 # Set up index file, makes testing easier
 [ -z "$GIT_INDEX_FILE" ] && {
-    export GIT_INDEX_FILE="$GIT_DIR/import-pk3-index"
+    export GIT_INDEX_FILE="$GIT_DIR/pk3-import-index"
     cleanup_index=t
 }
 
@@ -129,5 +129,5 @@ die "found no changes to commit"
 # Commit the index and point the ref to the new commit
 tree=$(git write-tree) &&
 commit=$(message | git commit-tree $tree -p $parent) &&
-git update-ref -m "import-pk3: $pk3name" $ref $commit ||
+git update-ref -m "pk3-import: $pk3name" $ref $commit ||
 die "couldn't commit changes"
