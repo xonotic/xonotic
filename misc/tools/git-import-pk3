@@ -66,11 +66,29 @@ message()
     echo -e "Import $pk3name\n" | cat - "$changes" 2> /dev/null
 }
 
+# Clean up on exit
+
+cleanup_index=
+cleanup_worktree=
+
+cleanup()
+{
+    [ "$cleanup_index" ] && rm -f "$GIT_INDEX_FILE"
+    [ "$cleanup_worktree" ] && find "$GIT_WORK_TREE" -mindepth 1 -delete
+}
+
+trap cleanup EXIT
+
+# Set up index file, makes testing easier
+[ -z "$GIT_INDEX_FILE" ] && {
+    export GIT_INDEX_FILE="$GIT_DIR/import-pk3-index"
+    cleanup_index=t
+}
+
 # Extract the PK3 (the -n suppresses prompting in an edge case)
-# FIXME: perhaps the caller should handle extraction and clean up
 unzip -n -qq "$pk3path" -d "$GIT_WORK_TREE" ||
 die "couldn't extract PK3 contents"
-trap 'find "$GIT_WORK_TREE" -mindepth 1 -delete' EXIT
+cleanup_worktree=t
 
 # Note the refs and the common ancestor
 master=refs/heads/master
