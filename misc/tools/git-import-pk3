@@ -109,9 +109,15 @@ die "couldn't initialize index"
 [ -z "$(git diff-files --diff-filter=M)" ] ||
 die "found changes to files in master"
 
+# Force reading of .gitignore files from cache, not the work tree
+git ls-files --cached -z |
+grep -z '\.gitignore$' |
+git update-index --skip-worktree -z --stdin ||
+die "couldn't set up exclude patterns from index"
+
 # Add untracked files; to filter out generated files such as BSP, add
-# them to .gitignore and push, --exclude-standard should take care of
-# the rest
+# them to .gitignore and push, --exclude-standard (and the above hack)
+# takes care of the rest
 git ls-files --exclude-standard -o -z |
 git update-index --add -z --stdin ||
 die "couldn't add files to index"
