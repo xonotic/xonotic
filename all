@@ -797,7 +797,7 @@ case "$cmd" in
 					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
 						git checkout "$realbase"
 						org=`git rev-parse HEAD`
-						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1   ' >/dev/null; }; then
+						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1	' >/dev/null; }; then
 							git reset --hard "$org"
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
