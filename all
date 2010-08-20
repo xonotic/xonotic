@@ -251,7 +251,7 @@ case "$cmd" in
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 
-					verbose git config remote.origin.autocrlf input
+					verbose git config core.autocrlf input
 
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
@@ -286,6 +286,11 @@ case "$cmd" in
 		misc/tools/xonotic-map-compiler-autobuild download
 		;;
 	checkout|switch)
+		checkoutflags=
+		if [ x"$1" = x"-f" ]; then
+			checkoutflags=-f
+			shift
+		fi
 		remote=$1
 		branch=$2
 		if [ -z "$branch" ]; then
@@ -306,18 +311,18 @@ case "$cmd" in
 			b=$branch
 			if [ -n "$b" ] && git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout "$b"
+				verbose git checkout $checkoutflags "$b"
 			elif [ -n "$b" ] && git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
 				exists=true
-				verbose git checkout --track -b "$b" "$remote/$b"
+				verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 			else
 				b=`repobranch "$d"`
 				if git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
 					exists=true
-					verbose git checkout "$b"
+					verbose git checkout $checkoutflags "$b"
 				elif git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
 					exists=true
-					verbose git checkout --track -b "$b" "$remote/$b"
+					verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 				else
 					echo "WTF? Not even branch $b doesn't exist in $d"
 					exit 1
@@ -556,13 +561,8 @@ case "$cmd" in
 					MAKEFLAGS=-j$ncpus
 				fi
 			fi
-			case "`uname`" in
-				Linux|*BSD)
-					MAKEFLAGS="$MAKEFLAGS DP_LINK_TO_LIBJPEG=1"
-					;;
-			esac
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw LIB_JPEG= CFLAGS_LIBJPEG="
 			fi
 		fi
 
@@ -607,7 +607,7 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
-			export PATH="$d0/misc/buildfiles/win64:$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
+			export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
@@ -807,7 +807,7 @@ case "$cmd" in
 					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
 						git checkout "$realbase"
 						org=`git rev-parse HEAD`
-						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1   ' >/dev/null; }; then
+						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1	' >/dev/null; }; then
 							git reset --hard "$org"
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
@@ -984,39 +984,40 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
-			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 		;;
 	release-engine-osx)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks" LIB_JPEG= CFLAGS_LIBJPEG=' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin' 'darkplaces-dedicated:xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib LIB_JPEG=$HOME/dp.linux32/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib LIB_JPEG=$HOME/dp.linux64/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
+		verbose "$SELF" release-engine-win64
 		verbose "$SELF" release-engine-osx
 		verbose "$SELF" release-engine-win32
-		# verbose "$SELF" release-engine-win64
 		verbose "$SELF" release-engine-linux32
 		verbose "$SELF" release-engine-linux64
 		;;
@@ -1187,14 +1188,12 @@ case "$cmd" in
 		verbose zip -0yr Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
 		verbose zip -0yr Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
 		verbose zip -0yr Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \

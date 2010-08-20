@@ -173,10 +173,10 @@ case "$1" in
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 			git reset --hard
 			git clean -xfd
-			git checkout "$HASH"
+			git checkout -f "$HASH"
 			allmaps buildthemap "$REFNAME" "$HASH" "$url" "$bspoutdir"
 		done
-		git checkout master
+		git checkout -f master
 		;;
 	download)
 		mkdir -p "$bspdir" "$bspdir.old"

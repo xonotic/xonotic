@@ -1,0 +1,97 @@
+#!/bin/sh
+
+# git-pk3-merge: Attempt a trivial merge of master in a bare repo.
+
+set -x
+
+# Helpers
+
+die()
+{
+    echo "$(basename "$0"): error: $*" >&2
+    exit 1
+}
+
+usage()
+{
+    cat <<EOF
+Usage:
+
+  # mandatory
+  export GIT_DIR=/path/to/xonotic-maps.pk3dir.git # absolute path
+  # optional
+  export GIT_AUTHOR_NAME="Some Guy"
+  export GIT_AUTHOR_EMAIL="someguy@example.com"
+
+  $(basename $0) nick branch
+
+EOF
+}
+
+# Check usage
+
+[ $# -eq 2 ] || {
+    usage
+    die "wrong number of arguments"
+}
+
+[ -z "$GIT_DIR" ] && {
+    usage
+    die "GIT_DIR not set"
+}
+
+nick="$1"
+branch=$(git check-ref-format --print "$nick/$2") ||
+die "malformed branch name '$nick/$2'"
+
+# Set up commit info
+
+[ -z "$GIT_AUTHOR_NAME" ] && export GIT_AUTHOR_NAME="$nick"
+[ -z "$GIT_AUTHOR_EMAIL" ] && export GIT_AUTHOR_EMAIL="${nick}@example.com"
+
+message()
+{
+    echo "Merge branch 'master'"
+}
+
+# Clean up on exit
+
+cleanup_index=
+
+cleanup()
+{
+    [ "$cleanup_index" ] && rm -f "$GIT_INDEX_FILE"
+}
+
+trap cleanup EXIT
+
+# Set up index file, makes testing easier
+[ -z "$GIT_INDEX_FILE" ] && {
+    export GIT_INDEX_FILE="$GIT_DIR/pk3-merge-index"
+    cleanup_index=t
+}
+
+# Note the refs and the common ancestor
+master=refs/heads/master
+ref=refs/heads/$branch
+base=$(git merge-base $master $ref 2> /dev/null) ||
+die "couldn't determine the common ancestor"
+
+# Figure out the parent commits
+parent1=$(git rev-parse --verify -q $ref) &&
+parent2=$(git rev-parse --verify -q $master) ||
+die "couldn't determine parent commits"
+
+# Attempt a trivial merge
+git read-tree -i -m --aggressive --trivial $base $ref $master ||
+die "couldn't do a trivial merge"
+
+# Check if the index contains changes against parent
+git diff-index --cached --quiet $parent1 &&
+die "found no changes to commit"
+
+# Commit the index and point the ref to the new commit
+tree=$(git write-tree) &&
+commit=$(message | git commit-tree $tree -p $parent1 -p $parent2) &&
+git update-ref -m "pk3-merge" $ref $commit ||
+die "couldn't commit merge"
