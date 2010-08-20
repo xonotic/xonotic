@@ -177,6 +177,7 @@ for F in "$@"; do
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	case "$f" in
+		*_bump) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
 		./textures/*) ;;
 		./models/*) ;;

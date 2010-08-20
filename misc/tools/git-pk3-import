@@ -1,0 +1,133 @@
+#!/bin/sh
+
+# git-pk3-import: Import a PK3 into a branch of a bare Git repo.
+
+set -x
+
+# Helpers
+
+die()
+{
+    echo "$(basename "$0"): error: $*" >&2
+    exit 1
+}
+
+usage()
+{
+    cat <<EOF
+Usage:
+
+  # mandatory
+  export GIT_DIR=/path/to/xonotic-maps.pk3dir.git # absolute path
+  export GIT_WORK_TREE=/tmp/worktree # pk3 is extracted here
+  # optional
+  export GIT_AUTHOR_NAME="Some Guy"
+  export GIT_AUTHOR_EMAIL="someguy@example.com"
+
+  $(basename $0) nick branch map.pk3 [changes.txt]
+
+EOF
+}
+
+# Check usage
+
+[ $# -ge 3 -a $# -le 4 ] || {
+    usage
+    die "wrong number of arguments"
+}
+
+[ -z "$GIT_DIR" ] && {
+    usage
+    die "GIT_DIR not set"
+}
+
+[ -z "$GIT_WORK_TREE" ] && {
+    usage
+    die "GIT_WORK_TREE not set"
+}
+
+[ -z "$(ls -A "$GIT_WORK_TREE")" ] ||
+die "GIT_WORK_TREE is not empty"
+
+nick="$1"
+branch=$(git check-ref-format --print "$nick/$2") ||
+die "malformed branch name '$nick/$2'"
+pk3path="$3"
+pk3name="$(basename "$pk3path")"
+changes="$4"
+
+# Set up commit info
+
+[ -z "$GIT_AUTHOR_NAME" ] && export GIT_AUTHOR_NAME="$nick"
+[ -z "$GIT_AUTHOR_EMAIL" ] && export GIT_AUTHOR_EMAIL="${nick}@example.com"
+
+message()
+{
+    echo -e "Import $pk3name\n" | cat - "$changes" 2> /dev/null
+}
+
+# Clean up on exit
+
+cleanup_index=
+cleanup_worktree=
+
+cleanup()
+{
+    [ "$cleanup_index" ] && rm -f "$GIT_INDEX_FILE"
+    [ "$cleanup_worktree" ] && find "$GIT_WORK_TREE" -mindepth 1 -delete
+}
+
+trap cleanup EXIT
+
+# Set up index file, makes testing easier
+[ -z "$GIT_INDEX_FILE" ] && {
+    export GIT_INDEX_FILE="$GIT_DIR/pk3-import-index"
+    cleanup_index=t
+}
+
+# Extract the PK3 (the -n suppresses prompting in an edge case)
+unzip -n -qq "$pk3path" -d "$GIT_WORK_TREE" ||
+die "couldn't extract PK3 contents"
+cleanup_worktree=t
+
+# Note the refs and the common ancestor
+master=refs/heads/master
+ref=refs/heads/$branch
+base=$(git merge-base $master $ref 2> /dev/null) ||
+base=$master
+
+# Figure out the parent commit
+parent=\
+$(git rev-parse --verify -q $ref || git rev-parse --verify -q $base) ||
+die "couldn't determine parent commit"
+
+# Read the tree at base into index
+git read-tree $base ||
+die "couldn't initialize index"
+
+# Reject any modified files, the mapper should create a branch instead
+[ -z "$(git diff-files --diff-filter=M)" ] ||
+die "found changes to files in master"
+
+# Force reading of .gitignore files from cache, not the work tree
+git ls-files --cached -z |
+grep -z '\.gitignore$' |
+git update-index --skip-worktree -z --stdin ||
+die "couldn't set up exclude patterns from index"
+
+# Add untracked files; to filter out generated files such as BSP, add
+# them to .gitignore and push, --exclude-standard (and the above hack)
+# takes care of the rest
+git ls-files --exclude-standard -o -z |
+git update-index --add -z --stdin ||
+die "couldn't add files to index"
+
+# Check if the index contains changes against parent
+git diff-index --cached --quiet $parent &&
+die "found no changes to commit"
+
+# Commit the index and point the ref to the new commit
+tree=$(git write-tree) &&
+commit=$(message | git commit-tree $tree -p $parent) &&
+git update-ref -m "pk3-import: $pk3name" $ref $commit ||
+die "couldn't commit changes"
