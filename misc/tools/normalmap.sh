@@ -13,11 +13,14 @@ out=$2
 #   Minimun Z (0 to 1)
 # scale:
 #   Scale (>0)
+# heightsource:
+#   Height source (0 = average RGB, 1 = alpha channel)
 # conv:
 #   Conversion (0 = none, 1 = Biased RGB, 2 = Red, 3 = Green, 4 = Blue, 5 = Max RGB, 6 = Min RGB, 7 = Colorspace)
 : ${filter:=0}
 : ${minz:=0}
 : ${scale:=1}
+: ${heightsource:=0}
 : ${conv:=0}
 
 gimp -i -b - <<EOF
@@ -28,7 +31,7 @@ gimp -i -b - <<EOF
 		(layer (car (gimp-image-get-active-layer img)))
 	)
 	(gimp-layer-add-alpha layer)
-	(plug-in-normalmap RUN-NONINTERACTIVE img drawable $filter $minz $scale 1 0 1 $conv 0 0 1 0 1 layer)
+	(plug-in-normalmap RUN-NONINTERACTIVE img drawable $filter $minz $scale 1 $heightsource 1 $conv 0 0 1 0 1 layer)
 	(file-tga-save RUN-NONINTERACTIVE img drawable "$out" "$out" 1 1)
 	(gimp-quit 0)
 )
