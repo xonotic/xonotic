@@ -2,6 +2,7 @@
 
 # usage: ./bump2norm.sh foo_bump.tga foo_norm.tga
 # NOTE: unfortunately requires X-server (otherwise file-tga-save won't work... no joke)
+# also, alpha channel value 0 is avoided as gimp doesn't save it properly
 
 in=$1
 out=$2
@@ -29,9 +30,14 @@ gimp -i -b - <<EOF
 		(img (car (gimp-file-load RUN-NONINTERACTIVE "$in" "$in")))
 		(drawable (car (gimp-image-active-drawable img)))
 		(layer (car (gimp-image-get-active-layer img)))
+		(mycurve (cons-array 256 'byte))
+		(i 1)
 	)
 	(gimp-layer-add-alpha layer)
 	(plug-in-normalmap RUN-NONINTERACTIVE img drawable $filter $minz $scale 1 $heightsource 1 $conv 0 0 1 0 1 layer)
+	(aset mycurve 0 1)
+	(while (< i 256) (aset mycurve i i) (set! i (+ i 1)))
+	(gimp-curves-explicit drawable HISTOGRAM-ALPHA 256 mycurve)
 	(file-tga-save RUN-NONINTERACTIVE img drawable "$out" "$out" 1 1)
 	(gimp-quit 0)
 )
