@@ -557,13 +557,8 @@ case "$cmd" in
 					MAKEFLAGS=-j$ncpus
 				fi
 			fi
-			case "`uname`" in
-				Linux|*BSD)
-					MAKEFLAGS="$MAKEFLAGS DP_LINK_TO_LIBJPEG=1"
-					;;
-			esac
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw LIB_JPEG= CFLAGS_LIBJPEG="
 			fi
 		fi
 
@@ -972,13 +967,13 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -DUSE_WSPIAPI_H -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config"' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -DSUPPORTDIRECTX -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LDFLAGS_WINCOMMON=""' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
 			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
@@ -986,19 +981,19 @@ case "$cmd" in
 	release-engine-osx)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks" LIB_JPEG= CFLAGS_LIBJPEG=' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin' 'darkplaces-dedicated:xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib LIB_JPEG=$HOME/dp.linux32/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib DP_LINK_TO_LIBJPEG=1' \
+			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib LIB_JPEG=$HOME/dp.linux64/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
