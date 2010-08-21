@@ -11,7 +11,7 @@ icon_icns=Darkplaces.app/Contents/Resources/Darkplaces.icns
 icon_ico=darkplaces.ico
 icon_xpm=darkplaces.xpm
 
-if [ -z "$1" ]; then
+if [ -z "$1" ] || [ x"$1" = x"--help" ]; then
 	echo "Usage: $0 brandfile binaries..."
 	exit
 fi
