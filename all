@@ -985,7 +985,7 @@ case "$cmd" in
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
-			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:xonotic-osx-dedicated'
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-osx-agl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
