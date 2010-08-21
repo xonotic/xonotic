@@ -11,6 +11,10 @@ icon_icns=Darkplaces.app/Contents/Resources/Darkplaces.icns
 icon_ico=darkplaces.ico
 icon_xpm=darkplaces.xpm
 
+if [ -z "$1" ]; then
+	echo "Usage: $0 brandfile binaries..."
+	exit
+fi
 . "$1"; shift
 
 d=`pwd`
