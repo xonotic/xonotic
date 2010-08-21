@@ -934,26 +934,28 @@ case "$cmd" in
 		makeflags=$4
 		srcdir=$5
 		targetfiles=$6
-		case " $HOSTS_THAT_ARE_MYSELF " in
-			*\ $host\ *)
-				verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
-				verbose eval make -C "$buildpath" clean $maketargets $makeflags
-				for f in $targetfiles; do
-					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
-				done
-				;;
-			*)
-				verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
-				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
-				for f in $targetfiles; do
-					verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
-				done
-				;;
-		esac
-		# now rebrand the binaries...
-		for f in $targetfiles; do
-			verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "$d0/misc/tools/xonotic.brand" "${f##*:}" || true
-		done
+		if [ -n "$targetfiles" ]; then
+			case " $HOSTS_THAT_ARE_MYSELF " in
+				*\ $host\ *)
+					verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
+					verbose eval make -C "$buildpath" clean $maketargets $makeflags
+					for f in $targetfiles; do
+						verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
+					done
+					;;
+				*)
+					verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
+					verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+					for f in $targetfiles; do
+						verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
+					done
+					;;
+			esac
+			# now rebrand the binaries...
+			for f in $targetfiles; do
+				verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "$d0/misc/tools/xonotic.brand" "${f##*:}" || true
+			done
+		fi
 		;;
 	release-compile)
 		suffix=$1
@@ -978,12 +980,23 @@ case "$cmd" in
 			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 		;;
-	release-engine-osx)
+	release-engine-osx-sv-sdl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
-			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin' 'darkplaces-dedicated:xonotic-osx-dedicated'
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:xonotic-osx-dedicated'
+		;;
+	release-engine-osx-agl)
+		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
+		verbose "$SELF" release-compile osx \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'' '' \
+			'cl-release' 'darkplaces-glx:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
+		;;
+	release-engine-osx)
+		verbose "$SELF" release-engine-osx-sv-sdl
+		verbose "$SELF" release-engine-osx-agl
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
