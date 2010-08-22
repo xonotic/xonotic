@@ -33,6 +33,8 @@
 
 #include <fftw3.h>
 
+#define TWO_PI (4*atan2(1,1) * 2)
+
 void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
 {
 	int x, y;
@@ -60,14 +62,14 @@ void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
 		 * n_z = -dh/dh = -1
 		 * BUT: darkplaces uses inverted normals, n_y actually is dh/dy by image pixel coordinates
 		 */
-		nx = (int)map[(w*y+x)*4+2] - 127.5;
-		ny = (int)map[(w*y+x)*4+1] - 127.5;
-		nz = (int)map[(w*y+x)*4+0] - 127.5;
+		nx = ((int)map[(w*y+x)*4+2] - 127.5) / 128;
+		ny = ((int)map[(w*y+x)*4+1] - 127.5) / 128;
+		nz = ((int)map[(w*y+x)*4+0] - 127.5) / 128;
 
 		/* reconstruct the derivatives from here */
 #ifdef C99
-		imgspace1[(w*y+x)] =  nx / nz; /* = dz/dx */
-		imgspace2[(w*y+x)] = -ny / nz; /* = dz/dy */
+		imgspace1[(w*y+x)] =  nx / nz * w; /* = dz/dx */
+		imgspace2[(w*y+x)] = -ny / nz * h; /* = dz/dy */
 #else
 		imgspace1[(w*y+x)][0] =  nx / nz; /* = dz/dx */
 		imgspace1[(w*y+x)][1] = 0;
@@ -92,15 +94,15 @@ void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
 			fy -= h;
 #ifdef C99
 		if(fx||fy)
-			freqspace1[(w*y+x)] = I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy);
+			freqspace1[(w*y+x)] = I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy) / TWO_PI;
 		else
 			freqspace1[(w*y+x)] = 0;
 #else
 		if(fx||fy)
 		{
 			save = freqspace1[(w*y+x)][0];
-			freqspace1[(w*y+x)][0] = -(fx * freqspace1[(w*y+x)][1] + fy * freqspace2[(w*y+x)][1]) / (fx*fx + fy*fy);
-			freqspace1[(w*y+x)][1] = (fx * save + fy * freqspace2[(w*y+x)][0]) / (fx*fx + fy*fy);
+			freqspace1[(w*y+x)][0] = -(fx * freqspace1[(w*y+x)][1] + fy * freqspace2[(w*y+x)][1]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)][1] =  (fx * save + fy * freqspace2[(w*y+x)][0]) / (fx*fx + fy*fy) / TWO_PI;
 		}
 		else
 		{
@@ -178,7 +180,7 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 {
 	int x, y;
 	double nx, ny, nz;
-	double v, vmin, vmax;
+	double v;
 #ifndef C99
 	double save;
 #endif
@@ -237,8 +239,8 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fx) / (double)(w/2), 1);
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fy) / (double)(h/2), 1);
 
-		freqspace2[(w*y+x)] = I * fy * freqspace1[(w*y+x)]; /* y derivative */
-		freqspace1[(w*y+x)] = I * fx * freqspace1[(w*y+x)]; /* x derivative */
+		freqspace2[(w*y+x)] = TWO_PI*I * fy * freqspace1[(w*y+x)]; /* y derivative */
+		freqspace1[(w*y+x)] = TWO_PI*I * fx * freqspace1[(w*y+x)]; /* x derivative */
 #else
 		/* a lowpass to prevent the worst */
 		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fx) / (double)(w/2), 1);
@@ -246,11 +248,11 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fy) / (double)(h/2), 1);
 		freqspace1[(w*y+x)][1] *= 1 - pow(abs(fy) / (double)(h/2), 1);
 
-		freqspace2[(w*y+x)][0] = -fy * freqspace1[(w*y+x)][1]; /* y derivative */
-		freqspace2[(w*y+x)][1] =  fy * freqspace1[(w*y+x)][0];
+		freqspace2[(w*y+x)][0] = -TWO_PI * fy * freqspace1[(w*y+x)][1]; /* y derivative */
+		freqspace2[(w*y+x)][1] =  TWO_PI * fy * freqspace1[(w*y+x)][0];
 		save = freqspace1[(w*y+x)][0];
-		freqspace1[(w*y+x)][0] = -fx * freqspace1[(w*y+x)][1]; /* x derivative */
-		freqspace1[(w*y+x)][1] =  fx * save;
+		freqspace1[(w*y+x)][0] = -TWO_PI * fx * freqspace1[(w*y+x)][1]; /* x derivative */
+		freqspace1[(w*y+x)][1] =  TWO_PI * fx * save;
 #endif
 	}
 
@@ -269,15 +271,17 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 		nx = imgspace1[(w*y+x)][0];
 		ny = imgspace2[(w*y+x)][0];
 #endif
-		nz = 1 / scale;
-		v = sqrt(nx*nx + ny*ny + nz*nz);
+		nx /= w;
+		ny /= h;
+		nz = -1 / scale;
+		v = -sqrt(nx*nx + ny*ny + nz*nz);
 		nx /= v;
 		ny /= v;
 		nz /= v;
 		ny = -ny; /* DP inverted normals */
-		map[(w*y+x)*4+2] = floor(127.5 + 127.5 * nx);
-		map[(w*y+x)*4+1] = floor(127.5 + 127.5 * ny);
-		map[(w*y+x)*4+0] = floor(127.5 + 127.5 * nz);
+		map[(w*y+x)*4+2] = floor(128 + 127.5 * nx);
+		map[(w*y+x)*4+1] = floor(128 + 127.5 * ny);
+		map[(w*y+x)*4+0] = floor(128 + 127.5 * nz);
 	}
 
 	fftw_destroy_plan(i12f1);
@@ -288,6 +292,69 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	fftw_free(freqspace1);
 	fftw_free(imgspace2);
 	fftw_free(imgspace1);
+}
+
+void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double scale)
+{
+	int x, y;
+	double nx, ny, nz;
+	double v;
+	int i, j;
+	double *img_reduced = malloc(w*h * sizeof(double));
+	static const double filter[3][3] = { /* filter to derive one component */
+		{ -1, 0, 1 },
+		{ -2, 0, 2 },
+		{ -1, 0, 1 }
+	};
+	static const double filter_mult = 0.125;
+
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+		switch(src_chan)
+		{
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				v = map[(w*y+x)*4+src_chan];
+				break;
+			case 4:
+				v = (map[(w*y+x)*4+0] + map[(w*y+x)*4+1] + map[(w*y+x)*4+2]) / 3;
+				break;
+			default:
+			case 5:
+				v = (map[(w*y+x)*4+0]*0.114 + map[(w*y+x)*4+1]*0.587 + map[(w*y+x)*4+2]*0.299);
+				break;
+		}
+		img_reduced[(w*y+x)] = (v - 128.0) / 127.0;
+		map[(w*y+x)*4+3] = floor(v + 0.5);
+	}
+
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+		nz = -1 / (scale * filter_mult);
+		nx = ny = 0;
+
+		for(i = -(int)(sizeof(filter) / sizeof(*filter)) / 2; i <= (int)(sizeof(filter) / sizeof(*filter)) / 2; ++i)
+			for(j = -(int)(sizeof(*filter) / sizeof(**filter)) / 2; j <= (int)(sizeof(*filter) / sizeof(**filter)) / 2; ++j)
+			{
+				nx += img_reduced[w*((y+i+h)%h)+(x+j+w)%w] * filter[i+(sizeof(filter) / sizeof(*filter)) / 2][j+(sizeof(*filter) / sizeof(**filter)) / 2];
+				ny += img_reduced[w*((y+j+h)%h)+(x+i+w)%w] * filter[i+(sizeof(filter) / sizeof(*filter)) / 2][j+(sizeof(*filter) / sizeof(**filter)) / 2];
+			}
+
+		v = -sqrt(nx*nx + ny*ny + nz*nz);
+		nx /= v;
+		ny /= v;
+		nz /= v;
+		ny = -ny; /* DP inverted normals */
+		map[(w*y+x)*4+2] = floor(128 + 127.5 * nx);
+		map[(w*y+x)*4+1] = floor(128 + 127.5 * ny);
+		map[(w*y+x)*4+0] = floor(128 + 127.5 * nz);
+	}
+
+	free(img_reduced);
 }
 
 unsigned char *FS_LoadFile(const char *fn, int *len)
@@ -774,12 +841,18 @@ int Image_WriteTGABGRA (const char *filename, int width, int height, const unsig
 int usage(const char *me)
 {
 	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset>]] (get heightmap from normalmap)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from R)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -4 [<scale>] (read from A)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -5 [<scale>] (read from (R+G+B)/3)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -6 [<scale>] (read from Y)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from R, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -4 [<scale>] (read from A, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -5 [<scale>] (read from (R+G+B)/3, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -6 [<scale>] (read from Y, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -7 [<scale>] (read from R, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -8 [<scale>] (read from G, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -9 [<scale>] (read from R, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -10 [<scale>] (read from A, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -11 [<scale>] (read from (R+G+B)/3, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -12 [<scale>] (read from Y, FFT)\n", me);
 	return 1;
 }
 
@@ -823,8 +896,10 @@ int main(int argc, char **argv)
 		printf("LoadTGA_BGRA failed\n");
 		return 2;
 	}
-	if(scale < 0)
-		hmap_to_nmap(nmap, image_width, image_height, -scale-1, offset);
+	if(scale < -6)
+		hmap_to_nmap(nmap, image_width, image_height, -scale-7, offset);
+	else if(scale < 0)
+		hmap_to_nmap_local(nmap, image_width, image_height, -scale-1, offset);
 	else
 		nmap_to_hmap(nmap, image_width, image_height, scale, offset);
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
