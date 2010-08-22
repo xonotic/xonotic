@@ -841,13 +841,13 @@ int Image_WriteTGABGRA (const char *filename, int width, int height, const unsig
 int usage(const char *me)
 {
 	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset>]] (get heightmap from normalmap)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from R, Diff)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from B, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -4 [<scale>] (read from A, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -5 [<scale>] (read from (R+G+B)/3, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -6 [<scale>] (read from Y, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -7 [<scale>] (read from R, FFT)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -7 [<scale>] (read from B, FFT)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -8 [<scale>] (read from G, FFT)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -9 [<scale>] (read from R, FFT)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -10 [<scale>] (read from A, FFT)\n", me);
