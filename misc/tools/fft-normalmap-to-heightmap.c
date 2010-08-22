@@ -161,18 +161,128 @@ void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
 			v = -1;
 		if(v > 1)
 			v = 1;
-		/*
-		map[(w*y+x)*4+0] = 128 + 127 * v;
-		map[(w*y+x)*4+1] = 128 + 127 * v;
-		map[(w*y+x)*4+2] = 128 + 127 * v;
-		map[(w*y+x)*4+3] = 255;
-		*/
 		map[(w*y+x)*4+3] = floor(128.5 + 127 * v);
 	}
 
 	fftw_destroy_plan(i12f1);
 	fftw_destroy_plan(i22f2);
 	fftw_destroy_plan(f12i1);
+
+	fftw_free(freqspace2);
+	fftw_free(freqspace1);
+	fftw_free(imgspace2);
+	fftw_free(imgspace1);
+}
+
+void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
+{
+	int x, y;
+	double nx, ny, nz;
+	double v, vmin, vmax;
+#ifndef C99
+	double save;
+#endif
+
+	fftw_complex *imgspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_plan i12f1 = fftw_plan_dft_2d(w, h, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan f12i1 = fftw_plan_dft_2d(w, h, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan f22i2 = fftw_plan_dft_2d(w, h, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+		switch(src_chan)
+		{
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+				v = map[(w*y+x)*4+src_chan];
+				break;
+			case 4:
+				v = (map[(w*y+x)*4+0] + map[(w*y+x)*4+1] + map[(w*y+x)*4+2]) / 3;
+				break;
+			default:
+			case 5:
+				v = (map[(w*y+x)*4+0]*0.114 + map[(w*y+x)*4+1]*0.587 + map[(w*y+x)*4+2]*0.299);
+				break;
+		}
+#ifdef C99
+		imgspace1[(w*y+x)] = (v - 128.0) / 127.0;
+#else
+		imgspace1[(w*y+x)][0] = (v - 128.0) / 127.0;
+		imgspace1[(w*y+x)][1] = 0;
+#endif
+		map[(w*y+x)*4+3] = floor(v + 0.5);
+	}
+
+	/* see http://www.gamedev.net/community/forums/topic.asp?topic_id=561430 */
+
+	fftw_execute(i12f1);
+	
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+		int fx = x;
+		int fy = y;
+		if(fx > w/2)
+			fx -= w;
+		if(fy > h/2)
+			fy -= h;
+#ifdef C99
+		/* a lowpass to prevent the worst */
+		freqspace1[(w*y+x)] *= 1 - pow(abs(fx) / (double)(w/2), 1);
+		freqspace1[(w*y+x)] *= 1 - pow(abs(fy) / (double)(h/2), 1);
+
+		freqspace2[(w*y+x)] = I * fy * freqspace1[(w*y+x)]; /* y derivative */
+		freqspace1[(w*y+x)] = I * fx * freqspace1[(w*y+x)]; /* x derivative */
+#else
+		/* a lowpass to prevent the worst */
+		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fx) / (double)(w/2), 1);
+		freqspace1[(w*y+x)][1] *= 1 - pow(abs(fx) / (double)(w/2), 1);
+		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fy) / (double)(h/2), 1);
+		freqspace1[(w*y+x)][1] *= 1 - pow(abs(fy) / (double)(h/2), 1);
+
+		freqspace2[(w*y+x)][0] = -fy * freqspace1[(w*y+x)][1]; /* y derivative */
+		freqspace2[(w*y+x)][1] =  fy * freqspace1[(w*y+x)][0];
+		save = freqspace1[(w*y+x)][0];
+		freqspace1[(w*y+x)][0] = -fx * freqspace1[(w*y+x)][1]; /* x derivative */
+		freqspace1[(w*y+x)][1] =  fx * save;
+#endif
+	}
+
+	fftw_execute(f12i1);
+	fftw_execute(f22i2);
+
+	scale /= (w*h);
+
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+#ifdef C99
+		nx = creal(imgspace1[(w*y+x)]);
+		ny = creal(imgspace2[(w*y+x)]);
+#else
+		nx = imgspace1[(w*y+x)][0];
+		ny = imgspace2[(w*y+x)][0];
+#endif
+		nz = 1 / scale;
+		v = sqrt(nx*nx + ny*ny + nz*nz);
+		nx /= v;
+		ny /= v;
+		nz /= v;
+		ny = -ny; /* DP inverted normals */
+		map[(w*y+x)*4+2] = floor(127.5 + 127.5 * nx);
+		map[(w*y+x)*4+1] = floor(127.5 + 127.5 * ny);
+		map[(w*y+x)*4+0] = floor(127.5 + 127.5 * nz);
+	}
+
+	fftw_destroy_plan(i12f1);
+	fftw_destroy_plan(f12i1);
+	fftw_destroy_plan(f22i2);
 
 	fftw_free(freqspace2);
 	fftw_free(freqspace1);
@@ -663,7 +773,13 @@ int Image_WriteTGABGRA (const char *filename, int width, int height, const unsig
 
 int usage(const char *me)
 {
-	printf("Usage: %s <infile.tga> <outfile.tga> [<scale> [<offset>]]\n", me);
+	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset>]] (get heightmap from normalmap)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from R)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -4 [<scale>] (read from A)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -5 [<scale>] (read from (R+G+B)/3)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -6 [<scale>] (read from Y)\n", me);
 	return 1;
 }
 
@@ -707,7 +823,10 @@ int main(int argc, char **argv)
 		printf("LoadTGA_BGRA failed\n");
 		return 2;
 	}
-	nmap_to_hmap(nmap, image_width, image_height, scale, offset);
+	if(scale < 0)
+		hmap_to_nmap(nmap, image_width, image_height, -scale-1, offset);
+	else
+		nmap_to_hmap(nmap, image_width, image_height, scale, offset);
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
 	{
 		printf("Image_WriteTGABGRA failed\n");
