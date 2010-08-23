@@ -94,7 +94,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			fy -= h;
 #ifdef C99
 		if(fx||fy)
-			freqspace1[(w*y+x)] = I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)] = _Complex_I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy) / TWO_PI;
 		else
 			freqspace1[(w*y+x)] = 0;
 #else
@@ -114,24 +114,20 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 
 	fftw_execute(f12i1);
 
+	/* renormalize */
+	for(y = 0; y < h; ++y)
+	for(x = 0; x < w; ++x)
+	{
+#ifdef C99
+		imgspace1[(w*y+x)] /= (w*h);
+#else
+		imgspace1[(w*y+x)][0] /= (w*h);
+		imgspace1[(w*y+x)][1] /= (w*h);
+#endif
+	}
+
 	if(refmap)
 	{
-		// refmap: a reference map to define the heights
-		// alpha = weight, color = value
-		// if more than one color value is used, colors are also matched
-
-		// we do linear regression, basically
-		// f'(x, y) = f(x, y) * scale + offset
-		// sum((f(x, y) * scale + offset - ref_y(x, y))^2 * ref_a(x, y)) minimize
-
-		// diff by offset:
-		// sum(-2*ref_y(x,y)*ref_a(x,y) + 2*scale*f(x,y)*ref_a(x,y) + 2*offset*ref_a(x,y)) = 0
-		// diff by scale:
-		// sum(-2*f(x,y)*ref_a(x,y) + 2*scale*f(x,y)^2*ref_a(x,y) + 2*offset*f(x,y)*ref_a(x,y)) = 0
-		// ->
-		// offset = (sfa*sfya - sffa*sya) / (sfa*sfa-sa*sffa)
-		// scale  = (sfa*sya - sa*sfya) / (sfa*sfa-sa*sffa)
-
 		double f, a;
 		double o, s;
 		double sa, sfa, sffa, sfva, sva;
@@ -142,9 +138,9 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		for(y = 0; y < h; ++y)
 		for(x = 0; x < w; ++x)
 		{
-			a = (int)refmap[(w*y+x)*4+0];
-			v = (map[(w*y+x)*4+0]*0.114 + map[(w*y+x)*4+1]*0.587 + map[(w*y+x)*4+2]*0.299);
-			v = (v - 128.0) / 127.0; // value 0 is forbidden, 1 -> -1, 255 -> 1
+			a = (int)refmap[(w*y+x)*4+3];
+			v = (refmap[(w*y+x)*4+0]*0.114 + refmap[(w*y+x)*4+1]*0.587 + refmap[(w*y+x)*4+2]*0.299);
+			v = (v - 128.0) / 127.0;
 #ifdef C99
 			f = creal(imgspace1[(w*y+x)]);
 #else
@@ -152,33 +148,35 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 #endif
 			if(a <= 0)
 				continue;
-			if(y < mi)
-				mi = y;
-			if(y > ma)
-				ma = y;
+			if(v < mi)
+				mi = v;
+			if(v > ma)
+				ma = v;
 			sa += a;
 			sfa += f*a;
 			sffa += f*f*a;
 			sfva += f*v*a;
 			sva += v*a;
 		}
-		sfa /= (w*h);
-		sffa /= (w*h);
-		sffa /= (w*h);
-		sfva /= (w*h);
 		if(mi < ma)
 		{
+			/* linear regression ftw */
 			o = (sfa*sfva - sffa*sva) / (sfa*sfa-sa*sffa);
 			s = (sfa*sva - sa*sfva) / (sfa*sfa-sa*sffa);
 		}
-		else // all values of v are equal, so we cannot get scale; we can still get offset
+		else /* all values of v are equal, so we cannot get scale; we can still get offset */
 		{
 			o = ((sva - sfa) / sa);
 			s = 1;
 		}
-		// now apply user-given offset and scale to these values
-		// (x * s + o) * scale + offset
-		// x * s * scale + o * scale + offset
+
+		printf("Ref-computed scale: %f\nRef-computed offset: %f\n", s, o);
+
+		/*
+		 * now apply user-given offset and scale to these values
+		 * (x * s + o) * scale + offset
+		 * x * s * scale + o * scale + offset
+		 */
 		offset += o * scale;
 		scale *= s;
 	}
@@ -203,9 +201,6 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 				vmax = v;
 		}
 
-		vmin /= (w*h);
-		vmax /= (w*h);
-
 		/*
 		 * map vmin to -1
 		 * map vmax to +1
@@ -215,8 +210,6 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 
 		printf("Autocomputed scale: %f\nAutocomputed offset: %f\n", scale, offset);
 	}
-
-	scale /= (w*h);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -307,8 +300,8 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fx) / (double)(w/2), 1);
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fy) / (double)(h/2), 1);
 
-		freqspace2[(w*y+x)] = TWO_PI*I * fy * freqspace1[(w*y+x)]; /* y derivative */
-		freqspace1[(w*y+x)] = TWO_PI*I * fx * freqspace1[(w*y+x)]; /* x derivative */
+		freqspace2[(w*y+x)] = TWO_PI*_Complex_I * fy * freqspace1[(w*y+x)]; /* y derivative */
+		freqspace1[(w*y+x)] = TWO_PI*_Complex_I * fx * freqspace1[(w*y+x)]; /* x derivative */
 #else
 		/* a lowpass to prevent the worst */
 		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fx) / (double)(w/2), 1);
@@ -974,7 +967,7 @@ int main(int argc, char **argv)
 
 	if(reffile)
 	{
-		nmapdata = FS_LoadFile(infile, &nmaplen);
+		nmapdata = FS_LoadFile(reffile, &nmaplen);
 		if(!nmapdata)
 		{
 			printf("FS_LoadFile failed\n");
@@ -993,6 +986,8 @@ int main(int argc, char **argv)
 			return 2;
 		}
 	}
+	else
+		refmap = NULL;
 
 	if(scale < -6)
 		hmap_to_nmap(nmap, image_width, image_height, -scale-7, offset);
