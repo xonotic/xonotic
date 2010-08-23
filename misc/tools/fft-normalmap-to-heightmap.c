@@ -35,7 +35,7 @@
 
 #define TWO_PI (4*atan2(1,1) * 2)
 
-void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
+void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset)
 {
 	int x, y;
 	double nx, ny, nz;
@@ -114,7 +114,75 @@ void nmap_to_hmap(unsigned char *map, int w, int h, double scale, double offset)
 
 	fftw_execute(f12i1);
 
-	if(scale == 0)
+	if(refmap)
+	{
+		// refmap: a reference map to define the heights
+		// alpha = weight, color = value
+		// if more than one color value is used, colors are also matched
+
+		// we do linear regression, basically
+		// f'(x, y) = f(x, y) * scale + offset
+		// sum((f(x, y) * scale + offset - ref_y(x, y))^2 * ref_a(x, y)) minimize
+
+		// diff by offset:
+		// sum(-2*ref_y(x,y)*ref_a(x,y) + 2*scale*f(x,y)*ref_a(x,y) + 2*offset*ref_a(x,y)) = 0
+		// diff by scale:
+		// sum(-2*f(x,y)*ref_a(x,y) + 2*scale*f(x,y)^2*ref_a(x,y) + 2*offset*f(x,y)*ref_a(x,y)) = 0
+		// ->
+		// offset = (sfa*sfya - sffa*sya) / (sfa*sfa-sa*sffa)
+		// scale  = (sfa*sya - sa*sfya) / (sfa*sfa-sa*sffa)
+
+		double f, a;
+		double o, s;
+		double sa, sfa, sffa, sfva, sva;
+		double mi, ma;
+		sa = sfa = sffa = sfva = sva = 0;
+		mi = 1;
+		ma = -1;
+		for(y = 0; y < h; ++y)
+		for(x = 0; x < w; ++x)
+		{
+			a = (int)refmap[(w*y+x)*4+0];
+			v = (map[(w*y+x)*4+0]*0.114 + map[(w*y+x)*4+1]*0.587 + map[(w*y+x)*4+2]*0.299);
+			v = (v - 128.0) / 127.0; // value 0 is forbidden, 1 -> -1, 255 -> 1
+#ifdef C99
+			f = creal(imgspace1[(w*y+x)]);
+#else
+			f = imgspace1[(w*y+x)][0];
+#endif
+			if(a <= 0)
+				continue;
+			if(y < mi)
+				mi = y;
+			if(y > ma)
+				ma = y;
+			sa += a;
+			sfa += f*a;
+			sffa += f*f*a;
+			sfva += f*v*a;
+			sva += v*a;
+		}
+		sfa /= (w*h);
+		sffa /= (w*h);
+		sffa /= (w*h);
+		sfva /= (w*h);
+		if(mi < ma)
+		{
+			o = (sfa*sfva - sffa*sva) / (sfa*sfa-sa*sffa);
+			s = (sfa*sva - sa*sfva) / (sfa*sfa-sa*sffa);
+		}
+		else // all values of v are equal, so we cannot get scale; we can still get offset
+		{
+			o = ((sva - sfa) / sa);
+			s = 1;
+		}
+		// now apply user-given offset and scale to these values
+		// (x * s + o) * scale + offset
+		// x * s * scale + o * scale + offset
+		offset += o * scale;
+		scale *= s;
+	}
+	else if(scale == 0)
 	{
 #ifdef C99
 		vmin = vmax = creal(imgspace1[0]);
@@ -840,7 +908,7 @@ int Image_WriteTGABGRA (const char *filename, int width, int height, const unsig
 
 int usage(const char *me)
 {
-	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset>]] (get heightmap from normalmap)\n", me);
+	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset> [<infile_ref.tga>]]] (get heightmap from normalmap)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from B, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G, Diff)\n", me);
 	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R, Diff)\n", me);
@@ -858,10 +926,10 @@ int usage(const char *me)
 
 int main(int argc, char **argv)
 {
-	const char *infile, *outfile;
+	const char *infile, *outfile, *reffile;
 	double scale, offset;
-	int nmaplen;
-	unsigned char *nmapdata, *nmap;
+	int nmaplen, w, h;
+	unsigned char *nmapdata, *nmap, *refmap;
 
 	if(argc > 1)
 		infile = argv[1];
@@ -881,7 +949,12 @@ int main(int argc, char **argv)
 	if(argc > 4)
 		offset = atof(argv[4]);
 	else
-		offset = 0;
+		offset = (scale<0) ? 1 : 0;
+
+	if(argc > 5)
+		reffile = argv[5];
+	else
+		reffile = NULL;
 
 	nmapdata = FS_LoadFile(infile, &nmaplen);
 	if(!nmapdata)
@@ -896,12 +969,37 @@ int main(int argc, char **argv)
 		printf("LoadTGA_BGRA failed\n");
 		return 2;
 	}
+	w = image_width;
+	h = image_height;
+
+	if(reffile)
+	{
+		nmapdata = FS_LoadFile(infile, &nmaplen);
+		if(!nmapdata)
+		{
+			printf("FS_LoadFile failed\n");
+			return 2;
+		}
+		refmap = LoadTGA_BGRA(nmapdata, nmaplen);
+		free(nmapdata);
+		if(!refmap)
+		{
+			printf("LoadTGA_BGRA failed\n");
+			return 2;
+		}
+		if(image_width != w || image_height != h)
+		{
+			printf("reference map must have same size as input normalmap\n");
+			return 2;
+		}
+	}
+
 	if(scale < -6)
 		hmap_to_nmap(nmap, image_width, image_height, -scale-7, offset);
 	else if(scale < 0)
 		hmap_to_nmap_local(nmap, image_width, image_height, -scale-1, offset);
 	else
-		nmap_to_hmap(nmap, image_width, image_height, scale, offset);
+		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset);
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
 	{
 		printf("Image_WriteTGABGRA failed\n");
