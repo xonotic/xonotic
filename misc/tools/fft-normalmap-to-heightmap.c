@@ -114,16 +114,21 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 
 	fftw_execute(f12i1);
 
-	/* renormalize */
+	/* renormalize, find min/max */
+	vmin = vmax = 0;
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
 #ifdef C99
-		imgspace1[(w*y+x)] /= (w*h);
+		v = creal(imgspace1[(w*y+x)] /= (w*h));
 #else
-		imgspace1[(w*y+x)][0] /= (w*h);
+		v = (imgspace1[(w*y+x)][0] /= (w*h));
 		imgspace1[(w*y+x)][1] /= (w*h);
 #endif
+		if(v < vmin || (x == 0 && y == 0))
+			vmin = v;
+		if(v > vmax || (x == 0 && y == 0))
+			vmax = v;
 	}
 
 	if(refmap)
@@ -170,8 +175,6 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			s = 1;
 		}
 
-		printf("Ref-computed scale: %f\nRef-computed offset: %f\n", s, o);
-
 		/*
 		 * now apply user-given offset and scale to these values
 		 * (x * s + o) * scale + offset
@@ -182,34 +185,16 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	}
 	else if(scale == 0)
 	{
-#ifdef C99
-		vmin = vmax = creal(imgspace1[0]);
-#else
-		vmin = vmax = imgspace1[0][0];
-#endif
-		for(y = 0; y < h; ++y)
-		for(x = 0; x < w; ++x)
-		{
-#ifdef C99
-			v = creal(imgspace1[(w*y+x)]);
-#else
-			v = imgspace1[(w*y+x)][0];
-#endif
-			if(v < vmin)
-				vmin = v;
-			if(v > vmax)
-				vmax = v;
-		}
-
 		/*
 		 * map vmin to -1
 		 * map vmax to +1
 		 */
 		scale = 2 / (vmax - vmin);
 		offset = -(vmax + vmin) / (vmax - vmin);
-
-		printf("Autocomputed scale: %f\nAutocomputed offset: %f\n", scale, offset);
 	}
+
+	printf("Min: %f\nAvg: %f\nMax: %f\nScale: %f\nOffset: %f\nScaled-Min: %f\nScaled-Avg: %f\nScaled-Max: %f\n", 
+		vmin, 0.0, vmax, scale, offset, vmin * scale + offset, offset, vmax * scale + offset);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
