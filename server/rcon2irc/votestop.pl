@@ -13,7 +13,7 @@
 $store{plugin_votestop} = \%vs; }
 
 # add a dependency on joinsparts.pl
-if (defined %config && $config{plugins} !~ m/joinsparts.pl /gi) {
+if (defined %config && $config{plugins} !~ m/joinsparts\.pl/gi) {
 	die "votestop.pl depends on joinsparts.pl but it appears to not be loaded.";
 }
 
@@ -60,13 +60,15 @@ sub time_to_seconds {
 	}
 	
 	$vs->{currentvote} = $id;
+	$vs->{command} = $command;
 	return 0;
 } ],
 
 [ dp => q{:vote:v(yes|no|timeout|stop):.*} => sub {
 	my ($cmd) = @_;
-	$store{plugin_votestop}->{currentvote} = undef;
 	my $vs = $store{plugin_votestop};
+	$vs->{currentvote} = undef;
+	$vs->{command} = undef;
 	
 	if ($cmd eq 'stop' && $vs->{vstopignore}) {
 		$vs->{vstopignore} = undef;
@@ -80,10 +82,11 @@ sub time_to_seconds {
 	my ($id) = @_;
 	my $vs = $store{plugin_votestop};
 	
-	if (defined $store{plugin_votestop}->{currentvote} && $id == $store{plugin_votestop}->{currentvote}) {
+	if (defined $vs->{currentvote} && $id == $vs->{currentvote}) {
 		$vs->{vstopignore} = 1;
 		out dp => 0, "sv_cmd vote stop";
-		out irc => 0, "PRIVMSG $config{irc_channel} :* vote \00304$command\017 by " . $store{"playernick_byid_$id"} .
+		out dp => 0, "say Vote was stopped as player left the server";
+		out irc => 0, "PRIVMSG $config{irc_channel} :* vote \00304" . $vs->{command} . "\017 by " . $store{"playernick_byid_$id"} .
 			"\017 was stopped because he left the server";
 	}
 	
@@ -93,9 +96,10 @@ sub time_to_seconds {
 [ dp => q{:gamestart:(.*):[0-9.]*} => sub {
 	my $vs = $store{plugin_votestop};
 	
-	if (defined $store{plugin_votestop}->{currentvote}) {
+	if (defined $vs->{currentvote}) {
 		out dp => 0, "sv_cmd vote stop";
-		$store{plugin_votestop}->{currentvote} = undef;
+		$vs->{currentvote} = undef;
+		$vs->{command} = undef;
 		$vs->{vstopignore} = undef;
 	}
 	
