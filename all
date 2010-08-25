@@ -113,11 +113,11 @@ repos_urls="
 data/xonotic-data.pk3dir      |                                                   | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 data/xonotic-music.pk3dir     |                                                   | master      |
-data/xonotic-nexcompat.pk3dir |                                                   | master      |
-mediasource                   |                                                   | master      |
+data/xonotic-nexcompat.pk3dir |                                                   | master      | no
+mediasource                   |                                                   | master      | no
 darkplaces                    |                                                   | div0-stable | svn
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 |                                                   | master      |
+div0-gittools                 |                                                   | master      | no
 netradiant                    |                                                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
@@ -171,12 +171,44 @@ repoflags()
 	echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
 }
 
-repos=`for d in $repos; do
-	p="${d%dir}"
-	if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! { [ -f "$d.no" ] || [ -f "$p" ]; }; then
-		echo "$d"
-	fi
-done`
+listrepos()
+{
+	for d in $repos; do
+		p="${d%dir}"
+		f="`repoflags "$d"`"
+		# if we have the dir, always keep it
+		if [ -d "$d" ]; then
+			msg "Repository $d enabled because it already exists"
+			echo "$d"
+			continue
+		fi
+		# if .yes file exists, always keep it
+		if [ -f "$d.yes" ]; then
+			msg "Repository $d enabled by a .yes file"
+			echo "$d"
+			continue
+		fi
+		# if we have .no file, skip
+		if [ -f "$d.no" ]; then
+			msg "Repository $d disabled by a .no file, delete $p.no to enable"
+			continue
+		fi
+		# if we have matching pk3, skip
+		if [ x"$p" != x"$d" ] && [ -f "$p" ]; then
+			msg "Repository $d disabled by matching .pk3 file, delete $p or create $d.yes to enable"
+			continue
+		fi
+		# if "no" flag is set, skip
+		case ",$f," in
+			*,no,*)
+				msg "Repository $d disabled by default, create $d.yes to enable"
+				continue
+				;;
+		esac
+	done
+}
+
+repos=`listrepos`
 
 if [ "$#" = 0 ]; then
 	set -- help
