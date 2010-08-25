@@ -261,6 +261,14 @@ fix_upstream_rebase_mergefail()
 	fix_upstream_rebase
 }
 
+fix_git_config()
+{
+	verbose git config core.autocrlf input
+	if [ -z "`git config push.default`" ]; then
+		verbose git config push.default current # or is tracking better?
+	fi
+}
+
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
@@ -279,11 +287,9 @@ case "$cmd" in
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
+					fix_git_config
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-
-					verbose git config core.autocrlf input
-
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
@@ -306,6 +312,7 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
+				fix_git_config
 				if [ "$branch" != "master" ]; then
 					verbose git checkout --track -b "$branch" origin/"$branch"
 				fi
