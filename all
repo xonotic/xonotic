@@ -205,6 +205,9 @@ listrepos()
 				continue
 				;;
 		esac
+		# default: enable
+		msg "Repository $d enabled by default"
+		echo "$d"
 	done
 }
 
