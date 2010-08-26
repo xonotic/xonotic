@@ -179,6 +179,7 @@ for F in "$@"; do
 	case "$f" in
 		*_bump) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
+		./models/sprites/*) will_dds=false ;;
 		./textures/*) ;;
 		./models/*) ;;
 		./particles/*) ;;
