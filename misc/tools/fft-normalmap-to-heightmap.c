@@ -38,6 +38,8 @@
 void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset)
 {
 	int x, y;
+	int fx, fy;
+	int ffx, ffy;
 	double nx, ny, nz;
 	double v, vmin, vmax;
 #ifndef C99
@@ -86,23 +88,26 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
-		int fx = x;
-		int fy = y;
+		fx = x;
+		fy = y;
 		if(fx > w/2)
 			fx -= w;
 		if(fy > h/2)
 			fy -= h;
+		/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
+		ffx = fx;
+		ffy = fy;
 #ifdef C99
 		if(fx||fy)
-			freqspace1[(w*y+x)] = _Complex_I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)] = _Complex_I * (ffx * freqspace1[(w*y+x)] + ffy * freqspace2[(w*y+x)]) / (ffx*fx + ffy*fy) / TWO_PI;
 		else
 			freqspace1[(w*y+x)] = 0;
 #else
 		if(fx||fy)
 		{
 			save = freqspace1[(w*y+x)][0];
-			freqspace1[(w*y+x)][0] = -(fx * freqspace1[(w*y+x)][1] + fy * freqspace2[(w*y+x)][1]) / (fx*fx + fy*fy) / TWO_PI;
-			freqspace1[(w*y+x)][1] =  (fx * save + fy * freqspace2[(w*y+x)][0]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)][0] = -(ffx * freqspace1[(w*y+x)][1] + ffy * freqspace2[(w*y+x)][1]) / (ffx*fx + ffy*fy) / TWO_PI;
+			freqspace1[(w*y+x)][1] =  (ffx * save + ffy * freqspace2[(w*y+x)][0]) / (ffx*fx + ffy*fy) / TWO_PI;
 		}
 		else
 		{
