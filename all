@@ -113,11 +113,11 @@ repos_urls="
 data/xonotic-data.pk3dir      |                                                   | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 data/xonotic-music.pk3dir     |                                                   | master      |
-data/xonotic-nexcompat.pk3dir |                                                   | master      |
-mediasource                   |                                                   | master      |
+data/xonotic-nexcompat.pk3dir |                                                   | master      | no
+mediasource                   |                                                   | master      | no
 darkplaces                    |                                                   | div0-stable | svn
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 |                                                   | master      |
+div0-gittools                 |                                                   | master      | no
 netradiant                    |                                                   | master      |
 d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
 "
@@ -172,12 +172,47 @@ repoflags()
 	echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
 }
 
-repos=`for d in $repos; do
-	p="${d%dir}"
-	if [ x"$p" = x"$d" ] || [ -d "$d" ] || ! { [ -f "$d.no" ] || [ -f "$p" ]; }; then
+listrepos()
+{
+	for d in $repos; do
+		p="${d%dir}"
+		f="`repoflags "$d"`"
+		# if we have the dir, always keep it
+		if [ -d "$d" ]; then
+			msg "Repository $d enabled because it already exists"
+			echo "$d"
+			continue
+		fi
+		# if .yes file exists, always keep it
+		if [ -f "$d.yes" ]; then
+			msg "Repository $d enabled by a .yes file"
+			echo "$d"
+			continue
+		fi
+		# if we have .no file, skip
+		if [ -f "$d.no" ]; then
+			msg "Repository $d disabled by a .no file, delete $p.no to enable"
+			continue
+		fi
+		# if we have matching pk3, skip
+		if [ x"$p" != x"$d" ] && [ -f "$p" ]; then
+			msg "Repository $d disabled by matching .pk3 file, delete $p or create $d.yes to enable"
+			continue
+		fi
+		# if "no" flag is set, skip
+		case ",$f," in
+			*,no,*)
+				msg "Repository $d disabled by default, create $d.yes to enable"
+				continue
+				;;
+		esac
+		# default: enable
+		msg "Repository $d enabled by default"
 		echo "$d"
-	fi
-done`
+	done
+}
+
+repos=`listrepos`
 
 if [ "$#" = 0 ]; then
 	set -- help
@@ -230,6 +265,14 @@ fix_upstream_rebase_mergefail()
 	fix_upstream_rebase
 }
 
+fix_git_config()
+{
+	verbose git config core.autocrlf input
+	if [ -z "`git config push.default`" ]; then
+		verbose git config push.default current # or is tracking better?
+	fi
+}
+
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
@@ -248,11 +291,9 @@ case "$cmd" in
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
+					fix_git_config
 					verbose git config remote.origin.url "$url"
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-
-					verbose git config core.autocrlf input
-
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
@@ -275,6 +316,7 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
+				fix_git_config
 				if [ "$branch" != "master" ]; then
 					verbose git checkout --track -b "$branch" origin/"$branch"
 				fi
@@ -951,26 +993,28 @@ case "$cmd" in
 		makeflags=$4
 		srcdir=$5
 		targetfiles=$6
-		case " $HOSTS_THAT_ARE_MYSELF " in
-			*\ $host\ *)
-				verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
-				verbose eval make -C "$buildpath" clean $maketargets $makeflags
-				for f in $targetfiles; do
-					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
-				done
-				;;
-			*)
-				verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
-				verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
-				for f in $targetfiles; do
-					verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
-				done
-				;;
-		esac
-		# now rebrand the binaries...
-		for f in $targetfiles; do
-			verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "$d0/misc/tools/xonotic.brand" "${f##*:}" || true
-		done
+		if [ -n "$targetfiles" ]; then
+			case " $HOSTS_THAT_ARE_MYSELF " in
+				*\ $host\ *)
+					verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
+					verbose eval make -C "$buildpath" clean $maketargets $makeflags
+					for f in $targetfiles; do
+						verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
+					done
+					;;
+				*)
+					verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
+					verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+					for f in $targetfiles; do
+						verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
+					done
+					;;
+			esac
+			# now rebrand the binaries...
+			for f in $targetfiles; do
+				verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "${XONOTIC_BRAND:-$d0/misc/tools/xonotic.brand}" "${f##*:}" || true
+			done
+		fi
 		;;
 	release-compile)
 		suffix=$1
@@ -995,12 +1039,23 @@ case "$cmd" in
 			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 		;;
-	release-engine-osx)
+	release-engine-osx-sv-sdl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks" LIB_JPEG= CFLAGS_LIBJPEG=' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
-			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin' 'darkplaces-dedicated:xonotic-osx-dedicated'
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
+		;;
+	release-engine-osx-agl)
+		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
+		verbose "$SELF" release-compile osx \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'' '' \
+			'cl-release' 'darkplaces-glx:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
+		;;
+	release-engine-osx)
+		verbose "$SELF" release-engine-osx-sv-sdl
+		verbose "$SELF" release-engine-osx-agl
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
