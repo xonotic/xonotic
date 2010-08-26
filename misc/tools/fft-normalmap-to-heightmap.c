@@ -48,9 +48,9 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_plan i12f1 = fftw_plan_dft_2d(w, h, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan i22f2 = fftw_plan_dft_2d(w, h, imgspace2, freqspace2, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan f12i1 = fftw_plan_dft_2d(w, h, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan i22f2 = fftw_plan_dft_2d(h, w, imgspace2, freqspace2, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -235,9 +235,9 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_plan i12f1 = fftw_plan_dft_2d(w, h, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan f12i1 = fftw_plan_dft_2d(w, h, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
-	fftw_plan f22i2 = fftw_plan_dft_2d(w, h, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan f22i2 = fftw_plan_dft_2d(h, w, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
