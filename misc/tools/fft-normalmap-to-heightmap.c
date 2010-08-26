@@ -39,7 +39,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 {
 	int x, y;
 	int fx, fy;
-	int ffx, ffy;
+	double ffx, ffy;
 	double nx, ny, nz;
 	double v, vmin, vmax;
 #ifndef C99
@@ -95,6 +95,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		if(fy > h/2)
 			fy -= h;
 		/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
+		/* it basically decides how artifacts are distributed */
 		ffx = fx;
 		ffy = fy;
 #ifdef C99
