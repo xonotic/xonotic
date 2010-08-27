@@ -14,7 +14,7 @@ library_names='libd0_blind_id.so.0.0.0 libd0_blind_id.so.0 libd0_blind_id.so'
 old_library='libd0_blind_id.a'
 
 # Libraries that this one depends upon.
-dependency_libs=' /usr/lib/libgmp.la'
+dependency_libs=' -L/home/xonotic/dp.linux32/lib /usr/lib/libgmp.la'
 
 # Version information for libd0_blind_id.
 current=0
@@ -32,4 +32,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/xonotic/xonotic.linux32/misc/builddeps/dp.linux32/lib'
+libdir='/home/xonotic/dp.linux32/lib'
