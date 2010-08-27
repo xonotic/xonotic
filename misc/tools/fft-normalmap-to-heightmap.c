@@ -38,6 +38,8 @@
 void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset)
 {
 	int x, y;
+	int fx, fy;
+	double ffx, ffy;
 	double nx, ny, nz;
 	double v, vmin, vmax;
 #ifndef C99
@@ -48,9 +50,9 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_plan i12f1 = fftw_plan_dft_2d(w, h, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan i22f2 = fftw_plan_dft_2d(w, h, imgspace2, freqspace2, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan f12i1 = fftw_plan_dft_2d(w, h, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan i22f2 = fftw_plan_dft_2d(h, w, imgspace2, freqspace2, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -86,23 +88,27 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
-		int fx = x;
-		int fy = y;
+		fx = x;
+		fy = y;
 		if(fx > w/2)
 			fx -= w;
 		if(fy > h/2)
 			fy -= h;
+		/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
+		/* it basically decides how artifacts are distributed */
+		ffx = fx;
+		ffy = fy;
 #ifdef C99
 		if(fx||fy)
-			freqspace1[(w*y+x)] = _Complex_I * (fx * freqspace1[(w*y+x)] + fy * freqspace2[(w*y+x)]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)] = _Complex_I * (ffx * freqspace1[(w*y+x)] + ffy * freqspace2[(w*y+x)]) / (ffx*fx + ffy*fy) / TWO_PI;
 		else
 			freqspace1[(w*y+x)] = 0;
 #else
 		if(fx||fy)
 		{
 			save = freqspace1[(w*y+x)][0];
-			freqspace1[(w*y+x)][0] = -(fx * freqspace1[(w*y+x)][1] + fy * freqspace2[(w*y+x)][1]) / (fx*fx + fy*fy) / TWO_PI;
-			freqspace1[(w*y+x)][1] =  (fx * save + fy * freqspace2[(w*y+x)][0]) / (fx*fx + fy*fy) / TWO_PI;
+			freqspace1[(w*y+x)][0] = -(ffx * freqspace1[(w*y+x)][1] + ffy * freqspace2[(w*y+x)][1]) / (ffx*fx + ffy*fy) / TWO_PI;
+			freqspace1[(w*y+x)][1] =  (ffx * save + ffy * freqspace2[(w*y+x)][0]) / (ffx*fx + ffy*fy) / TWO_PI;
 		}
 		else
 		{
@@ -235,9 +241,9 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_plan i12f1 = fftw_plan_dft_2d(w, h, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_plan f12i1 = fftw_plan_dft_2d(w, h, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
-	fftw_plan f22i2 = fftw_plan_dft_2d(w, h, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan f22i2 = fftw_plan_dft_2d(h, w, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)

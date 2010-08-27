@@ -919,9 +919,10 @@ case "$cmd" in
 			force=true
 		fi
 		for d in $repos; do
-			enter "$d0/$d" verbose
+			verbose cd "$d0/$d"
 			if $force; then
-				verbose git checkout-index -fa
+				verbose git reset --hard
+				#redundant# verbose git checkout-index -fa
 			fi
 			case "$d" in
 				.)
