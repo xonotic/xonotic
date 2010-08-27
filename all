@@ -1035,7 +1035,7 @@ case "$cmd" in
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
 			'' '' \
-			'cl-release' 'darkplaces-glx:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
+			'cl-release' 'darkplaces-agl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
 		;;
 	release-engine-osx)
 		verbose "$SELF" release-engine-osx-sv-sdl
