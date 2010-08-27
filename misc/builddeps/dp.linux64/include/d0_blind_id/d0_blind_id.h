@@ -34,10 +34,11 @@ EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_authenticate_with_private_id_start(d0
 EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_authenticate_with_private_id_challenge(d0_blind_id_t *ctx, BOOL is_first, BOOL recv_modulus, const char *inbuf, size_t inbuflen, char *outbuf, size_t *outbuflen, BOOL *status);
 EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_authenticate_with_private_id_response(d0_blind_id_t *ctx, const char *inbuf, size_t inbuflen, char *outbuf, size_t *outbuflen);
 EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_authenticate_with_private_id_verify(d0_blind_id_t *ctx, const char *inbuf, size_t inbuflen, char *msg, size_t *msglen, BOOL *status);
+EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_authenticate_with_private_id_generate_missing_signature(d0_blind_id_t *ctx);
 EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_fingerprint64_public_id(const d0_blind_id_t *ctx, char *outbuf, size_t *outbuflen);
 EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_sessionkey_public_id(const d0_blind_id_t *ctx, char *outbuf, size_t *outbuflen); // can only be done after successful key exchange, this performs a modpow; key length is limited by SHA_DIGESTSIZE for now; also ONLY valid after successful d0_blind_id_authenticate_with_private_id_verify/d0_blind_id_fingerprint64_public_id
 
-EXPORT void d0_blind_id_INITIALIZE(void);
+EXPORT WARN_UNUSED_RESULT BOOL d0_blind_id_INITIALIZE(void);
 EXPORT void d0_blind_id_SHUTDOWN(void);
 
 EXPORT void d0_blind_id_util_sha256(char *out, const char *in, size_t n);
