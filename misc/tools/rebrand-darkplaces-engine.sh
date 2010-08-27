@@ -10,6 +10,7 @@ userdirname=darkplaces
 icon_icns=Darkplaces.app/Contents/Resources/Darkplaces.icns
 icon_ico=darkplaces.ico
 icon_xpm=darkplaces.xpm
+icons_tga=
 
 if [ -z "$1" ] || [ x"$1" = x"--help" ]; then
 	echo "Usage: $0 brandfile binaries..."
@@ -64,8 +65,17 @@ for EXECUTABLE in "$@"; do
 
 	if $uses_xpm; then
 		cp "$icon_xpm" "$t/darkplaces-icon.xpm"
+		cnt=
+		for i in $icons_tga; do
+			convert "$i" "$t/darkplaces-icon$cnt.tga"
+			if [ -z "$cnt" ]; then
+				cnt=2
+			else
+				cnt=$(($cnt+1))
+			fi
+		done
 		cd "$t"
-		zip -9r darkplaces-this.zip darkplaces-icon.xpm
+		zip -9r darkplaces-this.zip darkplaces-icon*
 		cd "$d"
 	fi
 
