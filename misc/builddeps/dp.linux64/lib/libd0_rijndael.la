@@ -14,7 +14,7 @@ library_names='libd0_rijndael.so.0.0.0 libd0_rijndael.so.0 libd0_rijndael.so'
 old_library='libd0_rijndael.a'
 
 # Libraries that this one depends upon.
-dependency_libs=' /usr/lib/libgmp.la'
+dependency_libs=' -L/home/xonotic/dp.linux64/lib /home/xonotic/dp.linux64/lib/libgmp.la'
 
 # Version information for libd0_rijndael.
 current=0
