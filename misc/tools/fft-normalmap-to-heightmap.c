@@ -270,6 +270,8 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 		imgspace1[(w*y+x)][0] = (v - 128.0) / 127.0;
 		imgspace1[(w*y+x)][1] = 0;
 #endif
+		if(v < 1)
+			v = 1; /* do not write alpha zero */
 		map[(w*y+x)*4+3] = floor(v + 0.5);
 	}
 
@@ -380,6 +382,8 @@ void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double s
 				break;
 		}
 		img_reduced[(w*y+x)] = (v - 128.0) / 127.0;
+		if(v < 1)
+			v = 1; /* do not write alpha zero */
 		map[(w*y+x)*4+3] = floor(v + 0.5);
 	}
 
