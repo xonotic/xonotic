@@ -354,11 +354,11 @@ void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double s
 	int i, j;
 	double *img_reduced = malloc(w*h * sizeof(double));
 	static const double filter[3][3] = { /* filter to derive one component */
-		{ -1, 0, 1 },
-		{ -2, 0, 2 },
-		{ -1, 0, 1 }
+		{  -3, 0,  3 },
+		{ -10, 0, 10 },
+		{  -3, 0,  3 }
 	};
-	static const double filter_mult = 0.125;
+	static const double filter_mult = 0.03125;
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
