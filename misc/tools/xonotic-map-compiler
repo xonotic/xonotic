@@ -19,7 +19,7 @@ use File::Temp;
 	our $Q3MAP2FLAGS = '-fs_forbiddenpath xonotic-data.pk3 -fs_forbiddenpath xonotic-data.pk3dir -fs_forbiddenpath xonotic-nexcompat.pk3 -fs_forbiddenpath xonotic-nexcompat.pk3dir';
 
 	# Default flags for the -bsp stage
-	our $BSPFLAGS    = '-meta -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000';
+	our $BSPFLAGS    = '-meta -maxarea -samplesize 8 -minsamplesize 4 -mv 1000000 -mi 6000000';
 
 	# Default flags for the -vis stage
 	our $VISFLAGS    = '';
