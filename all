@@ -548,16 +548,10 @@ case "$cmd" in
 				cleanqc=true
 				shift
 				;;
-			-n)
-				cleandp=false
-				cleanqcc=false
-				cleanqc=false
-				shift
-				;;
 			*)
 				cleandp=false
 				cleanqcc=false
-				cleanqc=true # version info
+				cleanqc=false
 				;;
 		esac
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
