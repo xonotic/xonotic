@@ -1226,6 +1226,7 @@ case "$cmd" in
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe \
+			Xonotic/key_0.d0pk \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose zip -0yr Xonotic-$stamp.zip \
