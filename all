@@ -931,7 +931,11 @@ case "$cmd" in
 		esac
 		verbose rm -rf Xonotic Xonotic*.zip
 		verbose mkdir -p Xonotic
-		verbose date +%Y%m%d > Xonotic/stamp.txt
+		if [ -n "$RELEASEDATE" ]; then
+			verbose echo "$RELEASEDATE" > Xonotic/stamp.txt
+		else
+			verbose date +%Y%m%d > Xonotic/stamp.txt
+		fi
 		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc
