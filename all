@@ -656,6 +656,8 @@ case "$cmd" in
 			fi
 		fi
 		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic -mygames "$@"
+		# change this to:
+		#set -- "darkplaces/darkplaces$client" -xonotic -mygames "$@"
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
@@ -994,7 +996,21 @@ case "$cmd" in
 			esac
 			# now rebrand the binaries...
 			for f in $targetfiles; do
-				verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "${XONOTIC_BRAND:-$d0/misc/tools/xonotic.brand}" "${f##*:}" || true
+				#verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "${XONOTIC_BRAND:-$d0/misc/tools/xonotic.brand}" "${f##*:}" || true
+				case "$f" in
+					xonotic*.exe)
+						verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "$f"
+						(
+							d=`mktemp -d -t rebrand.XXXXXX`
+							cd "$d"
+							echo "-mygames" > darkplaces.opt
+							zip -9r darkplaces.zip darkplaces.opt
+							cat darkplaces.zip
+							cd "$d0"
+							rm -rf "$d"
+						) >> "$f"
+						;;
+				esac
 			done
 		fi
 		;;
