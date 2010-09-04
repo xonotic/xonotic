@@ -1220,16 +1220,19 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
-		verbose zip -9yr Xonotic-$stamp-common.zip \
+		verbose zip -9yr Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
+			Xonotic/bin64/*.dll \
+			Xonotic/*.app \
+			Xonotic/xonotic-* \
+			Xonotic/xonotic.exe
+		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
+		verbose zip -9yr Xonotic-$stamp-common.zip \
 			Xonotic/source/*/ \
 			Xonotic/Docs \
 			Xonotic/misc \
 			Xonotic/fteqcc \
 			Xonotic/server \
-			Xonotic/*.app \
-			Xonotic/xonotic-* \
-			Xonotic/xonotic.exe \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose zip -0yr Xonotic-$stamp.zip \
