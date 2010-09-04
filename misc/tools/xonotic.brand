@@ -1,4 +1,4 @@
-flags="-nexuiz"
+flags="-nexuiz -mygames"
 name=Xonotic
 dirname1=data
 dirname2=
