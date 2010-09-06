@@ -5,13 +5,13 @@
 
 #include "d0.h"
 
-EXPORT int d0_rijndael_setup_encrypt(unsigned long *rk, const unsigned char *key,
+D0_EXPORT int d0_rijndael_setup_encrypt(unsigned long *rk, const unsigned char *key,
   int keybits);
-EXPORT int d0_rijndael_setup_decrypt(unsigned long *rk, const unsigned char *key,
+D0_EXPORT int d0_rijndael_setup_decrypt(unsigned long *rk, const unsigned char *key,
   int keybits);
-EXPORT void d0_rijndael_encrypt(const unsigned long *rk, int nrounds,
+D0_EXPORT void d0_rijndael_encrypt(const unsigned long *rk, int nrounds,
   const unsigned char plaintext[16], unsigned char ciphertext[16]);
-EXPORT void d0_rijndael_decrypt(const unsigned long *rk, int nrounds,
+D0_EXPORT void d0_rijndael_decrypt(const unsigned long *rk, int nrounds,
   const unsigned char ciphertext[16], unsigned char plaintext[16]);
 
 #define D0_RIJNDAEL_KEYLENGTH(keybits) ((keybits)/8)
