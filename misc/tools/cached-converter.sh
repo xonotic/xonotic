@@ -49,9 +49,9 @@ cached()
 		sum=$lastinfileshash
 	else
 		if [ -n "$git_src_repo" ]; then
-			sum=`( cd "$git_src_repo"; git rev-parse HEAD:"$infile1" )`
+			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"$infile1" | grep . ) || git hash-object "$infile1"`
 			if [ -n "$infile2" ]; then
-				sum=`( cd "$git_src_repo"; git rev-parse HEAD:"$infile2" )`
+				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"$infile2" | grep . ) || git hash-object "$infile2"`
 			fi
 		else
 			sum=`git hash-object "$infile1"`
