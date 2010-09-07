@@ -1727,7 +1727,7 @@ schedule sub {
 	my ($timer) = @_;
 
 	# log on to IRC when needed
-	if(exists $store{dp_hostname} && !exists $store{irc_logged_in})
+	if(exists $store{dp_hostname} && !exists $store{irc_seen_welcome})
 	{
 		$store{irc_nick_requested} = $config{irc_nick};
 		out irc => 1, "NICK $config{irc_nick}", "USER $config{irc_user} localhost localhost :$store{dp_hostname}";
