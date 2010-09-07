@@ -1068,11 +1068,17 @@ case "$cmd" in
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
-		verbose "$SELF" release-engine-win64
-		verbose "$SELF" release-engine-osx
-		verbose "$SELF" release-engine-win32
-		verbose "$SELF" release-engine-linux32
-		verbose "$SELF" release-engine-linux64
+		verbose "$SELF" release-engine-linux32 &
+		verbose "$SELF" release-engine-linux64 &
+		verbose "$SELF" release-engine-win32 &
+		verbose "$SELF" release-engine-win64 &
+		verbose "$SELF" release-engine-osx &
+		wait %1
+		wait %2
+		wait %3
+		wait %4
+		wait %5
+		wait
 		;;
 	release-maps)
 		verbose "$SELF" update-maps
