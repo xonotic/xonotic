@@ -12,6 +12,7 @@ set -e
 : ${do_ogg:=false}
 : ${ogg_qual:=1}
 : ${del_src:=false}
+: ${git_src_repo:=}
 
 me=$0
 case "$me" in
@@ -47,9 +48,16 @@ cached()
 	if [ x"$infile1/../$infile2" = x"$lastinfiles" ]; then
 		sum=$lastinfileshash
 	else
-		sum=`git hash-object "$infile1"`
-		if [ -n "$infile2" ]; then
-			sum=$sum`git hash-object "$infile2"`
+		if [ -n "$git_src_repo" ]; then
+			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile1#./}" | grep . ) || git hash-object "$infile1"`
+			if [ -n "$infile2" ]; then
+				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile2#./}" | grep . ) || git hash-object "$infile2"`
+			fi
+		else
+			sum=`git hash-object "$infile1"`
+			if [ -n "$infile2" ]; then
+				sum=$sum`git hash-object "$infile2"`
+			fi
 		fi
 		lastinfileshash=$sum
 	fi
