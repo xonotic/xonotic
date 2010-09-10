@@ -1321,12 +1321,20 @@ sub cond($)
 		return irc_joinstage(0);
 	} ],
 	
-	# Catch joins of people in a channel the bot is in and catch our own joins of a channel
+	# Catch joins of people in a channel the bot is in and catch our own joins of a channel,
+	# detect channel join message and note hostname length to get the maximum allowed line length
 	[ irc => q{:(([^! ]*)![^ ]*) JOIN (#.+)} => sub {
 		my ($hostmask, $nick, $chan) = @_;
+
+		if ($nick eq $store{irc_nick}) {
+			$store{irc_maxlen} = 510 - length($hostmask);
+			$store{irc_joined_channel} = 1;
+			print "* detected maximum line length for channel messages: $store{irc_maxlen}\n";
+		}
+
 		return 0 unless ($store{irc_quakenet_users});
 		
-		if ($nick eq $config{irc_nick}) {
+		if ($nick eq $store{irc_nick}) {
 			out irc => 0, "PRIVMSG Q :users $chan"; # get auths for all users
 		} else {
 			$store{quakenet_hosts}->{$nick} = $hostmask;
@@ -1392,14 +1400,6 @@ sub cond($)
 			if $data ne $store{irc_pingtime};
 		print "* measured IRC line delay: @{[time() - $store{irc_pingtime}]}\n";
 		undef $store{irc_pingtime};
-		return 0;
-	} ],
-
-	# detect channel join message and note hostname length to get the maximum allowed line length
-	[ irc => q{(:(?i:(??{$store{irc_nick}}))![^ ]* )(?i:JOIN) :(?i:(??{$config{irc_channel}}))} => sub {
-		$store{irc_maxlen} = 510 - length($1);
-		$store{irc_joined_channel} = 1;
-		print "* detected maximum line length for channel messages: $store{irc_maxlen}\n";
 		return 0;
 	} ],
 
@@ -1727,7 +1727,7 @@ schedule sub {
 	my ($timer) = @_;
 
 	# log on to IRC when needed
-	if(exists $store{dp_hostname} && !exists $store{irc_logged_in})
+	if(exists $store{dp_hostname} && !exists $store{irc_seen_welcome})
 	{
 		$store{irc_nick_requested} = $config{irc_nick};
 		out irc => 1, "NICK $config{irc_nick}", "USER $config{irc_user} localhost localhost :$store{dp_hostname}";
