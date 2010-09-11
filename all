@@ -1025,14 +1025,16 @@ case "$cmd" in
 		verbose "$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$darkplaces_files"
 		;;
 	release-engine-win32)
+		# TODO change to g++ and D3D=1 when D3D gets added
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-g++ -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
+		# TODO change to g++ and D3D=1 when D3D gets added
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-g++ -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
 			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
