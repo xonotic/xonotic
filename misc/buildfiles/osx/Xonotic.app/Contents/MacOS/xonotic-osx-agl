@@ -3,4 +3,6 @@
 export DYLD_LIBRARY_PATH="${0%/*}"
 	# same dir as the executable
 
-exec "$0"-bin "$@" -notexturenonpoweroftwo
+set -- "$0"-bin "$@" -notexturenonpoweroftwo
+
+exec "$@"
