@@ -3,4 +3,16 @@
 export DYLD_LIBRARY_PATH="${0%/*}"
 	# same dir as the executable
 
-exec "$0"-bin "$@" -notexturenonpoweroftwo
+set -- "$0"-bin "$@" -notexturenonpoweroftwo
+
+case "`sw_vers -productVersion`" in
+	# shell pattern for "10.6 and higher"
+	10.[6-9]*|10.[1-5][0-9]*|1[1-9]*|[2-9]*)
+		# no workaround needed on 10.6+
+		exec "$@"
+		;;
+	*)
+		# need to force a 32bit arch on 10.5 and below
+		exec arch -arch i386 -arch ppc "$@"
+		;;
+esac
