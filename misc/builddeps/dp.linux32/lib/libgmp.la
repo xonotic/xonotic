@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname='libgmp.so.10'
+dlname=''
 
 # Names of this library.
-library_names='libgmp.so.10.0.1 libgmp.so.10 libgmp.so'
+library_names=''
 
 # The name of the static archive.
 old_library='libgmp.a'
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/xonotic/dp.linux32/lib'
+libdir='/tmp/g/lib'
