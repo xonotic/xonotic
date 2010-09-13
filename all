@@ -976,19 +976,23 @@ case "$cmd" in
 		maketargets=$3
 		makeflags=$4
 		srcdir=$5
-		targetfiles=$6
+		depsdir=$6
+		targetfiles=$7
 		if [ -n "$targetfiles" ]; then
 			case " $HOSTS_THAT_ARE_MYSELF " in
 				*\ $host\ *)
-					verbose rsync --delete -zvaSHP "$srcdir"/ "$buildpath/"
+					verbose rsync --delete -zLvaSHP "$srcdir"/ "$buildpath/"
+					verbose rsync --delete -zLvaSHP "$depsdir"/ "$buildpath.deps/"
+					verbose ln -snf "$buildpath.deps" "$buildpath/.deps"
 					verbose eval make -C "$buildpath" clean $maketargets $makeflags
 					for f in $targetfiles; do
 						verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
 					done
 					;;
 				*)
-					verbose rsync --delete -zvaSHP "$srcdir"/ "$host:$buildpath/"
-					verbose ssh "$host" ". ~/.profile && cd $buildpath && make clean $maketargets $makeflags"
+					verbose rsync --delete -zLvaSHP "$srcdir"/ "$host:$buildpath/"
+					verbose rsync --delete -zLvaSHP "$depsdir"/ "$host:$buildpath.deps/"
+					verbose ssh "$host" ". ~/.profile && ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && make clean $maketargets $makeflags"
 					for f in $targetfiles; do
 						verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
 					done
@@ -1021,20 +1025,21 @@ case "$cmd" in
 		fteqcc_files=$4
 		darkplaces_maketargets=$5
 		darkplaces_files=$6
-		verbose "$SELF" release-compile-run "xonotic-build-$suffix" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/source/fteqcc" "$fteqcc_files"
-		verbose "$SELF" release-compile-run "xonotic-build-$suffix" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$darkplaces_files"
+		host=xonotic-build-$suffix
+		verbose "$SELF" release-compile-run "$host" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/source/fteqcc" "$d0/misc/builddeps/dp.$suffix" "$fteqcc_files"
+		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/dp.$suffix" "$darkplaces_files"
 		;;
 	release-engine-win32)
 		# TODO change to g++ and D3D=1 when D3D gets added
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win32/include -L$HOME/dp.win32/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win32/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		# TODO change to g++ and D3D=1 when D3D gets added
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I$HOME/dp.win64/include -L$HOME/dp.win64/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="$HOME/dp.win64/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
 			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
 			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
@@ -1042,14 +1047,14 @@ case "$cmd" in
 	release-engine-osx-sv-sdl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-osx-agl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I$HOME/dp.osx/include -L$HOME/dp.osx/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
 			'' '' \
 			'cl-release' 'darkplaces-agl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
 		;;
@@ -1059,13 +1064,13 @@ case "$cmd" in
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I$HOME/dp.linux32/include -L$HOME/dp.linux32/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux32/lib LIB_JPEG=$HOME/dp.linux32/lib/libjpeg.a' \
+			'STRIP=: CC="gcc -m32 -g -Wl,--hash-style=sysv -I.deps/include -L.deps/lib" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I$HOME/dp.linux64/include -L$HOME/dp.linux64/lib" DP_MODPLUG_STATIC_LIBDIR=$HOME/dp.linux64/lib LIB_JPEG=$HOME/dp.linux64/lib/libjpeg.a' \
+			'STRIP=: CC="gcc -m64 -g -Wl,--hash-style=sysv -I.deps/include -L.deps/lib" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
