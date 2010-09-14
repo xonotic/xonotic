@@ -23,6 +23,20 @@ unrewrite()
 	esac
 }
 
+ignorefile()
+{
+	case "$1" in
+		.gitattributes) return 0 ;;
+		scripts/nexcompat-trak4.shader) return 0 ;;
+		scripts/nexcompat-trak5.shader) return 0 ;;
+		scripts/nexcompat-eX.shader) return 0 ;;
+		textures/trak4/*) return 0 ;;
+		textures/trak5/*) return 0 ;;
+		textures/eX/*) return 0 ;;
+	esac
+	return 1
+}
+
 wantfile()
 {
 	case "$1" in
@@ -85,9 +99,9 @@ cd "$COMPATLOC"
 git reset --hard
 git clean -xdf
 git ls-files | while IFS= read -r L; do
-	case "$L" in
-		.gitattributes) continue ;;
-	esac
+	if ignorefile "$L"; then
+		continue
+	fi
 	if ! wantfile "`unrewrite "$L"`"; then
 		echo "D $L"
 		git rm -f "$L"
@@ -107,6 +121,9 @@ find "$NEXLOC" -type f | while IFS= read -r L; do
 	L0=${L#$NEXLOC/}
 	echo "$UP$L0$KILL" >&2
 	LR=`rewrite "$L0"`
+	if ignorefile "$LR"; then
+		continue
+	fi
 	if wantfile "$L0"; then
 		newhash=`cd "$NEXLOC"; git rev-parse ":data/$L0"`
 		if oldhash=`git rev-parse ":$LR" 2>/dev/null`; then
