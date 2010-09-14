@@ -2268,7 +2268,7 @@ enum
 
 /* Define CC and CFLAGS which were used to build this version of GMP */
 #define __GMP_CC "gcc -std=gnu99"
-#define __GMP_CFLAGS "-m32 -O2 -pedantic -fomit-frame-pointer -mtune=pentium4 -march=pentium4"
+#define __GMP_CFLAGS "-m32 -O2 -pedantic -fomit-frame-pointer -mtune=pentiumpro -march=pentiumpro"
 
 /* Major version number is the value of __GNU_MP__ too, above and in mp.h. */
 #define __GNU_MP_VERSION 5
