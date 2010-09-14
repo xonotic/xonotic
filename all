@@ -1172,16 +1172,29 @@ case "$cmd" in
 			major=$(($gv / 10000))
 			minor=$(($gv / 100 - $major * 100))
 			patch=$(($gv - $major * 10000 - $minor * 100))
+			versionstr="$major.$minor.$patch"
+			case "$RELEASETYPE" in
+				beta)
+					versionstr="$versionstr""beta"
+					;;
+			esac
 			verbose sed -i "
-				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $major.$minor.$patch /;
+				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 			" defaultXonotic.cfg
+			(
+				verbose cd gfx/menu/luminos
+				verbose cp "$d0"/mediasource/gfx/menu/luminos_versionbuilder/background_l2.svg .
+				verbose "$d0"/mediasource/gfx/menu/luminos_versionbuilder/versionbuilder "$versionstr"
+				verbose rm background_l2.svg
+			)
 		fi
 		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
 			for X in ../../data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
 				if [ -f "$X" ]; then
 					verbose unzip "$X"
+					verbose rm -f maps/*.log maps/*.irc maps/*.lin
 				fi
 			done
 		fi
