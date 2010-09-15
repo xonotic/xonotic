@@ -981,7 +981,7 @@ case "$cmd" in
 		if [ -n "$targetfiles" ]; then
 			case " $HOSTS_THAT_ARE_DISABLED " in
 				*\ $host\ *)
-					return 0
+					exit
 					;;
 			esac
 			case " $HOSTS_THAT_ARE_MYSELF " in
