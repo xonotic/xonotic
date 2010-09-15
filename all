@@ -978,6 +978,7 @@ case "$cmd" in
 		srcdir=$5
 		depsdir=$6
 		targetfiles=$7
+		set -x
 		if [ -n "$targetfiles" ]; then
 			case " $HOSTS_THAT_ARE_DISABLED " in
 				*\ $host\ *)
