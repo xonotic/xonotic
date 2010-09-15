@@ -979,6 +979,11 @@ case "$cmd" in
 		depsdir=$6
 		targetfiles=$7
 		if [ -n "$targetfiles" ]; then
+			case " $HOSTS_THAT_ARE_DISABLED " in
+				*\ $host\ *)
+					return 0
+					;;
+			esac
 			case " $HOSTS_THAT_ARE_MYSELF " in
 				*\ $host\ *)
 					verbose rsync --delete -zLvaSHP "$srcdir"/ "$buildpath/"
