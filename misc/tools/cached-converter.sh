@@ -113,10 +113,10 @@ reduce_ogg_ogg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	tags=`vorbiscomment -R -l "$i"`
+	tags=`vorbiscomment -R -l "$i" || true`
 	oggdec -o "$tmpdir/x.wav" "$i" && \
 	oggenc -q"$1" -o "$o" "$tmpdir/x.wav"
-	echo "$tags" | vorbiscomment -R -w "$o"
+	echo "$tags" | vorbiscomment -R -w "$o" || true
 }
 
 reduce_wav_ogg()
