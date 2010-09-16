@@ -272,6 +272,21 @@ fix_git_config()
 	fi
 }
 
+mkzip()
+{
+	archive=$1
+	shift
+	ziplist=`mktemp`
+	find "$@" -xtype f         \( -type f -not -executable \)    -print > "$ziplist"; 7za a -tzip -mx=9 -i@"$ziplist" "$archive" || true
+	rm -f "$ziplist"
+	find "$@" -xtype f \( -not \( -type f -not -executable \) \) -print             | zip         -9y   -@            "$archive" || true
+}
+
+mkzip0()
+{
+	zip -0y "$@"
+}
+
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
@@ -1211,7 +1226,7 @@ case "$cmd" in
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		verbose 7za a -tzip -mx=9 "../../$dst" .
+		verbose mkzip "../../$dst" .
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
 		;;
@@ -1254,14 +1269,14 @@ case "$cmd" in
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
 		# need to use infozip for these (+x bits)
-		verbose zip -9yr Xonotic-$stamp-engine.zip \
+		verbose mkzip Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
-		verbose 7za a -tzip -mx=9 Xonotic-$stamp-common.zip \
+		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/*/ \
 			Xonotic/Docs \
 			Xonotic/misc \
@@ -1269,23 +1284,23 @@ case "$cmd" in
 			Xonotic/server \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
-		verbose zip -0yr Xonotic-$stamp.zip \
+		verbose mkzip0 Xonotic-$stamp.zip \
 			Xonotic/data/xonotic-$stamp-data.pk3 \
 			Xonotic/data/xonotic-$stamp-maps.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
-		verbose zip -0yr Xonotic-$stamp-low.zip \
+		verbose mkzip0 Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
-		verbose zip -0yr Xonotic-$stamp-lowdds.zip \
+		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
-		verbose zip -0yr Xonotic-$stamp-high.zip \
+		verbose mkzip0 Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
