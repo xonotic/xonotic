@@ -4,7 +4,7 @@ set -e
 
 bspdir="$PWD/data"
 url=http://beta.xonotic.org/autobuild-bsp/
-url_ssh=beta.xonotic.org:autobuild-bsp/
+url_ssh=xonotic-beta:autobuild-bsp/
 cachedir="$HOME/xonotic-map-compiler.cache/"
 override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 
