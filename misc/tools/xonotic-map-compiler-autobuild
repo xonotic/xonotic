@@ -117,7 +117,7 @@ buildthemap()
 	HASH=$2
 	url=$3
 	M=$4
-	blobhash=$6
+	blobhash=$5
 	if HEAD "$url$M-$blobhash.pk3"; then
 		continue
 	fi
