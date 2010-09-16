@@ -116,10 +116,9 @@ buildthemap()
 	REFNAME=$1
 	HASH=$2
 	url=$3
-	bspdir=$4
-	M=$5
+	M=$4
 	blobhash=$6
-	if [ -f "$bspdir/$M-$blobhash.pk3" ]; then
+	if HEAD "$url$M-$blobhash.pk3"; then
 		continue
 	fi
 	if [ -n "$IRCSPAM" ]; then
@@ -140,7 +139,6 @@ buildthemap()
 	ln -snf "../$M-$blobhash.pk3" "$M.pk3" # from ALL branches, so beware!
 	rsync -vaSHP "$M-$blobhash.pk3" "$url_ssh"
 	rsync -vaSHP "$M.pk3" "$url_ssh""latest/"
-	rm -f *.pk3
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "maps/$M.irc"
 	fi
@@ -180,7 +178,7 @@ case "$1" in
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
-			allmaps buildthemap "$REFNAME" "$HASH" "$url" "$bspoutdir"
+			allmaps buildthemap "$REFNAME" "$HASH" "$url"
 			touch "$cachedir/$HASH"
 		done
 		git checkout -f master
