@@ -1211,7 +1211,7 @@ case "$cmd" in
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		verbose zip -9yr "../../$dst" .
+		verbose 7za a -tzip -mx=9 "../../$dst" .
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
 		;;
@@ -1253,6 +1253,7 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
+		# need to use infozip for these (+x bits)
 		verbose zip -9yr Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin64/*.dll \
@@ -1260,7 +1261,7 @@ case "$cmd" in
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
-		verbose zip -9yr Xonotic-$stamp-common.zip \
+		verbose 7za a -tzip -mx=9 Xonotic-$stamp-common.zip \
 			Xonotic/source/*/ \
 			Xonotic/Docs \
 			Xonotic/misc \
