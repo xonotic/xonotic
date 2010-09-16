@@ -5,6 +5,7 @@ set -e
 bspdir="$PWD/data"
 url=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=beta.xonotic.org:autobuild-bsp/
+cachedir="$HOME/xonotic-map-compiler.cache/"
 override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 
 allmaps()
@@ -173,10 +174,14 @@ case "$1" in
 	build)
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			if [ -f "$cachedir/$HASH" ]; then
+				continue
+			fi
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
 			allmaps buildthemap "$REFNAME" "$HASH" "$url" "$bspoutdir"
+			touch "$cachedir/$HASH"
 		done
 		git checkout -f master
 		;;
