@@ -1227,7 +1227,7 @@ case "$cmd" in
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		verbose mkzip "../../$dst" .
+		verbose mkzip "../../$dst" *
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
 		;;
