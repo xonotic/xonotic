@@ -3,10 +3,9 @@
 set -e
 
 bspdir="$PWD/data"
-url=http://141.2.16.23/~xonotic/bsp-autobuilds/
+url=http://beta.xonotic.org/autobuild-bsp/
+url_ssh=beta.xonotic.org:autobuild-bsp/
 override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
-
-bspoutdir="$HOME/public_html/bsp-autobuilds/"
 
 allmaps()
 {
@@ -136,8 +135,11 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" "$dt" > "maps/$M.irc"
 	fi
-	zip -9r "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
-	ln -snf "../$M-$blobhash.pk3" "$bspdir/latest/$M.pk3" # from ALL branches, so beware!
+	zip -9r "$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
+	ln -snf "../$M-$blobhash.pk3" "$M.pk3" # from ALL branches, so beware!
+	rsync -vaSHP "$M-$blobhash.pk3" "$url_ssh"
+	rsync -vaSHP "$M.pk3" "$url_ssh""latest/"
+	rm -f *.pk3
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "maps/$M.irc"
 	fi
@@ -169,8 +171,6 @@ getthemap()
 
 case "$1" in
 	build)
-		mkdir -p "$bspoutdir"
-		mkdir -p "$bspoutdir/latest"
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 			git reset --hard
