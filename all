@@ -1269,6 +1269,8 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
+		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
+		chmod a-x *.exe *.dll
 		# need to use infozip for these (+x bits)
 		verbose mkzip Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
