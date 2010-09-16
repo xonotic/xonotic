@@ -278,8 +278,8 @@ mkzip()
 	shift
 	ziplist=`mktemp`
 	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
-	7za a -tzip -mx=9 -x@"$ziplist" "$archive" || true
-	zip         -9y   -@<"$ziplist" "$archive" || true
+	7za a -tzip -mx=9 -x@"$ziplist" "$archive" "$@" || true
+	zip         -9y   -@<"$ziplist" "$archive"      || true
 	rm -f "$ziplist"
 }
 
