@@ -862,7 +862,7 @@ sub irc_error()
 			return;
 			# this will keep irc_error_active
 		}
-		$channels{irc} = new Channel::Line(new Connection::Socket(tcp => "" => $config{irc_server} => 6667));
+		$channels{irc} = new Channel::Line(new Connection::Socket(tcp => $config{irc_local} => $config{irc_server} => 6667));
 		delete $store{$_} for grep { /^irc_/ } keys %store;
 		$store{irc_nick} = "";
 		schedule sub {

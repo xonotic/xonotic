@@ -35,10 +35,11 @@
 
 #define TWO_PI (4*atan2(1,1) * 2)
 
-void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset)
+void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset, const double *filter, int filterw, int filterh)
 {
 	int x, y;
-	int fx, fy;
+	int i, j;
+	double fx, fy;
 	double ffx, ffy;
 	double nx, ny, nz;
 	double v, vmin, vmax;
@@ -88,34 +89,72 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
-		fx = x;
-		fy = y;
-		if(fx > w/2)
-			fx -= w;
-		if(fy > h/2)
-			fy -= h;
-		/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
-		/* it basically decides how artifacts are distributed */
-		ffx = fx;
-		ffy = fy;
+		fx = x * 1.0 / w;
+		fy = y * 1.0 / h;
+		if(filter)
+		{
+			// discontinous case
+			// we must invert whatever "filter" would do on (x, y)!
 #ifdef C99
-		if(fx||fy)
-			freqspace1[(w*y+x)] = _Complex_I * (ffx * freqspace1[(w*y+x)] + ffy * freqspace2[(w*y+x)]) / (ffx*fx + ffy*fy) / TWO_PI;
-		else
-			freqspace1[(w*y+x)] = 0;
+			fftw_complex response_x = 0;
+			fftw_complex response_y = 0;
+			double sum;
+			for(i = -filterh / 2; i <= filterh / 2; ++i)
+				for(j = -filterw / 2; j <= filterw / 2; ++j)
+				{
+					response_x += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cexp(-_Complex_I * TWO_PI * (j * fx + i * fy));
+					response_y += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cexp(-_Complex_I * TWO_PI * (i * fx + j * fy));
+				}
+
+			// we know:
+			//   fourier(df/dx)_xy = fourier(f)_xy * response_x
+			//   fourier(df/dy)_xy = fourier(f)_xy * response_y
+			// mult by conjugate of response_x, response_y:
+			//   conj(response_x) * fourier(df/dx)_xy = fourier(f)_xy * |response_x^2|
+			//   conj(response_y) * fourier(df/dy)_xy = fourier(f)_xy * |response_y^2|
+			// and
+			//   fourier(f)_xy = (conj(response_x) * fourier(df/dx)_xy + conj(response_y) * fourier(df/dy)_xy) / (|response_x|^2 + |response_y|^2)
+
+			sum = cabs(response_x) * cabs(response_x) + cabs(response_y) * cabs(response_y);
+
+			if(sum > 0)
+				freqspace1[(w*y+x)] = (conj(response_x) * freqspace1[(w*y+x)] + conj(response_y) * freqspace2[(w*y+x)]) / sum;
+			else
+				freqspace1[(w*y+x)] = 0;
 #else
-		if(fx||fy)
-		{
-			save = freqspace1[(w*y+x)][0];
-			freqspace1[(w*y+x)][0] = -(ffx * freqspace1[(w*y+x)][1] + ffy * freqspace2[(w*y+x)][1]) / (ffx*fx + ffy*fy) / TWO_PI;
-			freqspace1[(w*y+x)][1] =  (ffx * save + ffy * freqspace2[(w*y+x)][0]) / (ffx*fx + ffy*fy) / TWO_PI;
+			// not yet implemented
+#endif
 		}
 		else
 		{
-			freqspace1[(w*y+x)][0] = 0;
-			freqspace1[(w*y+x)][1] = 0;
-		}
+			// continuous integration case
+			if(fx > 0.5)
+				fx -= 1;
+			if(fy > 0.5)
+				fy -= 1;
+			/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
+			/* it basically decides how artifacts are distributed */
+			ffx = fx;
+			ffy = fy;
+#ifdef C99
+			if(fx||fy)
+				freqspace1[(w*y+x)] = _Complex_I * (ffx * freqspace1[(w*y+x)] + ffy * freqspace2[(w*y+x)]) / (ffx*fx + ffy*fy) / TWO_PI;
+			else
+				freqspace1[(w*y+x)] = 0;
+#else
+			if(fx||fy)
+			{
+				save = freqspace1[(w*y+x)][0];
+				freqspace1[(w*y+x)][0] = -(ffx * freqspace1[(w*y+x)][1] + ffy * freqspace2[(w*y+x)][1]) / (ffx*fx + ffy*fy) / TWO_PI;
+				freqspace1[(w*y+x)][1] =  (ffx * save + ffy * freqspace2[(w*y+x)][0]) / (ffx*fx + ffy*fy) / TWO_PI;
+			}
+			else
+			{
+				freqspace1[(w*y+x)][0] = 0;
+				freqspace1[(w*y+x)][1] = 0;
+			}
 #endif
+		}
 	}
 
 	fftw_execute(f12i1);
@@ -126,10 +165,10 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	for(x = 0; x < w; ++x)
 	{
 #ifdef C99
-		v = creal(imgspace1[(w*y+x)] /= (w*h));
+		v = creal(imgspace1[(w*y+x)] /= pow(w*h, 1.5));
 #else
-		v = (imgspace1[(w*y+x)][0] /= (w*h));
-		imgspace1[(w*y+x)][1] /= (w*h);
+		v = (imgspace1[(w*y+x)][0] /= pow(w*h, 1.5));
+		imgspace1[(w*y+x)][1] /= pow(w*h, 1.5);
 #endif
 		if(v < vmin || (x == 0 && y == 0))
 			vmin = v;
@@ -231,6 +270,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 {
 	int x, y;
+	double fx, fy;
 	double nx, ny, nz;
 	double v;
 #ifndef C99
@@ -282,26 +322,32 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
-		int fx = x;
-		int fy = y;
+		fx = x;
+		fy = y;
 		if(fx > w/2)
 			fx -= w;
 		if(fy > h/2)
 			fy -= h;
+#ifdef DISCONTINUOUS
+		fx = sin(fx * TWO_PI / w);
+		fy = sin(fy * TWO_PI / h);
+#else
 #ifdef C99
 		/* a lowpass to prevent the worst */
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fx) / (double)(w/2), 1);
 		freqspace1[(w*y+x)] *= 1 - pow(abs(fy) / (double)(h/2), 1);
-
-		freqspace2[(w*y+x)] = TWO_PI*_Complex_I * fy * freqspace1[(w*y+x)]; /* y derivative */
-		freqspace1[(w*y+x)] = TWO_PI*_Complex_I * fx * freqspace1[(w*y+x)]; /* x derivative */
 #else
 		/* a lowpass to prevent the worst */
 		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fx) / (double)(w/2), 1);
 		freqspace1[(w*y+x)][1] *= 1 - pow(abs(fx) / (double)(w/2), 1);
 		freqspace1[(w*y+x)][0] *= 1 - pow(abs(fy) / (double)(h/2), 1);
 		freqspace1[(w*y+x)][1] *= 1 - pow(abs(fy) / (double)(h/2), 1);
-
+#endif
+#endif
+#ifdef C99
+		freqspace2[(w*y+x)] = TWO_PI*_Complex_I * fy * freqspace1[(w*y+x)]; /* y derivative */
+		freqspace1[(w*y+x)] = TWO_PI*_Complex_I * fx * freqspace1[(w*y+x)]; /* x derivative */
+#else
 		freqspace2[(w*y+x)][0] = -TWO_PI * fy * freqspace1[(w*y+x)][1]; /* y derivative */
 		freqspace2[(w*y+x)][1] =  TWO_PI * fy * freqspace1[(w*y+x)][0];
 		save = freqspace1[(w*y+x)][0];
@@ -348,19 +394,13 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	fftw_free(imgspace1);
 }
 
-void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double scale)
+void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double scale, const double *filter, int filterw, int filterh)
 {
 	int x, y;
 	double nx, ny, nz;
 	double v;
 	int i, j;
 	double *img_reduced = malloc(w*h * sizeof(double));
-	static const double filter[3][3] = { /* filter to derive one component */
-		{  -3, 0,  3 },
-		{ -10, 0, 10 },
-		{  -3, 0,  3 }
-	};
-	static const double filter_mult = 0.03125;
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -390,14 +430,14 @@ void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double s
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
-		nz = -1 / (scale * filter_mult);
+		nz = -1 / scale;
 		nx = ny = 0;
 
-		for(i = -(int)(sizeof(filter) / sizeof(*filter)) / 2; i <= (int)(sizeof(filter) / sizeof(*filter)) / 2; ++i)
-			for(j = -(int)(sizeof(*filter) / sizeof(**filter)) / 2; j <= (int)(sizeof(*filter) / sizeof(**filter)) / 2; ++j)
+		for(i = -filterh / 2; i <= filterh / 2; ++i)
+			for(j = -filterw / 2; j <= filterw / 2; ++j)
 			{
-				nx += img_reduced[w*((y+i+h)%h)+(x+j+w)%w] * filter[i+(sizeof(filter) / sizeof(*filter)) / 2][j+(sizeof(*filter) / sizeof(**filter)) / 2];
-				ny += img_reduced[w*((y+j+h)%h)+(x+i+w)%w] * filter[i+(sizeof(filter) / sizeof(*filter)) / 2][j+(sizeof(*filter) / sizeof(**filter)) / 2];
+				nx += img_reduced[w*((y+i+h)%h)+(x+j+w)%w] * filter[(i + filterh / 2) * filterw + j + filterw / 2];
+				ny += img_reduced[w*((y+j+h)%h)+(x+i+w)%w] * filter[(i + filterh / 2) * filterw + j + filterw / 2];
 			}
 
 		v = -sqrt(nx*nx + ny*ny + nz*nz);
@@ -896,21 +936,56 @@ int Image_WriteTGABGRA (const char *filename, int width, int height, const unsig
 
 int usage(const char *me)
 {
-	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> [<scale> [<offset> [<infile_ref.tga>]]] (get heightmap from normalmap)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -1 [<scale>] (read from B, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -2 [<scale>] (read from G, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -3 [<scale>] (read from R, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -4 [<scale>] (read from A, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -5 [<scale>] (read from (R+G+B)/3, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -6 [<scale>] (read from Y, Diff)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -7 [<scale>] (read from B, FFT)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -8 [<scale>] (read from G, FFT)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -9 [<scale>] (read from R, FFT)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -10 [<scale>] (read from A, FFT)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -11 [<scale>] (read from (R+G+B)/3, FFT)\n", me);
-	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> -12 [<scale>] (read from Y, FFT)\n", me);
+	printf("Usage: %s <infile_norm.tga> <outfile_normandheight.tga> filtertype [<scale> [<offset> [<infile_ref.tga>]]] (get heightmap from normalmap)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -1 [<scale>] (read from B)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -2 [<scale>] (read from G)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -3 [<scale>] (read from R)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -4 [<scale>] (read from A)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -5 [<scale>] (read from (R+G+B)/3)\n", me);
+	printf("or:    %s <infile_height.tga> <outfile_normandheight.tga> filtertype -6 [<scale>] (read from Y)\n", me);
 	return 1;
 }
+
+static const double filter_scharr3[3][3] = {
+	{  -3/32.0, 0,  3/32.0 },
+	{ -10/32.0, 0, 10/32.0 },
+	{  -3/32.0, 0,  3/32.0 }
+};
+
+static const double filter_prewitt3[3][3] = {
+	{ -1/6.0, 0, 1/6.0 },
+	{ -1/6.0, 0, 1/6.0 },
+	{ -1/6.0, 0, 1/6.0 }
+};
+
+// pathologic for inverting
+static const double filter_sobel3[3][3] = {
+	{ -1/8.0, 0, 1/8.0 },
+	{ -2/8.0, 0, 2/8.0 },
+	{ -1/8.0, 0, 1/8.0 }
+};
+
+// pathologic for inverting
+static const double filter_sobel5[5][5] = {
+	{ -1/128.0,  -2/128.0, 0,  2/128.0, 1/128.0 },
+	{ -4/128.0,  -8/128.0, 0,  8/128.0, 4/128.0 },
+	{ -6/128.0, -12/128.0, 0, 12/128.0, 6/128.0 },
+	{ -4/128.0,  -8/128.0, 0,  8/128.0, 4/128.0 },
+	{ -1/128.0,  -2/128.0, 0,  2/128.0, 1/128.0 }
+};
+
+// pathologic for inverting
+static const double filter_prewitt5[5][5] = {
+	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
+	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
+	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
+	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
+	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 }
+};
+
+static const double filter_trivial[1][3] = {
+	{ -0.5, 0, 0.5 }
+};
 
 int main(int argc, char **argv)
 {
@@ -918,6 +993,17 @@ int main(int argc, char **argv)
 	double scale, offset;
 	int nmaplen, w, h;
 	unsigned char *nmapdata, *nmap, *refmap;
+	const char *filtertype;
+	const double *filter = NULL;
+	int filterw = 0, filterh = 0;
+#define USE_FILTER(f) \
+	do \
+	{ \
+		filterw = sizeof(*(f)) / sizeof(**(f)); \
+		filterh = sizeof((f)) / sizeof(*(f)); \
+		filter = &(f)[0][0]; \
+	} \
+	while(0)
 
 	if(argc > 1)
 		infile = argv[1];
@@ -930,17 +1016,22 @@ int main(int argc, char **argv)
 		return usage(*argv);
 	
 	if(argc > 3)
-		scale = atof(argv[3]);
+		filtertype = argv[3];
+	else
+		return usage(*argv);
+	
+	if(argc > 4)
+		scale = atof(argv[4]);
 	else
 		scale = 0;
 
-	if(argc > 4)
-		offset = atof(argv[4]);
+	if(argc > 5)
+		offset = atof(argv[5]);
 	else
 		offset = (scale<0) ? 1 : 0;
 
-	if(argc > 5)
-		reffile = argv[5];
+	if(argc > 6)
+		reffile = argv[6];
 	else
 		reffile = NULL;
 
@@ -984,12 +1075,29 @@ int main(int argc, char **argv)
 	else
 		refmap = NULL;
 
-	if(scale < -6)
-		hmap_to_nmap(nmap, image_width, image_height, -scale-7, offset);
-	else if(scale < 0)
-		hmap_to_nmap_local(nmap, image_width, image_height, -scale-1, offset);
+	if(!strcmp(filtertype, "trivial"))
+		USE_FILTER(filter_trivial);
+	if(!strcmp(filtertype, "prewitt3"))
+		USE_FILTER(filter_prewitt3);
+	if(!strcmp(filtertype, "scharr3"))
+		USE_FILTER(filter_scharr3);
+	if(!strcmp(filtertype, "sobel3"))
+		USE_FILTER(filter_sobel3);
+	if(!strcmp(filtertype, "prewitt5"))
+		USE_FILTER(filter_prewitt5);
+	if(!strcmp(filtertype, "sobel5"))
+		USE_FILTER(filter_sobel5);
+
+	if(scale < 0)
+	{
+		if(filter)
+			hmap_to_nmap_local(nmap, image_width, image_height, -scale-1, offset, filter, filterw, filterh);
+		else
+			hmap_to_nmap(nmap, image_width, image_height, -scale-1, offset);
+	}
 	else
-		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset);
+		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset, filter, filterw, filterh);
+
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
 	{
 		printf("Image_WriteTGABGRA failed\n");
