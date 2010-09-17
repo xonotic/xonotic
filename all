@@ -273,6 +273,22 @@ fix_git_config()
 	fi
 }
 
+mkzip()
+{
+	archive=$1
+	shift
+	ziplist=`mktemp`
+	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
+	7za a -tzip -mx=9 -x@"$ziplist" "$archive" "$@" || true
+	zip         -9y   -@<"$ziplist" "$archive"      || true
+	rm -f "$ziplist"
+}
+
+mkzip0()
+{
+	zip -0y "$@"
+}
+
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
@@ -994,7 +1010,13 @@ case "$cmd" in
 		srcdir=$5
 		depsdir=$6
 		targetfiles=$7
+		set -x
 		if [ -n "$targetfiles" ]; then
+			case " $HOSTS_THAT_ARE_DISABLED " in
+				*\ $host\ *)
+					exit
+					;;
+			esac
 			case " $HOSTS_THAT_ARE_MYSELF " in
 				*\ $host\ *)
 					verbose rsync --delete -zLvaSHP "$srcdir"/ "$buildpath/"
@@ -1008,7 +1030,7 @@ case "$cmd" in
 				*)
 					verbose rsync --delete -zLvaSHP "$srcdir"/ "$host:$buildpath/"
 					verbose rsync --delete -zLvaSHP "$depsdir"/ "$host:$buildpath.deps/"
-					verbose ssh "$host" "ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && make clean $maketargets $makeflags"
+					verbose ssh "$host" "ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && nice -`nice` make clean $maketargets $makeflags"
 					for f in $targetfiles; do
 						verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
 					done
@@ -1193,22 +1215,35 @@ case "$cmd" in
 			major=$(($gv / 10000))
 			minor=$(($gv / 100 - $major * 100))
 			patch=$(($gv - $major * 10000 - $minor * 100))
+			versionstr="$major.$minor.$patch"
+			case "$RELEASETYPE" in
+				beta)
+					versionstr="$versionstr""beta"
+					;;
+			esac
 			verbose sed -i "
-				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $major.$minor.$patch /;
+				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 			" defaultXonotic.cfg
+			(
+				verbose cd gfx/menu/luminos
+				verbose cp "$d0"/mediasource/gfx/menu/luminos_versionbuilder/background_l2.svg .
+				verbose "$d0"/mediasource/gfx/menu/luminos_versionbuilder/versionbuilder "$versionstr"
+				verbose rm background_l2.svg
+			)
 		fi
 		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
 			for X in ../../data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
 				if [ -f "$X" ]; then
 					verbose unzip "$X"
+					verbose rm -f maps/*.log maps/*.irc maps/*.lin
 				fi
 			done
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		verbose zip -9yr "../../$dst" .
+		verbose mkzip "../../$dst" *
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
 		;;
@@ -1250,14 +1285,17 @@ case "$cmd" in
 		;;
 	release-zip)
 		stamp=`cat Xonotic/stamp.txt`
-		verbose zip -9yr Xonotic-$stamp-engine.zip \
+		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
+		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
+		# need to use infozip for these (+x bits)
+		verbose mkzip Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
-		verbose zip -9yr Xonotic-$stamp-common.zip \
+		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/*/ \
 			Xonotic/Docs \
 			Xonotic/misc \
@@ -1266,23 +1304,23 @@ case "$cmd" in
 			Xonotic/key_0.d0pk \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
-		verbose zip -0yr Xonotic-$stamp.zip \
+		verbose mkzip0 Xonotic-$stamp.zip \
 			Xonotic/data/xonotic-$stamp-data.pk3 \
 			Xonotic/data/xonotic-$stamp-maps.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
-		verbose zip -0yr Xonotic-$stamp-low.zip \
+		verbose mkzip0 Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
-		verbose zip -0yr Xonotic-$stamp-lowdds.zip \
+		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
-		verbose zip -0yr Xonotic-$stamp-high.zip \
+		verbose mkzip0 Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
