@@ -514,7 +514,7 @@ sub recvchallenge($)
 					if not defined $s;
 				length $s
 					or last;
-				if($s =~ /^\377\377\377\377challenge (.*)$/s)
+				if($s =~ /^\377\377\377\377challenge (.*)(?:$|\0)/s)
 				{
 					return $1;
 				}
