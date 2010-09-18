@@ -895,15 +895,17 @@ case "$cmd" in
 	clean)
 		force=false
 		gotoupstream=false
+		fetchupstream=false
 		gotomaster=false
 		rmuntracked=false
 		killbranches=false
 		# usage:
-		#   ./all clean [-m] [-f | -fu] [-r] [-D]
+		#   ./all clean [-m] [-f | -fu | -fU] [-r] [-D]
 		#   ./all clean --reclone
 		while :; do
 			if [ x"$1" = x"--reclone" ]; then
 				force=true
+				fetchupstream=true
 				gotoupstream=true
 				gotomaster=true
 				rmuntracked=true
@@ -912,9 +914,16 @@ case "$cmd" in
 				force=true
 			elif [ x"$1" = x"-u" ]; then
 				gotoupstream=true
+			elif [ x"$1" = x"-U" ]; then
+				gotoupstream=true
+				fetchupstream=true
 			elif [ x"$1" = x"-fu" ]; then
 				force=true
 				gotoupstream=true
+			elif [ x"$1" = x"-Fu" ]; then
+				force=true
+				gotoupstream=true
+				fetchupstream=true
 			elif [ x"$1" = x"-m" ]; then
 				gotomaster=true
 			elif [ x"$1" = x"-r" ]; then
@@ -934,6 +943,9 @@ case "$cmd" in
 					exit 1
 				fi
 				if $gotomaster; then
+					if $fetchupstream; then
+						verbose git fetch origin
+					fi
 					verbose git checkout -f "`repobranch "$d"`"
 					verbose git reset --hard origin/"`repobranch "$d"`"
 				else
@@ -942,6 +954,9 @@ case "$cmd" in
 					rem=`git config "branch.$r.remote" || echo origin`
 					bra=`git config "branch.$r.merge" || echo "$r"`
 					upstream="$rem/${bra#refs/heads/}"
+					if $fetchupstream; then
+						verbose git fetch "$rem"
+					fi
 					if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 						upstream="origin/`repobranch "$d"`"
 					fi
