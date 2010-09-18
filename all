@@ -902,6 +902,7 @@ case "$cmd" in
 		# usage:
 		#   ./all clean [-m] [-f | -fu | -fU] [-r] [-D]
 		#   ./all clean --reclone
+		found=false
 		while :; do
 			if [ x"$1" = x"--reclone" ]; then
 				force=true
@@ -933,8 +934,12 @@ case "$cmd" in
 			else
 				break
 			fi
+			found=true
 			shift
 		done
+		if ! $found; then
+			rmuntracked=true
+		fi
 		for d in $repos; do
 			verbose cd "$d0/$d"
 			if $gotoupstream; then
