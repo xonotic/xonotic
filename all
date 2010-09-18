@@ -921,7 +921,7 @@ case "$cmd" in
 			elif [ x"$1" = x"-fu" ]; then
 				force=true
 				gotoupstream=true
-			elif [ x"$1" = x"-Fu" ]; then
+			elif [ x"$1" = x"-fU" ]; then
 				force=true
 				gotoupstream=true
 				fetchupstream=true
