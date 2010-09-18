@@ -928,7 +928,7 @@ case "$cmd" in
 				fi
 				if $gotomaster; then
 					verbose git checkout -f "`repobranch "$d"`"
-					git reset --hard origin/"`repobranch "$d"`"
+					verbose git reset --hard origin/"`repobranch "$d"`"
 				else
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
@@ -961,7 +961,9 @@ case "$cmd" in
 			fi
 			if $killbranches; then
 				git for-each-ref --format='%(refname)' refs/heads/ | while IFS= read -r B; do
-					git branch -D "${B#refs/heads/}" 2>/dev/null
+					if [ x"$B" != x"`git symbolic-ref HEAD`" ]; then
+						verbose git branch -D "${B#refs/heads/}"
+					fi
 				done
 			fi
 		done
