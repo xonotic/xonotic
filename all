@@ -970,6 +970,7 @@ case "$cmd" in
 			elif $gotomaster; then
 				if $force; then
 					verbose git checkout -f "`repobranch "$d"`"
+					verbose git reset --hard
 				else
 					verbose git checkout "`repobranch "$d"`"
 				fi
