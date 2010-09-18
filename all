@@ -900,8 +900,15 @@ case "$cmd" in
 		killbranches=false
 		# usage:
 		#   ./all clean [-m] [-f | -fu] [-r] [-D]
+		#   ./all clean --reclone
 		while :; do
-			if [ x"$1" = x"-f" ]; then
+			if [ x"$1" = x"--reclone" ]; then
+				force=true
+				gotoupstream=true
+				gotomaster=true
+				rmuntracked=true
+				killbranches=true
+			elif [ x"$1" = x"-f" ]; then
 				force=true
 			elif [ x"$1" = x"-u" ]; then
 				gotoupstream=true
