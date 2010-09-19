@@ -1352,7 +1352,7 @@ case "$cmd" in
 		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
 		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
 		# let's pass crypto import laws of some nasty countries
-		crypto_libs=`find Xonotic -name \*d0_rijndael\* -exec rm -f {} \;`
+		crypto_libs=`find Xonotic -name \*d0_rijndael\*`
 		if [ -n "$crypto_libs" ]; then
 			verbose mkzip Xonotic-$stamp-crypto.zip \
 				$crypto_libs
