@@ -1,7 +1,7 @@
 @echo off
 
 setlocal
-set executable=xonotic -dedicated
+set executable=xonotic.exe
 
 %~d0
 cd "%~p0"
@@ -24,4 +24,4 @@ exit
 cd ..
 
 :good
-.\%executable% +serverconfig server.cfg %*
+.\%executable% -dedicated +serverconfig server.cfg %*
