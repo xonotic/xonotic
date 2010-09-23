@@ -438,26 +438,15 @@ case "$cmd" in
 	branches)
 		for d in $repos; do
 			cd "$d0/$d" # am in a pipe, shouldn't use enter
-			git branch -a -v -v | cut -c 3- | sed "s/^(no branch)/(no_branch)/" | sed "s,^,$d ,"
+			git branch -r -v -v | cut -c 3- | sed "s/^(no branch)/(no_branch)/" | sed "s,^,$d ,"
 			cd "$d0"
 		done | {
 			branches_list=
 			# branches_repos_*=
-			while read -r d BRANCH REV UPSTREAM TEXT; do
+			while read -r d BRANCH REV TEXT; do
 				if [ x"$BRANCH" = x"`repobranch "$d"`" ]; then
 					continue
 				fi
-				case "$UPSTREAM" in
-					\[*)
-						UPSTREAM=${UPSTREAM#\[}
-						UPSTREAM=${UPSTREAM%\]}
-						UPSTREAM=${UPSTREAM%:*}
-						;;
-					*)
-						TEXT="$UPSTREAM $TEXT"
-						UPSTREAM=
-						;;
-				esac
 				if [ x"$REV" = x"->" ]; then
 					continue
 				fi
@@ -465,14 +454,7 @@ case "$cmd" in
 				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
 				branches_list="$branches_list $BRANCH" # TEH SORT MAKEZ IT UNIEQ
 				eval "r=\$branches_repos_$ID"
-				case "$UPSTREAM" in
-					'')
-						r="$r $d"
-						;;
-					*)
-						r="$r $d:$UPSTREAM"
-						;;
-				esac
+				r="$r $d"
 				eval "branches_repos_$ID=\$r"
 			done
 			echo -n "$branches_list" | xargs -n 1 echo | sort -u | while IFS= read -r BRANCH; do
@@ -912,23 +894,106 @@ case "$cmd" in
 		;;
 	clean)
 		force=false
-		if [ x"$1" = x"-f" ]; then
-			force=true
+		gotoupstream=false
+		fetchupstream=false
+		gotomaster=false
+		rmuntracked=false
+		killbranches=false
+		# usage:
+		#   ./all clean [-m] [-f | -fu | -fU] [-r] [-D]
+		#   ./all clean --reclone
+		found=false
+		while :; do
+			if [ x"$1" = x"--reclone" ]; then
+				force=true
+				fetchupstream=true
+				gotoupstream=true
+				gotomaster=true
+				rmuntracked=true
+				killbranches=true
+			elif [ x"$1" = x"-f" ]; then
+				force=true
+			elif [ x"$1" = x"-u" ]; then
+				gotoupstream=true
+			elif [ x"$1" = x"-U" ]; then
+				gotoupstream=true
+				fetchupstream=true
+			elif [ x"$1" = x"-fu" ]; then
+				force=true
+				gotoupstream=true
+			elif [ x"$1" = x"-fU" ]; then
+				force=true
+				gotoupstream=true
+				fetchupstream=true
+			elif [ x"$1" = x"-m" ]; then
+				gotomaster=true
+			elif [ x"$1" = x"-r" ]; then
+				rmuntracked=true
+			elif [ x"$1" = x"-D" ]; then
+				killbranches=true
+			else
+				break
+			fi
+			found=true
+			shift
+		done
+		if ! $found; then
+			rmuntracked=true
 		fi
 		for d in $repos; do
 			verbose cd "$d0/$d"
-			if $force; then
+			if $gotoupstream; then
+				if ! $force; then
+					msg "Must also use -f (delete local changes) when using -u"
+					exit 1
+				fi
+				if $gotomaster; then
+					if $fetchupstream; then
+						verbose git fetch origin
+					fi
+					verbose git checkout -f "`repobranch "$d"`"
+					verbose git reset --hard origin/"`repobranch "$d"`"
+				else
+					r=`git symbolic-ref HEAD`
+					r=${r#refs/heads/}
+					rem=`git config "branch.$r.remote" || echo origin`
+					bra=`git config "branch.$r.merge" || echo "$r"`
+					upstream="$rem/${bra#refs/heads/}"
+					if $fetchupstream; then
+						verbose git fetch "$rem"
+					fi
+					if ! git rev-parse "$upstream" >/dev/null 2>&1; then
+						upstream="origin/`repobranch "$d"`"
+					fi
+					verbose git reset --hard "$upstream"
+				fi
+			elif $gotomaster; then
+				if $force; then
+					verbose git checkout -f "`repobranch "$d"`"
+					verbose git reset --hard
+				else
+					verbose git checkout "`repobranch "$d"`"
+				fi
+			elif $force; then
 				verbose git reset --hard
-				#redundant# verbose git checkout-index -fa
 			fi
-			case "$d" in
-				.)
-					verbose git clean -df
-					;;
-				*)
-					verbose git clean -xdf
-					;;
-			esac
+			if $rmuntracked; then
+				case "$d" in
+					.)
+						verbose git clean -df
+						;;
+					*)
+						verbose git clean -xdf
+						;;
+				esac
+			fi
+			if $killbranches; then
+				git for-each-ref --format='%(refname)' refs/heads/ | while IFS= read -r B; do
+					if [ x"$B" != x"`git symbolic-ref HEAD`" ]; then
+						verbose git branch -D "${B#refs/heads/}"
+					fi
+				done
+			fi
 		done
 		;;
 
@@ -1063,8 +1128,7 @@ case "$cmd" in
 		verbose "$SELF" release-compile win64 \
 			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
-			'sv-release cl-release' 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
-			# release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl-x64.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated-x64.exe'
+			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
 		;;
 	release-engine-osx-sv-sdl)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
@@ -1320,15 +1384,24 @@ case "$cmd" in
 
 	*)
 		echo "Usage:"
-		echo "  $SELF pull"
-		echo "  $SELF merge"
-		echo "  $SELF push [-s]"
+		echo "  $SELF admin-merge [<branch>]"
+		echo "  $SELF branch <branch>"
+		echo "  $SELF branch <remote> <branch> [<srcbranch>]"
 		echo "  $SELF branches"
-		echo "  $SELF branch [<remote>] <branchname>"
-		echo "  $SELF branch <remote> <branchname> <srcbranchname>"
-		echo "  $SELF checkout [<remote>] <branchname>"
-		echo "  $SELF compile [-c|-n] [<client>] <options>"
-		echo "  $SELF run [<client>] <options>"
-		echo "  $SELF each <command>"
+		echo "  $SELF checkout|switch <branch>"
+		echo "  $SELF checkout|switch <remote>/<branch>"
+		echo "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
+		echo "  $SELF clean --reclone"
+		echo "  $SELF compile [-c]"
+		echo "  $SELF each|foreach [-k] command..."
+		echo "  $SELF fix_upstream_rebase"
+		echo "  $SELF merge"
+		echo "  $SELF push|commit [-s]"
+		echo "  $SELF release"
+		echo "  $SELF restore-patches"
+		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		echo "  $SELF save-patches"
+		echo "  $SELF update-maps"
+		echo "  $SELF update|pull [-N]"
 		;;
 esac
