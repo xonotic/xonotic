@@ -137,8 +137,11 @@ buildthemap()
 	fi
 	zip -9r "$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$M.pk3" # from ALL branches, so beware!
-	rsync -vaSHP "$M-$blobhash.pk3" "$url_ssh"
-	rsync -vaSHP "$M.pk3" "$url_ssh""latest/"
+	cp "$M-$blobhash.pk3" "$M-full-$blobhash.pk3"
+	zip -9r "$M-full-$blobhash.pk3" `git diff --name-only --diff-filter=ACMRTUXB master...HEAD` || true
+	ln -snf "../$M-full-$blobhash.pk3" "$M-full.pk3" # from ALL branches, so beware!
+	rsync -vaSHP "$M-$blobhash.pk3" "$M-full-$blobhash.pk3" "$url_ssh"
+	rsync -vaSHP "$M.pk3" "$M-full.pk3" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "maps/$M.irc"
 	fi
