@@ -1117,9 +1117,8 @@ case "$cmd" in
 		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/dp.$suffix" "$darkplaces_files"
 		;;
 	release-engine-win32)
-		# TODO change to g++ and D3D=1 when D3D gets added
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-g++ -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=1' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
