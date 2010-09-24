@@ -1341,10 +1341,12 @@ case "$cmd" in
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
-			Xonotic/xonotic.exe
+			Xonotic/xonotic.exe \
+			Xonotic/source/darkplaces/
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
-			Xonotic/source/*/ \
+			Xonotic/source/fteqcc/ \
+			Xonotic/source/qcsrc/ \
 			Xonotic/Docs \
 			Xonotic/misc \
 			Xonotic/fteqcc \
