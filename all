@@ -111,15 +111,15 @@ enter()
 repos_urls="
 .                             |                                                   | master      |
 data/xonotic-data.pk3dir      |                                                   | master      |
-data/xonotic-maps.pk3dir      |                                                   | master      |
 data/xonotic-music.pk3dir     |                                                   | master      |
 data/xonotic-nexcompat.pk3dir |                                                   | master      | no
-mediasource                   |                                                   | master      | no
 darkplaces                    |                                                   | div0-stable | svn
-fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 |                                                   | master      | no
 netradiant                    |                                                   | master      |
+div0-gittools                 |                                                   | master      | no
 d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
+data/xonotic-maps.pk3dir      |                                                   | master      |
+mediasource                   |                                                   | master      | no
+fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
@@ -1134,41 +1134,34 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			'' ''
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-g++ -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			'' '' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="x86_64-w64-mingw32-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
-			'' ''
+			'sv-release sdl-release' 'darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="x86_64-w64-mingw32-g++ -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="x86_64-w64-mingw32-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			'' '' \
-			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
+			cl-release 'darkplaces.exe:Xonotic/xonotic-x64.exe'
 		;;
-	release-engine-osx-sv-sdl)
+	release-engine-osx)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
-		;;
-	release-engine-osx-agl)
-		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
 			'' '' \
 			'cl-release' 'darkplaces-agl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
-		;;
-	release-engine-osx)
-		verbose "$SELF" release-engine-osx-sv-sdl
-		verbose "$SELF" release-engine-osx-agl
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
