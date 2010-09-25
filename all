@@ -950,6 +950,7 @@ case "$cmd" in
 				if $gotomaster; then
 					if $fetchupstream; then
 						verbose git fetch origin
+						verbose git remote prune origin
 					fi
 					verbose git checkout -f "`repobranch "$d"`"
 					verbose git reset --hard origin/"`repobranch "$d"`"
@@ -961,6 +962,7 @@ case "$cmd" in
 					upstream="$rem/${bra#refs/heads/}"
 					if $fetchupstream; then
 						verbose git fetch "$rem"
+						verbose git remote prune "$rem"
 					fi
 					if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 						upstream="origin/`repobranch "$d"`"
