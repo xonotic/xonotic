@@ -111,14 +111,14 @@ enter()
 repos_urls="
 .                             |                                                   | master      |
 data/xonotic-data.pk3dir      |                                                   | master      |
-data/xonotic-maps.pk3dir      |                                                   | master      |
 data/xonotic-music.pk3dir     |                                                   | master      |
 data/xonotic-nexcompat.pk3dir |                                                   | master      | no
-mediasource                   |                                                   | master      | no
 darkplaces                    |                                                   | div0-stable | svn
-fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
-div0-gittools                 |                                                   | master      | no
 netradiant                    |                                                   | master      |
+div0-gittools                 |                                                   | master      | no
+data/xonotic-maps.pk3dir      |                                                   | master      |
+mediasource                   |                                                   | master      | no
+fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
