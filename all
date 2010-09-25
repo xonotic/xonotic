@@ -833,7 +833,7 @@ case "$cmd" in
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
 							reportecho4 "--> merge failed"
-						elif ! "$SELF" compile -n 2>&1 | tee "$t"; then
+						elif ! "$SELF" compile 2>&1 | tee "$t"; then
 							git reset --hard "$org"
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Compile failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
