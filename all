@@ -668,7 +668,7 @@ case "$cmd" in
 
 		if [ -n "$USE_GDB" ]; then
 			set -- gdb --args "$@"
-		elif which catchsegv >/dev/null 2>&1/; then
+		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
 		fi
 		"$@"
