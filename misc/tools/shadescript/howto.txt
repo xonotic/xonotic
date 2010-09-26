@@ -1,0 +1,9 @@
+First make sure your textures are in the correct paths, eg
+Correct: textures/yourset/wall/bricks.tga
+Wrong: textures/yourset/bricks.tga
+
+Copy shade.vbs and template.shader to textures/yourset/
+
+Edit the template.shader if you need non standard stuff
+
+Run the shade.vbs, copy textures/yourset/yourset.shader to scripts/yourset.shader, add yourset to scripts/shaderlist.txt
