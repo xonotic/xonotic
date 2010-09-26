@@ -4,7 +4,8 @@ case "$#" in
 	2)
 		;;
 	*)
-		echo "Usage: $1 directory shader.template"
+		echo "Usage: from xonotic-maps.pk3dir directory, copy and edit shader.template, then"
+		echo "  $0 texturepackname myshader.template"
 		exit 1
 		;;
 esac
