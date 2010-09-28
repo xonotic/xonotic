@@ -118,7 +118,7 @@ netradiant                    |                                                 
 div0-gittools                 |                                                   | master      | no
 data/xonotic-maps.pk3dir      |                                                   | master      |
 mediasource                   |                                                   | master      | no
-fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
+fteqcc                        | http://github.com/Blub/qclib.git                  | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
