@@ -60,7 +60,7 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 			;;
 		*metal*)
 			bounceScale=`echo "$bounceScale + 0.25" | bc -l`
-			shaderHead="$shaderHead		surfaceparm metalsteps\n"
+			shaderHead="$shaderHead	surfaceparm metalsteps\n"
 			;;
 	esac
 
@@ -88,7 +88,7 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 
 	shaderDiffuse="$F"
 	if [ -f "$F""_gloss.tga" ] || [ -f "$F""_gloss.jpg" ] || [ -f "$F""_gloss.png" ]; then
-		bounceScale=`echo "$bounceScale - 0.25" | bc -l`
+		bounceScale=`echo "$bounceScale + 0.25" | bc -l`
 	fi
 
 	if [ -f "$F""_qei.tga" ] || [ -f "$F""_qei.jpg" ] || [ -f "$F""_qei.png" ]; then
