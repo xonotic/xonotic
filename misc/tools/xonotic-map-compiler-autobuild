@@ -194,12 +194,12 @@ screenshotthemap()
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
 		if [ -n "$IRCSPAM" ]; then
-			ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" > "maps/$M.ircss"
+			ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 1 > "maps/$M.ircss"
 		fi
 		return 1
 	fi
 	if [ -n "$IRCSPAM" ]; then
-		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" > "maps/$M.ircss"
+		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
 	fi
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
