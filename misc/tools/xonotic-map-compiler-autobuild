@@ -243,6 +243,11 @@ case "$1" in
 	build)
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			case "$REFNAME" in
+				*/archived/*)
+					continue
+					;;
+			esac
 			if [ -f "$build_cachedir/$HASH" ]; then
 				continue
 			fi
@@ -257,6 +262,11 @@ case "$1" in
 	screenshot)
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			case "$REFNAME" in
+				*/archived/*)
+					continue
+					;;
+			esac
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
 			fi
