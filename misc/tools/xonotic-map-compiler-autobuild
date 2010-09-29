@@ -190,7 +190,11 @@ screenshotthemap()
 	rm -rf ~/.xonotic
 	(
 		cd ../..
-		misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
+		if [ -n "$DISPLAY" ]; then
+			misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
+		else
+			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+		fi
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
 		if [ -n "$IRCSPAM" ]; then
