@@ -201,7 +201,6 @@ screenshotthemap()
 	if [ -n "$IRCSPAM" ]; then
 		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" > "maps/$M.ircss"
 	fi
-	mv ~/.xonotic/data/screenshots "$M-$blobhash"
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
