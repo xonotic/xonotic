@@ -16,7 +16,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'r_letterbox -1' \
 	+'r_drawviewmodel 0' \
 	+'crosshair 0' \
-	+'sv_cheats 1' \
+	+'sv_cheats 2' \
 	+'set catchme "catchme_"' \
 	+"alias catchme_$count \"quit\"" \
 	+'alias "autoscreenshot" "$catchme; set catchme \"${catchme}x\"; impulse 911; defer 1 \"screenshot; autoscreenshot\""' \
