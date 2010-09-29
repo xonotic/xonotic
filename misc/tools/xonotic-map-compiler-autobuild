@@ -10,6 +10,8 @@ screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
 build_override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 screenshot_override="9 300"
 
+getthemap_fail=false
+
 allmaps()
 {
 	for F in maps/*.map.options; do
@@ -227,6 +229,7 @@ getthemap()
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
+		getthemap_fail=true
 		return 0
 	fi
 }
@@ -255,8 +258,11 @@ case "$1" in
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
-			allmaps screenshotthemap "$REFNAME" "$HASH" "$url"
-			touch "$screenshot_cachedir/$HASH"
+			allmaps getthemap "$url" "$bspdir.old" "$bspdir"
+			if ! $getthemap_fail; then
+				allmaps screenshotthemap "$REFNAME" "$HASH" "$url"
+				touch "$screenshot_cachedir/$HASH"
+			fi
 		done
 		git checkout -f master
 		;;
