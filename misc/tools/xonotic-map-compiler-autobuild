@@ -3,7 +3,7 @@
 set -e
 
 bspdir="$PWD/data"
-url=http://beta.xonotic.org/autobuild-bsp/
+http_url=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
 build_cachedir="$HOME/xonotic-map-compiler.cache/"
 screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
@@ -249,7 +249,7 @@ case "$1" in
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
-			allmaps buildthemap "$REFNAME" "$HASH" "$url"
+			allmaps buildthemap "$REFNAME" "$HASH" "$http_url"
 			touch "$build_cachedir/$HASH"
 		done
 		git checkout -f master
@@ -263,9 +263,9 @@ case "$1" in
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
-			allmaps getthemap "$url" "$bspdir.old" "$bspdir"
+			allmaps getthemap "$http_url" "$bspdir.old" "$bspdir"
 			if ! $getthemap_fail; then
-				allmaps screenshotthemap "$REFNAME" "$HASH" "$url"
+				allmaps screenshotthemap "$REFNAME" "$HASH" "$http_url"
 				touch "$screenshot_cachedir/$HASH"
 			fi
 		done
@@ -279,7 +279,7 @@ case "$1" in
 			fi
 		done
 		cd data/xonotic-maps.pk3dir
-		allmaps getthemap "$url" "$bspdir.old" "$bspdir"
+		allmaps getthemap "$http_url" "$bspdir.old" "$bspdir"
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
 		ls -l "$bspdir.old"
 		;;
@@ -287,7 +287,7 @@ case "$1" in
 		mkdir -p "$bspdir"
 		cd "$bspdir"
 		rm -f *-????????????????????????????????????????-????????????????????????????????????????.pk3
-		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url""latest"
+		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$http_url""latest"
 		;;
 	log2spam-test)
 		log2spam "mapname" "http://mapurl" "branch" "commit" "0"
