@@ -7,7 +7,7 @@ url=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
 build_cachedir="$HOME/xonotic-map-compiler.cache/"
 screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
-override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
+build_override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 screenshot_override="9 300"
 
 allmaps()
@@ -47,13 +47,24 @@ ss2spam()
 	url=$2
 	branch=$3
 	hash=$4
+	status=$5
 
 	branch=${branch##refs/heads/}
 	branch=${branch##refs/remotes/}
 	branch=${branch##origin/}
 	hash=`echo "$hash" | cut -c 1-7`
 
-	echo "[$branch $hash] screenshots of $map are available on $url"
+	s_error=
+
+	if [ "$status" -ne 0 ]; then
+		s_error="exited with status $status"
+	fi
+
+	if [ -n "$s_error" ]; then
+		echo "[$branch $hash] 4screenshots of $map could not be made: $s_error"
+	else
+		echo "[$branch $hash] screenshots of $map are available on $url"
+	fi
 }
 
 log2spam()
@@ -144,7 +155,7 @@ buildthemap()
 	t0=`date +%s`
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $override > "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $build_override > "$M.log"
 	)
 	t1=`date +%s`
 	dt=$(($t1 - $t0))
@@ -176,7 +187,14 @@ screenshotthemap()
 	fi
 	rm -rf ~/.xonotic
 	(
+		../../misc/tools/xonotic-map-screenshot "$M" $screenshot_override +scr_screenshot_name "$M"
 	)
+	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
+		if [ -n "$IRCSPAM" ]; then
+			ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" > "maps/$M.ircss"
+		fi
+		return 1
+	fi
 	if [ -n "$IRCSPAM" ]; then
 		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" > "maps/$M.ircss"
 	fi
