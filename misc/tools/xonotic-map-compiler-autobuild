@@ -206,6 +206,7 @@ screenshotthemap()
 		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
 	fi
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
+	chmod -R 1777 "$M"
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
