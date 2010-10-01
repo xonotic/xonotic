@@ -676,7 +676,7 @@ case "$cmd" in
 			set -- catchsegv "$@"
 		fi
 		rm -f xonotic.core
-		"$@"
+		"$@" || true
 		if [ -f xonotic.core ]; then
 			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
 				gdb "$binary" xonotic.core
