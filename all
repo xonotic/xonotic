@@ -678,8 +678,16 @@ case "$cmd" in
 		rm -f xonotic.core
 		"$@"
 		if [ -f xonotic.core ]; then
-			echo "The program has CRASHED. Please examine the core dump in the debugger."
-			gdb "$binary" xonotic.core
+			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
+				gdb "$binary" xonotic.core
+			#elif yesno "You did not want to examine the core dump. Do you want to provide it - including your DarkPlaces checkout - to the Xonotic developers?"; then
+			#	tar cvzf xonotic.core.tar.gz xonotic.core darkplaces/*.c darkplaces/*.h
+			#	# somehow send it
+			#	rm -f xonotic.core.tar.gz
+			else
+				echo "The core dump can be examined later by"
+				echo "  gdb $binary xonotic.core"
+			fi
 		fi
 		;;
 	each|foreach)
