@@ -666,12 +666,21 @@ case "$cmd" in
 			fi
 		fi
 
+		binary=$1
+
 		if [ -n "$USE_GDB" ]; then
 			set -- gdb --args "$@"
+		elif which gdb >/dev/null 2>&1; then
+			set -- gdb --batch -x savecore.gdb --args "$@"
 		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
 		fi
+		rm -f xonotic.core
 		"$@"
+		if [ -f xonotic.core ]; then
+			echo "The program has CRASHED. Please examine the core dump in the debugger."
+			gdb "$binary" xonotic.core
+		fi
 		;;
 	each|foreach)
 		keep_going=false
