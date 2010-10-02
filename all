@@ -119,7 +119,7 @@ div0-gittools                 |                                                 
 d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 mediasource                   |                                                   | master      | no
-fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
+fteqcc                        | http://github.com/Blub/qclib.git                  | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
@@ -667,9 +667,7 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		set -- "darkplaces/darkplaces$client" -nexuiz -customgamename Xonotic -customgamedirname1 data -customgamedirname2 "" -customgamescreenshotname xonotic -customgameuserdirname xonotic -mygames "$@"
-		# change this to:
-		#set -- "darkplaces/darkplaces$client" -xonotic -mygames "$@"
+		set -- "darkplaces/darkplaces$client" -xonotic -mygames "$@"
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
@@ -680,10 +678,29 @@ case "$cmd" in
 			fi
 		fi
 
+		binary=$1
+
 		if [ -n "$USE_GDB" ]; then
 			set -- gdb --args "$@"
+		elif which gdb >/dev/null 2>&1; then
+			set -- gdb --batch -x savecore.gdb --args "$@"
+		elif which catchsegv >/dev/null 2>&1; then
+			set -- catchsegv "$@"
 		fi
-		"$@"
+		rm -f xonotic.core
+		"$@" || true
+		if [ -f xonotic.core ]; then
+			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
+				gdb "$binary" xonotic.core
+			#elif yesno "You did not want to examine the core dump. Do you want to provide it - including your DarkPlaces checkout - to the Xonotic developers?"; then
+			#	tar cvzf xonotic.core.tar.gz xonotic.core darkplaces/*.c darkplaces/*.h
+			#	# somehow send it
+			#	rm -f xonotic.core.tar.gz
+			else
+				echo "The core dump can be examined later by"
+				echo "  gdb $binary xonotic.core"
+			fi
+		fi
 		;;
 	each|foreach)
 		keep_going=false
@@ -847,7 +864,7 @@ case "$cmd" in
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Merge failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
 							reportecho4 "--> merge failed"
-						elif ! "$SELF" compile -n 2>&1 | tee "$t"; then
+						elif ! "$SELF" compile 2>&1 | tee "$t"; then
 							git reset --hard "$org"
 							GIT_NOTES_REF=refs/notes/admin-merge git notes edit -m "Compile failed:$LF`cat "$t"`" "$ref"
 							reportdo4 cat "$t"
@@ -964,6 +981,7 @@ case "$cmd" in
 				if $gotomaster; then
 					if $fetchupstream; then
 						verbose git fetch origin
+						verbose git remote prune origin
 					fi
 					verbose git checkout -f "`repobranch "$d"`"
 					verbose git reset --hard origin/"`repobranch "$d"`"
@@ -975,6 +993,7 @@ case "$cmd" in
 					upstream="$rem/${bra#refs/heads/}"
 					if $fetchupstream; then
 						verbose git fetch "$rem"
+						verbose git remote prune "$rem"
 					fi
 					if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 						upstream="origin/`repobranch "$d"`"
@@ -1134,44 +1153,44 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			'' ''
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			'' '' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="amd64-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DSUPPORTIPV6" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc-x64.exe' \
 			'sv-release sdl-release' 'darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="x86_64-w64-mingw32-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="x86_64-w64-mingw32-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DSUPPORTIPV6" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=0' \
 			'' '' \
 			cl-release 'darkplaces.exe:Xonotic/xonotic-x64.exe'
 		;;
 	release-engine-osx)
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks -DSUPPORTIPV6"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks"' \
+			'STRIP=: CC="gcc -g -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks -DSUPPORTIPV6"' \
 			'' '' \
 			'cl-release' 'darkplaces-agl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -g -I.deps/include -L.deps/lib" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
+			'STRIP=: CC="gcc -m32 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g -I.deps/include -L.deps/lib" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
+			'STRIP=: CC="gcc -m64 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;

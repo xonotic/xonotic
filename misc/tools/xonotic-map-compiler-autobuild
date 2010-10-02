@@ -3,10 +3,14 @@
 set -e
 
 bspdir="$PWD/data"
-url=http://beta.xonotic.org/autobuild-bsp/
+url_http=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
-cachedir="$HOME/xonotic-map-compiler.cache/"
-override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
+build_cachedir="$HOME/xonotic-map-compiler.cache/"
+screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
+build_override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
+screenshot_override="9 600 +g_ctf 1"
+
+getthemap_fail=false
 
 allmaps()
 {
@@ -37,6 +41,32 @@ pre2spam()
 	hash=`echo "$hash" | cut -c 1-7`
 
 	echo "[$branch $hash] starting map compile of $map"
+}
+
+ss2spam()
+{
+	map=$1
+	url=$2
+	branch=$3
+	hash=$4
+	status=$5
+
+	branch=${branch##refs/heads/}
+	branch=${branch##refs/remotes/}
+	branch=${branch##origin/}
+	hash=`echo "$hash" | cut -c 1-7`
+
+	s_error=
+
+	if [ "$status" -ne 0 ]; then
+		s_error="exited with status $status"
+	fi
+
+	if [ -n "$s_error" ]; then
+		echo "[$branch $hash] 4screenshots of $map could not be made: $s_error"
+	else
+		echo "[$branch $hash] screenshots of $map are available on $url"
+	fi
 }
 
 log2spam()
@@ -127,7 +157,7 @@ buildthemap()
 	t0=`date +%s`
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $override > "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $build_override > "$M.log"
 	)
 	t1=`date +%s`
 	dt=$(($t1 - $t0))
@@ -147,6 +177,45 @@ buildthemap()
 	fi
 }
 
+screenshotthemap()
+{
+	REFNAME=$1
+	HASH=$2
+	url=$3
+	M=$4
+	blobhash=$5
+	if HEAD "$url$M-$blobhash/"; then
+		continue
+	fi
+	rm -rf ~/.xonotic
+	(
+		cd ../..
+		if [ -n "$DISPLAY" ]; then
+			misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
+		else
+			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+		fi
+	)
+	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
+		if [ -n "$IRCSPAM" ]; then
+			#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 1 > "maps/$M.ircss"
+			ss2spam "$M" "$url?d" "$REFNAME" "$HASH" 1 > "maps/$M.ircss"
+		fi
+		return 1
+	fi
+	if [ -n "$IRCSPAM" ]; then
+		#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
+		ss2spam "$M" "$url?d" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
+	fi
+	chmod 1777 "$M-$blobhash"
+	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
+	rsync -vaSHP "$M-$blobhash" "$url_ssh"
+	rsync -vaSHP "$M" "$url_ssh""latest/"
+	if [ -n "$IRCSPAM" ]; then
+		$IRCSPAM < "maps/$M.ircss"
+	fi
+}
+
 getthemap()
 {
 	url=$1
@@ -161,12 +230,14 @@ getthemap()
 		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 			rm -f "$bspdir/$M-$blobhash.pk3"
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
+			getthemap_fail=true
 			return 0
 		fi
 	fi
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
+		getthemap_fail=true
 		return 0
 	fi
 }
@@ -175,14 +246,51 @@ case "$1" in
 	build)
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
-			if [ -f "$cachedir/$HASH" ]; then
+			case "$REFNAME" in
+				*/archived/*)
+					continue
+					;;
+			esac
+			if [ -f "$build_cachedir/$HASH" ]; then
 				continue
 			fi
 			git reset --hard
 			git clean -xfd
 			git checkout -f "$HASH"
-			allmaps buildthemap "$REFNAME" "$HASH" "$url"
-			touch "$cachedir/$HASH"
+			allmaps buildthemap "$REFNAME" "$HASH" "$url_http"
+			touch "$build_cachedir/$HASH"
+		done
+		git checkout -f master
+		;;
+	screenshot)
+		cd data/xonotic-maps.pk3dir
+		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			case "$REFNAME" in
+				*/archived/*)
+					continue
+					;;
+			esac
+			if [ -f "$screenshot_cachedir/$HASH" ]; then
+				continue
+			fi
+			git reset --hard
+			git clean -xfd
+			git checkout -f "$HASH"
+
+			cd ../..
+			mkdir -p "$bspdir" "$bspdir.old"
+			for b in "$bspdir"/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
+				if [ -e "$b" ]; then
+					mv "$b" "$bspdir.old"/
+				fi
+			done
+			cd data/xonotic-maps.pk3dir
+			allmaps getthemap "$url_http" "$bspdir.old" "$bspdir"
+
+			if ! $getthemap_fail; then
+				allmaps screenshotthemap "$REFNAME" "$HASH" "$url_http"
+				touch "$screenshot_cachedir/$HASH"
+			fi
 		done
 		git checkout -f master
 		;;
@@ -194,7 +302,7 @@ case "$1" in
 			fi
 		done
 		cd data/xonotic-maps.pk3dir
-		allmaps getthemap "$url" "$bspdir.old" "$bspdir"
+		allmaps getthemap "$url_http" "$bspdir.old" "$bspdir"
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
 		ls -l "$bspdir.old"
 		;;
@@ -202,7 +310,7 @@ case "$1" in
 		mkdir -p "$bspdir"
 		cd "$bspdir"
 		rm -f *-????????????????????????????????????????-????????????????????????????????????????.pk3
-		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url""latest"
+		wget -r -l1 -A "*.pk3" -N --no-parent --no-directories "$url_http""latest"
 		;;
 	log2spam-test)
 		log2spam "mapname" "http://mapurl" "branch" "commit" "0"
