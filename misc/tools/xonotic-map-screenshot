@@ -20,7 +20,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'sv_cheats 2' \
 	+'set catchme "catchme_"' \
 	+"alias catchme_$count \"quit\"" \
-	+'alias "autoscreenshot" "$catchme; set catchme \"${catchme}x\"; impulse 911; defer 1 \"screenshot; autoscreenshot\""' \
+	+'alias "autoscreenshot" "$catchme; set catchme \"${catchme}x\"; impulse 911; defer 2 \"screenshot; autoscreenshot\""' \
 	+'alias cl_hook_gamestart_all "cmd join; defer 1 god; defer 2 noclip; defer 3 autoscreenshot"' \
 	+"defer \"$watchdog\" quit" \
 	+"map \"$map\"" \
