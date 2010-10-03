@@ -520,11 +520,11 @@ case "$cmd" in
 		done
 		;;
 	compile)
+		if [ -z "$CC" ]; then
+			export CC="gcc -DSUPPORT_IPV6"
+		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-debug cl-debug"
-			if [ -z "$CC" ]; then
-				export CC=gcc
-			fi
 		elif [ x"`uname`" = x"Darwin" ]; then
 			case "`uname -r`" in
 				?.*)
@@ -535,7 +535,7 @@ case "$cmd" in
 					TARGETS="sv-debug sdl-debug"
 					;;
 			esac
-			export CC="gcc -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
+			export CC="$CC -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
 			TARGETS="sv-debug cl-debug sdl-debug"
 		fi
