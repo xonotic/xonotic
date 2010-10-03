@@ -521,7 +521,7 @@ case "$cmd" in
 		;;
 	compile)
 		if [ -z "$CC" ]; then
-			export CC="gcc -DSUPPORT_IPV6"
+			export CC="gcc -DSUPPORTIPV6"
 		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-debug cl-debug"
