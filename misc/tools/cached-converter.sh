@@ -41,6 +41,7 @@ cached()
 	if ! $flag; then
 		return 0
 	fi
+	sleep 0.25
 	if [ x"$infile1" = x"$outfile1" ]; then
 		keep=true
 	fi
