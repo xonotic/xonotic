@@ -299,6 +299,13 @@ fix_upstream_rebase_mergefail()
 
 fix_git_config()
 {
+	verbose git config remote.origin.url "$1"
+	if [ -n "$2" ]; then
+		verbose git config remote.origin.pushurl "$2"
+	else
+		verbose git config --unset remote.origin.pushurl || true
+	fi
+	verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 	verbose git config core.autocrlf input
 	if [ -z "`git config push.default`" ]; then
 		verbose git config push.default current # or is tracking better?
@@ -340,14 +347,7 @@ case "$cmd" in
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
-					fix_git_config
-					verbose git config remote.origin.url "$url"
-					if [ -n "$pushurl" ]; then
-						verbose git config remote.origin.pushurl "$pushurl"
-					else
-						verbose git config --unset remote.origin.pushurl
-					fi
-					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+					fix_git_config "$url" "$pushurl"
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
@@ -370,12 +370,7 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
-				if [ -n "$pushurl" ]; then
-					verbose git config remote.origin.pushurl "$pushurl"
-				else
-					verbose git config --unset remote.origin.pushurl
-				fi
-				fix_git_config
+				fix_git_config "$url" "$pushurl"
 				if [ "$branch" != "master" ]; then
 					verbose git checkout --track -b "$branch" origin/"$branch"
 				fi
