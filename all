@@ -134,6 +134,18 @@ case "$base" in
 		exit 1
 		;;
 esac
+pushbase=`git config remote.origin.pushurl || true`
+case "$pushbase" in
+	*/xonotic.git)
+		pushbase=${pushbase%xonotic.git}
+		;;
+	'')
+		;;
+	*)
+		echo "The main repo is not xonotic.git, what have you done?"
+		exit 1
+		;;
+esac
 
 repourl()
 {
@@ -152,6 +164,27 @@ repourl()
 			echo "$base""xonotic.git"
 		else
 			echo "$base${1##*/}.git"
+		fi
+	fi
+}
+
+repopushurl()
+{
+	[ -n "$pushbase" ] || return 0
+	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	if [ -n "$repo_t" ]; then
+		case "$repo_t" in
+			*://*)
+				;;
+			*)
+				echo "$pushbase$repo_t"
+				;;
+		esac
+	else
+		if [ x"$1" = x"." ]; then
+			echo "$pushbase""xonotic.git"
+		else
+			echo "$pushbase${1##*/}.git"
 		fi
 	fi
 }
@@ -302,12 +335,18 @@ case "$cmd" in
 		fi
 		for d in $repos; do
 			url=`repourl "$d"`
+			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
 					fix_git_config
 					verbose git config remote.origin.url "$url"
+					if [ -n "$pushurl" ]; then
+						verbose git config --unset remote.origin.pushurl
+					else
+						verbose git config remote.origin.pushurl "$pushurl"
+					fi
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
@@ -331,6 +370,11 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
+				if [ -n "$pushurl" ]; then
+					verbose git config --unset remote.origin.pushurl
+				else
+					verbose git config remote.origin.pushurl "$pushurl"
+				fi
 				fix_git_config
 				if [ "$branch" != "master" ]; then
 					verbose git checkout --track -b "$branch" origin/"$branch"
