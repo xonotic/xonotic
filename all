@@ -343,9 +343,9 @@ case "$cmd" in
 					fix_git_config
 					verbose git config remote.origin.url "$url"
 					if [ -n "$pushurl" ]; then
-						verbose git config --unset remote.origin.pushurl
-					else
 						verbose git config remote.origin.pushurl "$pushurl"
+					else
+						verbose git config --unset remote.origin.pushurl
 					fi
 					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 					r=`git symbolic-ref HEAD`
@@ -371,9 +371,9 @@ case "$cmd" in
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
 				if [ -n "$pushurl" ]; then
-					verbose git config --unset remote.origin.pushurl
-				else
 					verbose git config remote.origin.pushurl "$pushurl"
+				else
+					verbose git config --unset remote.origin.pushurl
 				fi
 				fix_git_config
 				if [ "$branch" != "master" ]; then
