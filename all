@@ -335,10 +335,25 @@ case "$cmd" in
 			verbose fix_upstream_rebase_mergefail && verbose fix_upstream_rebase_mergeok
 		done
 		;;
+	fix_config)
+		for d in $repos; do
+			url=`repourl "$d"`
+			pushurl=`repopushurl "$d"`
+			branch=`repobranch "$d"`
+			if [ -d "$d0/$d" ]; then
+				enter "$d0/$d" verbose
+				fix_git_config "$url" "$pushurl"
+				cd "$d0"
+			fi
+		done
+		;;
 	update|pull)
 		allow_pull=true
 		if [ x"$1" = x"-N" ]; then
 			allow_pull=false
+		fi
+		if $allow_pull; then
+			"$SELF" fix_config
 		fi
 		for d in $repos; do
 			url=`repourl "$d"`
@@ -347,7 +362,6 @@ case "$cmd" in
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
-					fix_git_config "$url" "$pushurl"
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
@@ -949,6 +963,8 @@ case "$cmd" in
 		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
 	clean)
+		"$SELF" fix_config
+		"$SELF" update -N
 		force=false
 		gotoupstream=false
 		fetchupstream=false
