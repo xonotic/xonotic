@@ -157,7 +157,13 @@ buildthemap()
 	t0=`date +%s`
 	(
 		cd maps
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $build_override > "$M.log"
+		sz=`grep '^size\>' "$M.mapinfo" 2>/dev/null || true`
+		if [ -n "$sz" ]; then
+			minimap_override="-minimap + -minmax ${sz#size}"
+		else
+			minimap_override=
+		fi
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $build_override $minimap_override > "$M.log"
 	)
 	t1=`date +%s`
 	dt=$(($t1 - $t0))
