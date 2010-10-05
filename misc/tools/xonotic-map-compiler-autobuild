@@ -306,6 +306,9 @@ case "$1" in
 		;;
 	screenshot)
 		cd data/xonotic-maps.pk3dir
+		runmakeindex > branches.idx.new
+		rsync -vaSHP "$branches.idx.new" "$url_ssh""branches.idx.new"
+		rm -f branches.idx.new
 		branches | while read -r HASH TYPE REFNAME; do
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
@@ -322,9 +325,6 @@ case "$1" in
 			touch "$screenshot_cachedir/$HASH"
 		done
 		git checkout -f master
-		runmakeindex > branches.idx.new
-		rsync -vaSHP "$branches.idx.new" "$url_ssh""branches.idx.new"
-		rm -f branches.idx.new
 		;;
 	makeindex)
 		runmakeindex
@@ -332,7 +332,7 @@ case "$1" in
 	download)
 		rundownload
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
-		ls -l "$bspdir.old"
+		ls -l "$bspdir.old" || true
 		;;
 	download-latest)
 		mkdir -p "$bspdir"
