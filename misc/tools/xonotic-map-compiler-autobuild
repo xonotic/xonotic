@@ -279,18 +279,23 @@ rundownload()
 	cd ../..
 }
 
+branches()
+{
+	git for-each-ref 'refs/remotes' | grep -vE '	refs/remotes/([^/]*/HEAD|.*/archived/.*)$'
+}
+
+runmakeindex()
+{
+	cd data/xonotic-maps.pk3dir
+	branches | while read -r HASH TYPE REFNAME; do
+		allmaps "$HASH" indexthemap "$REFNAME"
+	done
+}
+
 case "$1" in
 	build)
 		cd data/xonotic-maps.pk3dir
-		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
-			case "$REFNAME" in
-				*/HEAD)
-					continue
-					;;
-				*/archived/*)
-					continue
-					;;
-			esac
+		branches | while read -r HASH TYPE REFNAME; do
 			if [ -f "$build_cachedir/$HASH" ]; then
 				continue
 			fi
@@ -301,15 +306,7 @@ case "$1" in
 		;;
 	screenshot)
 		cd data/xonotic-maps.pk3dir
-		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
-			case "$REFNAME" in
-				*/HEAD)
-					continue
-					;;
-				*/archived/*)
-					continue
-					;;
-			esac
+		branches | while read -r HASH TYPE REFNAME; do
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
 			fi
@@ -325,21 +322,12 @@ case "$1" in
 			touch "$screenshot_cachedir/$HASH"
 		done
 		git checkout -f master
+		runmakeindex > branches.idx.new
+		rsync -vaSHP "$branches.idx.new" "$url_ssh""branches.idx.new"
+		rm -f branches.idx.new
 		;;
 	makeindex)
-		cd data/xonotic-maps.pk3dir
-		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
-			case "$REFNAME" in
-				*/HEAD)
-					continue
-					;;
-				*/archived/*)
-					continue
-					;;
-			esac
-			allmaps "$HASH" indexthemap "$REFNAME"
-		done
-		git checkout -f master
+		runmakeindex
 		;;
 	download)
 		rundownload
