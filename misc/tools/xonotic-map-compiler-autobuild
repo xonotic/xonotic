@@ -290,6 +290,7 @@ runmakeindex()
 	branches | while read -r HASH TYPE REFNAME; do
 		allmaps "$HASH" indexthemap "$REFNAME"
 	done
+	cd ../..
 }
 
 case "$1" in
@@ -305,10 +306,10 @@ case "$1" in
 		git checkout -f master
 		;;
 	screenshot)
-		cd data/xonotic-maps.pk3dir
 		runmakeindex > branches.idx.new
 		rsync -vaSHP "$branches.idx.new" "$url_ssh""branches.idx.new"
 		rm -f branches.idx.new
+		cd data/xonotic-maps.pk3dir
 		branches | while read -r HASH TYPE REFNAME; do
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
