@@ -320,8 +320,9 @@ case "$1" in
 			fi
 
 			cd data/xonotic-maps.pk3dir
-
 			allmaps "$HASH" screenshotthemap "$REFNAME" "$url_http"
+			cd ../..
+
 			touch "$screenshot_cachedir/$HASH"
 		done
 		git checkout -f master
