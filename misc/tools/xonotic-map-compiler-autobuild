@@ -338,7 +338,9 @@ case "$1" in
 		runmakeindex
 		;;
 	download)
+		cd data/xonotic-maps.pk3dir
 		rundownload
+		cd ../..
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
 		ls -l "$bspdir.old" || true
 		;;
