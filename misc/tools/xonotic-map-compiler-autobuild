@@ -16,10 +16,16 @@ allmaps()
 {
 	commithash=$1
 	shift
-	for F in `git ls-files "$commithash" -- maps/\*.map.options`; do
-		M=${F#maps/}
-		M=${M%.map.options}
-		blobhash=`git rev-parse --revs-only "$commithash:maps/$M.map.options" || true`-`git rev-parse --revs-only "$commithash:maps/$M.map" || true`
+	for F in `git show "${commithash}:maps/"`; do
+		case "$F" in
+			*.map.options)
+				;;
+			*)
+				continue
+				;;
+		esac
+		M=${F%.map.options}
+		blobhash=`git rev-parse --revs-only "${commithash}:maps/$M.map.options" || true`-`git rev-parse --revs-only "${commithash}:maps/$M.map" || true`
 		case "$blobhash" in
 			-*)
 				;;
