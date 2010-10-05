@@ -280,9 +280,7 @@ rundownload()
 			mv "$b" "$bspdir.old"/
 		fi
 	done
-	cd data/xonotic-maps.pk3dir
 	allmaps "HEAD" getthemap "$url_http" "$bspdir.old" "$bspdir"
-	cd ../..
 }
 
 branches()
