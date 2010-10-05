@@ -134,6 +134,18 @@ case "$base" in
 		exit 1
 		;;
 esac
+pushbase=`git config remote.origin.pushurl || true`
+case "$pushbase" in
+	*/xonotic.git)
+		pushbase=${pushbase%xonotic.git}
+		;;
+	'')
+		;;
+	*)
+		echo "The main repo is not xonotic.git, what have you done?"
+		exit 1
+		;;
+esac
 
 repourl()
 {
@@ -152,6 +164,27 @@ repourl()
 			echo "$base""xonotic.git"
 		else
 			echo "$base${1##*/}.git"
+		fi
+	fi
+}
+
+repopushurl()
+{
+	[ -n "$pushbase" ] || return 0
+	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	if [ -n "$repo_t" ]; then
+		case "$repo_t" in
+			*://*)
+				;;
+			*)
+				echo "$pushbase$repo_t"
+				;;
+		esac
+	else
+		if [ x"$1" = x"." ]; then
+			echo "$pushbase""xonotic.git"
+		else
+			echo "$pushbase${1##*/}.git"
 		fi
 	fi
 }
@@ -266,6 +299,13 @@ fix_upstream_rebase_mergefail()
 
 fix_git_config()
 {
+	verbose git config remote.origin.url "$1"
+	if [ -n "$2" ]; then
+		verbose git config remote.origin.pushurl "$2"
+	else
+		verbose git config --unset remote.origin.pushurl || true
+	fi
+	verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 	verbose git config core.autocrlf input
 	if [ -z "`git config push.default`" ]; then
 		verbose git config push.default current # or is tracking better?
@@ -295,20 +335,33 @@ case "$cmd" in
 			verbose fix_upstream_rebase_mergefail && verbose fix_upstream_rebase_mergeok
 		done
 		;;
+	fix_config)
+		for d in $repos; do
+			url=`repourl "$d"`
+			pushurl=`repopushurl "$d"`
+			branch=`repobranch "$d"`
+			if [ -d "$d0/$d" ]; then
+				enter "$d0/$d" verbose
+				fix_git_config "$url" "$pushurl"
+				cd "$d0"
+			fi
+		done
+		;;
 	update|pull)
 		allow_pull=true
 		if [ x"$1" = x"-N" ]; then
 			allow_pull=false
 		fi
+		if $allow_pull; then
+			"$SELF" fix_config
+		fi
 		for d in $repos; do
 			url=`repourl "$d"`
+			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
 				if $allow_pull; then
 					enter "$d0/$d" verbose
-					fix_git_config
-					verbose git config remote.origin.url "$url"
-					verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
 					if git config branch.$r.remote >/dev/null 2>&1; then
@@ -331,7 +384,7 @@ case "$cmd" in
 			else
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
-				fix_git_config
+				fix_git_config "$url" "$pushurl"
 				if [ "$branch" != "master" ]; then
 					verbose git checkout --track -b "$branch" origin/"$branch"
 				fi
@@ -910,6 +963,8 @@ case "$cmd" in
 		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
 	clean)
+		"$SELF" fix_config
+		"$SELF" update -N
 		force=false
 		gotoupstream=false
 		fetchupstream=false
