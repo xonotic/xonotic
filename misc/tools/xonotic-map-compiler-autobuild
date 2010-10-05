@@ -14,17 +14,21 @@ getthemap_fail=false
 
 allmaps()
 {
-	for F in maps/*.map.options; do
-		if ! [ -f "$F" ]; then
-			continue
-		fi
-		if ! [ -f "${F%.options}" ]; then
-			continue
-		fi
+	commithash=$1
+	shift
+	for F in `git ls-files "$commithash" -- maps/\*.map.options`; do
 		M=${F#maps/}
 		M=${M%.map.options}
-		blobhash=`git ls-files -s -- "$F" | cut -d ' ' -f 2`-`git ls-files -s -- "${F%.options}" | cut -d ' ' -f 2`
-		"$@" "$M" "$blobhash"
+		blobhash=`git rev-parse --revs-only "$commithash:maps/$M.map.options" || true`-`git rev-parse --revs-only "$commithash:maps/$M.map" || true`
+		case "$blobhash" in
+			-*)
+				;;
+			*-)
+				;;
+			*)
+				"$@" "$M" "$blobhash" "$commithash"
+				;;
+		esac
 	done
 }
 
@@ -144,13 +148,18 @@ log2spam()
 buildthemap()
 {
 	REFNAME=$1
-	HASH=$2
-	url=$3
-	M=$4
-	blobhash=$5
+	url=$2
+	M=$3
+	blobhash=$4
+	HASH=$5
 	if HEAD "$url$M-$blobhash.pk3"; then
 		continue
 	fi
+
+	git reset --hard
+	git clean -xfd
+	git checkout -f "$HASH"
+
 	if [ -n "$IRCSPAM" ]; then
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
 	fi
@@ -180,13 +189,18 @@ buildthemap()
 screenshotthemap()
 {
 	REFNAME=$1
-	HASH=$2
-	url=$3
-	M=$4
-	blobhash=$5
+	url=$2
+	M=$3
+	blobhash=$4
+	HASH=$5
 	if HEAD "$url$M-$blobhash/"; then
 		continue
 	fi
+
+	git reset --hard
+	git clean -xfd
+	git checkout -f "$HASH"
+
 	rm -rf ~/.xonotic
 	(
 		cd ../..
@@ -223,6 +237,7 @@ getthemap()
 	bspdir=$3
 	M=$4
 	blobhash=$5
+	HASH=$6
 	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3"; then
 		continue
 	fi
@@ -242,11 +257,36 @@ getthemap()
 	fi
 }
 
+indexthemap()
+{
+	REFNAME=$1
+	M=$2
+	blobhash=$3
+	HASH=$4
+	echo "$M $blobhash $HASH $REFNAME"
+}
+
+rundownload()
+{
+	mkdir -p "$bspdir" "$bspdir.old"
+	for b in "$bspdir"/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
+		if [ -e "$b" ]; then
+			mv "$b" "$bspdir.old"/
+		fi
+	done
+	cd data/xonotic-maps.pk3dir
+	allmaps "HEAD" getthemap "$url_http" "$bspdir.old" "$bspdir"
+	cd ../..
+}
+
 case "$1" in
 	build)
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 			case "$REFNAME" in
+				*/HEAD)
+					continue
+					;;
 				*/archived/*)
 					continue
 					;;
@@ -254,10 +294,7 @@ case "$1" in
 			if [ -f "$build_cachedir/$HASH" ]; then
 				continue
 			fi
-			git reset --hard
-			git clean -xfd
-			git checkout -f "$HASH"
-			allmaps buildthemap "$REFNAME" "$HASH" "$url_http"
+			allmaps "$HASH" buildthemap "$REFNAME" "$url_http"
 			touch "$build_cachedir/$HASH"
 		done
 		git checkout -f master
@@ -266,6 +303,9 @@ case "$1" in
 		cd data/xonotic-maps.pk3dir
 		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
 			case "$REFNAME" in
+				*/HEAD)
+					continue
+					;;
 				*/archived/*)
 					continue
 					;;
@@ -273,36 +313,36 @@ case "$1" in
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
 			fi
-			git reset --hard
-			git clean -xfd
-			git checkout -f "$HASH"
 
-			cd ../..
-			mkdir -p "$bspdir" "$bspdir.old"
-			for b in "$bspdir"/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
-				if [ -e "$b" ]; then
-					mv "$b" "$bspdir.old"/
-				fi
-			done
-			cd data/xonotic-maps.pk3dir
-			allmaps getthemap "$url_http" "$bspdir.old" "$bspdir"
-
-			if ! $getthemap_fail; then
-				allmaps screenshotthemap "$REFNAME" "$HASH" "$url_http"
-				touch "$screenshot_cachedir/$HASH"
+			rundownload
+			if $getthemap_fail; then
+				continue
 			fi
+
+			cd data/xonotic-maps.pk3dir
+
+			allmaps "$HASH" screenshotthemap "$REFNAME" "$url_http"
+			touch "$screenshot_cachedir/$HASH"
+		done
+		git checkout -f master
+		;;
+	makeindex)
+		cd data/xonotic-maps.pk3dir
+		git for-each-ref 'refs/remotes' | while read -r HASH TYPE REFNAME; do
+			case "$REFNAME" in
+				*/HEAD)
+					continue
+					;;
+				*/archived/*)
+					continue
+					;;
+			esac
+			allmaps "$HASH" indexthemap "$REFNAME"
 		done
 		git checkout -f master
 		;;
 	download)
-		mkdir -p "$bspdir" "$bspdir.old"
-		for b in "$bspdir"/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
-			if [ -e "$b" ]; then
-				mv "$b" "$bspdir.old"/
-			fi
-		done
-		cd data/xonotic-maps.pk3dir
-		allmaps getthemap "$url_http" "$bspdir.old" "$bspdir"
+		rundownload
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
 		ls -l "$bspdir.old"
 		;;
