@@ -317,7 +317,7 @@ case "$1" in
 
 			git reset --hard
 			git clean -xfd
-			git checkout -f "$commithash"
+			git checkout -f "$HASH"
 
 			rundownload
 			if $getthemap_fail; then
