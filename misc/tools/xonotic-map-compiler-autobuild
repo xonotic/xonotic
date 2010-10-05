@@ -203,10 +203,6 @@ screenshotthemap()
 		continue
 	fi
 
-	git reset --hard
-	git clean -xfd
-	git checkout -f "$commithash"
-
 	rm -rf ~/.xonotic
 	(
 		cd ../..
@@ -318,6 +314,10 @@ case "$1" in
 			if [ -f "$screenshot_cachedir/$HASH" ]; then
 				continue
 			fi
+
+			git reset --hard
+			git clean -xfd
+			git checkout -f "$commithash"
 
 			rundownload
 			if $getthemap_fail; then
