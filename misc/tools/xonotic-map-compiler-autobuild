@@ -157,17 +157,17 @@ buildthemap()
 	url=$2
 	M=$3
 	blobhash=$4
-	HASH=$5
+	commithash=$5
 	if HEAD "$url$M-$blobhash.pk3"; then
 		continue
 	fi
 
 	git reset --hard
 	git clean -xfd
-	git checkout -f "$HASH"
+	git checkout -f "$commithash"
 
 	if [ -n "$IRCSPAM" ]; then
-		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" | $IRCSPAM
+		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM
 	fi
 	t0=`date +%s`
 	(
@@ -178,7 +178,7 @@ buildthemap()
 	dt=$(($t1 - $t0))
 	status=$?
 	if [ -n "$IRCSPAM" ]; then
-		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$HASH" "$status" "$dt" > "maps/$M.irc"
+		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" "$status" "$dt" > "maps/$M.irc"
 	fi
 	zip -9r "$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$M.pk3" # from ALL branches, so beware!
@@ -198,14 +198,14 @@ screenshotthemap()
 	url=$2
 	M=$3
 	blobhash=$4
-	HASH=$5
+	commithash=$5
 	if HEAD "$url$M-$blobhash/"; then
 		continue
 	fi
 
 	git reset --hard
 	git clean -xfd
-	git checkout -f "$HASH"
+	git checkout -f "$commithash"
 
 	rm -rf ~/.xonotic
 	(
@@ -218,14 +218,14 @@ screenshotthemap()
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
 		if [ -n "$IRCSPAM" ]; then
-			#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 1 > "maps/$M.ircss"
-			ss2spam "$M" "$url?d" "$REFNAME" "$HASH" 1 > "maps/$M.ircss"
+			#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
+			ss2spam "$M" "$url?d" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
 		fi
 		return 1
 	fi
 	if [ -n "$IRCSPAM" ]; then
-		#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
-		ss2spam "$M" "$url?d" "$REFNAME" "$HASH" 0 > "maps/$M.ircss"
+		#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 0 > "maps/$M.ircss"
+		ss2spam "$M" "$url?d" "$REFNAME" "$commithash" 0 > "maps/$M.ircss"
 	fi
 	chmod 1777 "$M-$blobhash"
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
@@ -243,7 +243,7 @@ getthemap()
 	bspdir=$3
 	M=$4
 	blobhash=$5
-	HASH=$6
+	commithash=$6
 	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3"; then
 		continue
 	fi
@@ -268,8 +268,8 @@ indexthemap()
 	REFNAME=$1
 	M=$2
 	blobhash=$3
-	HASH=$4
-	echo "$M $blobhash $HASH $REFNAME"
+	commithash=$4
+	echo "$M $blobhash $commithash $REFNAME"
 }
 
 rundownload()
