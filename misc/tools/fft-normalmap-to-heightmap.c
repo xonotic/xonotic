@@ -74,9 +74,9 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		imgspace1[(w*y+x)] =  nx / nz * w; /* = dz/dx */
 		imgspace2[(w*y+x)] = -ny / nz * h; /* = dz/dy */
 #else
-		imgspace1[(w*y+x)][0] =  nx / nz; /* = dz/dx */
+		imgspace1[(w*y+x)][0] =  nx / nz * w; /* = dz/dx */
 		imgspace1[(w*y+x)][1] = 0;
-		imgspace2[(w*y+x)][0] = -ny / nz; /* = dz/dy */
+		imgspace2[(w*y+x)][0] = -ny / nz * h; /* = dz/dy */
 		imgspace2[(w*y+x)][1] = 0;
 #endif
 	}
@@ -128,19 +128,20 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			for(i = -filterh / 2; i <= filterh / 2; ++i)
 				for(j = -filterw / 2; j <= filterw / 2; ++j)
 				{
-					response_x[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(TWO_PI * (j * fx + i * fy));
-					response_x[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(TWO_PI * (j * fx + i * fy));
-					response_y[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(TWO_PI * (i * fx + j * fy));
-					response_y[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(TWO_PI * (i * fx + j * fy));
+					response_x[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(-TWO_PI * (j * fx + i * fy));
+					response_x[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(-TWO_PI * (j * fx + i * fy));
+					response_y[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(-TWO_PI * (i * fx + j * fy));
+					response_y[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(-TWO_PI * (i * fx + j * fy));
 				}
 
-			sum = response_x[0] * response_x[0] + response_x[1] + response_x[1]
-			    + response_y[0] * response_y[0] + response_y[1] + response_y[1];
+			sum = response_x[0] * response_x[0] + response_x[1] * response_x[1]
+			    + response_y[0] * response_y[0] + response_y[1] * response_y[1];
 
 			if(sum > 0)
 			{
-				freqspace1[(w*y+x)][0] = (response_x[0] * freqspace1[(w*y+x)][0] + response_x[1] * freqspace1[(w*y+x)][1] + response_y[0] * freqspace2[(w*y+x)][0] + response_y[1] * freqspace2[(w*y+x)][1]) / sum;
-				freqspace1[(w*y+x)][1] = (response_x[0] * freqspace1[(w*y+x)][1] - response_x[1] * freqspace1[(w*y+x)][0] + response_y[0] * freqspace2[(w*y+x)][1] - response_y[1] * freqspace2[(w*y+x)][0]) / sum;
+				double s = freqspace1[(w*y+x)][0];
+				freqspace1[(w*y+x)][0] = (response_x[0] * s                      + response_x[1] * freqspace1[(w*y+x)][1] + response_y[0] * freqspace2[(w*y+x)][0] + response_y[1] * freqspace2[(w*y+x)][1]) / sum;
+				freqspace1[(w*y+x)][1] = (response_x[0] * freqspace1[(w*y+x)][1] - response_x[1] * s                      + response_y[0] * freqspace2[(w*y+x)][1] - response_y[1] * freqspace2[(w*y+x)][0]) / sum;
 			}
 			else
 			{
@@ -192,7 +193,8 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		v = creal(imgspace1[(w*y+x)] /= pow(w*h, 1.5));
 #else
 		v = (imgspace1[(w*y+x)][0] /= pow(w*h, 1.5));
-		imgspace1[(w*y+x)][1] /= pow(w*h, 1.5);
+		// imgspace1[(w*y+x)][1] /= pow(w*h, 1.5);
+		// this value is never used
 #endif
 		if(v < vmin || (x == 0 && y == 0))
 			vmin = v;
