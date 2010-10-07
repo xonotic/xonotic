@@ -122,7 +122,31 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			else
 				freqspace1[(w*y+x)] = 0;
 #else
-			// not yet implemented
+			fftw_complex response_x = {0, 0};
+			fftw_complex response_y = {0, 0};
+			double sum;
+			for(i = -filterh / 2; i <= filterh / 2; ++i)
+				for(j = -filterw / 2; j <= filterw / 2; ++j)
+				{
+					response_x[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(TWO_PI * (j * fx + i * fy));
+					response_x[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(TWO_PI * (j * fx + i * fy));
+					response_y[0] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cos(TWO_PI * (i * fx + j * fy));
+					response_y[1] += filter[(i + filterh / 2) * filterw + j + filterw / 2] * sin(TWO_PI * (i * fx + j * fy));
+				}
+
+			sum = response_x[0] * response_x[0] + response_x[1] + response_x[1]
+			    + response_y[0] * response_y[0] + response_y[1] + response_y[1];
+
+			if(sum > 0)
+			{
+				freqspace1[(w*y+x)][0] = (response_x[0] * freqspace1[(w*y+x)][0] + response_x[1] * freqspace1[(w*y+x)][1] + response_y[0] * freqspace2[(w*y+x)][0] + response_y[1] * freqspace2[(w*y+x)][1]) / sum;
+				freqspace1[(w*y+x)][1] = (response_x[0] * freqspace1[(w*y+x)][1] - response_x[1] * freqspace1[(w*y+x)][0] + response_y[0] * freqspace2[(w*y+x)][1] - response_y[1] * freqspace2[(w*y+x)][0]) / sum;
+			}
+			else
+			{
+				freqspace1[(w*y+x)][0] = 0;
+				freqspace1[(w*y+x)][1] = 0;
+			}
 #endif
 		}
 		else
