@@ -573,38 +573,46 @@ case "$cmd" in
 		done
 		;;
 	compile)
+		cleandp=false
+		cleanqcc=false
+		cleanqc=false
+		debug=debug
+		while :; do
+			case "$1" in
+				-c)
+					cleandp=true
+					cleanqcc=true
+					cleanqc=true
+					shift
+					;;
+				-r)
+					debug=release
+					shift
+					;;
+				*)
+					break
+					;;
+			esac
+		done
 		if [ -z "$CC" ]; then
 			export CC="gcc -DSUPPORTIPV6"
 		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			TARGETS="sv-debug cl-debug"
+			TARGETS="sv-$debug cl-$debug"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			case "`uname -r`" in
 				?.*)
-					TARGETS="sv-debug cl-debug sdl-debug"
+					TARGETS="sv-$debug cl-$debug sdl-$debug"
 					;;
 				*)
 					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
-					TARGETS="sv-debug sdl-debug"
+					TARGETS="sv-$debug sdl-$debug"
 					;;
 			esac
 			export CC="$CC -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
-			TARGETS="sv-debug cl-debug sdl-debug"
+			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
-		case "$1" in
-			-c)
-				cleandp=true
-				cleanqcc=true
-				cleanqc=true
-				shift
-				;;
-			*)
-				cleandp=false
-				cleanqcc=false
-				cleanqc=false
-				;;
-		esac
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
 			# if we give the command make the arg "", it will surely fail (invalid filename),
 			# so better handle it as an empty client option
