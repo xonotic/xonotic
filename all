@@ -341,7 +341,7 @@ case "$cmd" in
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
-				enter "$d0/$d" verbose
+				verbose cd "$d0/$d"
 				fix_git_config "$url" "$pushurl"
 				cd "$d0"
 			fi
