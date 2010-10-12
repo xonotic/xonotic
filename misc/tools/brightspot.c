@@ -52,6 +52,20 @@ static const double skyboxtexcoord2f[6*4*2] =
     0, 0
 };
 
+#define GET_SKY_IMAGE(x,y,z) \
+	(fabs(x)>=fabs(y) && fabs(x)>=fabs(z)) ?  (((x) > 0) ? 0 : 1) : \
+	(fabs(y)>=fabs(x) && fabs(y)>=fabs(z)) ?  (((y) > 0) ? 2 : 3) : \
+	                                          (((z) > 0) ? 4 : 5)
+
+int highest[6] =
+{
+	0,
+	0,
+	1,
+	1,
+	2,
+	2
+};
 
 static const double skyboxvertex3f[6*4*3] =
 {
@@ -117,6 +131,56 @@ void Map3f(double u, double v, const double *corners, double *x, double *y, doub
 	*z = corners[2] + u * (corners[5] - corners[2]) + v * (corners[8] - corners[5]);
 }
 
+void Map2f(double u, double v, const double *corners, double *x, double *y)
+{
+	*x = u * (corners[2] - corners[0]) + v * (corners[4] - corners[2]) + corners[0];
+	*y = u * (corners[3] - corners[1]) + v * (corners[5] - corners[3]) + corners[1];
+}
+
+void Unmap3f(double x, double y, double z, const double *corners, double *u, double *v)
+{
+	//*x = corners[0] + u * (corners[3] - corners[0]) + v * (corners[6] - corners[3]);
+	//*y = corners[1] + u * (corners[4] - corners[1]) + v * (corners[7] - corners[4]);
+	//*z = corners[2] + u * (corners[5] - corners[2]) + v * (corners[8] - corners[5]);
+	// THREE equations, TWO would be better! Let's simply use the two "better" ones
+	
+	double xc0 = x - corners[0];
+	double yc1 = y - corners[1];
+	double zc2 = z - corners[2];
+	double c30 = corners[3] - corners[0];
+	double c41 = corners[4] - corners[1];
+	double c52 = corners[5] - corners[2];
+	double c63 = corners[6] - corners[3];
+	double c74 = corners[7] - corners[4];
+	double c85 = corners[8] - corners[5];
+
+	double det_x = c41 * c85 - c52 * c74;
+	double det_y = c30 * c85 - c52 * c63;
+	double det_z = c30 * c74 - c41 * c63;
+
+	if(fabs(det_x) >= fabs(det_y) && fabs(det_x) >= fabs(det_z))
+	{
+		double du = yc1 * c85 - zc2 * c74;
+		double dv = c41 * zc2 - c52 * yc1;
+		*u = du / det_x;
+		*v = dv / det_x;
+	}
+	else if(fabs(det_y) >= fabs(det_z))
+	{
+		double du = xc0 * c85 - zc2 * c63;
+		double dv = c30 * zc2 - c52 * xc0;
+		*u = du / det_y;
+		*v = dv / det_y;
+	}
+	else
+	{
+		double du = xc0 * c74 - yc1 * c63;
+		double dv = c30 * yc1 - c41 * xc0;
+		*u = du / det_z;
+		*v = dv / det_z;
+	}
+}
+
 void MapCoord(int pic, int y, int x, double vec[3])
 {
 	int h;
@@ -138,6 +202,44 @@ void MapCoord(int pic, int y, int x, double vec[3])
 
 	Unmap2f((x + 0.5) / 512.0, (y + 0.5) / 512.0, skyboxtexcoord2f + 4*2*pic, &u, &v);
 	Map3f(u, v, skyboxvertex3f + 6*2*pic, &vec[0], &vec[1], &vec[2]);
+}
+
+void UnmapCoord(const double vec_[3], int *pic, int *y, int *x)
+{
+	int h;
+	int flipx;
+	int flipy;
+	int flipdiag;
+	double u, v, xx, yy;
+	double f;
+	double vec[3];
+
+	// identify which pic it is
+	*pic = GET_SKY_IMAGE(vec_[0], vec_[1], vec_[2]);
+	f = 16.0/fabs(vec_[highest[*pic]]);
+	vec[0] = vec_[0] * f;
+	vec[1] = vec_[1] * f;
+	vec[2] = vec_[2] * f;
+	flipx = flip[3*(*pic)+0];
+	flipy = flip[3*(*pic)+1];
+	flipdiag = flip[3*(*pic)+2];
+
+	*x = *y = 0;
+	Unmap3f(vec[0], vec[1], vec[2], skyboxvertex3f + 6*2*(*pic), &u, &v);
+	Map2f(u, v, skyboxtexcoord2f + 4*2*(*pic), &xx, &yy);
+	*x = (int) (xx * 512.0 + 0.5);
+	*y = (int) (yy * 512.0 + 0.5);
+
+	if(flipdiag)
+	{
+		h = *x; *x = *y; *y = h;
+	}
+
+	if(flipy)
+		*y = 511 - *y;
+
+	if(flipx)
+		*x = 511 - *x;
 }
 
 int main(int argc, char **argv)
@@ -185,11 +287,18 @@ int main(int argc, char **argv)
 			}
 
 	l = sqrt(brightvec[0]*brightvec[0] + brightvec[1]*brightvec[1] + brightvec[2]*brightvec[2]);
-	fprintf(stderr, "vec = %f %f %f\n", brightvec[0] / l, brightvec[1] / l, brightvec[2] / l);
+	l /= 16;
+	brightvec[0] /= l;
+	brightvec[1] /= l;
+	brightvec[2] /= l;
+	fprintf(stderr, "vec = %f %f %f\n", brightvec[0], brightvec[1], brightvec[2]);
+	UnmapCoord(brightvec, &i, &j, &k);
+	fprintf(stderr, "picture %d pixel (%d %d) value %d\n", i, k, j, picture[i][j][k]);
 	
 	pitch = atan2(brightvec[2], sqrt(brightvec[0]*brightvec[0] + brightvec[1]*brightvec[1]));
 	yaw = atan2(brightvec[1], brightvec[0]);
 
 	printf("%f %f\n", yaw * 180 / M_PI, pitch * 180 / M_PI);
+
 	return 0;
 }
