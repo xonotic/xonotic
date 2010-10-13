@@ -577,6 +577,9 @@ case "$cmd" in
 		cleanqcc=false
 		cleanqc=false
 		debug=debug
+		if [ -z "$CC" ]; then
+			export CC="gcc -DSUPPORTIPV6"
+		fi
 		while :; do
 			case "$1" in
 				-c)
@@ -587,6 +590,7 @@ case "$cmd" in
 					;;
 				-r)
 					debug=release
+					export CC="$CC -mtune=native -march=native"
 					shift
 					;;
 				*)
@@ -594,9 +598,6 @@ case "$cmd" in
 					;;
 			esac
 		done
-		if [ -z "$CC" ]; then
-			export CC="gcc -DSUPPORTIPV6"
-		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-$debug cl-$debug"
 		elif [ x"`uname`" = x"Darwin" ]; then
