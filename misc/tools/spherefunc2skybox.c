@@ -141,6 +141,65 @@ void color_mandelbrot(double x, double y, double z, double *r, double *g, double
 	*b = pow(iterations, color_mandelbrot_parms[12]);
 }
 
+struct
+{
+	int n;
+}
+color_starfield_parms;
+void color_starfield(double x, double y, double z, double *r, double *g, double *b)
+{
+	static struct
+	{
+		double x, y, z, e;
+		double R, G, B, A;
+	} *starfield = NULL;
+	int i;
+
+	if(!starfield)
+	{
+		fprintf(stderr, "Initializing starfield...\n");
+		starfield = malloc(sizeof(*starfield) * color_starfield_parms.n);
+		for(i = 0; i < color_starfield_parms.n; ++i)
+		{
+			double r;
+			do
+			{
+				starfield[i].x = rnd() * 2 - 1;
+				starfield[i].y = rnd() * 2 - 1;
+				starfield[i].z = rnd() * 2 - 1;
+				r = starfield[i].x * starfield[i].x
+				  + starfield[i].y * starfield[i].y
+				  + starfield[i].z * starfield[i].z;
+			}
+			while(r > 1);
+			r = sqrt(r);
+			starfield[i].x /= r;
+			starfield[i].y /= r;
+			starfield[i].z /= r;
+
+			starfield[i].e = rnd() * 100 + 5;
+
+			starfield[i].R = rnd();
+			starfield[i].G = rnd();
+			starfield[i].B = rnd();
+			starfield[i].A = rnd();
+		}
+		fprintf(stderr, "Done.\n");
+	}
+
+	*r = *g = *b = 0;
+	for(i = 0; i < color_starfield_parms.n; ++i)
+	{
+		double dot = x * starfield[i].x + y * starfield[i].y + z * starfield[i].z;
+		if(dot <= 0)
+			continue;
+		double f = pow(dot, starfield[i].e) * starfield[i].A;
+		*r += starfield[i].R * f;
+		*g += starfield[i].G * f;
+		*b += starfield[i].B * f;
+	}
+}
+
 void map_back(double x_in, double y_in, double *x_out, double *y_out, double *z_out)
 {
 	*x_out = 2 * x_in - 1;
@@ -260,10 +319,15 @@ int main(int argc, char **argv)
 		color_mandelbrot_parms[11] = argc<=15 ?   0.5   : atof(argv[15]);
 		color_mandelbrot_parms[12] = argc<=16 ?   0.2   : atof(argv[16]);
 	}
+	else if(!strcmp(argv[3], "starfield"))
+	{
+		f = color_starfield;
+		color_starfield_parms.n = argc<= 4 ? 1024 : atoi(argv[4]);
+	}
 	else
 	{
 		f = color_test;
 	}
-	map_all(argv[1], color_mandelbrot, res, res);
+	map_all(argv[1], f, res, res);
 	return 0;
 }
