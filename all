@@ -1075,6 +1075,8 @@ case "$cmd" in
 						verbose git branch -D "${B#refs/heads/}"
 					fi
 				done
+				verbose git branch -t master origin/master || true
+				verbose git branch -t "`repobranch "$d"`" origin/"`repobranch "$d"`" || true
 			fi
 		done
 		;;
