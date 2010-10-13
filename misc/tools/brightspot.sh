@@ -26,6 +26,7 @@ ext=${i##*.}
 name=${i%.*}
 name=${name%_[rlbfud][tfktpn]}
 
+echo >&2 "Order: 0=rt 1=lf 2=bk 3=ft 4=up 5=dn"
 {
 	convert "$name"_rt."$ext" -depth 8 -geometry 512x512 GRAY:-
 	convert "$name"_lf."$ext" -depth 8 -geometry 512x512 GRAY:-
