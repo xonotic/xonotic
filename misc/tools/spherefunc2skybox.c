@@ -144,6 +144,9 @@ void color_mandelbrot(double x, double y, double z, double *r, double *g, double
 struct
 {
 	int n;
+	double darkness;
+	double power;
+	double density;
 }
 color_starfield_parms;
 void color_starfield(double x, double y, double z, double *r, double *g, double *b)
@@ -154,6 +157,7 @@ void color_starfield(double x, double y, double z, double *r, double *g, double 
 		double R, G, B, A;
 	} *starfield = NULL;
 	int i;
+	double f;
 
 	if(!starfield)
 	{
@@ -177,11 +181,15 @@ void color_starfield(double x, double y, double z, double *r, double *g, double 
 			starfield[i].y /= r;
 			starfield[i].z /= r;
 
-			starfield[i].e = rnd() * 100 + 5;
+			starfield[i].e = color_starfield_parms.density * pow(rnd(), -color_starfield_parms.power);
 
 			starfield[i].R = rnd();
 			starfield[i].G = rnd();
 			starfield[i].B = rnd();
+			f = starfield[i].R * 0.299 + starfield[i].G * 0.587 + starfield[i].B * 0.114;
+			starfield[i].R /= f;
+			starfield[i].G /= f;
+			starfield[i].B /= f;
 			starfield[i].A = rnd();
 		}
 		fprintf(stderr, "Done.\n");
@@ -198,6 +206,10 @@ void color_starfield(double x, double y, double z, double *r, double *g, double 
 		*g += starfield[i].G * f;
 		*b += starfield[i].B * f;
 	}
+	// make fit in 0..1
+	*r = *r / (color_starfield_parms.darkness + *r);
+	*g = *g / (color_starfield_parms.darkness + *g);
+	*b = *b / (color_starfield_parms.darkness + *b);
 }
 
 void map_back(double x_in, double y_in, double *x_out, double *y_out, double *z_out)
@@ -246,6 +258,7 @@ void writepic(colorfunc_t f, mapfunc_t m, const char *fn, int width, int height)
 {
 	int x, y;
 	uint8_t tga[18];
+	int percent, p;
 
 	FILE *file = fopen(fn, "wb");
 	if(!file)
@@ -260,7 +273,9 @@ void writepic(colorfunc_t f, mapfunc_t m, const char *fn, int width, int height)
 	tga[16] = 24;        // pixel size
 
 	fwrite(&tga, sizeof(tga), 1, file);
+	percent = 0;
 	for(y = height-1; y >= 0; --y)
+	{
 		for(x = 0; x < width; ++x)
 		{
 			uint8_t rgb[3];
@@ -281,6 +296,14 @@ void writepic(colorfunc_t f, mapfunc_t m, const char *fn, int width, int height)
 			rgb[0] = floor(rnd() + bb * 255);
 			fwrite(rgb, sizeof(rgb), 1, file);
 		}
+		p = (100 * (height - y)) / height;
+		if(p != percent)
+		{
+			percent = p;
+			fprintf(stderr, "%d%%\r", percent);
+		}
+	}
+	fprintf(stderr, "\n");
 	
 	fclose(file);
 }
@@ -288,11 +311,17 @@ void writepic(colorfunc_t f, mapfunc_t m, const char *fn, int width, int height)
 void map_all(const char *fn, colorfunc_t f, int width, int height)
 {
 	char buf[1024];
+	fprintf(stderr, "%s_bk.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_bk.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_back, buf, width, height);
+	fprintf(stderr, "%s_ft.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_ft.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_front, buf, width, height);
+	fprintf(stderr, "%s_rt.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_rt.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_right, buf, width, height);
+	fprintf(stderr, "%s_lf.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_lf.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_left, buf, width, height);
+	fprintf(stderr, "%s_up.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_up.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_up, buf, width, height);
+	fprintf(stderr, "%s_dn.tga\n", fn);
 	snprintf(buf, sizeof(buf), "%s_dn.tga", fn); buf[sizeof(buf) - 1] = 0; writepic(f, map_down, buf, width, height);
 }
 
@@ -322,7 +351,10 @@ int main(int argc, char **argv)
 	else if(!strcmp(argv[3], "starfield"))
 	{
 		f = color_starfield;
-		color_starfield_parms.n = argc<= 4 ? 1024 : atoi(argv[4]);
+		color_starfield_parms.n = argc<= 4 ? 8192 : atoi(argv[4]);
+		color_starfield_parms.darkness = argc<= 5 ? 0.4 : atof(argv[5]);
+		color_starfield_parms.power = argc<= 6 ? 2.5 : atof(argv[6]);
+		color_starfield_parms.density = argc<= 7 ? 60000 : atof(argv[7]);
 	}
 	else
 	{
