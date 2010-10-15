@@ -1106,7 +1106,7 @@ case "$cmd" in
 				msg "        +---------------------------------------------------------^---+"
 				msg "        |   ____                                                      |"
 				msg "        |  /    \  This is the official release build system.         |"
-				msg "        | |      | If you are no member of the Xonotic Core Team,     |"
+				msg "        | |      | If you are not a member of the Xonotic Core Team,  |"
 				msg "        | | STOP | you are not supposed to use this script and should |"
 				msg "        | |      | instead use ./all compile to compile the engine    |"
 				msg "        |  \____/  and game code.                                     |"
