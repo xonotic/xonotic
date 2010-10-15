@@ -147,17 +147,32 @@ struct
 	double darkness;
 	double power;
 	double density;
+	int g;
+	double gpower;
+	double gfactor;
+	double gdpower;
 }
 color_starfield_parms;
+typedef struct
+{
+	double x, y, z, e;
+	double R, G, B, A;
+} starfield_t;
+starfield_t *starfield = NULL;
+int starfield_cmp(const void *a_, const void *b_)
+{
+	const starfield_t *a = a_;
+	const starfield_t *b = b_;
+	if(a->z < b->z)
+		return -1;
+	if(a->z > b->z)
+		return +1;
+	return 0;
+}
 void color_starfield(double x, double y, double z, double *r, double *g, double *b)
 {
-	static struct
-	{
-		double x, y, z, e;
-		double R, G, B, A;
-	} *starfield = NULL;
-	int i;
-	double f;
+	int i, j, k;
+	double f, mindot, d;
 
 	if(!starfield)
 	{
@@ -176,12 +191,6 @@ void color_starfield(double x, double y, double z, double *r, double *g, double 
 				  + starfield[i].z * starfield[i].z;
 			}
 			while(r > 1);
-			r = sqrt(r);
-			starfield[i].x /= r;
-			starfield[i].y /= r;
-			starfield[i].z /= r;
-
-			starfield[i].e = color_starfield_parms.density * pow(rnd(), -color_starfield_parms.power);
 
 			starfield[i].R = rnd();
 			starfield[i].G = rnd();
@@ -191,15 +200,39 @@ void color_starfield(double x, double y, double z, double *r, double *g, double 
 			starfield[i].G /= f;
 			starfield[i].B /= f;
 			starfield[i].A = rnd();
+			starfield[i].e = color_starfield_parms.density * pow(rnd(), -color_starfield_parms.power);
 		}
+		fprintf(stderr, "Gravitating starfield...\n");
+		for(k = 0; k < color_starfield_parms.g; ++k)
+		{
+			i = rand() % color_starfield_parms.n;
+			j = rand() % color_starfield_parms.n;
+			f = pow(rnd(), color_starfield_parms.gpower);
+			f = f * color_starfield_parms.gfactor;
+			d = pow(starfield[j].x - starfield[i].x, 2)
+			  + pow(starfield[j].y - starfield[i].y, 2)
+			  + pow(starfield[j].z - starfield[i].z, 2);
+			f *= pow(1 / (1 + d), color_starfield_parms.gdpower);
+			starfield[i].x += f * (starfield[j].x - starfield[i].x);
+			starfield[i].y += f * (starfield[j].y - starfield[i].y);
+			starfield[i].z += f * (starfield[j].z - starfield[i].z);
+			double r = starfield[i].x * starfield[i].x + starfield[i].y * starfield[i].y + starfield[i].z * starfield[i].z;
+			r = sqrt(r);
+			starfield[i].x /= r;
+			starfield[i].y /= r;
+			starfield[i].z /= r;
+		}
+		fprintf(stderr, "Sorting starfield...\n");
+		qsort(starfield, sizeof(*starfield), color_starfield_parms.n, starfield_cmp);
 		fprintf(stderr, "Done.\n");
 	}
 
 	*r = *g = *b = 0;
+	mindot = pow(1/256.0, 1.0/color_starfield_parms.density);
 	for(i = 0; i < color_starfield_parms.n; ++i)
 	{
 		double dot = x * starfield[i].x + y * starfield[i].y + z * starfield[i].z;
-		if(dot <= 0)
+		if(dot <= mindot)
 			continue;
 		double f = pow(dot, starfield[i].e) * starfield[i].A;
 		*r += starfield[i].R * f;
@@ -355,6 +388,10 @@ int main(int argc, char **argv)
 		color_starfield_parms.darkness = argc<= 5 ? 0.4 : atof(argv[5]);
 		color_starfield_parms.power = argc<= 6 ? 2.5 : atof(argv[6]);
 		color_starfield_parms.density = argc<= 7 ? 60000 : atof(argv[7]);
+		color_starfield_parms.g = argc<= 8 ? 10000000 : atoi(argv[8]);
+		color_starfield_parms.gpower = argc<= 9 ? 3 : atoi(argv[9]);
+		color_starfield_parms.gfactor = argc<= 10 ? 0.9 : atof(argv[10]);
+		color_starfield_parms.gdpower = argc<= 11 ? 15 : atof(argv[11]);
 	}
 	else
 	{
