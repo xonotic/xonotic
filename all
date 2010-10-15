@@ -668,9 +668,41 @@ case "$cmd" in
 		fi
 		if ! [ -f Makefile ]; then
 			verbose sh autogen.sh
-			verbose ./configure
+			verbose ./configure || true
 		fi
-		verbose make $MAKEFLAGS
+		if ! verbose make $MAKEFLAGS; then
+			# compilation of crypto library failed
+			# use binaries then, if we can...
+			mkdir -p .libs
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+				cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+			else
+				case "`uname`" in
+					Linux)
+						case `uname -m` in
+							x86_64)
+								cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
+								cp "$d0/misc/builddeps/dp.linux64/lib/libgmp.so*" .libs/
+								;;
+							*86)
+								cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
+								cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								;;
+							*)
+								error "Please install libgmp development libraries first"
+								;;
+						esac
+						;;
+					Darwin)
+						cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						;;
+					*)
+						error "Please install libgmp development libraries first"
+						;;
+				esac
+			fi
+		fi
 
 		enter "$d0/fteqcc" verbose
 		if $cleanqcc; then
