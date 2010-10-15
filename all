@@ -117,7 +117,7 @@ data/xonotic-nexcompat.pk3dir |                                                 
 darkplaces                    |                                                   | div0-stable | svn
 netradiant                    |                                                   | master      |
 div0-gittools                 |                                                   | master      | no
-d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
+d0_blind_id                   | git://github.com/divVerent/d0_blind_id.git        | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 mediasource                   |                                                   | master      | no
 fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
@@ -579,12 +579,16 @@ case "$cmd" in
 		cleandp=false
 		cleanqcc=false
 		cleanqc=false
+		compiled0=false
 		debug=debug
 		if [ -z "$CC" ]; then
 			export CC="gcc -DSUPPORTIPV6"
 		fi
 		while :; do
 			case "$1" in
+				-0)
+					compiled0=true
+					;;
 				-c)
 					cleand0=true
 					cleandp=true
@@ -663,45 +667,52 @@ case "$cmd" in
 		fi
 
 		enter "$d0/d0_blind_id" verbose
-		if $cleand0; then
-			verbose make $MAKEFLAGS distclean
-		fi
-		if ! [ -f Makefile ]; then
-			verbose sh autogen.sh
-			verbose ./configure || true
-		fi
-		if ! verbose make $MAKEFLAGS; then
+		if ! $compiled0; then
 			# compilation of crypto library failed
 			# use binaries then, if we can...
 			mkdir -p .libs
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
-				cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
 			else
 				case "`uname`" in
 					Linux)
 						case `uname -m` in
 							x86_64)
-								cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
-								cp "$d0/misc/builddeps/dp.linux64/lib/libgmp.so*" .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
 								;;
 							*86)
-								cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
-								cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
 								;;
 							*)
-								error "Please install libgmp development libraries first"
+								compiled0=true
 								;;
 						esac
 						;;
 					Darwin)
-						cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
 						;;
 					*)
-						error "Please install libgmp development libraries first"
+						compiled0=true
 						;;
 				esac
 			fi
+		fi
+		if $compiled0; then
+			if $cleand0; then
+				if [ -f Makefile ]; then
+					verbose make $MAKEFLAGS distclean
+				fi
+			fi
+			if ! [ -f Makefile ]; then
+				verbose sh autogen.sh
+				verbose ./configure
+			fi
+			verbose make $MAKEFLAGS
 		fi
 
 		enter "$d0/fteqcc" verbose
