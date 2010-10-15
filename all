@@ -6,6 +6,7 @@ set -e
 # I use this in EVERY shell script ;)
 LF="
 "
+ESC=""
 
 d00=`pwd`
 while ! [ -f ./all ]; do
@@ -35,7 +36,7 @@ esac
 
 msg()
 {
-	echo >&2 "[1m$*[m"
+	echo >&2 "$ESC[1m$*$ESC[m"
 }
 
 self=`git hash-object "$SELF"`
@@ -1093,7 +1094,45 @@ case "$cmd" in
 				msg "Building a RELEASE"
 				;;
 			*)
-				msg "Must either set RELEASETYPE=beta or RELEASETYPE=release"
+				echo >&2 -n "$ESC[2J$ESC[H"
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg "        +---------------------------------------------------------.---+"
+				msg "        | NOTE                                                    | X |"
+				msg "        +---------------------------------------------------------^---+"
+				msg "        |   ____                                                      |"
+				msg "        |  /    \  This is the official release build system.         |"
+				msg "        | |      | If you are no member of the Xonotic Core Team,     |"
+				msg "        | | STOP | you are not supposed to use this script and should |"
+				msg "        | |      | instead use ./all compile to compile the engine    |"
+				msg "        |  \____/  and game code.                                     |"
+				msg "        |                                                             |"
+				msg "        |                      [ I understand ]                       |"
+				msg "        +-------------------------------------------------------------+"
+				sleep 10
+				# A LOT of build infrastructure is required:
+				# - vorbis-tools
+				# - ImageMagick
+				# - .ssh/config must be configured so the following
+				#   host names are reachable and have a compile
+				#   infrastructure set up:
+				#   - xonotic-build-linux32 (with gcc on x86)
+				#   - xonotic-build-linux64 (with gcc on x86_64)
+				#   - xonotic-build-win32 (with i586-mingw32msvc-g++)
+				#   - xonotic-build-win64 (with amd64-mingw32msvc-g++
+				#     and x86_64-w64-mingw32-g++)
+				#   - xonotic-build-osx (with Xcode and SDL.framework)
+				# - AMD Compressonator installed in WINE
+				# - ResEdit installed in WINE
+				# - a lot of other requirements you will figure out
+				#   while reading the error messages
+				# - environment variable RELEASETYPE set
+				# - optionally, environment variable RELEASEDATE set
+				#   (YYYYMMDD)
 				exit 1
 				;;
 		esac
