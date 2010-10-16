@@ -351,10 +351,34 @@ case "$cmd" in
 		;;
 	update|pull)
 		allow_pull=true
-		if [ x"$1" = x"-N" ]; then
-			allow_pull=false
+		fix_config=false
+		while :; do
+			if [ x"$1" = x"-N" ]; then
+				allow_pull=false
+			elif [ x"$1" = x"-p" ]; then
+				fix_config=true
+				pushbase=ssh://xonotic@git.xonotic.org/
+			elif [ x"$1" = x"-s" ]; then
+				fix_config=true
+				base=ssh://xonotic@git.xonotic.org/
+				pushbase=
+			elif [ x"$1" = x"-g" ]; then
+				fix_config=true
+				base=git://git.xonotic.org/xonotic/
+			elif [ x"$1" = x"-h" ]; then
+				fix_config=true
+				base=http://git.xonotic.org/xonotic/
+			else
+				break
+			fi
+			shift
+		done
+		if $fix_config; then
+			url=`repourl .`
+			pushurl=`repopushurl .`
+			fix_git_config "$url" "$pushurl"
 		fi
-		if $allow_pull; then
+		if $allow_pull || $fix_config; then
 			"$SELF" fix_config
 		fi
 		for d in $repos; do
