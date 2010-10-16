@@ -1664,9 +1664,10 @@ case "$cmd" in
 		echo "  $SELF checkout|switch <remote>/<branch>"
 		echo "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
 		echo "  $SELF clean --reclone"
-		echo "  $SELF compile [-c]"
+		echo "  $SELF compile [-c] [-r] [-0]"
 		echo "  $SELF each|foreach [-k] command..."
 		echo "  $SELF fix_upstream_rebase"
+		echo "  $SELF keygen"
 		echo "  $SELF merge"
 		echo "  $SELF push|commit [-s]"
 		echo "  $SELF release"
@@ -1674,6 +1675,6 @@ case "$cmd" in
 		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
 		echo "  $SELF save-patches"
 		echo "  $SELF update-maps"
-		echo "  $SELF update|pull [-N]"
+		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]]"
 		;;
 esac
