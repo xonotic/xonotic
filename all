@@ -365,6 +365,9 @@ case "$cmd" in
 			msg "apply for access and paste the following output into the ticket:"
 			msg ""
 			msg "`cat ~/.ssh/id_rsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
 		elif [ -f ~/.ssh/id_dsa.pub ]; then
 			msg ""
 			msg "A key already exists and no new one will be generated. If you"
@@ -377,6 +380,9 @@ case "$cmd" in
 			msg "apply for access and paste the following output into the ticket:"
 			msg ""
 			msg "`cat ~/.ssh/id_dsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
 		else
 			msg ""
 			msg "No key has been generated yet. One will be generated now."
@@ -391,6 +397,9 @@ case "$cmd" in
 			msg "apply for access and paste the following output into the ticket:"
 			msg ""
 			msg "`cat ~/.ssh/id_rsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
 		fi
 		;;
 	update|pull)
