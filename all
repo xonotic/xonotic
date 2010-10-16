@@ -387,7 +387,8 @@ case "$cmd" in
 			msg ""
 			msg "No key has been generated yet. One will be generated now."
 			msg "If other people are using your computer, it is recommended"
-			msg "to specify a passphrase."
+			msg "to specify a passphrase. Otherwise you can simply hit ENTER"
+			msg "when asked for a passphrase."
 			msg ""
 			ssh-keygen -t rsa -b 4096
 			msg ""
