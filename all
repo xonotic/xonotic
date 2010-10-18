@@ -428,12 +428,14 @@ case "$cmd" in
 			elif [ x"$1" = x"-l" ]; then
 				case "$2" in
 					nl) ;;
-					# de) ;;
+					de) ;;
+					default) ;;
 					*)
 						msg "Invalid location!"
 						msg "Possible locations for the -l option:"
 						msg "  nl (Netherlands, run by merlijn)"
-						#msg "  de (Germany, run by divVerent)"
+						msg "  de (Germany, run by divVerent)"
+						msg "  default (currently nl)"
 						exit 1
 						;;
 				esac
@@ -446,7 +448,7 @@ case "$cmd" in
 			shift
 		done
 		case "$location" in
-			main|nl)
+			default)
 				location=
 				;;
 			current)
@@ -1715,6 +1717,6 @@ case "$cmd" in
 		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
 		echo "  $SELF save-patches"
 		echo "  $SELF update-maps"
-		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l country]"
+		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
 		;;
 esac
