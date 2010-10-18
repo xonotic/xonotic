@@ -406,6 +406,7 @@ case "$cmd" in
 	update|pull)
 		allow_pull=true
 		fix_config=false
+		location=current
 		while :; do
 			if [ x"$1" = x"-N" ]; then
 				allow_pull=false
@@ -424,11 +425,49 @@ case "$cmd" in
 			elif [ x"$1" = x"-h" ]; then
 				fix_config=true
 				base=http://git.xonotic.org/xonotic/
+			elif [ x"$1" = x"-l" ]; then
+				case "$2" in
+					nl) ;;
+					# de) ;;
+					*)
+						msg "Invalid location!"
+						msg "Possible locations for the -l option:"
+						msg "  nl (Netherlands, run by merlijn)"
+						#msg "  de (Germany, run by divVerent)"
+						exit 1
+						;;
+				esac
+				fix_config=true
+				location=$2
+				shift
 			else
 				break
 			fi
 			shift
 		done
+		case "$location" in
+			main|nl)
+				location=
+				;;
+			current)
+				case "$base" in
+					*://*.git.xonotic.org/*)
+						location=${base%%.git.xonotic.org/*}
+						location=${location##*://}
+						;;
+					*)
+						location=
+						;;
+				esac
+				;;
+		esac
+		if [ -n "$location" ]; then
+			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+		else
+			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
+			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
+		fi
 		if $fix_config; then
 			url=`repourl .`
 			pushurl=`repopushurl .`
@@ -1676,6 +1715,6 @@ case "$cmd" in
 		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
 		echo "  $SELF save-patches"
 		echo "  $SELF update-maps"
-		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]]"
+		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l country]"
 		;;
 esac
