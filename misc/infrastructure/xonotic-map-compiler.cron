@@ -1,0 +1,17 @@
+#!/bin/sh
+
+mepwd=$PWD
+me=$0
+if ! lockfile-create "$me"; then
+	exit 1
+fi
+lockfile-touch "$me" & lockpid=$!
+trap 'kill $lockpid || true; cd "$mepwd"; lockfile-remove "$me"' EXIT
+trap 'exit 1' INT TERM
+
+set -e
+cd xonotic-map-compiler
+./all clean -m -fU -D
+# like reclone but do not delete untracked, so q3map2.x86 compile stays
+make -C netradiant install/q3map2.x86
+./misc/tools/xonotic-map-compiler-autobuild build

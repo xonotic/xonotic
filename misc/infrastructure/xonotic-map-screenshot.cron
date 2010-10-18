@@ -1,0 +1,37 @@
+#!/bin/sh
+
+mepwd=$PWD
+me=$0
+if ! lockfile-create "$me"; then
+        exit 1
+fi
+lockfile-touch "$me" & lockpid=$!
+trap 'kill $lockpid || true; cd "$mepwd"; lockfile-remove "$me"' EXIT
+trap 'exit 1' INT TERM
+
+set -e
+cd xonotic
+./all clean -m -fU -D
+# like reclone but do not delete untracked, so q3map2.x86 compile stays
+./all compile
+export __GL_FSAA_MODE=8
+sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot
+
+GET http://beta.xonotic.org/autobuild-bsp/ >/dev/null
+cd "$HOME/autobuild-bsp" || exit 1
+now=`date +%s`
+deltime=$(($now + 86400))
+grep -l -- '-->(none)<!--' */index.html | cut -d / -f 1 | while IFS= read -r D; do
+	for F in "$D" "$D.pk3" "`echo "$D" | rev | cut -d - -f 3- | rev`-full-`echo "$D" | rev | cut -d - -f 1-2 | rev`.pk3"; do
+		echo "$deltime $F" >> .to_delete
+	done
+done
+deltime=$(($now - 86400))
+while IFS=' ' read -r d f; do
+	if [ $d -lt $now ]; then
+		rm -f "$f"
+	else
+		echo "$d $f"
+	done
+done < .to_delete > .to_delete_new
+mv .to_delete_new .to_delete
