@@ -803,9 +803,10 @@ case "$cmd" in
 
 		enter "$d0/data/xonotic-data.pk3dir" verbose
 		if $cleanqc; then
-			verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
+			verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
 		fi
-		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
+		verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
 
 		enter "$d0/darkplaces" verbose
 		if [ x"$BAD_TARGETS" = x" " ]; then
@@ -1441,10 +1442,10 @@ case "$cmd" in
 	release-qc)
 		case "$RELEASETYPE" in
 			beta)
-				verbose make -C Xonotic/source FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+				verbose make -C Xonotic/source FTEQCC="../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
 				;;
 			release)
-				verbose make -C Xonotic/source FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
+				verbose make -C Xonotic/source FTEQCC="../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
 				;;
 		esac
 		verbose rm -f Xonotic/source/*/fteqcc.log
