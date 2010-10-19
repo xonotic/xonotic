@@ -117,10 +117,10 @@ data/xonotic-nexcompat.pk3dir |                                                 
 darkplaces                    |                                                   | div0-stable | svn
 netradiant                    |                                                   | master      |
 div0-gittools                 |                                                   | master      | no
-d0_blind_id                   | git://github.com/divVerent/d0_blind_id.git        | master      |
+d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 mediasource                   |                                                   | master      | no
-fteqcc                        | git://github.com/Blub/qclib.git                   | master      |
+fteqcc                        | http://github.com/Blub/qclib.git                  | master      |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
