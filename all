@@ -1483,10 +1483,11 @@ case "$cmd" in
 	release-qc)
 		case "$RELEASETYPE" in
 			beta)
-				verbose make -C Xonotic/source FTEQCC="../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+				# back out of: source/qcsrc/server
 				;;
 			release)
-				verbose make -C Xonotic/source FTEQCC="../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
+				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
 				;;
 		esac
 		verbose rm -f Xonotic/source/*/fteqcc.log
