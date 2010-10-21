@@ -1,6 +1,6 @@
 * -crlf
 
-*.7z -crlf -diff
+*.7z -diff -crlf
 *.ac crlf=input
 *.afm crlf=input
 *.aft crlf=input
@@ -8,19 +8,19 @@
 all crlf=input
 *.am crlf=input
 *.animinfo crlf=input
-*.aps -crlf -diff
+*.aps -diff -crlf
 *.ase -crlf
 *.bat -crlf
 *.bgs crlf=input
-*.blend -crlf -diff
-*.bmp -crlf -diff
+*.blend -diff -crlf
+*.bmp -diff -crlf
 branch-manager crlf=input
 BSDmakefile crlf=input
 bsp2ent crlf=input
-*.bsp -crlf -diff
-*.cache -crlf -diff
+*.bsp -diff -crlf
+*.cache -diff -crlf
 *.cbp -crlf
-*.cbp -crlf -diff
+*.cbp -diff -crlf
 *.c crlf=input
 *.cfg crlf=input
 *.cg crlf=input
@@ -34,26 +34,26 @@ COPYING crlf=input
 *.cpp crlf=input
 create crlf=input
 *.css crlf=input
-Current -crlf -diff
+Current -diff -crlf
 *.cvsignore crlf=input
 *.cvswrappers crlf=input
-*.dat -crlf -diff
-*.db -crlf -diff
+*.dat -diff -crlf
+*.db -diff -crlf
 *.default crlf=input
 *.def crlf=input
-*.dem -crlf -diff
+*.dem -diff -crlf
 *.dev -crlf
-*.dll -crlf -diff
-DOCS -crlf -diff
+*.dll -diff -crlf
+DOCS -diff -crlf
 *.dot crlf=input
 DoxyConfig crlf=input
 Doxyfile crlf=input
 *.doxygen crlf=input
-*.dpm -crlf -diff
+*.dpm -diff -crlf
 *.dsp -crlf
 *.dsw -crlf
 *.dtd crlf=input
-*.dylib -crlf -diff
+*.dylib -diff -crlf
 *.EncoderPlugin crlf=input
 *.ent -crlf
 *.form crlf=input
@@ -62,7 +62,7 @@ Doxyfile crlf=input
 gendox crlf=input
 gendoxfunctions crlf=input
 genDoxyfile crlf=input
-*.gif -crlf -diff
+*.gif -diff -crlf
 *.gitattributes crlf=input
 git-branch-manager crlf=input
 git-filter-index crlf=input
@@ -81,64 +81,64 @@ GPL crlf=input
 *.hs crlf=input
 *.html crlf=input
 *.html-part crlf=input
-*.icns -crlf -diff
-*.ico -crlf -diff
+*.icns -diff -crlf
+*.ico -diff -crlf
 *.idsoftware crlf=input
 *.inc crlf=input
 *.in crlf=input
 *.instantaction crlf=input
-*.iqm -crlf -diff
+*.iqm -diff -crlf
 *.java crlf=input
 *.jhm crlf=input
 *.jnlp crlf=input
-*.jpg -crlf -diff
+*.jpg -diff -crlf
 *.jsmooth crlf=input
 LGPL crlf=input
 LICENSE crlf=input
-*.lmp -crlf -diff
+*.lmp -diff -crlf
 *.loaders crlf=input
-*.lso -crlf -diff
+*.lso -diff -crlf
 makefile crlf=input
 Makefile crlf=input
 *.makespr32 crlf=input
 makespr32 crlf=input
-*.map -crlf
+*.map -crlf filter=mapclean
 *.mapinfo crlf=input
 *.m crlf=input
-*.md3 -crlf -diff
+*.md3 -diff -crlf
 *.md5anim -crlf
 *.md5mesh -crlf
-*.mdl -crlf -diff
+*.mdl -diff -crlf
 *.med crlf=input
 *.mf crlf=input
-*.mid -crlf -diff
+*.mid -diff -crlf
 *.mk crlf=input
-*.mkdir -crlf -diff
-*.mmpz -crlf -diff
+*.mkdir -diff -crlf
+*.mmpz -diff -crlf
 *.modinfo crlf=input
 *.modules crlf=input
 nexuiz-map-compiler crlf=input
 *.nib -crlf
 *.obj -crlf
-OFFSETS -crlf -diff
-*.ogg -crlf -diff
+OFFSETS -diff -crlf
+*.ogg -diff -crlf
 *.options crlf=input
 pangorc crlf=input
 *.patch crlf=input
 *.patchsets crlf=input
-*.pcx -crlf -diff
-*.pfb -crlf -diff
-*.pfm -crlf -diff
-*.pk3 -crlf -diff
+*.pcx -diff -crlf
+*.pfb -diff -crlf
+*.pfm -diff -crlf
+*.pk3 -diff -crlf
 PkgInfo crlf=input
 *.pl crlf=input
 *.plist crlf=input
 *.pm crlf=input
-*.png -crlf -diff
-POSITIONS -crlf -diff
+*.png -diff -crlf
+POSITIONS -diff -crlf
 *.proj -crlf
 *.properties crlf=input
-*.psd -crlf -diff
+*.psd -diff -crlf
 *.py crlf=input
 *.q3map1 crlf=input
 *.qc crlf=input
@@ -149,46 +149,46 @@ POSITIONS -crlf -diff
 *.rc -crlf
 *.readme crlf=input
 README crlf=input
-*.rtlights -crlf -diff
+*.rtlights -diff -crlf
 SCHEMA crlf=input
 *.scm crlf=input
-SDL -crlf -diff
+SDL -diff -crlf
 SDLMain.m crlf=input
 *.shader crlf=input
 *.sh crlf=input
 *.skin crlf=input
 *.sln -crlf
 *.sounds crlf=input
-*.sp2 -crlf -diff
-*.spr32 -crlf -diff
-*.spr -crlf -diff
+*.sp2 -diff -crlf
+*.spr32 -diff -crlf
+*.spr -diff -crlf
 *.src crlf=input
 *.strings crlf=input
 *.strip crlf=input
 strip crlf=input
-*.svg -crlf -diff
-*.TAB -crlf -diff
-*.tga -crlf -diff
-TMAP -crlf -diff
+*.svg -diff -crlf
+*.TAB -diff -crlf
+*.tga -diff -crlf
+TMAP -diff -crlf
 todo crlf=input
 TODO crlf=input
-*.ttf -crlf -diff
-*.TTF -crlf -diff
+*.ttf -diff -crlf
+*.TTF -diff -crlf
 *.txt crlf=input
 *.TXT crlf=input
 update-shaderlists crlf=input
 *.vcproj -crlf
-*.wav -crlf -diff
-*.waypoints -crlf -diff
+*.wav -diff -crlf
+*.waypoints -diff -crlf
 w crlf=input
 *.width crlf=input
 *.workspace -crlf
-*.xcf -crlf -diff
+*.xcf -diff -crlf
 *.xlink crlf=input
 *.xml crlf=input
 xonotic-map-compiler-autobuild crlf=input
 xonotic-map-compiler crlf=input
 *.xpm crlf=input
-*.zip -crlf -diff
+*.zip -diff -crlf
 zipdiff crlf=input
-*.zym -crlf -diff
+*.zym -diff -crlf

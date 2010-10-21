@@ -3,7 +3,7 @@
 exec 3<&0
 
 ISANYTHING=" -crlf"
-ISBINARY=" -crlf -diff"
+ISBINARY=" -diff -crlf"
 ISTEXT=" crlf=input"
 
 LF="
@@ -33,16 +33,16 @@ find . -name .git -prune -o \( -type f -print \) | {
 		esac
 		unseen=`{ echo "$nam"; echo "$nam"; echo "$unseen"; } | sort | uniq -u`
 		case "$LF$eol$LF$neweol$LF" in
-			*$LF$nam$ISANYTHING$LF*)
+			*$LF$nam$ISANYTHING*$LF*)
 				# ignore and treat as binary
 				;;
-			*$LF$nam$ISBINARY$LF*)
+			*$LF$nam$ISBINARY*$LF*)
 				# should be binary
 				if $t; then
 					echo "WARNING: file $LINE is text, should be binary"
 				fi
 				;;
-			*$LF$nam$ISTEXT$LF*)
+			*$LF$nam$ISTEXT*$LF*)
 				# should be text
 				if ! $t; then
 					echo "WARNING: file $LINE is binary, should be text"
