@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# is being run as cronjob, better set PATH
+export PATH=/home/xonotic-build/bin:/usr/local/bin:/usr/bin:/bin:/usr/games
+
+mepwd=$PWD
+me=$0
+if ! lockfile-create "$me"; then
+	exit 1
+fi
+lockfile-touch "$me" & lockpid=$!
+trap 'kill $lockpid || true; cd "$mepwd"; lockfile-remove "$me"' EXIT
+trap 'exit 1' INT TERM
+
+set -ex
+export HOSTS_THAT_ARE_MYSELF="xonotic-build-win32 xonotic-build-win64"
+export HOSTS_THAT_ARE_DISABLED=""
+ssh xonotic-beta '
+	cd autobuild/;
+	s0=`date -d "now - 7 days - 12 hours" +%s`;
+	s00=`date -d "now - 60 days - 12 hours" +%s`;
+	for X in *; do
+		[ -f "$X" ] || continue;
+		d=${X#Xonotic-};
+		d=${d%%[_-.]*};
+		[ x"$d" != x"latest" ] || continue;
+		w=`date -d $d +%w`;
+		s=`date -d $d +%s`;
+		if [ "$w" -ne 0 -a "$s" -lt "$s0" -o "$s" -lt "$s00" ]; then
+			rm -f "$X";
+		fi;
+	done
+'
+cd ~/xonotic-release-build
+./all clean --reclone
+./all each git checkout HEAD^0
+# add all feature branches we want
+
+# map branches that we include:
+#   winners in the poll for upcoming CTF maps
+#   maps near completion
+
+for b in \
+	origin/fruitiex/space_elevator \
+	origin/fruitiex/dance \
+	origin/fruitiex/runningmanctf \
+	origin/mintox/geoplanetary
+do
+	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
+done
+./all update -N
+d0=`date +%Y%m%d`
+d=$d0
+i=1
+while HEAD http://xonotic:g-23@beta.xonotic.org/autobuild/"Xonotic-$d.zip"; do
+	i=$(($i+1))
+	d="$d0"_"$i"
+done
+RELEASETYPE=beta RELEASEDATE=$d ./all release
+for X in Xonotic-$d*.zip; do
+	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
+done
+rsync -vaSHP Xonotic*.zip xonotic-beta:autobuild/
+echo "Finished a new beta build at http://beta.xonotic.org/autobuild/" | $IRCSPAM
+cd

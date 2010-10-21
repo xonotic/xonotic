@@ -6,6 +6,7 @@ set -e
 # I use this in EVERY shell script ;)
 LF="
 "
+ESC=""
 
 d00=`pwd`
 while ! [ -f ./all ]; do
@@ -35,7 +36,7 @@ esac
 
 msg()
 {
-	echo >&2 "[1m$*[m"
+	echo >&2 "$ESC[1m$*$ESC[m"
 }
 
 self=`git hash-object "$SELF"`
@@ -116,6 +117,7 @@ data/xonotic-nexcompat.pk3dir |                                                 
 darkplaces                    |                                                   | div0-stable | svn
 netradiant                    |                                                   | master      |
 div0-gittools                 |                                                   | master      | no
+d0_blind_id                   | http://github.com/divVerent/d0_blind_id.git       | master      |
 data/xonotic-maps.pk3dir      |                                                   | master      |
 mediasource                   |                                                   | master      | no
 fteqcc                        | http://github.com/Blub/qclib.git                  | master      |
@@ -347,12 +349,133 @@ case "$cmd" in
 			fi
 		done
 		;;
+	keygen)
+		# enable the ssh URL for pushing
+		"$SELF" update -N -p
+
+		if [ -f ~/.ssh/id_rsa.pub ]; then
+			msg ""
+			msg "A key already exists and no new one will be generated. If you"
+			msg "already have done the procedure for getting your key approved, you"
+			msg "can skip the following paragraph and already use the repository."
+			msg ""
+			msg "To get access, your key has to be approved first. For that, visit"
+			msg "http://dev.xonotic.org/, then log in, create a \"New Issue\" on"
+			msg "the \"Support\" tracker in the \"Repository\" category where you"
+			msg "apply for access and paste the following output into the issue:"
+			msg ""
+			msg "`cat ~/.ssh/id_rsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
+		elif [ -f ~/.ssh/id_dsa.pub ]; then
+			msg ""
+			msg "A key already exists and no new one will be generated. If you"
+			msg "already have done the procedure for getting your key approved, you"
+			msg "can skip the following paragraph and already use the repository."
+			msg ""
+			msg "To get access, your key has to be approved first. For that, visit"
+			msg "http://dev.xonotic.org/, then log in, create a \"New Issue\" on"
+			msg "the \"Support\" tracker in the \"Repository\" category where you"
+			msg "apply for access and paste the following output into the issue:"
+			msg ""
+			msg "`cat ~/.ssh/id_dsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
+		else
+			msg ""
+			msg "No key has been generated yet. One will be generated now."
+			msg "If other people are using your computer, it is recommended"
+			msg "to specify a passphrase. Otherwise you can simply hit ENTER"
+			msg "when asked for a passphrase."
+			msg ""
+			ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa
+			msg ""
+			msg "To get access, your key has to be approved first. For that, visit"
+			msg "http://dev.xonotic.org/, then log in, create a \"New Issue\" on"
+			msg "the \"Support\" tracker in the \"Repository\" category where you"
+			msg "apply for access and paste the following output into the issue:"
+			msg ""
+			msg "`cat ~/.ssh/id_rsa.pub`"
+			msg ""
+			msg "Note that you will only have write access to branches that start"
+			msg "with your user name."
+		fi
+		;;
 	update|pull)
 		allow_pull=true
-		if [ x"$1" = x"-N" ]; then
-			allow_pull=false
+		fix_config=false
+		location=current
+		while :; do
+			if [ x"$1" = x"-N" ]; then
+				allow_pull=false
+			elif [ x"$1" = x"-p" ]; then
+				fix_config=true
+				if [ x"$base" != x"ssh://xonotic@git.xonotic.org/" ]; then
+					pushbase=ssh://xonotic@git.xonotic.org/
+				fi
+			elif [ x"$1" = x"-s" ]; then
+				fix_config=true
+				base=ssh://xonotic@git.xonotic.org/
+				pushbase=
+			elif [ x"$1" = x"-g" ]; then
+				fix_config=true
+				base=git://git.xonotic.org/xonotic/
+			elif [ x"$1" = x"-h" ]; then
+				fix_config=true
+				base=http://git.xonotic.org/xonotic/
+			elif [ x"$1" = x"-l" ]; then
+				case "$2" in
+					nl) ;;
+					de) ;;
+					default) ;;
+					*)
+						msg "Invalid location!"
+						msg "Possible locations for the -l option:"
+						msg "  nl (Netherlands, run by merlijn)"
+						msg "  de (Germany, run by divVerent)"
+						msg "  default (currently nl)"
+						exit 1
+						;;
+				esac
+				fix_config=true
+				location=$2
+				shift
+			else
+				break
+			fi
+			shift
+		done
+		case "$location" in
+			default)
+				location=
+				;;
+			current)
+				case "$base" in
+					*://*.git.xonotic.org/*)
+						location=${base%%.git.xonotic.org/*}
+						location=${location##*://}
+						;;
+					*)
+						location=
+						;;
+				esac
+				;;
+		esac
+		if [ -n "$location" ]; then
+			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+		else
+			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
+			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
 		fi
-		if $allow_pull; then
+		if $fix_config; then
+			url=`repourl .`
+			pushurl=`repopushurl .`
+			fix_git_config "$url" "$pushurl"
+		fi
+		if $allow_pull || $fix_config; then
 			"$SELF" fix_config
 		fi
 		for d in $repos; do
@@ -573,13 +696,22 @@ case "$cmd" in
 		done
 		;;
 	compile)
+		cleand0=false
 		cleandp=false
 		cleanqcc=false
 		cleanqc=false
+		compiled0=false
 		debug=debug
+		if [ -z "$CC" ]; then
+			export CC="gcc -DSUPPORTIPV6"
+		fi
 		while :; do
 			case "$1" in
+				-0)
+					compiled0=true
+					;;
 				-c)
+					cleand0=true
 					cleandp=true
 					cleanqcc=true
 					cleanqc=true
@@ -587,6 +719,7 @@ case "$cmd" in
 					;;
 				-r)
 					debug=release
+					export CC="$CC -g -mtune=native -march=native"
 					shift
 					;;
 				*)
@@ -594,9 +727,6 @@ case "$cmd" in
 					;;
 			esac
 		done
-		if [ -z "$CC" ]; then
-			export CC="gcc -DSUPPORTIPV6"
-		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-$debug cl-$debug"
 		elif [ x"`uname`" = x"Darwin" ]; then
@@ -657,6 +787,55 @@ case "$cmd" in
 			fi
 		fi
 
+		enter "$d0/d0_blind_id" verbose
+		if ! $compiled0; then
+			# compilation of crypto library failed
+			# use binaries then, if we can...
+			mkdir -p .libs
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+			else
+				case "`uname`" in
+					Linux)
+						case `uname -m` in
+							x86_64)
+								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
+								;;
+							*86)
+								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
+								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
+								;;
+							*)
+								compiled0=true
+								;;
+						esac
+						;;
+					Darwin)
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						;;
+					*)
+						compiled0=true
+						;;
+				esac
+			fi
+		fi
+		if $compiled0; then
+			if $cleand0; then
+				if [ -f Makefile ]; then
+					verbose make $MAKEFLAGS distclean
+				fi
+			fi
+			if ! [ -f Makefile ]; then
+				verbose sh autogen.sh
+				verbose ./configure
+			fi
+			verbose make $MAKEFLAGS
+		fi
+
 		enter "$d0/fteqcc" verbose
 		if $cleanqcc; then
 			verbose make $MAKEFLAGS clean
@@ -665,9 +844,10 @@ case "$cmd" in
 
 		enter "$d0/data/xonotic-data.pk3dir" verbose
 		if $cleanqc; then
-			verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
+			verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
 		fi
-		verbose make FTEQCC="$d0/fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
+		verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
 
 		enter "$d0/darkplaces" verbose
 		if [ x"$BAD_TARGETS" = x" " ]; then
@@ -677,7 +857,7 @@ case "$cmd" in
 			verbose make $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
-			verbose make $MAKEFLAGS "$@" "$T"
+			verbose make $MAKEFLAGS STRIP=: "$@" "$T"
 		done
 		for T in $BAD_TARGETS; do
 			echo "Warning: discarded invalid client $T."
@@ -688,12 +868,13 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
-			export PATH="$d0/misc/buildfiles/win32:$PATH"
+			export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
-			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS"
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 			client=-sdl
 		else
+			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
 			client=-sdl
 		fi
 		case "$1" in
@@ -1092,7 +1273,45 @@ case "$cmd" in
 				msg "Building a RELEASE"
 				;;
 			*)
-				msg "Must either set RELEASETYPE=beta or RELEASETYPE=release"
+				echo >&2 -n "$ESC[2J$ESC[H"
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg ""
+				msg "        +---------------------------------------------------------.---+"
+				msg "        | NOTE                                                    | X |"
+				msg "        +---------------------------------------------------------^---+"
+				msg "        |   ____                                                      |"
+				msg "        |  /    \  This is the official release build system.         |"
+				msg "        | |      | If you are not a member of the Xonotic Core Team,  |"
+				msg "        | | STOP | you are not supposed to use this script and should |"
+				msg "        | |      | instead use ./all compile to compile the engine    |"
+				msg "        |  \____/  and game code.                                     |"
+				msg "        |                                                             |"
+				msg "        |                      [ I understand ]                       |"
+				msg "        +-------------------------------------------------------------+"
+				sleep 10
+				# A LOT of build infrastructure is required:
+				# - vorbis-tools
+				# - ImageMagick
+				# - .ssh/config must be configured so the following
+				#   host names are reachable and have a compile
+				#   infrastructure set up:
+				#   - xonotic-build-linux32 (with gcc on x86)
+				#   - xonotic-build-linux64 (with gcc on x86_64)
+				#   - xonotic-build-win32 (with i586-mingw32msvc-g++)
+				#   - xonotic-build-win64 (with amd64-mingw32msvc-g++
+				#     and x86_64-w64-mingw32-g++)
+				#   - xonotic-build-osx (with Xcode and SDL.framework)
+				# - AMD Compressonator installed in WINE
+				# - ResEdit installed in WINE
+				# - a lot of other requirements you will figure out
+				#   while reading the error messages
+				# - environment variable RELEASETYPE set
+				# - optionally, environment variable RELEASEDATE set
+				#   (YYYYMMDD)
 				exit 1
 				;;
 		esac
@@ -1103,7 +1322,7 @@ case "$cmd" in
 		else
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 		fi
-		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles | {
+		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk | {
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc
 			verbose tar xvf -
@@ -1112,6 +1331,7 @@ case "$cmd" in
 			verbose mv misc/buildfiles/win64 bin64 || true
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
+			verbose rm -rf misc/pki
 		}
 		{
 			verbose cd darkplaces
@@ -1134,6 +1354,7 @@ case "$cmd" in
 			verbose cd Xonotic/source
 			verbose tar xvf -
 		}
+		rm -f Xonotic/key_15.d0pk
 		;;
 	release-compile-run)
 		host=$1
@@ -1202,7 +1423,7 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		verbose "$SELF" release-compile win32 \
-			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
+			'STRIP=: DP_MAKE_TARGET=mingw CC="i586-mingw32msvc-gcc -march=i686 -g -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=0' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			'' ''
 		verbose "$SELF" release-compile win32 \
@@ -1233,13 +1454,13 @@ case "$cmd" in
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a' \
+			'STRIP=: CC="gcc -m32 -march=i686 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a' \
+			'STRIP=: CC="gcc -m64 -g -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
@@ -1262,10 +1483,11 @@ case "$cmd" in
 	release-qc)
 		case "$RELEASETYPE" in
 			beta)
-				verbose make -C Xonotic/source FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+				# back out of: source/qcsrc/server
 				;;
 			release)
-				verbose make -C Xonotic/source FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
+				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
 				;;
 		esac
 		verbose rm -f Xonotic/source/*/fteqcc.log
@@ -1399,8 +1621,8 @@ case "$cmd" in
 		;;
 	release-pack)
 		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir             raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '' raw '-raw' low '-low' lowdds '-lowdds'
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal ''            low '-low' lowdds '-lowdds'
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal ''            low '-low' lowdds '-lowdds'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                raw ''     low '-low'
 		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
 		;;
@@ -1418,7 +1640,14 @@ case "$cmd" in
 		stamp=`cat Xonotic/stamp.txt`
 		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
 		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
-		# need to use infozip for these (+x bits)
+		# let's pass crypto import laws of some nasty countries
+		crypto_libs=`find Xonotic -name \*d0_rijndael\*`
+		if [ -n "$crypto_libs" ]; then
+			verbose mkzip Xonotic-$stamp-crypto.zip \
+				$crypto_libs
+			rm -f $crypto_libs
+		fi
+		# build the archives
 		verbose mkzip Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin64/*.dll \
@@ -1434,6 +1663,7 @@ case "$cmd" in
 			Xonotic/misc \
 			Xonotic/fteqcc \
 			Xonotic/server \
+			Xonotic/key_0.d0pk \
 			Xonotic/data/font-nimbussansl-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose mkzip0 Xonotic-$stamp.zip \
@@ -1446,17 +1676,17 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
-		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
+#		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
+#		verbose mkzip0 Xonotic-$stamp-high.zip \
+#			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
+#			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
+#			Xonotic/data/xonotic-$stamp-music.pk3 \
+#			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
 		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
-		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
-		verbose mkzip0 Xonotic-$stamp-high.zip \
-			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
-			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
-			Xonotic/data/xonotic-$stamp-music.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		;;
 	release)
 		verbose "$SELF" release-prepare
@@ -1477,9 +1707,10 @@ case "$cmd" in
 		echo "  $SELF checkout|switch <remote>/<branch>"
 		echo "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
 		echo "  $SELF clean --reclone"
-		echo "  $SELF compile [-c]"
+		echo "  $SELF compile [-c] [-r] [-0]"
 		echo "  $SELF each|foreach [-k] command..."
 		echo "  $SELF fix_upstream_rebase"
+		echo "  $SELF keygen"
 		echo "  $SELF merge"
 		echo "  $SELF push|commit [-s]"
 		echo "  $SELF release"
@@ -1487,6 +1718,6 @@ case "$cmd" in
 		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
 		echo "  $SELF save-patches"
 		echo "  $SELF update-maps"
-		echo "  $SELF update|pull [-N]"
+		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
 		;;
 esac
