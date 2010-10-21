@@ -309,7 +309,7 @@ fix_git_config()
 	fi
 	verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 	verbose git config core.autocrlf input
-	if [ -z "`git config push.default`" ]; then
+	if [ -z "`git config push.default || true`" ]; then
 		verbose git config push.default current # or is tracking better?
 	fi
 	git config filter.mapclean.clean "grep ^[^/]"
