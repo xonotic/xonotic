@@ -1166,33 +1166,33 @@ case "$cmd" in
 		#   ./all clean [-m] [-f | -fu | -fU] [-r] [-D]
 		#   ./all clean --reclone
 		found=false
-		while :; do
-			if [ x"$1" = x"--reclone" ]; then
+		for X in "$@"; do
+			if [ x"$X" = x"--reclone" ]; then
 				force=true
 				fetchupstream=true
 				gotoupstream=true
 				gotomaster=true
 				rmuntracked=true
 				killbranches=true
-			elif [ x"$1" = x"-f" ]; then
+			elif [ x"$X" = x"-f" ]; then
 				force=true
-			elif [ x"$1" = x"-u" ]; then
+			elif [ x"$X" = x"-u" ]; then
 				gotoupstream=true
-			elif [ x"$1" = x"-U" ]; then
+			elif [ x"$X" = x"-U" ]; then
 				gotoupstream=true
 				fetchupstream=true
-			elif [ x"$1" = x"-fu" ]; then
+			elif [ x"$X" = x"-fu" ]; then
 				force=true
 				gotoupstream=true
-			elif [ x"$1" = x"-fU" ]; then
+			elif [ x"$X" = x"-fU" ]; then
 				force=true
 				gotoupstream=true
 				fetchupstream=true
-			elif [ x"$1" = x"-m" ]; then
+			elif [ x"$X" = x"-m" ]; then
 				gotomaster=true
-			elif [ x"$1" = x"-r" ]; then
+			elif [ x"$X" = x"-r" ]; then
 				rmuntracked=true
-			elif [ x"$1" = x"-D" ]; then
+			elif [ x"$X" = x"-D" ]; then
 				killbranches=true
 			else
 				break
@@ -1261,6 +1261,7 @@ case "$cmd" in
 				git rev-parse refs/heads/master >/dev/null 2>&1 || verbose git branch -t master origin/master || true
 				git rev-parse "refs/heads/`repobranch "$d"`" >/dev/null 2>&1 || verbose git branch -t "`repobranch "$d"`" origin/"`repobranch "$d"`" || true
 			fi
+			checkself "$cmd" "$@"
 		done
 		;;
 
