@@ -72,21 +72,21 @@ data/data/wazat1.mapinfo for me. The file may look like:
     _spawnpoints 5
     has weapons
 	cdtrack 5
-    type dm 30 20
-    type dom 200 20
-    type rune 200 20
-    type lms 9 20
-    type arena 10 20
+    gametype dm // defaults: timelimit=20 pointlimit=30 leadlimit=0
+    gametype dom // defaults: timelimit=20 pointlimit=200 teams=2 leadlimit=0
+    gametype rune // defaults: timelimit=20 pointlimit=200 leadlimit=0
+    gametype lms // defaults: timelimit=20 lives=9 leadlimit=0
+    gametype arena // defaults: timelimit=20 pointlimit=10 leadlimit=0
 
 As I see, the menu autodetected that my map may be suitable for deathmatch,
 domination, runematch, last man standing and arena. But I want the map to be
 played in domination, deathmatch, team deathmatch, runematch only, and I also
-want different timelimits/fraglimits, so I will change the "type" lines to:
+want different timelimits/fraglimits, so I will change the "gametype" lines to:
 
-    type dom 100 15
-    type rune 1000 25
-    type dm 40 15
-    type tdm 50 0 2
+    gametype dom pointlimit=100 timelimit=15
+    gametype rune pointlimit=1000 timelimit=25
+    gametype dm pointlimit=40 timelimit=15
+    gametype tdm pointlimit=50 timelimit=0 teams=2
 
 Also, while I am at it, I should fix the placeholders in the map description lines:
 
@@ -107,22 +107,22 @@ have weapon entities placed.
 
 There's much more power in a mapinfo file. See Appendix A for more details.
 
-Gametype        | Syntax                                                                                            | Notes
-----------------+---------------------------------------------------------------------------------------------------+-------------------------------------------------------
-Deathmatch      | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
-Team Deathmatch | type tdm     <fraglimit>  <timelimit> <teams>                                         <leadlimit> | 2, 3, or 4 teams
-Domination      | type dom     <pointlimit> <timelimit>                                                 <leadlimit> | teams are set by the map's entities
-CTF             | type ctf     <pointlimit> <timelimit> <caplimit>                                      <leadlimit> | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
-Runematch       | type rune    <pointlimit> <timelimit>                                                 <leadlimit> |
-LMS             | type lms     <lives>      <timelimit>                                                 <leadlimit> |
-Arena           | type arena   <fraglimit>  <timelimit>                                                 <leadlimit> |
-Key Hunt        | type kh      <pointlimit> <timelimit> <teams>                                         <leadlimit> | 2, 3, or 4 teams
-Assault         | type as                   <timelimit>                                                             | never uses points
-Onslaught       | type ons                  <timelimit>                                                             | never uses points
-Race            | type rc                   <timelimit> <qualifyingtimelimit> <laplimit> <teamlaplimit> <leadlimit> | g_race_teams: teamlaplimit is used instead of laplimit
-CTS             | type cts                  <timelimit> <skill>                                                     | never uses points
-CA              | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
-Nexball         | type dm      <fraglimit>  <timelimit>                                                 <leadlimit> |
+Gametype        | Syntax                                                                                                   | Notes
+----------------+----------------------------------------------------------------------------------------------------------+-------------------------------------------------------
+Deathmatch      | gametype dm [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
+Team Deathmatch | gametype tdm [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams
+Domination      | gametype dom [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams, only if map has no dom_team ents
+CTF             | gametype ctf [timelimit=...] [pointlimit=...] [caplimit=...] [leadlimit=...]                             | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
+Runematch       | gametype rune [timelimit=...] [pointlimit=...] [leadlimit=...]                                           |
+LMS             | gametype lms [timelimit=...] [lives=...] [leadlimit=...]                                                 |
+Arena           | gametype arena [timelimit=...] [pointlinit=...] [leadlimit=...]                                          |
+Key Hunt        | gametype kh [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 | 2, 3, or 4 teams
+Assault         | gametype as [timelimit=...]                                                                              | never uses points
+Onslaught       | gametype ons [timelimit=...]                                                                             | never uses points
+Race            | gametype rc [timelimit=...] [qualifying_timelimit=...] [laplimit=...] [teamlaplimit=...] [leadlimit=...] | g_race_teams: teamlaplimit is used instead of laplimit
+CTS             | gametype cts [timelimit=...] [skill=...]                                                                 | never uses points
+CA              | gametype ca [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
+Nexball         | gametype dm [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
 
 
 ===============
@@ -261,7 +261,7 @@ instead of just one, making it more valuable.
 If your map contains the required entities for Domination, the menu will
 automatically detect it for supporting Domination. To force the map to get
 re-detected after you add such entities, delete the data/data/mapname.mapinfo
-file - or simply edit it to add the "type dom" line.
+file - or simply edit it to add the "gametype dom" line.
 
 
 =========
@@ -292,7 +292,7 @@ If you don't make team spawnpoints, info_player_deathmatch is used instead.
 If your map contains the required entities for CTF, the menu will automatically
 detect it for supporting CTF. To force the map to get re-detected after you add
 such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
-add the "type ctf" line.
+add the "gametype ctf" line.
 
 ==============
 =V. Runematch=
@@ -310,7 +310,7 @@ classname  runematch_spawn_point
 If your map contains the required entities for Runematch, the menu will automatically
 detect it for supporting Runematch. To force the map to get re-detected after you add
 such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
-add the "type rune" line.
+add the "gametype rune" line.
 
 ==============
 =VI. Race/CTS=
@@ -363,7 +363,7 @@ $$$:  classname = trigger_race_checkpoint, cnt = 1, targetname = cp1
 If your map contains the required entities for Race, the menu will automatically
 detect it for supporting Race. To force the map to get re-detected after you add
 such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
-add the "type rc" line.
+add the "gametype rc" line.
 
 CTS maps do not use checkpoints with race_place set, so you can leave them out
 for CTS maps.
