@@ -312,7 +312,7 @@ fix_git_config()
 	if [ -z "`git config push.default || true`" ]; then
 		verbose git config push.default current # or is tracking better?
 	fi
-	verbose git config filter.mapclean.clean "grep ^[^/]"
+	verbose git config filter.mapclean.clean "tr -d '\r' | grep '^[^/]'"
 	verbose git config filter.mapclean.smudge "cat"
 }
 
