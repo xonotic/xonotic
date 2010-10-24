@@ -182,6 +182,8 @@ for F in "$@"; do
 	echo >&2 "Handling $F..."
 	conv=false
 	keep=false
+	jqual_rgb=$jpeg_qual_rgb
+	jqual_a=$jpeg_qual_a
 
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
@@ -199,6 +201,21 @@ for F in "$@"; do
 			will_dds=false
 			;;
 	esac
+
+	# for deluxemaps, lightmaps and normalmaps, enforce high jpeg quality (like on alpha channels)
+	if [ "$jqual_a" -gt "$jqual_rgb" ]; then
+		case "$f" in
+			./maps/*/lm_[0-9][0-9][0-9][13579]) # deluxemap
+				jqual_rgb=$jqual_a
+				;;
+			./maps/*/lm_[0-9][0-9][0-9][02468]) # lightmap
+				jqual_rgb=$jqual_a
+				;;
+			*_norm) # normalmap
+				jqual_rgb=$jqual_a
+				;;
+		esac
+	fi
 
 	if $do_jpeg_if_not_dds; then
 		if $will_dds; then
@@ -221,10 +238,10 @@ for F in "$@"; do
 		*.jpg)
 			if [ -f "${f}_alpha.jpg" ]; then
 				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
 			else                                   
 				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""               "$F"           ""               "$jpeg_qual_rgb"
+				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""               "$F"           ""               "$jqual_rgb"
 			fi
 			;;
 		*.png|*.tga)
@@ -232,10 +249,10 @@ for F in "$@"; do
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
 				cached "$will_dds"  reduce_rgba_dds    "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jpeg_qual_rgb" "$jpeg_qual_a"
+				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
 			else                                                             
 				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""               "${f}.jpg"     ""               "$jpeg_qual_rgb"
+				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""               "${f}.jpg"     ""               "$jqual_rgb"
 			fi
 			rm -f "$F.hasalpha"
 			;;
