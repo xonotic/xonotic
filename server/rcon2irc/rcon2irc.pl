@@ -28,6 +28,7 @@ our $VERSION = '0.4.2 svn $Revision$';
 # MISC STRING UTILITY ROUTINES to convert between DarkPlaces and IRC conventions
 
 # convert mIRC color codes to DP color codes
+our $color_utf8_enable = 1;
 our @color_irc2dp_table = (7, 0, 4, 2, 1, 1, 6, 1, 3, 2, 5, 5, 4, 6, 7, 7);
 our @color_dp2irc_table = (-1, 4, 9, 8, 12, 11, 13, -1, -1, -1); # not accurate, but legible
 our @color_dp2ansi_table = ("m", "1;31m", "1;32m", "1;33m", "1;34m", "1;36m", "1;35m", "m", "1m", "1m"); # not accurate, but legible
@@ -90,16 +91,28 @@ our @text_qfont_table = ( # ripped from DP console.c qfont_table
     'p',  'q',  'r',  's',  't',  'u',  'v',  'w',
     'x',  'y',  'z',  '{',  '|',  '}',  '~',  '<'
 );
+sub text_qfont_table($)
+{
+	my ($char) = @_;
+	my $o = ord $char;
+	if($color_utf8_enable)
+	{
+		return ($o & 0xFF00 == 0xE000) ? $text_qfont_table[$o & 0xFF] : $char;
+	}
+	else
+	{
+		return $text_qfont_table[$o];
+	}
+}
 sub text_dp2ascii($)
 {
 	my ($message) = @_;
-	$message = join '', map { $text_qfont_table[ord $_] } split //, $message;
+	$message = join '', map { text_qfont_table $_ } split //, $message;
 }
 
 sub color_dp_transform(&$)
 {
 	my ($block, $message) = @_;
-
 	$message =~ s{(?:(\^\^)|\^x([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])|\^([0-9])|(.))(?=([0-9,]?))}{
 		defined $1 ? $block->(char => '^', $7) :
 		defined $2 ? $block->(rgb => [hex $2, hex $3, hex $4], $7) :
@@ -119,7 +132,7 @@ sub color_dp2none($)
 	{
 		my ($type, $data, $next) = @_;
 		$type eq 'char'
-			? $text_qfont_table[ord $data]
+			? text_qfont_table $data
 			: "";
 	}
 	$message;
@@ -196,7 +209,7 @@ sub color_dp2irc($)
 			$data = color_rgb2basic $data;
 		}
 
-		$type eq 'char'  ? $text_qfont_table[ord $data] :
+		$type eq 'char'  ? text_qfont_table $data :
 		$type eq 'color' ? do {
 			my $oldcolor = $color;
 			$color = $color_dp2irc_table[$data];
@@ -225,7 +238,7 @@ sub color_dp2ansi($)
 			$data = color_rgb2basic $data;
 		}
 
-		$type eq 'char'  ? $text_qfont_table[ord $data] :
+		$type eq 'char'  ? text_qfont_table $data :
 		$type eq 'color' ? do {
 			my $oldcolor = $color;
 			$color = $color_dp2ansi_table[$data];
@@ -306,6 +319,7 @@ sub new($$)
 		PeerAddr => $remote,
 		PeerPort => $defaultport
 	) or die "socket $proto/$local/$remote/$defaultport: $!";
+	binmode $sock;
 	$sock->blocking(0);
 	my $you = {
 		# Mortal fool! Release me from this wretched tomb! I must be set free
@@ -465,6 +479,8 @@ sub join_commands($@)
 sub send($$$)
 {
 	my ($self, $line, $nothrottle) = @_;
+	utf8::encode $line
+		if $color_utf8_enable;
 	if($self->{secure} > 1)
 	{
 		$self->{connector}->send("\377\377\377\377getchallenge");
@@ -514,7 +530,7 @@ sub recvchallenge($)
 					if not defined $s;
 				length $s
 					or last;
-				if($s =~ /^\377\377\377\377challenge (.*)(?:$|\0)/s)
+				if($s =~ /^\377\377\377\377challenge (.*?)(?:$|\0)/s)
 				{
 					return $1;
 				}
@@ -544,7 +560,10 @@ sub recv($)
 	my @out = ();
 	while($self->{recvbuf} =~ s/^(.*?)(?:\r\n?|\n)//)
 	{
-		push @out, $1;
+		my $s = $1;
+		utf8::decode $s
+			if $color_utf8_enable;
+		push @out, $s;
 	}
 	return @out;
 }
@@ -611,6 +630,8 @@ sub throttle($$$)
 sub send($$$)
 {
 	my ($self, $line, $nothrottle) = @_;
+	utf8::encode $line
+		if $color_utf8_enable;
 	my $t = time();
 	if(defined $self->{capacity})
 	{
@@ -652,7 +673,10 @@ sub recv($)
 	my @out = ();
 	while($self->{recvbuf} =~ s/^(.*?)(?:\r\n?|\n)//)
 	{
-		push @out, $1;
+		my $s = $1;
+		utf8::decode $s
+			if $color_utf8_enable;
+		push @out, $s;
 	}
 	return @out;
 }
@@ -716,6 +740,7 @@ our %config = (
 	dp_password => undef,
 	dp_status_delay => 30,
 	dp_server_from_wan => "",
+	dp_utf8_enable => $color_utf8_enable,
 	irc_local => "",
 
 	irc_admin_password => "",
@@ -769,6 +794,7 @@ my @missing = grep { !defined $config{$_} } keys %config;
 die "The following config items are missing: @missing"
 	if @missing;
 
+$color_utf8_enable = $config{dp_utf8_enable};
 
 
 # Create a channel for error messages and other internal status messages...
