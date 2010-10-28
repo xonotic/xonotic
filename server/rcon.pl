@@ -96,7 +96,7 @@ sub text_qfont_table($)
 	my $o = ord $char;
 	if($color_utf8_enable)
 	{
-		return ($o & 0xFF00 == 0xE000) ? $text_qfont_table[$o & 0xFF] : $char;
+		return (($o & 0xFF00) == 0xE000) ? $text_qfont_table[$o & 0xFF] : $char;
 	}
 	else
 	{
