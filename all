@@ -711,6 +711,7 @@ case "$cmd" in
 			case "$1" in
 				-0)
 					compiled0=true
+					shift
 					;;
 				-c)
 					cleand0=true
