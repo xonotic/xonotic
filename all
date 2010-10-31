@@ -704,6 +704,7 @@ case "$cmd" in
 		cleanqc=false
 		compiled0=false
 		debug=debug
+		snowleopardhack=false
 		if [ -z "$CC" ]; then
 			export CC="gcc -DSUPPORTIPV6"
 		fi
@@ -739,6 +740,7 @@ case "$cmd" in
 					;;
 				*)
 					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
+					snowleopardhack=true
 					TARGETS="sv-$debug sdl-$debug"
 					;;
 			esac
@@ -760,7 +762,13 @@ case "$cmd" in
 					sdl)
 						TARGETS="$TARGETS sdl-debug"
 						;;
-					glx|agl|wgl)
+					agl)
+						TARGETS="$TARGETS cl-debug"
+						if $snowleopardhack; then
+							export CC="$CC -arch i386"
+						fi
+						;;
+					glx|wgl)
 						TARGETS="$TARGETS cl-debug"
 						;;
 					dedicated)
