@@ -110,17 +110,17 @@ enter()
 }
 
 repos_urls="
-.                             |                                                   | master      |
-data/xonotic-data.pk3dir      |                                                   | master      |
-data/xonotic-music.pk3dir     |                                                   | master      |
-data/xonotic-nexcompat.pk3dir |                                                   | master      | no
-darkplaces                    |                                                   | div0-stable | svn
-netradiant                    |                                                   | master      |
-div0-gittools                 |                                                   | master      | no
-d0_blind_id                   |                                                   | master      |
-data/xonotic-maps.pk3dir      |                                                   | master      |
-mediasource                   |                                                   | master      | no
-fteqcc                        |                                                   | master      |
+.                             |                                                   | master         |
+data/xonotic-data.pk3dir      |                                                   | master         |
+data/xonotic-music.pk3dir     |                                                   | master         |
+data/xonotic-nexcompat.pk3dir |                                                   | master         | no
+darkplaces                    |                                                   | div0-stable    | svn
+netradiant                    |                                                   | master         |
+div0-gittools                 |                                                   | master         | no
+d0_blind_id                   |                                                   | master         |
+data/xonotic-maps.pk3dir      |                                                   | master         |
+mediasource                   |                                                   | master         | no
+fteqcc                        |                                                   | xonotic-stable |
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
