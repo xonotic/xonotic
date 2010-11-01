@@ -120,7 +120,7 @@ div0-gittools                 |                                                 
 d0_blind_id                   |                                                   | master         |
 data/xonotic-maps.pk3dir      |                                                   | master         |
 mediasource                   |                                                   | master         | no
-fteqcc                        |                                                   | xonotic-stable |
+fteqcc                        |                                                   | xonotic-stable | noautocrlf
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
@@ -308,7 +308,14 @@ fix_git_config()
 		verbose git config --unset remote.origin.pushurl || true
 	fi
 	verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-	verbose git config core.autocrlf input
+	case ",`repoflags "$d"`," in
+		*,noautocrlf,*)
+			verbose git config --unset core.autocrlf
+			;;
+		*)
+			verbose git config core.autocrlf input
+			;;
+	esac
 	if [ -z "`git config push.default || true`" ]; then
 		verbose git config push.default current # or is tracking better?
 	fi
