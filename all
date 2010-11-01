@@ -310,7 +310,7 @@ fix_git_config()
 	verbose git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 	case ",`repoflags "$d"`," in
 		*,noautocrlf,*)
-			verbose git config --unset core.autocrlf
+			verbose git config --unset core.autocrlf || true
 			;;
 		*)
 			verbose git config core.autocrlf input
