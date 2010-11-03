@@ -1046,6 +1046,12 @@ case "$cmd" in
 			reportecho "$o"
 		}
 		for d in $repos; do
+			case "$d" in
+				fteqcc)
+					# sorry, fteqcc repo is managed manually
+					continue
+					;;
+			esac
 			enter "$d0/$d" verbose
 			base="`repobranch "$d"`"
 			reportecho "In $d:"
