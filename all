@@ -1138,7 +1138,7 @@ case "$cmd" in
 							# apply crlf, or other cleanup filters (non-behavioural changes)
 							git reset --hard
 							find . -type f -exec touch {} \;
-							git commit -a --amend -c HEAD
+							git commit -a --amend -c HEAD || true # don't fail if nothing to commit
 
 							echo "MERGING"
 							case ",`repoflags "$d"`," in
