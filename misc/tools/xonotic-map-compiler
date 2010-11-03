@@ -31,7 +31,7 @@ use File::Temp;
 	our $MINIMAPFLAGS = '';
 
 	# Default order of commands
-	our $ORDER = 'light,vis,minimap';
+	our $ORDER = 'vis,light';
 
 # end of user changable part
 
@@ -325,7 +325,7 @@ for my $m(@{$options->{maps}})
 				or die "rename ${m}_s.bsp $m.bsp: $!";
 		}
 		my @o = @{$options->{order}};
-		push @o, qw/light vis minimap/;
+		push @o, qw/light vis/;
 		my %o = ();
 
 		for(@o)
@@ -347,14 +347,6 @@ for my $m(@{$options->{maps}})
 						or die "-vis: $?";
 				}
 			}
-			if($_ eq 'minimap')
-			{
-				if(defined $options->{minimap})
-				{
-					q3map2 '-minimap',      @{$options->{minimap}}, "$m.map"
-						or die "-minimap: $?";
-				}
-			}
 		}
 
 		if($postscale != 1)
@@ -363,6 +355,12 @@ for my $m(@{$options->{maps}})
 				or die "-scale: $?";
 			rename "${m}_s.bsp", "$m.bsp"
 				or die "rename ${m}_s.bsp $m.bsp: $!";
+		}
+
+		if(defined $options->{minimap})
+		{
+			q3map2 '-minimap',      @{$options->{minimap}}, "$m.map"
+				or die "-minimap: $?";
 		}
 
 		unlink "$m.srf";
