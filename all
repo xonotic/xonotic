@@ -1235,7 +1235,7 @@ case "$cmd" in
 				msg ' \\\\_ \\_>~'\''      /  UUUU-'
 				msg ''
 			else
-				break
+				msg "Unknown arg: $X"
 			fi
 			found=true
 			shift
