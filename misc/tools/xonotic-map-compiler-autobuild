@@ -116,6 +116,11 @@ log2spam()
 			WARNING:\ Couldn\'t\ find\ image\ for\ shader\ *)
 				s_failshaders="$s_failshaders ${L##* }"
 				;;
+			ERROR:\ *)
+				if [ -z "$s_error" ]; then
+					s_error=$L
+				fi
+				;;
 			'******* leaked *******')
 				s_leaked=1
 				;;
@@ -178,11 +183,14 @@ buildthemap()
 		else
 			minimap_override=
 		fi
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override $build_override > "$M.log"
+		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override $build_override > "$M.log" 2>&1
 	)
+	status=$?
+	if ! [ -f "maps/$M.bsp" ]; then
+		echo >>"$M.log" "ERROR: No BSP file"
+	fi
 	t1=`date +%s`
 	dt=$(($t1 - $t0))
-	status=$?
 	if [ -n "$IRCSPAM" ]; then
 		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" "$status" "$dt" > "maps/$M.irc"
 	fi
@@ -206,6 +214,11 @@ screenshotthemap()
 	blobhash=$4
 	commithash=$5
 	if HEAD "$url$M-$blobhash/"; then
+		continue
+	fi
+
+	if ! unzip -l "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp"; then
+		# no BSP file
 		continue
 	fi
 
