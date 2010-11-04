@@ -1222,6 +1222,7 @@ case "$cmd" in
 			elif [ x"$X" = x"-D" ]; then
 				killbranches=true
 			elif echo "$X" | grep '^-FFFF*UUUU*$' >/dev/null; then
+				msg ''
 				msg '        _____'
 				msg '    ,--'\''-\\P/`\\  FFFFFFF'
 				msg ' __/_    B/,-.\\  FFFFFFF'
@@ -1232,7 +1233,7 @@ case "$cmd" in
 				msg '|     |    __,C>|| UUUU'
 				msg '\\    /_ ,-/,-'\''   |  UUUU'
 				msg ' \\\\_ \\_>~'\''      /  UUUU-'
-
+				msg ''
 			else
 				break
 			fi
