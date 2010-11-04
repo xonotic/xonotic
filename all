@@ -1223,15 +1223,16 @@ case "$cmd" in
 				killbranches=true
 			elif echo "$X" | grep '^-FFFF*UUUU*$' >/dev/null; then
 				msg '        _____'
-				msg '    ,--'\''-\P/`\  FFFFFFF'
-				msg ' __/_    B/,-.\  FFFFFFF'
-				msg ' /  _\  (//  O\\  FFFFFF'
-				msg '| (O  `) _\._ _)\  FFFUU'
-				msg '| |___/.^d0~~"\  \ UUUU'
-				msg '|     |`~'\''     \ |  UUUU'
+				msg '    ,--'\''-\\P/`\\  FFFFFFF'
+				msg ' __/_    B/,-.\\  FFFFFFF'
+				msg ' /  _\\  (//  O\\\\  FFFFFF'
+				msg '| (O  `) _\\._ _)\\  FFFUU'
+				msg '| |___/.^d0~~"\\  \\ UUUU'
+				msg '|     |`~'\''     \\ |  UUUU'
 				msg '|     |    __,C>|| UUUU'
-				msg '\    /_ ,-/,-'\''   |  UUUU'
-				msg ' \\_ \_>~'\''      /  UUUU-'
+				msg '\\    /_ ,-/,-'\''   |  UUUU'
+				msg ' \\\\_ \\_>~'\''      /  UUUU-'
+
 			else
 				break
 			fi
