@@ -92,7 +92,7 @@ while(@ARGV)
 	elsif($_ eq '-scale')
 	{
 		$options->{scale} = (shift @ARGV) || 1;
-		$enterflags = 'scale';
+		#$enterflags = 'scale';
 	}
 	elsif($_ eq '-novis')
 	{
@@ -215,25 +215,16 @@ $mapdir = "/" if $mapdir eq "";
 symlink "$mapdir", "$linkdir/data";
 
 my ($prescale, $postscale) = ($options->{scale} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
+$prescale = 1 if not defined $prescale;
 $postscale = 1 if not defined $postscale;
 
 for my $m(@{$options->{maps}})
 {
 	$m =~ s/\.(?:map|bsp)$//;
+
 	if($prescale != 1)
 	{
-		open my $checkfh, "<", "$m.map"
-			or die "open $m.map: $!";
-		my $keeplights = 0;
-		while(<$checkfh>)
-		{
-			/^\s*"_keeplights"\s+"1"\s*$/
-				or next;
-			$keeplights = 1;
-		}
-		close $checkfh;
-		die "$m does not define _keeplights to 1"
-			unless $keeplights;
+		unshift @{$options->{bsp}}, "-keeplights";
 	}
 
 	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "../scripts/*.shader";
