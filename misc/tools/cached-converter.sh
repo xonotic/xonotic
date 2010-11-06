@@ -158,7 +158,7 @@ reduce_rgb_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" "$o" && \
+	convert "$i" -quality 100 "$o" && \
 	jpegoptim --strip-all -m"$1" "$o"
 }
 
