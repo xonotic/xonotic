@@ -259,6 +259,9 @@ for F in "$@"; do
 		*.ogg)
 			cached "$do_ogg" reduce_ogg_ogg "$F" "" "$F" "" "$ogg_qual"
 			;;
+		./sound/misc/null.wav)
+			# never convert this one
+			;;
 		*.wav)
 			cached "$do_ogg" reduce_wav_ogg "$F" "" "${f}.ogg" "" "$ogg_qual"
 			;;
