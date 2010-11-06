@@ -260,7 +260,7 @@ for F in "$@"; do
 			cached "$do_ogg" reduce_ogg_ogg "$F" "" "$F" "" "$ogg_qual"
 			;;
 		*.wav)
-			cached "$do_ogg" reduce_wav_ogg "$F" "" "$F" "" "$ogg_qual"
+			cached "$do_ogg" reduce_wav_ogg "$F" "" "${f}.ogg" "" "$ogg_qual"
 			;;
 	esac
 	if $del_src; then
