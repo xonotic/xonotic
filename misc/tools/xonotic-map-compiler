@@ -55,7 +55,7 @@ my $options =
 	scale => [], # can't have defaults atm
 	order => [split /\s*,\s*/, $ORDER],
 	maps => [],
-	scale => 1,
+	scalefactor => 1,
 	bsp_timeout => 0,
 	vis_timeout => 0,
 	light_timeout => 0,
@@ -91,8 +91,8 @@ while(@ARGV)
 	}
 	elsif($_ eq '-scale')
 	{
-		$options->{scale} = (shift @ARGV) || 1;
-		#$enterflags = 'scale';
+		$options->{scalefactor} = @ARGV ? shift(@ARGV) : 1;
+		$enterflags = 'scale';
 	}
 	elsif($_ eq '-novis')
 	{
@@ -128,7 +128,7 @@ while(@ARGV)
 	}
 	elsif($_ eq '-scale_timeout')
 	{
-		$options->{minimap_timeout} = shift @ARGV;
+		$options->{scale_timeout} = shift @ARGV;
 	}
 	elsif($_ eq '-order')
 	{
@@ -214,7 +214,7 @@ sub q3map2(@)
 $mapdir = "/" if $mapdir eq "";
 symlink "$mapdir", "$linkdir/data";
 
-my ($prescale, $postscale) = ($options->{scale} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
+my ($prescale, $postscale) = ($options->{scalefactor} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
 $prescale = 1 if not defined $prescale;
 $postscale = 1 if not defined $postscale;
 
@@ -310,7 +310,7 @@ for my $m(@{$options->{maps}})
 			or die "-bsp: $?";
 		if($prescale != 1)
 		{
-			q3map2 '-scale', $prescale, "$m.bsp"
+			q3map2 '-scale', @{$options->{scale}}, $prescale, "$m.bsp"
 				or die "-scale: $?";
 			rename "${m}_s.bsp", "$m.bsp"
 				or die "rename ${m}_s.bsp $m.bsp: $!";
@@ -342,7 +342,7 @@ for my $m(@{$options->{maps}})
 
 		if($postscale != 1)
 		{
-			q3map2 '-scale', $postscale, "$m.bsp"
+			q3map2 '-scale', @{$options->{scale}}, $postscale, "$m.bsp"
 				or die "-scale: $?";
 			rename "${m}_s.bsp", "$m.bsp"
 				or die "rename ${m}_s.bsp $m.bsp: $!";
