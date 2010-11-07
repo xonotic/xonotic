@@ -99,15 +99,33 @@ reduce_jpeg2_jpeg2()
 	ia=$1; shift
 	o=$1; shift
 	oa=$1; shift
-	cp "$i" "$o" && jpegoptim --strip-all -m"$1" "$o" && \
-	cp "$ia" "$oa" && jpegoptim --strip-all -m"$2" "$oa"
+	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+		if [ "`stat -c %s "$i"`" -lt "`stat -c %s "$o"`" ]; then
+			cp "$i" "$o"
+		fi
+	else
+		return 0
+	fi
+	if convert "$ia" TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
+		if [ "`stat -c %s "$ia"`" -lt "`stat -c %s "$oa"`" ]; then
+			cp "$ia" "$oa"
+		fi
+	else
+		return 1
+	fi
 }
 
 reduce_jpeg_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	cp "$i" "$o" && jpegoptim --strip-all -m"$1" "$o"
+	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+		if [ "`stat -c %s "$i"`" -lt "`stat -c %s "$o"`" ]; then
+			cp "$i" "$o"
+		fi
+	else
+		return 0
+	fi
 }
 
 reduce_ogg_ogg()
@@ -140,10 +158,16 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	convert "$i" -alpha off     -quality 100 "$o" && \
-	convert "$i" -alpha extract -quality 100 "$oa" && \
-	jpegoptim --strip-all -m"$1" "$o" && \
-	jpegoptim --strip-all -m"$2" "$oa"
+	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+		:
+	else
+		return 0
+	fi
+	if convert "$ia" TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
+		:
+	else
+		return 1
+	fi
 }
 
 reduce_rgb_dds()
@@ -158,8 +182,11 @@ reduce_rgb_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" -quality 100 "$o" && \
-	jpegoptim --strip-all -m"$1" "$o"
+	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+		:
+	else
+		return 0
+	fi
 }
 
 has_alpha()
