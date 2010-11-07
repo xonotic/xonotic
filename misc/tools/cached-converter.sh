@@ -104,7 +104,7 @@ reduce_jpeg2_jpeg2()
 			cp "$i" "$o"
 		fi
 	else
-		return 0
+		return 1
 	fi
 	if convert "$ia" TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
 		if [ "`stat -c %s "$ia"`" -lt "`stat -c %s "$oa"`" ]; then
@@ -124,7 +124,7 @@ reduce_jpeg_jpeg()
 			cp "$i" "$o"
 		fi
 	else
-		return 0
+		return 1
 	fi
 }
 
@@ -158,12 +158,12 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+	if convert "$i" -alpha off TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		:
 	else
-		return 0
+		return 1
 	fi
-	if convert "$ia" TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
+	if convert "$i" -alpha extract TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
 		:
 	else
 		return 1
@@ -185,7 +185,7 @@ reduce_rgb_jpeg()
 	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		:
 	else
-		return 0
+		return 1
 	fi
 }
 
@@ -193,7 +193,7 @@ has_alpha()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	if convert "$F" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
+	if convert "$i" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
 		# no alpha
 		: > "$o"
 	else
