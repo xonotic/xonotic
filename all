@@ -352,6 +352,10 @@ bestmirror()
 	pre=$1; shift
 	suf=$1; shift
 
+	if ! { time -p true; } >/dev/null 2>&1; then
+		return 1
+	fi
+
 	bestin=
 	bestt=
 	for in in "$@"; do
@@ -368,8 +372,12 @@ bestmirror()
 			msg "$m -> FAIL"
 		fi
 	done
-	msg "Best mirror seems to be $pre$bestin$suf"
-	echo "$bestin"
+	if [ -n "$bestin" ]; then
+		msg "Best mirror seems to be $pre$bestin$suf"
+		echo "$bestin"
+	else
+		return 1
+	fi
 }
 
 case "$cmd" in
@@ -510,7 +518,11 @@ case "$cmd" in
 				base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$base" in
 					*\ *)
-						location=`bestmirror $base"xonotic.git" de nl`
+						if location=`bestmirror $base"xonotic.git" de nl`; then
+							:
+						else
+							location=
+						fi
 						;;
 					*)
 						location=
