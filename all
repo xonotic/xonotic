@@ -1544,7 +1544,7 @@ case "$cmd" in
 		# texture: convert to jpeg and dds
 		verbose export do_jpeg=true
 		verbose export jpeg_qual_rgb=95
-		verbose export jpeg_qual_a=100
+		verbose export jpeg_qual_a=99
 		verbose export do_dds=true
 		verbose export dds_flags=
 		verbose export do_ogg=false
@@ -1558,7 +1558,7 @@ case "$cmd" in
 		# music: reduce bitrate
 		verbose export do_jpeg=true
 		verbose export jpeg_qual_rgb=80
-		verbose export jpeg_qual_a=99
+		verbose export jpeg_qual_a=97
 		verbose export do_dds=false
 		verbose export do_ogg=true
 		verbose export ogg_qual=1
