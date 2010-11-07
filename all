@@ -500,6 +500,23 @@ case "$cmd" in
 			shift
 		done
 		case "$location" in
+			best)
+				newbase=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
+				case "$newbase" in
+					*\ *)
+						if location=`bestmirror $newbase"xonotic.git" de nl`; then
+							:
+						else
+							location=current
+						fi
+						;;
+					*)
+						location=current
+						;;
+				esac
+				;;
+		esac
+		case "$location" in
 			default)
 				location=
 				;;
@@ -508,21 +525,6 @@ case "$cmd" in
 					*://*.git.xonotic.org/*)
 						location=${base%%.git.xonotic.org/*}
 						location=${location##*://}
-						;;
-					*)
-						location=
-						;;
-				esac
-				;;
-			best)
-				base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
-				case "$base" in
-					*\ *)
-						if location=`bestmirror $base"xonotic.git" de nl`; then
-							:
-						else
-							location=
-						fi
 						;;
 					*)
 						location=
