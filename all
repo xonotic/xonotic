@@ -339,6 +339,39 @@ mkzip0()
 	zip -0y "$@"
 }
 
+mirrorspeed()
+{
+	# first result is to be ignored, but we use it to check status
+	git ls-remote "$1" refs/heads/master >/dev/null 2>&1 || return 1
+	time -p git ls-remote "$1" refs/heads/master 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,'
+		# unit: clock ticks (depends on what "time" returns
+}
+
+bestmirror()
+{
+	pre=$1; shift
+	suf=$1; shift
+
+	bestin=
+	bestt=
+	for in in "$@"; do
+		m=$pre$in$suf
+		if t=`mirrorspeed "$m"`; then
+			msg "$m -> $t ticks"
+			if [ -n "$t" ]; then
+				if [ -z "$bestt" ] || [ "$t" -lt "$bestt" ]; then
+					bestin=$in
+					bestt=$t
+				fi
+			fi
+		else
+			msg "$m -> FAIL"
+		fi
+	done
+	msg "Best mirror seems to be $pre$bestin$suf"
+	echo "$bestin"
+}
+
 case "$cmd" in
 	fix_upstream_rebase)
 		for d in $repos; do
@@ -438,12 +471,14 @@ case "$cmd" in
 				case "$2" in
 					nl) ;;
 					de) ;;
+					best) ;;
 					default) ;;
 					*)
 						msg "Invalid location!"
 						msg "Possible locations for the -l option:"
 						msg "  nl (Netherlands, run by merlijn)"
 						msg "  de (Germany, run by divVerent)"
+						msg "  best (find automatically)"
 						msg "  default (currently nl)"
 						exit 1
 						;;
@@ -465,6 +500,17 @@ case "$cmd" in
 					*://*.git.xonotic.org/*)
 						location=${base%%.git.xonotic.org/*}
 						location=${location##*://}
+						;;
+					*)
+						location=
+						;;
+				esac
+				;;
+			best)
+				base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
+				case "$base" in
+					*\ *)
+						location=`bestmirror $base"xonotic.git" de nl`
 						;;
 					*)
 						location=
