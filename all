@@ -339,16 +339,11 @@ mkzip0()
 	zip -0y "$@"
 }
 
-timewrapper()
-{
-	time -p "$@"
-}
-
 mirrorspeed()
 {
 	# first result is to be ignored, but we use it to check status
 	git ls-remote "$1" refs/heads/master >/dev/null 2>&1 || return 1
-	timewrapper git ls-remote "$1" refs/heads/master 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,'
+	{ time -p git ls-remote "$1" refs/heads/master; } 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,'
 		# unit: clock ticks (depends on what "time" returns
 }
 
