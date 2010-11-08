@@ -2,6 +2,9 @@
 # vim: filetype=zsh
 
 set -e
+if [ -n "$ZSH_VERSION" ]; then
+	setopt SH_WORD_SPLIT
+fi
 
 # I use this in EVERY shell script ;)
 LF="
@@ -36,7 +39,7 @@ esac
 
 msg()
 {
-	echo >&2 "$ESC[1m$*$ESC[m"
+	echo >&2 "$ESC""[1m$*$ESC""[m"
 }
 
 self=`git hash-object "$SELF"`
