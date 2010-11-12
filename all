@@ -5,6 +5,13 @@ set -e
 if [ -n "$ZSH_VERSION" ]; then
 	setopt SH_WORD_SPLIT
 fi
+if [ -z "$ECHO" ]; then
+	if echo "\\\\" | grep .. >/dev/null; then
+		ECHO=echo
+	else
+		ECHO=`which echo`
+	fi
+fi
 
 # I use this in EVERY shell script ;)
 LF="
@@ -14,8 +21,8 @@ ESC=""
 d00=`pwd`
 while ! [ -f ./all ]; do
 	if [ x"`pwd`" = x"/" ]; then
-		echo "Cannot find myself."
-		echo "Please run this script with the working directory inside a Xonotic checkout."
+		$ECHO "Cannot find myself."
+		$ECHO "Please run this script with the working directory inside a Xonotic checkout."
 		exit 1
 	fi
 	cd ..
@@ -39,7 +46,7 @@ esac
 
 msg()
 {
-	echo >&2 "$ESC""[1m$*$ESC""[m"
+	$ECHO >&2 "$ESC""[1m$*$ESC""[m"
 }
 
 self=`git hash-object "$SELF"`
@@ -70,10 +77,10 @@ visible_repo_name()
 {
 	case "$1" in
 		.)
-			echo "the root directory"
+			$ECHO "the root directory"
 			;;
 		*)
-			echo "\"$1\""
+			$ECHO "\"$1\""
 			;;
 	esac
 }
@@ -81,16 +88,16 @@ visible_repo_name()
 check_mergeconflict()
 {
 	if git ls-files -u | grep ' 1	'; then
-		echo
-		echo "MERGE CONFLICT."
-		echo "change into the \"$1\" project directory, and then:"
-		echo "- edit the files mentioned above with your favorite editor,"
-		echo "  and fix the conflicts (marked with <<<<<<< blocks)"
-		echo "- for binary files, you can select the files using"
-		echo "  git checkout --ours or git checkout --theirs"
-		echo "- when done with a file, 'git add' the file"
-		echo "- when done, 'git commit'"
-		echo
+		$ECHO
+		$ECHO "MERGE CONFLICT."
+		$ECHO "change into the \"$1\" project directory, and then:"
+		$ECHO "- edit the files mentioned above with your favorite editor,"
+		$ECHO "  and fix the conflicts (marked with <<<<<<< blocks)"
+		$ECHO "- for binary files, you can select the files using"
+		$ECHO "  git checkout --ours or git checkout --theirs"
+		$ECHO "- when done with a file, 'git add' the file"
+		$ECHO "- when done, 'git commit'"
+		$ECHO
 		exit 1
 	fi
 }
@@ -100,7 +107,7 @@ yesno()
 	yesno=
 	while [ x"$yesno" != x"y" -a x"$yesno" != x"n" ]; do
 		eval "$2"
-		echo "$1"
+		$ECHO "$1"
 		IFS= read -r yesno
 	done
 	[ x"$yesno" = x"y" ]
@@ -127,7 +134,7 @@ fteqcc                        |                                                 
 "
 # todo: in darkplaces, change repobranch to div0-stable
 
-repos=`echo "$repos_urls" | grep . | cut -d '|' -f 1 | tr -d ' '`
+repos=`$ECHO "$repos_urls" | grep . | cut -d '|' -f 1 | tr -d ' '`
 
 base=`git config remote.origin.url`
 case "$base" in
@@ -135,7 +142,7 @@ case "$base" in
 		base=${base%xonotic.git}
 		;;
 	*)
-		echo "The main repo is not xonotic.git, what have you done?"
+		$ECHO "The main repo is not xonotic.git, what have you done?"
 		exit 1
 		;;
 esac
@@ -147,28 +154,28 @@ case "$pushbase" in
 	'')
 		;;
 	*)
-		echo "The main repo is not xonotic.git, what have you done?"
+		$ECHO "The main repo is not xonotic.git, what have you done?"
 		exit 1
 		;;
 esac
 
 repourl()
 {
-	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
 	if [ -n "$repo_t" ]; then
 		case "$repo_t" in
 			*://*)
-				echo "$repo_t"
+				$ECHO "$repo_t"
 				;;
 			*)
-				echo "$base$repo_t"
+				$ECHO "$base$repo_t"
 				;;
 		esac
 	else
 		if [ x"$1" = x"." ]; then
-			echo "$base""xonotic.git"
+			$ECHO "$base""xonotic.git"
 		else
-			echo "$base${1##*/}.git"
+			$ECHO "$base${1##*/}.git"
 		fi
 	fi
 }
@@ -176,37 +183,37 @@ repourl()
 repopushurl()
 {
 	[ -n "$pushbase" ] || return 0
-	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
+	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
 	if [ -n "$repo_t" ]; then
 		case "$repo_t" in
 			*://*)
 				;;
 			*)
-				echo "$pushbase$repo_t"
+				$ECHO "$pushbase$repo_t"
 				;;
 		esac
 	else
 		if [ x"$1" = x"." ]; then
-			echo "$pushbase""xonotic.git"
+			$ECHO "$pushbase""xonotic.git"
 		else
-			echo "$pushbase${1##*/}.git"
+			$ECHO "$pushbase${1##*/}.git"
 		fi
 	fi
 }
 
 repobranch()
 {
-	repo_t=`echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
+	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
 	if [ -n "$repo_t" ]; then
-		echo "$repo_t"
+		$ECHO "$repo_t"
 	else
-		echo "master"
+		$ECHO "master"
 	fi
 }
 
 repoflags()
 {
-	echo "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
+	$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
 }
 
 listrepos()
@@ -217,13 +224,13 @@ listrepos()
 		# if we have the dir, always keep it
 		if [ -d "$d" ]; then
 			msg "Repository $d enabled because it already exists"
-			echo "$d"
+			$ECHO "$d"
 			continue
 		fi
 		# if .yes file exists, always keep it
 		if [ -f "$d.yes" ]; then
 			msg "Repository $d enabled by a .yes file"
-			echo "$d"
+			$ECHO "$d"
 			continue
 		fi
 		# if we have .no file, skip
@@ -245,7 +252,7 @@ listrepos()
 		esac
 		# default: enable
 		msg "Repository $d enabled by default"
-		echo "$d"
+		$ECHO "$d"
 	done
 }
 
@@ -271,9 +278,9 @@ fix_upstream_rebase()
 		r_l_other=`git log --pretty="format:%s" "$r_me".."$r_other" | grep -v "^Merge" | sort -u`
 
 		# heuristics: upstream rebase/filter-branch if more than 50% of the commits of one of the sides are in the other too
-		r_lc_me=`echo "$r_l_me" | wc -l`
-		r_lc_other=`echo "$r_l_other" | wc -l`
-		r_lc_together=`{ echo "$r_l_me"; echo "$r_l_other"; } | sort -u | wc -l`
+		r_lc_me=`$ECHO "$r_l_me" | wc -l`
+		r_lc_other=`$ECHO "$r_l_other" | wc -l`
+		r_lc_together=`{ $ECHO "$r_l_me"; $ECHO "$r_l_other"; } | sort -u | wc -l`
 		r_lc_same=$(($r_lc_me + $r_lc_other - $r_lc_together))
 
 		if [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_me )) ] || [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_other )) ]; then
@@ -377,7 +384,7 @@ bestmirror()
 	done
 	if [ -n "$bestin" ]; then
 		msg "Best mirror seems to be $pre$bestin$suf"
-		echo "$bestin"
+		$ECHO "$bestin"
 	else
 		return 1
 	fi
@@ -504,7 +511,7 @@ case "$cmd" in
 		done
 		case "$location" in
 			best)
-				newbase=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
+				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
 						if location=`bestmirror $newbase"xonotic.git" de nl`; then
@@ -536,11 +543,11 @@ case "$cmd" in
 				;;
 		esac
 		if [ -n "$location" ]; then
-			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
-			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+			base=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
+			pushbase=`$ECHO "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
 		else
-			base=`echo "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
-			pushbase=`echo "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
+			base=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
+			pushbase=`$ECHO "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
 		fi
 		if $fix_config; then
 			url=`repourl .`
@@ -563,7 +570,7 @@ case "$cmd" in
 						if ! verbose git pull; then
 							fix_upstream_rebase_mergefail || true
 							check_mergeconflict "$d"
-							echo "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
+							$ECHO "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
 							read -r DUMMY
 						else
 							fix_upstream_rebase_mergeok || true
@@ -629,7 +636,7 @@ case "$cmd" in
 					exists=true
 					verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 				else
-					echo "WTF? Not even branch $b doesn't exist in $d"
+					$ECHO "WTF? Not even branch $b doesn't exist in $d"
 					exit 1
 				fi
 			fi
@@ -638,7 +645,7 @@ case "$cmd" in
 			cd "$d0"
 		done
 		if ! $exists; then
-			echo "The requested branch was not found in any repository."
+			$ECHO "The requested branch was not found in any repository."
 		fi
 		exec "$SELF" branch
 		;;
@@ -655,7 +662,7 @@ case "$cmd" in
 				enter "$d0/$d"
 				r=`git symbolic-ref HEAD`
 				r=${r#refs/heads/}
-				echo "$d is at $r"
+				$ECHO "$d is at $r"
 				cd "$d0"
 			done
 		else
@@ -663,7 +670,7 @@ case "$cmd" in
 				dv=`visible_repo_name "$d"`
 				enter "$d0/$d" verbose
 				if git rev-parse "refs/heads/$branch" >/dev/null 2>&1; then
-					echo "Already having this branch in $dv."
+					$ECHO "Already having this branch in $dv."
 				else
 					if yesno "Branch in $dv?"; then
 						if [ -n "$srcbranch" ]; then
@@ -699,17 +706,17 @@ case "$cmd" in
 					continue
 				fi
 				BRANCH=${BRANCH#remotes/}
-				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
+				ID=`$ECHO "$BRANCH" | tr -c "A-Za-z0-9." "_"`
 				branches_list="$branches_list $BRANCH" # TEH SORT MAKEZ IT UNIEQ
 				eval "r=\$branches_repos_$ID"
 				r="$r $d"
 				eval "branches_repos_$ID=\$r"
 			done
-			echo -n "$branches_list" | xargs -n 1 echo | sort -u | while IFS= read -r BRANCH; do
-				ID=`echo "$BRANCH" | tr -c "A-Za-z0-9." "_"`
+			$ECHO -n "$branches_list" | xargs -n 1 $ECHO | sort -u | while IFS= read -r BRANCH; do
+				ID=`$ECHO "$BRANCH" | tr -c "A-Za-z0-9." "_"`
 				eval "r=\$branches_repos_$ID"
 				printf "%-60s %s\n" "$BRANCH" "$r"
-				#echo "$BRANCH: $r"
+				#$ECHO "$BRANCH: $r"
 			done
 		}
 		;;
@@ -741,19 +748,19 @@ case "$cmd" in
 			diffdata=`git diff --color HEAD`
 			if [ -n "$diffdata" ]; then
 				# we have uncommitted changes
-				if yesno "Uncommitted changes in \"$r\" in $dv. Commit?" 'echo "$diffdata" | less -r'; then
+				if yesno "Uncommitted changes in \"$r\" in $dv. Commit?" '$ECHO "$diffdata" | less -r'; then
 					verbose git commit -a
 				fi
 			fi
-			rem=`git config "branch.$r.remote" || echo origin`
-			bra=`git config "branch.$r.merge" || echo "$r"`
+			rem=`git config "branch.$r.remote" || $ECHO origin`
+			bra=`git config "branch.$r.merge" || $ECHO "$r"`
 			upstream="$rem/${bra#refs/heads/}"
 			if ! git rev-parse "$upstream" >/dev/null 2>&1; then
 				upstream="origin/`repobranch "$d"`"
 			fi
 			logdata=`git log --color "$upstream".."$r"`
 			if [ -n "$logdata" ]; then
-				if yesno "Push \"$r\" in $dv?" 'echo "$logdata" | less -r'; then
+				if yesno "Push \"$r\" in $dv?" '$ECHO "$logdata" | less -r'; then
 					verbose git push "$rem" HEAD
 				fi
 			fi
@@ -932,7 +939,7 @@ case "$cmd" in
 
 		enter "$d0/darkplaces" verbose
 		if [ x"$BAD_TARGETS" = x" " ]; then
-			echo "Warning: invalid empty client, default clients will be used."
+			$ECHO "Warning: invalid empty client, default clients will be used."
 		fi
 		if $cleandp; then
 			verbose make $MAKEFLAGS clean
@@ -941,7 +948,7 @@ case "$cmd" in
 			verbose make $MAKEFLAGS STRIP=: "$@" "$T"
 		done
 		for T in $BAD_TARGETS; do
-			echo "Warning: discarded invalid client $T."
+			$ECHO "Warning: discarded invalid client $T."
 		done
 
 		verbose "$SELF" update-maps
@@ -972,7 +979,7 @@ case "$cmd" in
 			if [ -x "darkplaces/darkplaces$client.exe" ]; then
 				client=$client.exe
 			else
-				echo "Client darkplaces/darkplaces$client not found, aborting"
+				$ECHO "Client darkplaces/darkplaces$client not found, aborting"
 				exit 1
 			fi
 		fi
@@ -1006,8 +1013,8 @@ case "$cmd" in
 			#	# somehow send it
 			#	rm -f xonotic.core.tar.gz
 			else
-				echo "The core dump can be examined later by"
-				echo "  gdb $binary xonotic.core"
+				$ECHO "The core dump can be examined later by"
+				$ECHO "  gdb $binary xonotic.core"
 			fi
 		fi
 		;;
@@ -1052,10 +1059,10 @@ case "$cmd" in
 						continue
 					fi
 					if git format-patch -o "$patchdir/$i" "$UPSTREAM".."$BRANCH"; then
-						echo "$d" > "$patchdir/$i/info.txt"
-						echo "$BRANCH" >> "$patchdir/$i/info.txt"
-						echo "$UPSTREAM" >> "$patchdir/$i/info.txt"
-						echo "$TRACK" >> "$patchdir/$i/info.txt"
+						$ECHO "$d" > "$patchdir/$i/info.txt"
+						$ECHO "$BRANCH" >> "$patchdir/$i/info.txt"
+						$ECHO "$UPSTREAM" >> "$patchdir/$i/info.txt"
+						$ECHO "$TRACK" >> "$patchdir/$i/info.txt"
 						i=$(($i+1))
 					else
 						rm -rf "$patchdir/$i"
@@ -1096,12 +1103,12 @@ case "$cmd" in
 		reportecho()
 		{
 			report=$report"$*$LF"
-			echo "$*"
+			$ECHO "$*"
 		}
 		reportecho4()
 		{
 			report=$report"    $*$LF"
-			echo "    $*"
+			$ECHO "    $*"
 		}
 		reportdo4()
 		{
@@ -1164,14 +1171,14 @@ case "$cmd" in
 					diffdata=`git diff --color --find-copies-harder --ignore-space-change "$realbase"..."$ref"`
 					if [ -z "$diffdata" ]; then
 						reportecho4 "--> not merging, no changes vs master, branch contains redundant history"
-						if yesno "Branch \"$ref\" probably should get deleted. Do it?" '{ echo "$logdata"; } | less -r'; then
+						if yesno "Branch \"$ref\" probably should get deleted. Do it?" '{ $ECHO "$logdata"; } | less -r'; then
 							git push origin :"${ref#refs/remotes/origin/}"
 							reportecho4 "--> branch deleted"
 						fi
 					elif [ -z "$branch" ] && [ -n "$note" ]; then
-						reportdo4 echo "$note"
+						reportdo4 $ECHO "$note"
 						reportecho4 "--> not merging, already had this one rejected before"
-					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ echo "$logdata"; echo "$diffdata"; } | less -r'; then
+					elif yesno "Branch \"$ref\" may want to get merged. Do it?" '{ $ECHO "$logdata"; $ECHO "$diffdata"; } | less -r'; then
 						git checkout "$realbase"
 						org=`git rev-parse HEAD`
 						if ! git merge --no-ff "$ref" 2>&1 | tee "$t" && ! { git ls-files -u | grep ' 1	' >/dev/null; }; then
@@ -1192,7 +1199,7 @@ case "$cmd" in
 								git push origin :"${ref#refs/remotes/origin/}"
 								reportecho4 "--> test failed, branch deleted"
 							elif [ -n "$note" ]; then
-								reportdo4 echo "$note"
+								reportdo4 $ECHO "$note"
 								reportecho4 "--> test failed"
 							else
 								reportecho4 "--> test failed, postponed"
@@ -1203,7 +1210,7 @@ case "$cmd" in
 							find . -type f -exec touch {} \;
 							git commit -a --amend -C HEAD || true # don't fail if nothing to commit
 
-							echo "MERGING"
+							$ECHO "MERGING"
 							case ",`repoflags "$d"`," in
 								*,svn,*)
 									# we do quite a mess here... luckily we know $org
@@ -1229,7 +1236,7 @@ case "$cmd" in
 							git push origin :"${ref#refs/remotes/origin/}"
 							reportecho4 "--> branch deleted"
 						elif [ -n "$note" ]; then
-							reportdo4 echo "$note"
+							reportdo4 $ECHO "$note"
 							reportecho4 "--> rejected"
 						else
 							reportecho4 "--> postponed"
@@ -1241,7 +1248,7 @@ case "$cmd" in
 			reportecho ""
 		done
 		rm -f "$t"
-		echo "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
+		$ECHO "$report" | ssh nexuiz@rm.endoftheinternet.org cat '>>' public_html/xonotic-merge-notes.txt
 		;;
 	clean)
 		"$SELF" fix_config
@@ -1284,7 +1291,7 @@ case "$cmd" in
 				rmuntracked=true
 			elif [ x"$X" = x"-D" ]; then
 				killbranches=true
-			elif echo "$X" | grep '^-FFFF*UUUU*$' >/dev/null; then
+			elif $ECHO "$X" | grep '^-FFFF*UUUU*$' >/dev/null; then
 				msg ''
 				msg "        _____"
 				msg "    ,--'-\\P/\`\\  FFFFFFF"
@@ -1323,8 +1330,8 @@ case "$cmd" in
 				else
 					r=`git symbolic-ref HEAD`
 					r=${r#refs/heads/}
-					rem=`git config "branch.$r.remote" || echo origin`
-					bra=`git config "branch.$r.merge" || echo "$r"`
+					rem=`git config "branch.$r.remote" || $ECHO origin`
+					bra=`git config "branch.$r.merge" || $ECHO "$r"`
 					upstream="$rem/${bra#refs/heads/}"
 					if $fetchupstream; then
 						verbose git fetch "$rem"
@@ -1379,7 +1386,7 @@ case "$cmd" in
 				msg "Building a RELEASE"
 				;;
 			*)
-				echo >&2 -n "$ESC[2J$ESC[H"
+				$ECHO >&2 -n "$ESC[2J$ESC[H"
 				msg ""
 				msg ""
 				msg ""
@@ -1424,7 +1431,7 @@ case "$cmd" in
 		verbose rm -rf Xonotic Xonotic*.zip
 		verbose mkdir -p Xonotic
 		if [ -n "$RELEASEDATE" ]; then
-			verbose echo "$RELEASEDATE" > Xonotic/stamp.txt
+			verbose $ECHO "$RELEASEDATE" > Xonotic/stamp.txt
 		else
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 		fi
@@ -1505,7 +1512,7 @@ case "$cmd" in
 						(
 							d=`mktemp -d -t rebrand.XXXXXX`
 							cd "$d"
-							echo "-mygames" > darkplaces.opt
+							$ECHO "-mygames" > darkplaces.opt
 							zip -9r darkplaces.zip darkplaces.opt
 							cat darkplaces.zip
 							cd "$d0"
@@ -1804,26 +1811,26 @@ case "$cmd" in
 		;;
 
 	*)
-		echo "Usage:"
-		echo "  $SELF admin-merge [<branch>]"
-		echo "  $SELF branch <branch>"
-		echo "  $SELF branch <remote> <branch> [<srcbranch>]"
-		echo "  $SELF branches"
-		echo "  $SELF checkout|switch <branch>"
-		echo "  $SELF checkout|switch <remote>/<branch>"
-		echo "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
-		echo "  $SELF clean --reclone"
-		echo "  $SELF compile [-c] [-r] [-0]"
-		echo "  $SELF each|foreach [-k] command..."
-		echo "  $SELF fix_upstream_rebase"
-		echo "  $SELF keygen"
-		echo "  $SELF merge"
-		echo "  $SELF push|commit [-s]"
-		echo "  $SELF release"
-		echo "  $SELF restore-patches"
-		echo "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
-		echo "  $SELF save-patches"
-		echo "  $SELF update-maps"
-		echo "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
+		$ECHO "Usage:"
+		$ECHO "  $SELF admin-merge [<branch>]"
+		$ECHO "  $SELF branch <branch>"
+		$ECHO "  $SELF branch <remote> <branch> [<srcbranch>]"
+		$ECHO "  $SELF branches"
+		$ECHO "  $SELF checkout|switch <branch>"
+		$ECHO "  $SELF checkout|switch <remote>/<branch>"
+		$ECHO "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
+		$ECHO "  $SELF clean --reclone"
+		$ECHO "  $SELF compile [-c] [-r] [-0]"
+		$ECHO "  $SELF each|foreach [-k] command..."
+		$ECHO "  $SELF fix_upstream_rebase"
+		$ECHO "  $SELF keygen"
+		$ECHO "  $SELF merge"
+		$ECHO "  $SELF push|commit [-s]"
+		$ECHO "  $SELF release"
+		$ECHO "  $SELF restore-patches"
+		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		$ECHO "  $SELF save-patches"
+		$ECHO "  $SELF update-maps"
+		$ECHO "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
 		;;
 esac
