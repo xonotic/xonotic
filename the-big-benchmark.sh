@@ -25,6 +25,7 @@ while :; do
 done
 
 set -x
+rm -f data/benchmark.log
 ./all clean --reclone
 ./all compile -r
 ./all run -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable
@@ -46,6 +47,6 @@ echo " - graphics card (which vendor, which model)"
 echo " - operating system (including whether it is 32bit or 64bit)"
 echo " - graphics driver version"
 echo " - the following info:"
-tail -n 6 data/benchmark.log
+cat data/benchmark.log
 echo
 echo "Thank you"
