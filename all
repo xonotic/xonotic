@@ -801,6 +801,9 @@ case "$cmd" in
 				-r)
 					debug=release
 					export CC="$CC -g -mtune=native -march=native"
+					if [ -n "$WE_HATE_OUR_USERS" ]; then
+						export CC="$CC -fno-common"
+					fi
 					shift
 					;;
 				*)
