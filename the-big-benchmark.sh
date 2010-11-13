@@ -36,6 +36,7 @@ set -x
 ./all compile -r
 ./all run -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master
 ./all clean -r -f -u
+set +x
 
 echo
 echo "Please provide the the following info to the Xonotic developers:"
