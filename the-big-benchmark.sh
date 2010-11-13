@@ -28,14 +28,14 @@ set -x
 ./all clean --reclone
 ./all compile -r
 ./all run -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable
-./all clean --reclone
+./all clean -r -f
 (
 	cd darkplaces
 	git checkout master || git checkout -t origin/master || exit 1
 )
 ./all compile -r
 ./all run -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master
-./all clean --reclone
+./all clean -r -f -u
 
 echo
 echo "Please provide the the following info to the Xonotic developers:"
