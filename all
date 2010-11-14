@@ -892,20 +892,23 @@ case "$cmd" in
 			mkdir -p .libs
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
 				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libd0_rijndael"-* .libs/
 				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
 			else
 				case "`uname`" in
 					Linux)
 						case `uname -m` in
 							x86_64)
-								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
-								verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
 								;;
 							*86)
-								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
-								verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
 								;;
 							*)
 								compiled0=true
@@ -914,6 +917,7 @@ case "$cmd" in
 						;;
 					Darwin)
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
 						;;
 					*)
 						compiled0=true
