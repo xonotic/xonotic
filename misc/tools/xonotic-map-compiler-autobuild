@@ -260,9 +260,11 @@ getthemap()
 	blobhash=$5
 	commithash=$6
 	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3"; then
-		continue
+		if unzip -l "$bspdir/$M-$blobhash.pk3" >/dev/null 2>&1; then
+			return 0
+		fi
 	fi
-	if ! wget -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
+	if ! wget -c -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 			rm -f "$bspdir/$M-$blobhash.pk3"
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
