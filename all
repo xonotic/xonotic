@@ -1365,10 +1365,10 @@ case "$cmd" in
 			if $rmuntracked; then
 				case "$d" in
 					.)
-						verbose git clean -df
+						verbose git clean -df || true
 						;;
 					*)
-						verbose git clean -xdf
+						verbose git clean -xdf || true
 						;;
 				esac
 			fi
