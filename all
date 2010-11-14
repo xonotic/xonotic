@@ -908,7 +908,7 @@ case "$cmd" in
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
 								;;
 							*)
 								compiled0=true
