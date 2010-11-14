@@ -824,7 +824,7 @@ case "$cmd" in
 					TARGETS="sv-$debug sdl-$debug"
 					;;
 			esac
-			export CC="$CC -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
+			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
 		else
 			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
