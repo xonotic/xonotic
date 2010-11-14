@@ -1026,6 +1026,7 @@ case "$cmd" in
 				$ECHO "The core dump can be examined later by"
 				$ECHO "  gdb $binary xonotic.core"
 			fi
+			exit 1
 		fi
 		;;
 	each|foreach)

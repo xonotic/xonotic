@@ -28,14 +28,14 @@ set -x
 rm -f data/benchmark.log
 ./all clean --reclone
 ./all compile -r
-./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable
+./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable || true
 ./all clean -r -f
 (
 	cd darkplaces
 	git checkout master || git checkout -t origin/master || exit 1
 )
 ./all compile -r
-./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master
+./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master || true
 ./all clean -r -f -u
 set +x
 
