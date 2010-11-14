@@ -800,7 +800,14 @@ case "$cmd" in
 					;;
 				-r)
 					debug=release
-					export CC="$CC -g -mtune=native -march=native"
+					export CC="$CC -g"
+					case "`$CC -dumpversion`" in
+						[5-9]*|[1-9][0-9]*|4.[3-9]*|4.[1-9][0-9]*)
+							# gcc 4.3 or higher
+							# -march=native is broken < 4.3
+							export CC="$CC -mtune=native -march=native"
+							;;
+					esac
 					if [ -n "$WE_HATE_OUR_USERS" ]; then
 						export CC="$CC -fno-common"
 					fi
