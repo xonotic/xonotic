@@ -1010,9 +1010,9 @@ case "$cmd" in
 
 		binary=$1
 
-		if [ -n "$USE_GDB" ]; then
+		if [ x"$USE_GDB" = x"yes" ]; then
 			set -- gdb --args "$@"
-		elif which gdb >/dev/null 2>&1; then
+		elif [ x"$USE_GDB" != x"no" ] && which gdb >/dev/null 2>&1; then
 			set -- gdb --batch -x savecore.gdb --args "$@"
 		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
