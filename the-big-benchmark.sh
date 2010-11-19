@@ -8,21 +8,23 @@ echo
 echo "WARNING: running this script will destroy ANY local changes you"
 echo "might have on the repository."
 echo
-echo "Are you absolutely sure you want to run this?"
-echo
-while :; do
-	echo -n "y/n: "
-	read -r yesno
-	case "$yesno" in
-		y)
-			break
-			;;
-		n)
-			echo "Aborted."
-			exit 1
-			;;
-	esac
-done
+if [ x"$1" != x"--yes" ]; then
+	echo "Are you absolutely sure you want to run this?"
+	echo
+	while :; do
+		echo -n "y/n: "
+		read -r yesno
+		case "$yesno" in
+			y)
+				break
+				;;
+			n)
+				echo "Aborted."
+				exit 1
+				;;
+		esac
+	done
+fi
 
 set -x
 rm -f data/benchmark.log
