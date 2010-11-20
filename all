@@ -489,6 +489,7 @@ case "$cmd" in
 				case "$2" in
 					nl) ;;
 					de) ;;
+					us) ;;
 					best) ;;
 					default) ;;
 					*)
@@ -496,6 +497,7 @@ case "$cmd" in
 						msg "Possible locations for the -l option:"
 						msg "  nl (Netherlands, run by merlijn)"
 						msg "  de (Germany, run by divVerent)"
+						msg "  us (United States of America, run by detrate)"
 						msg "  best (find automatically)"
 						msg "  default (currently nl)"
 						exit 1
@@ -514,7 +516,7 @@ case "$cmd" in
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
-						if location=`bestmirror $newbase"xonotic.git" de nl`; then
+						if location=`bestmirror $newbase"xonotic.git" de nl us`; then
 							:
 						else
 							location=current
