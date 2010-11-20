@@ -41,8 +41,6 @@ cd ~/xonotic-release-build
 #   maps near completion
 
 for b in \
-	origin/fruitiex/space_elevator \
-	origin/fruitiex/dance \
 	origin/fruitiex/runningmanctf \
 	origin/mintox/geoplanetary
 do
@@ -61,5 +59,6 @@ for X in Xonotic-$d*.zip; do
 	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
 done
 rsync -vaSHP Xonotic*.zip xonotic-beta:autobuild/
+ssh xonotic-beta sh update-rsync.sh "$d"
 echo "Finished a new beta build at http://beta.xonotic.org/autobuild/" | $IRCSPAM
 cd

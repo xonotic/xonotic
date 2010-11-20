@@ -26,12 +26,11 @@ grep -l -- '-->(none)<!--' */index.html | cut -d / -f 1 | while IFS= read -r D; 
 		echo "$deltime $F" >> .to_delete
 	done
 done
-deltime=$(($now - 86400))
 while IFS=' ' read -r d f; do
 	if [ $d -lt $now ]; then
-		rm -f "$f"
+		rm -rf "$f"
 	else
 		echo "$d $f"
-	done
+	fi
 done < .to_delete > .to_delete_new
 mv .to_delete_new .to_delete
