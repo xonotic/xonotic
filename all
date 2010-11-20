@@ -529,7 +529,7 @@ case "$cmd" in
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
-						if location=`bestmirror $newbase"xonotic.git" de us nl:'*3/2'`; then
+						if location=`bestmirror $newbase"xonotic.git" de us nl:'*3/2'`; then # 50% malus to the NL server to not overload it too much
 							:
 						else
 							location=current
