@@ -34,7 +34,7 @@ USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keyb
 ./all clean -r -f
 (
 	cd darkplaces
-	git checkout master || git checkout -t origin/master || exit 1
+	git checkout div0-stable-pred3d9 || git checkout -t origin/div0-stable-pred3d9 || exit 1
 )
 ./all compile -r
 USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master || true
