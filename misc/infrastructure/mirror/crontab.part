@@ -1,0 +1,1 @@
+*/5 * * * * gitmirror sh /root/git-mirror-update.sh

@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+
+ServerName de.git.xonotic.org
+SetEnv GIT_PROJECT_ROOT /var/cache/git
+AliasMatch ^/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$          /var/cache/git/$1
+AliasMatch ^/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/cache/git/$1
+ScriptAliasMatch \
+       "(?x)^/(.*/(HEAD | \
+		       info/refs | \
+		       objects/info/[^/]+ | \
+		       git-(upload|receive)-pack))$" \
+       /usr/lib/git-core/git-http-backend/$1
+
+DocumentRoot /var/www-gitweb/
+Options FollowSymLinks +ExecCGI
+AddHandler cgi-script .cgi
+Alias /gitweb /var/www-gitweb/
+
+</VirtualHost>
