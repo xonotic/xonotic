@@ -368,15 +368,28 @@ bestmirror()
 
 	bestin=
 	bestt=
-	for in in "$@"; do
+	for mir in "$@"; do
+		case "$mir" in
+			*:*)
+				in=${mir%%:*}
+				op=${mir#*:}
+				;;
+			*)
+				in=$mir
+				op=
+				;;
+		esac
 		m=$pre$in$suf
 		if t=`mirrorspeed "$m"`; then
-			msg "$m -> $t ticks"
 			if [ -n "$t" ]; then
+				t=$(($t$op)) # fudge factor
+				msg "$m -> $t ticks ($op)"
 				if [ -z "$bestt" ] || [ "$t" -lt "$bestt" ]; then
 					bestin=$in
 					bestt=$t
 				fi
+			else
+				msg "$m -> error"
 			fi
 		else
 			msg "$m -> FAIL"
@@ -516,7 +529,7 @@ case "$cmd" in
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
-						if location=`bestmirror $newbase"xonotic.git" de nl us`; then
+						if location=`bestmirror $newbase"xonotic.git" de us nl:'*3/2'`; then
 							:
 						else
 							location=current
