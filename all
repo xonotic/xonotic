@@ -269,6 +269,17 @@ fix_upstream_rebase()
 	if [ -z "$r_me" ] || [ -z "$r_other" ]; then
 		return
 	fi
+
+	# one of the two sides of the merge should be remote upstream, or all is fine
+	r_r=`git symbolic-ref HEAD`
+	r_rem=`git config "branch.$r_rem.remote" || $ECHO origin`
+	r_bra=`git config "branch.$r_bra.merge" || $ECHO "$r_r"`
+	if [ x"$r_me" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
+		if [ x"$r_other" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
+			return
+		fi
+	fi
+
 	r_base=`git merge-base "$r_me" "$r_other"`
 
 	# no merge-base? upstream did filter-branch
