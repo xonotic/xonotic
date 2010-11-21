@@ -546,6 +546,13 @@ case "$cmd" in
 		esac
 		case "$location" in
 			best)
+				# if we fetched via ssh://, switch to git:// for fetching and keep using ssh:// for pushing
+				case "$base" in
+					ssh://*)
+						pushbase=$base
+						base=git://git.xonotic.org/xonotic/xonotic.git
+						;;
+				esac
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
