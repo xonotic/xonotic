@@ -272,6 +272,7 @@ fix_upstream_rebase()
 
 	# one of the two sides of the merge should be remote upstream, or all is fine
 	r_r=`git symbolic-ref HEAD`
+	r_r=${r_r#refs/heads/}
 	r_rem=`git config "branch.$r_rem.remote" || $ECHO origin`
 	r_bra=`git config "branch.$r_bra.merge" || $ECHO "$r_r"`
 	if [ x"$r_me" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
