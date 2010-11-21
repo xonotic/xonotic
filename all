@@ -269,6 +269,18 @@ fix_upstream_rebase()
 	if [ -z "$r_me" ] || [ -z "$r_other" ]; then
 		return
 	fi
+
+	# one of the two sides of the merge should be remote upstream, or all is fine
+	r_r=`git symbolic-ref HEAD`
+	r_r=${r_r#refs/heads/}
+	r_rem=`git config "branch.$r_rem.remote" || $ECHO origin`
+	r_bra=`git config "branch.$r_bra.merge" || $ECHO "$r_r"`
+	if [ x"$r_me" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
+		if [ x"$r_other" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
+			return
+		fi
+	fi
+
 	r_base=`git merge-base "$r_me" "$r_other"`
 
 	# no merge-base? upstream did filter-branch
@@ -382,11 +394,11 @@ bestmirror()
 		m=$pre$in$suf
 		if t=`mirrorspeed "$m"`; then
 			if [ -n "$t" ]; then
-				t=$(($t$op)) # fudge factor
-				msg "$m -> $t ticks ($op)"
-				if [ -z "$bestt" ] || [ "$t" -lt "$bestt" ]; then
+				tt=$(($t$op)) # fudge factor
+				msg "$m -> $t$op = $tt ticks"
+				if [ -z "$bestt" ] || [ "$tt" -lt "$bestt" ]; then
 					bestin=$in
-					bestt=$t
+					bestt=$tt
 				fi
 			else
 				msg "$m -> error"
@@ -525,11 +537,26 @@ case "$cmd" in
 			shift
 		done
 		case "$location" in
+			current)
+				if [ x"`git config xonotic.all.mirrorselection 2>/dev/null || true`" != x"done" ]; then
+					git config xonotic.all.mirrorselection done
+					location=best
+				fi
+				;;
+		esac
+		case "$location" in
 			best)
+				# if we fetched via ssh://, switch to git:// for fetching and keep using ssh:// for pushing
+				case "$base" in
+					ssh://*)
+						pushbase=$base
+						base=git://git.xonotic.org/xonotic/
+						;;
+				esac
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
 				case "$newbase" in
 					*\ *)
-						if location=`bestmirror $newbase"xonotic.git" de us nl:'*3/2'`; then # 50% malus to the NL server to not overload it too much
+						if location=`bestmirror $newbase"xonotic.git" de us nl:'*6/5'`; then # 20% malus to the NL server to not overload it too much
 							:
 						else
 							location=current

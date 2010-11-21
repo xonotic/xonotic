@@ -1,3 +1,7 @@
 xonotic-*.pk3dir
 *.pk3
 benchmark.log
+gfx
+maps
+scripts
+textures
