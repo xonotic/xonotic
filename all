@@ -394,11 +394,11 @@ bestmirror()
 		m=$pre$in$suf
 		if t=`mirrorspeed "$m"`; then
 			if [ -n "$t" ]; then
-				t=$(($t$op)) # fudge factor
-				msg "$m -> $t ticks ($op)"
-				if [ -z "$bestt" ] || [ "$t" -lt "$bestt" ]; then
+				tt=$(($t$op)) # fudge factor
+				msg "$m -> $t$op=$tt ticks"
+				if [ -z "$bestt" ] || [ "$tt" -lt "$bestt" ]; then
 					bestin=$in
-					bestt=$t
+					bestt=$tt
 				fi
 			else
 				msg "$m -> error"
