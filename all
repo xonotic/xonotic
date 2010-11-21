@@ -550,7 +550,7 @@ case "$cmd" in
 				case "$base" in
 					ssh://*)
 						pushbase=$base
-						base=git://git.xonotic.org/xonotic/xonotic.git
+						base=git://git.xonotic.org/xonotic/
 						;;
 				esac
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
