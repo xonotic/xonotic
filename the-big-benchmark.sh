@@ -37,7 +37,7 @@ USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keyb
 	git checkout div0-stable-pred3d9 || git checkout -t origin/div0-stable-pred3d9 || exit 1
 )
 ./all compile -r
-USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//master || true
+USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable-pred3d9 || true
 ./all clean -r -f -u
 set +x
 
