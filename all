@@ -395,7 +395,7 @@ bestmirror()
 		if t=`mirrorspeed "$m"`; then
 			if [ -n "$t" ]; then
 				tt=$(($t$op)) # fudge factor
-				msg "$m -> $t$op=$tt ticks"
+				msg "$m -> $t$op = $tt ticks"
 				if [ -z "$bestt" ] || [ "$tt" -lt "$bestt" ]; then
 					bestin=$in
 					bestt=$tt
@@ -536,6 +536,14 @@ case "$cmd" in
 			fi
 			shift
 		done
+		case "$location" in
+			current)
+				if [ x"`git config xonotic.all.mirrorselection 2>/dev/null || true`" != x"done" ]; then
+					git config xonotic.all.mirrorselection done
+					location=best
+				fi
+				;;
+		esac
 		case "$location" in
 			best)
 				newbase=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,:// .git.xonotic.org/,"`
