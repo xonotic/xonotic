@@ -275,6 +275,7 @@ fix_upstream_rebase()
 	r_r=${r_r#refs/heads/}
 	r_rem=`git config "branch.$r_rem.remote" || $ECHO origin`
 	r_bra=`git config "branch.$r_bra.merge" || $ECHO "$r_r"`
+	r_bra=${r_bra#refs/heads/}
 	if [ x"$r_me" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
 		if [ x"$r_other" != x"`git rev-parse "$r_rem/$r_bra"`" ]; then
 			return
