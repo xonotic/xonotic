@@ -30,7 +30,7 @@
  * SUCH DAMAGE.
  *
  * $Format:commit %H$
- * $Id: 8bcedf6746fc5fd1cd5709800f5ce5bcb5532a87 $
+ * $Id: 9a7b912057b836675f4e24f08514cad53fa46d2a $
  */
 
 #ifndef __D0_H__
@@ -44,6 +44,6 @@
 
 extern void *(*d0_malloc)(size_t len);
 extern void (*d0_free)(void *p);
-extern const char *d0_bsd_license_notitce;
+extern const char *d0_bsd_license_notice;
 
 #endif
