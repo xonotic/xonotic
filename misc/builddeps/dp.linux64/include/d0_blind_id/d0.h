@@ -44,6 +44,6 @@
 
 extern void *(*d0_malloc)(size_t len);
 extern void (*d0_free)(void *p);
-extern const char *d0_bsd_license_notitce;
+extern const char *d0_bsd_license_notice;
 
 #endif

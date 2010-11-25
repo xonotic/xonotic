@@ -1,4 +1,4 @@
-prefix=/tmp/d0c
+prefix=/home/rpolzer/Games/Xonotic/misc/builddeps/dp.linux64
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
