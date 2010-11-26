@@ -16,9 +16,10 @@ function d0_blind_id_verify()
 	global $d0_blind_id_keygen;
 	global $d0_blind_id_d0pk;
 
-	$postdata = file_get_contents("php://input");
-	if($postdata === false)
-		die("Cannot read from input");
+	if($_SERVER["REQUEST_METHOD"] == "POST")
+		$data = file_get_contents("php://input") . "\0" . $_SERVER["QUERY_STRING"];
+	else
+		$data = $_SERVER["QUERY_STRING"];
 	$sig = $_SERVER["HTTP_X_D0_BLIND_ID_DETACHED_SIGNATURE"];
 	if($sig)
 	{
@@ -41,7 +42,7 @@ function d0_blind_id_verify()
 			die("Cannot start process");
 		$outfh = $pipes[1];
 		$buffers = array(
-				4 => $postdata,
+				4 => $data,
 				5 => base64_decode($sig)
 				);
 		$rpipes = array(
