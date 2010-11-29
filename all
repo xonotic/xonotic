@@ -1055,7 +1055,7 @@ case "$cmd" in
 
 		if [ x"$USE_GDB" = x"yes" ]; then
 			set -- gdb --args "$@"
-		elif [ -z "$WE_HATE_OUR_USERS" ] && [ x"$USE_GDB" != x"no" ] && which gdb >/dev/null 2>&1; then
+		elif [ x"$USE_GDB" != x"no" ] && which gdb >/dev/null 2>&1; then
 			set -- gdb --batch -x savecore.gdb --args "$@"
 		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
