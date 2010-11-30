@@ -11,9 +11,8 @@ while(<>)
 {
 	chomp;
 	s/\r//g;
-	s/\/\/.*//;
 
-	if(/^\s*(?:set\s+|seta\s+|)(\S+)/)
+	if(/^\s*(?:set\s+|seta\s+)(\S+)/ or /^\s*(\S+_\S+)/)
 	{
 		if(exists $cvar2line{$1})
 		{
