@@ -158,8 +158,8 @@ if((my $key = $cgi->param('key')))
 		$ENV{REQUESTFILE} = $tempfh->filename;
 		$ENV{RESPONSEFILE} = $tempfh->filename;
 		$ENV{SECRET} = "key_$ca.d0sk";
-		open my $errfh, '-|', './xonotic-keygen -P "$SECRET" -j "$REQUESTFILE" -o "$RESPONSEFILE" 2>&1'
-			or die "cannot start xonotic-keygen";
+		open my $errfh, '-|', './crypto-keygen-standalone -P "$SECRET" -j "$REQUESTFILE" -o "$RESPONSEFILE" 2>&1'
+			or die "cannot start crypto-keygen-standalone";
 		my $err = <$errfh>;
 		close $errfh
 			or die "xonotic-keygen failed: $err";
