@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+
+use strict;
+use CGI;
+use LWP::Simple;
+use MIME::Base64;
+use File::Temp;
+use DBI;
+my $cgi = CGI->new();
+
+sub error($)
+{
+	my ($err) = @_;
+	print "Content-type: text/plain\n\nd0er $err";
+	exit 0;
+}
+
+sub check_dnsbl($$@)
+{
+	my ($goodpatterns, $badpatterns, $list) = @_;
+
+	my $name = $ENV{REMOTE_HOST} . ".";
+	my $addr = $ENV{REMOTE_ADDR};
+
+	# check goodpatterns
+	for(@$goodpatterns)
+	{
+		return 0
+			if $name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/;
+	}
+	# check badpatterns
+	for(@$badpatterns)
+	{
+		return -1
+			if $name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/;
+	}
+
+	# is he tor?
+	my $h = gethostbyname $addr;
+	return -1
+		if not defined $h;
+	
+	my $blprefix = join '.', reverse unpack 'C4', $h;
+	my $i = 0;
+	for(@$list)
+	{
+		++$i;
+		my $hn = "$blprefix.$_.";
+		my $h2 = gethostbyname $hn;
+		next
+			if not defined $h2;
+		return -1;
+	}
+
+	return 0;
+}
+
+# create table ip ( id INT AUTO_INCREMENT PRIMARY KEY, ip VARCHAR(64), t DATETIME, error BOOLEAN, INDEX(ip), INDEX(t), INDEX(error) );
+our $__CACHED_DBH__;
+
+sub check_sql($$$$$)
+{
+	my ($dsn, $u, $p, $tbl, $inc) = @_;
+	my $ip = $ENV{REMOTE_ADDR};
+	my $DBH = ($__CACHED_DBH__ ? $__CACHED_DBH__ : ($__CACHED_DBH__ = DBI->connect($dsn, $u, $p, { RaiseError => 1, AutoCommit => 0 })))
+		or die "DBI/DBD: $!";
+	$DBH->do("set character set utf8");
+	$DBH->do("set names utf8");
+	if($inc < 0)
+	{
+		$DBH->do("update $tbl set error=true where ip=?", undef, $ip);
+		$DBH->commit();
+		$DBH->disconnect();
+		return 0;
+	}
+	elsif($inc == 0)
+	{
+		my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>date_sub(now(), interval 7 day)", undef, $ip)
+			or die "DBI/DBD: $!";
+		$DBH->disconnect();
+		return $status->[0] ? -1 : 0;
+	}
+	else
+	{
+		my $status = $DBH->selectall_arrayref("select error, t>date_sub(now(), interval 7 day) from $tbl where ip=?", undef, $ip)
+			or die "DBI/DBD: $!";
+		if(@$status)
+		{
+			if($status->[0][0] || !$status->[0][1]) # error, or after interval
+			{
+				$DBH->do("update $tbl set error=false, t=now() where ip=?", undef, $ip);
+				$DBH->commit();
+				$DBH->disconnect();
+				return 0;
+			}
+			else # too soon
+			{
+				$DBH->disconnect();
+				return -1;
+			}
+		}
+		else
+		{
+			$DBH->do("insert into $tbl(ip, error, t) values(?, false, now())", undef, $ip);
+			$DBH->commit();
+			$DBH->disconnect();
+			return 0;
+		}
+	}
+}
+
+sub check_banlist($)
+{
+	my ($s) = @_;
+	my $ip = $ENV{REMOTE_ADDR};
+	my @s = split /\n/, get $s;
+	for(0..@s/4-1)
+	{
+		my $i = $s[4*$_];
+		return 1 if "$ip." =~ /^\Q$i\E\./;
+	}
+	return 0;
+}
+
+our %ca = ();
+our $default_ca = 0;
+
+do 'config.pl';
+
+if((my $key = $cgi->param('key')))
+{
+	local $| = 1;
+	undef local $/;
+
+	my $ca = $cgi->param('ca');
+	$ca = $default_ca if not defined $ca;
+	error "Invalid CA" if not defined $ca{$ca};
+	error "Not allowed" if not $ca{$ca}->{check}->(1);
+	my $tempfh = undef;
+	eval
+	{
+		$tempfh = File::Temp->new();
+		binmode $tempfh;
+		my $fh = $cgi->upload('key');
+		if($fh)
+		{
+			binmode $fh;
+			print $tempfh $_ for <$fh>;
+		}
+		else
+		{
+			$key =~ s/ /+/g;
+			$key = decode_base64($key);
+			print $tempfh $key;
+		}
+		seek $tempfh, 0, 0;
+
+		$ENV{REQUESTFILE} = $tempfh->filename;
+		$ENV{RESPONSEFILE} = $tempfh->filename;
+		$ENV{SECRET} = "key_$ca.d0sk";
+		open my $errfh, '-|', './xonotic-keygen -P "$SECRET" -j "$REQUESTFILE" -o "$RESPONSEFILE" 2>&1'
+			or die "cannot start xonotic-keygen";
+		my $err = <$errfh>;
+		close $errfh
+			or die "xonotic-keygen failed: $err";
+		1;
+	}
+	or do
+	{
+		$ca{$ca}->{check}->(-1);
+		die "$@";
+	};
+
+	print "Content-type: application/octet-stream\n\n";
+	binmode STDOUT;
+	print for <$tempfh>;
+}
+else
+{
+	print <<EOF;
+Content-type: text/html
+
+<!doctype html>
+<html>
+<head>
+	<title>Xonotic keygen</title>
+</head>
+<body>
+	<h1>Xonotic keygen</h1>
+	<form action="response.d0ir" method="post" enctype="multipart/form-data">
+	To generate and sign a key IN GAME, follow these steps on the console:
+	<ol>
+		<li>crypto_keygen $default_ca http://rm.endoftheinternet.org/~xonotic/keygen/?ca=$default_ca&amp;key=</li>
+	</ol>
+	To generate and sign a key MANUALLY, follow these steps on a UNIX command line:
+	<ol>
+		<li>./xonotic-keygen -p key_$default_ca.d0pk -o key_$default_ca.d0si</li>
+		<li>./xonotic-keygen -p key_$default_ca.d0pk -I key_$default_ca.d0si -o request.d0iq -O camouflage.d0ic
+		<li>Upload the request.d0iq file: <input type="file" name="key"><input type="submit"></li>
+		<li>Save the response.d0ir file you are getting</li>
+		<li>./xonotic-keygen -p key_$default_ca.d0pk -I key_$default_ca.d0si -c camouflage.d0ic -J response.d0ir -o key_$default_ca.d0si</li>
+		<li>Delete request.d0iq, camouflage.d0ic, response.d0ir</li>
+	</ol>
+	Your key_$default_ca.d0si key is now signed.
+	<hr>
+	To use another CA, please enter its number here before using this page:
+	<input type="text" name="ca" value="$default_ca" size="2">
+</body>
+</html>
+EOF
+}
