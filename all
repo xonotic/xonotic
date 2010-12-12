@@ -1750,7 +1750,6 @@ case "$cmd" in
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 			" defaultXonotic.cfg
-			release)
 			case "$RELEASETYPE" in
 				release)
 					echo "" >> defaultXonotic.cfg
