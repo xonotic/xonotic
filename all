@@ -1658,7 +1658,7 @@ case "$cmd" in
 				# back out of: source/qcsrc/server
 				;;
 			release)
-				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 FTEQCCFLAGS_WATERMARK= clean all
+				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
 				;;
 		esac
 		verbose rm -f Xonotic/source/*/fteqcc.log
@@ -1750,6 +1750,14 @@ case "$cmd" in
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 			" defaultXonotic.cfg
+			release)
+			case "$RELEASETYPE" in
+				release)
+					echo "" >> defaultXonotic.cfg
+					echo "// nicer menu" >> defaultXonotic.cfg
+					echo "set menu_watermark \"\"" >> defaultXonotic.cfg
+					;;
+			esac
 			(
 				verbose cd gfx/menu/luminos
 				verbose cp "$d0"/mediasource/gfx/menu/luminos_versionbuilder/background_l2.svg .
