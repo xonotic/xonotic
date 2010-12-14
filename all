@@ -1437,13 +1437,7 @@ case "$cmd" in
 	release-prepare)
 		#"$SELF" each git clean -fxd
 		case "$RELEASETYPE" in
-			beta)
-				msg "Building a BETA"
-				;;
-			release)
-				msg "Building a RELEASE"
-				;;
-			*)
+			'')
 				$ECHO >&2 -n "$ESC[2J$ESC[H"
 				msg ""
 				msg ""
@@ -1484,6 +1478,12 @@ case "$cmd" in
 				# - optionally, environment variable RELEASEDATE set
 				#   (YYYYMMDD)
 				exit 1
+				;;
+			release)
+				msg "Building a FINISHED RELEASE"
+				;;
+			*)
+				msg "Building a $RELEASETYPE"
 				;;
 		esac
 		verbose rm -rf Xonotic Xonotic*.zip
@@ -1652,15 +1652,7 @@ case "$cmd" in
 		verbose "$SELF" update-maps
 		;;
 	release-qc)
-		case "$RELEASETYPE" in
-			beta)
-				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
-				# back out of: source/qcsrc/server
-				;;
-			release)
-				verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
-				;;
-		esac
+		verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
 		verbose rm -f Xonotic/source/*/fteqcc.log
 		;;
 	release-buildpk3-transform-raw)
@@ -1741,8 +1733,10 @@ case "$cmd" in
 			patch=$(($gv - $major * 10000 - $minor * 100))
 			versionstr="$major.$minor.$patch"
 			case "$RELEASETYPE" in
-				beta)
-					versionstr="$versionstr""beta"
+				release)
+					;;
+				*)
+					versionstr="$versionstr$RELEASETYPE"
 					;;
 			esac
 			verbose sed -i "
