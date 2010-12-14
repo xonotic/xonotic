@@ -1848,12 +1848,6 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
-#		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
-#		verbose mkzip0 Xonotic-$stamp-high.zip \
-#			Xonotic/data/xonotic-$stamp-data-raw.pk3 \
-#			Xonotic/data/xonotic-$stamp-maps-raw.pk3 \
-#			Xonotic/data/xonotic-$stamp-music.pk3 \
-#			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
 		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
