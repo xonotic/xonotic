@@ -12,6 +12,7 @@ dst=$1; shift
 
 c=
 f=
+
 fourcchack=
 case "$tool" in
 	compressonator-dxtc)
@@ -29,6 +30,13 @@ case "$tool" in
 		esac
 		;;
 esac
+
+if [ -n "$fourcchack" ]; then
+	fourcchack_dir=`mktemp -d`
+	convert "$src" -fx "u*u.a" "$fourcchack_dir/src.$ext"
+	src="$fourcchack_dir/src.$ext"
+fi
+
 case "$tool" in
 	compressonator-dxtc|compressonator-atic)
 		case "$tool" in
@@ -70,4 +78,5 @@ esac
 if [ -n "$fourcchack" ]; then
 	# use dd to hack in the right FOURCC
 	echo -n "$fourcchack" | dd of="$dst" bs=1 count=4 seek=84
+	rm -rf "$fourcchack_dir"
 fi
