@@ -1,0 +1,15 @@
+Options +ExecCGI
+DirectoryIndex response.d0ir
+<Files response.d0ir>
+	SetHandler cgi-script
+</Files>
+# allow,deny: accept = A && !D
+# deny,allow: accept = !(D && !A) == A || !D
+<Files *.d0s*>
+	Order allow,deny
+	deny from all
+</Files>
+<Files config.pl>
+	Order allow,deny
+	deny from all
+</Files>

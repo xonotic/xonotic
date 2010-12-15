@@ -1,6 +1,7 @@
 handle SIGHUP nostop print pass
 handle SIGINT nostop print pass
 handle SIGCONT nostop print pass
+handle SIGSTOP nostop print pass
 handle SIGTSTP nostop print pass
 handle SIGTRAP nostop print nopass
 run
