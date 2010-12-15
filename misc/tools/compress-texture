@@ -12,6 +12,23 @@ dst=$1; shift
 
 c=
 f=
+fourcchack=
+case "$tool" in
+	compressonator-dxtc)
+		;;
+	*)
+		case "$format" in
+			dxt2)
+				fourcchack=DXT2
+				format=dxt3
+				;;
+			dxt4)
+				fourcchack=DXT4
+				format=dxt5
+				;;
+		esac
+		;;
+esac
 case "$tool" in
 	compressonator-dxtc|compressonator-atic)
 		case "$tool" in
@@ -20,7 +37,9 @@ case "$tool" in
 		esac
 		case "$format" in
 			dxt1) f="+fourCC DXT1" ;;
+			dxt2) f="+fourCC DXT2" ;;
 			dxt3) f="+fourCC DXT3" ;;
+			dxt4) f="+fourCC DXT4" ;;
 			dxt5) f="+fourCC DXT5" ;;
 		esac
 		dir=`mktemp -d "$HOME/.wine/drive_c/compressonator.XXXXXX"`
@@ -47,3 +66,8 @@ case "$tool" in
 		nvcompress $f "$@" "$src" "$dst"
 		;;
 esac
+
+if [ -n "$fourcchack" ]; then
+	# use dd to hack in the right FOURCC
+	echo -n "$fourcchack" | dd of="$dst" bs=1 count=4 seek=84
+fi
