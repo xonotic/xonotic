@@ -93,6 +93,15 @@ reduce_jpeg2_dds()
 	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
 }
 
+reduce_jpeg2_dds_premul()
+{
+	i=$1; shift
+	ia=$1; shift
+	o=$1; shift; shift 
+	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
+	"$meprefix"compress-texture "$dds_tool" dxt4 "$tmpdir/x.tga" "$o" $1
+}
+
 reduce_jpeg2_jpeg2()
 {
 	i=$1; shift
@@ -151,6 +160,14 @@ reduce_rgba_dds()
 	o=$1; shift; shift
 	convert "$i" "$tmpdir/x.tga" && \
 	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
+}
+
+reduce_rgba_dds_premul()
+{
+	i=$1; shift; shift
+	o=$1; shift; shift
+	convert "$i" "$tmpdir/x.tga" && \
+	"$meprefix"compress-texture "$dds_tool" dxt4 "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgba_jpeg2()
@@ -244,6 +261,13 @@ for F in "$@"; do
 		esac
 	fi
 
+	pm=
+	case "$f" in
+		./particles/particlefont) # particlefont uses premultiplied alpha
+			pm=_premul
+			;;
+	esac
+
 	if $do_jpeg_if_not_dds; then
 		if $will_dds; then
 			will_jpeg=false
@@ -264,22 +288,22 @@ for F in "$@"; do
 			;;
 		*.jpg)
 			if [ -f "${f}_alpha.jpg" ]; then
-				cached "$will_dds"  reduce_jpeg2_dds   "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg2_jpeg2 "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
+				cached "$will_dds"  reduce_jpeg2_dds$pm "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg2_jpeg2  "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
 			else                                   
-				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_jpeg_jpeg   "$F" ""               "$F"           ""               "$jqual_rgb"
+				cached "$will_dds"  reduce_rgb_dds      "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_jpeg_jpeg    "$F" ""               "$F"           ""               "$jqual_rgb"
 			fi
 			;;
 		*.png|*.tga)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
-				cached "$will_dds"  reduce_rgba_dds    "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_rgba_jpeg2  "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
+				cached "$will_dds"  reduce_rgba_dds$pm  "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgba_jpeg2   "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
 			else                                                             
-				cached "$will_dds"  reduce_rgb_dds     "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
-				cached "$will_jpeg" reduce_rgb_jpeg    "$F" ""               "${f}.jpg"     ""               "$jqual_rgb"
+				cached "$will_dds"  reduce_rgb_dds      "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
+				cached "$will_jpeg" reduce_rgb_jpeg     "$F" ""               "${f}.jpg"     ""               "$jqual_rgb"
 			fi
 			rm -f "$F.hasalpha"
 			;;
