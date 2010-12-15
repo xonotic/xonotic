@@ -263,7 +263,7 @@ for F in "$@"; do
 
 	pm=
 	case "$f" in
-		./particles/*) # deluxemap
+		./particles/particlefont) # particlefont uses premultiplied alpha
 			pm=_premul
 			;;
 	esac
