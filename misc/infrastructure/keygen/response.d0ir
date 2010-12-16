@@ -1,5 +1,14 @@
 #!/usr/bin/perl
 
+BEGIN
+{
+        $ENV{PATH} = "/usr/bin:/bin";
+}
+
+# if we are suid, set uid := euid
+$( = $);
+$< = $>;
+
 use strict;
 use CGI;
 use LWP::Simple;
@@ -125,7 +134,7 @@ sub check_banlist($)
 our %ca = ();
 our $default_ca = 0;
 
-do 'config.pl';
+do './config.pl';
 
 if((my $key = $cgi->param('key')))
 {
