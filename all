@@ -1495,7 +1495,7 @@ case "$cmd" in
 		fi
 		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk | {
 			verbose cd Xonotic
-			verbose mkdir data fteqcc source source/darkplaces source/fteqcc
+			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id
 			verbose tar xvf -
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32/* . || true
@@ -1524,6 +1524,14 @@ case "$cmd" in
 		} | {
 			verbose cd Xonotic/source
 			verbose tar xvf -
+		}
+		{
+			verbose cd d0_blind_id
+			verbose git archive --format=tar HEAD
+		} | {
+			verbose cd Xonotic/source/d0_blind_id
+			verbose tar xvf -
+			verbose sh autogen.sh
 		}
 		rm -f Xonotic/key_15.d0pk
 		;;
@@ -1813,7 +1821,7 @@ case "$cmd" in
 		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
 		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
 		# let's pass crypto import laws of some nasty countries
-		crypto_libs=`find Xonotic -name \*d0_rijndael\*`
+		crypto_libs=`find Xonotic -name \*d0_rijndael\*.so -o -name \*d0_rijndael\*.dylib -o -name \*d0_rijndael\*.dll -o -name \*d0_rijndael\*.c`
 		if [ -n "$crypto_libs" ]; then
 			verbose mkzip Xonotic-$stamp-crypto.zip \
 				$crypto_libs
