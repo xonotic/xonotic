@@ -190,7 +190,7 @@ Content-type: text/html
 	<form action="response.d0ir" method="post" enctype="multipart/form-data">
 	To generate and sign a key IN GAME, follow these steps on the console:
 	<ol>
-		<li>crypto_keygen $default_ca http://rm.endoftheinternet.org/~xonotic/keygen/?ca=$default_ca&amp;key=</li>
+		<li>crypto_keygen $default_ca http://xonotic.org/ca/?ca=$default_ca&amp;key=</li>
 	</ol>
 	To generate and sign a key MANUALLY, follow these steps on a UNIX command line:
 	<ol>
