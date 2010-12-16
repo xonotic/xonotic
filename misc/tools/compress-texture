@@ -16,6 +16,17 @@ f=
 fourcchack=
 case "$tool" in
 	compressonator-dxtc)
+		# we still have to preprocess the image to premultiply alpha, as it seems
+		case "$format" in
+			dxt2)
+				fourcchack=DXT2
+				format=dxt2
+				;;
+			dxt4)
+				fourcchack=DXT4
+				format=dxt4
+				;;
+		esac
 		;;
 	*)
 		case "$format" in

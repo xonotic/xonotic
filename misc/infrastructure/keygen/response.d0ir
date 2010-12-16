@@ -162,7 +162,7 @@ if((my $key = $cgi->param('key')))
 			or die "cannot start crypto-keygen-standalone";
 		my $err = <$errfh>;
 		close $errfh
-			or die "xonotic-keygen failed: $err";
+			or die "crypto-keygen-standalone failed: $err";
 		1;
 	}
 	or do
@@ -194,11 +194,11 @@ Content-type: text/html
 	</ol>
 	To generate and sign a key MANUALLY, follow these steps on a UNIX command line:
 	<ol>
-		<li>./xonotic-keygen -p key_$default_ca.d0pk -o key_$default_ca.d0si</li>
-		<li>./xonotic-keygen -p key_$default_ca.d0pk -I key_$default_ca.d0si -o request.d0iq -O camouflage.d0ic
+		<li>./crypto-keygen-standalone -p key_$default_ca.d0pk -o key_$default_ca.d0si</li>
+		<li>./crypto-keygen-standalone -p key_$default_ca.d0pk -I key_$default_ca.d0si -o request.d0iq -O camouflage.d0ic
 		<li>Upload the request.d0iq file: <input type="file" name="key"><input type="submit"></li>
 		<li>Save the response.d0ir file you are getting</li>
-		<li>./xonotic-keygen -p key_$default_ca.d0pk -I key_$default_ca.d0si -c camouflage.d0ic -J response.d0ir -o key_$default_ca.d0si</li>
+		<li>./crypto-keygen-standalone -p key_$default_ca.d0pk -I key_$default_ca.d0si -c camouflage.d0ic -J response.d0ir -o key_$default_ca.d0si</li>
 		<li>Delete request.d0iq, camouflage.d0ic, response.d0ir</li>
 	</ol>
 	Your key_$default_ca.d0si key is now signed.
