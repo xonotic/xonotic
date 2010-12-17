@@ -88,6 +88,6 @@ esac
 
 if [ -n "$fourcchack" ]; then
 	# use dd to hack in the right FOURCC
-	echo -n "$fourcchack" | dd of="$dst" bs=1 count=4 seek=84
+	echo -n "$fourcchack" | dd of="$dst" bs=1 count=4 seek=84 conv=notrunc
 	rm -rf "$fourcchack_dir"
 fi
