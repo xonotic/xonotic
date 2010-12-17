@@ -1573,7 +1573,7 @@ case "$cmd" in
 			for f in $targetfiles; do
 				#verbose "$d0/misc/tools/rebrand-darkplaces-engine.sh" "${XONOTIC_BRAND:-$d0/misc/tools/xonotic.brand}" "${f##*:}" || true
 				case "${f##*:}" in
-					xonotic*.exe)
+					Xonotic/xonotic*.exe)
 						verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "${f##*:}"
 						(
 							d=`mktemp -d -t rebrand.XXXXXX`
