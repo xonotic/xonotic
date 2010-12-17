@@ -10,6 +10,8 @@ format=$1; shift
 src=$1; shift
 dst=$1; shift
 
+ext=${src##*.}
+
 c=
 f=
 
@@ -63,7 +65,6 @@ case "$tool" in
 		esac
 		dir=`mktemp -d "$HOME/.wine/drive_c/compressonator.XXXXXX"`
 		dir_dos="C:/${dir##*/}"
-		ext=${src##*.}
 		cp "$src" "$dir/src.$ext"
 
 		# compressonator and wine suck, so we sometimes have to retry :(
