@@ -49,7 +49,15 @@ cached()
 	if [ x"$infile1/../$infile2" = x"$lastinfiles" ]; then
 		sum=$lastinfileshash
 	else
-		if [ -n "$git_src_repo" ]; then
+		evil=false
+		for infile in "$infile1" "$infile2"; do
+			case "$infile" in
+				*/background_l2.tga)
+					evil=true
+					;;
+			esac
+		done
+		if [ -n "$git_src_repo" ] && ! $evil; then
 			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile1#./}" | grep . ) || git hash-object "$infile1"`
 			if [ -n "$infile2" ]; then
 				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile2#./}" | grep . ) || git hash-object "$infile2"`
