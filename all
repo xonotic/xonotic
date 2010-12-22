@@ -1737,8 +1737,8 @@ case "$cmd" in
 			verbose rm -rf qcsrc
 			gv=`grep "^gameversion " "defaultXonotic.cfg" | awk '{ print $2 }'`
 			major=$(($gv / 10000))
-			minor=$(($gv / 100 - $major * 100))
-			patch=$(($gv - $major * 10000 - $minor * 100))
+			minor=$((($gv / 100) - ($major * 100)))
+			patch=$(($gv - ($major * 10000) - ($minor * 100)))
 			versionstr="$major.$minor.$patch"
 			case "$RELEASETYPE" in
 				release)
