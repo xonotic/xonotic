@@ -23,7 +23,7 @@ for r in \
 	/home/rpolzer/Games/Xonotic/fteqcc
 do
 	cd "$r"
-	git tag -u D276946B -m"version $VER" xonotic-v"$VER"
+	git tag -u D276946B -m"version $VER" xonotic-"$VER"
 done
 
 # excluded repos because not included with releases:
