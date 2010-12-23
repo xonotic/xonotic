@@ -34,5 +34,5 @@ EOF
 cd "$t"
 wine "c:/Program Files/ResEdit/ResEdit.exe" -convert darkplaces.rc darkplaces.exe
 cd "$d"
-mv "$t/darkplaces.exe" "$EXECUTABLE"
+mv "$t/darkplaces.exe" "$2"
 rm -rf "$t"
