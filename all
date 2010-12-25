@@ -1816,10 +1816,10 @@ case "$cmd" in
 		;;
 	release-pack)
 		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir                  raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '-high'            low '-low' lowdds '-lowdds' normaldds ''
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '-high'            low '-low' lowdds '-lowdds' normaldds ''
-		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                     raw ''     low '-low'
-		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                            low ''
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '-high'        low '-low' normaldds ''
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '-high'        low '-low' normaldds ''
+		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                     raw '' low '-low'
+		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                        low ''
 		;;
 	release-pack-needsx11)
 		case "$DISPLAY" in
@@ -1871,17 +1871,12 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
-		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-normaldds.zip
+		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
 		verbose mkzip0 Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-high.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-high.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat.pk3
-		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
-		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
-			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
-			Xonotic/data/xonotic-$stamp-maps-lowdds.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3
 		;;
 	release)
 		verbose "$SELF" release-prepare
