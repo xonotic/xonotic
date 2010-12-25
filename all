@@ -1679,6 +1679,21 @@ case "$cmd" in
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
+	release-buildpk3-transform-normaldds)
+		dir=$1
+		verbose cd "$dir"
+		# texture: convert to jpeg and dds
+		# music: reduce bitrate
+		verbose export do_jpeg=false
+		verbose export do_jpeg_if_not_dds=true
+		verbose export jpeg_qual_rgb=95
+		verbose export jpeg_qual_a=99
+		verbose export do_dds=true
+		verbose export dds_flags=
+		verbose export do_ogg=true
+		verbose export del_src=true
+		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
+		;;
 	release-buildpk3-transform-low)
 		dir=$1
 		verbose cd "$dir"
@@ -1801,8 +1816,8 @@ case "$cmd" in
 		;;
 	release-pack)
 		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir             raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal ''            low '-low' lowdds '-lowdds'
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal ''            low '-low' lowdds '-lowdds'
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal ''            low '-low' lowdds '-lowdds' normaldds '-normaldds'
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal ''            low '-low' lowdds '-lowdds' normaldds '-normaldds'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                raw ''     low '-low'
 		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                       low ''
 		;;
@@ -1856,6 +1871,12 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
+		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-normaldds.zip
+		verbose mkzip0 Xonotic-$stamp-normaldds.zip \
+			Xonotic/data/xonotic-$stamp-data-normaldds.pk3 \
+			Xonotic/data/xonotic-$stamp-maps-normaldds.pk3 \
+			Xonotic/data/xonotic-$stamp-music.pk3 \
+			Xonotic/data/xonotic-$stamp-nexcompat.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-lowdds.zip
 		verbose mkzip0 Xonotic-$stamp-lowdds.zip \
 			Xonotic/data/xonotic-$stamp-data-lowdds.pk3 \
