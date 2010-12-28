@@ -1156,6 +1156,13 @@ case "$cmd" in
 		;;
 	admin-merge)
 		branch=$1
+		only_delete=false
+		case "$branch" in
+			-d)
+				branch=
+				only_delete=true
+				;;
+		esac
 		t=`mktemp`
 		report=""
 		reportecho()
@@ -1233,6 +1240,8 @@ case "$cmd" in
 							git push origin :"${ref#refs/remotes/origin/}"
 							reportecho4 "--> branch deleted"
 						fi
+					elif $only_delete; then
+						reportecho4 "--> skipped in delete-only run"
 					elif [ -z "$branch" ] && [ -n "$note" ]; then
 						reportdo4 $ECHO "$note"
 						reportecho4 "--> not merging, already had this one rejected before"
