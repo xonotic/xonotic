@@ -1670,7 +1670,7 @@ case "$cmd" in
 		;;
 	release-qc)
 		verbose make -C Xonotic/source FTEQCC="../../../fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
-		verbose rm -f Xonotic/source/*/fteqcc.log
+		verbose rm -f Xonotic/source/qcsrc/*/fteqcc.log
 		;;
 	release-buildpk3-transform-raw)
 		dir=$1
