@@ -498,13 +498,16 @@ case "$cmd" in
 				allow_pull=false
 			elif [ x"$1" = x"-p" ]; then
 				fix_config=true
-				if [ x"$base" != x"ssh://xonotic@git.xonotic.org/" ]; then
-					pushbase=ssh://xonotic@git.xonotic.org/
-				fi
+				pushbase=ssh://xonotic@git.xonotic.org/
+			elif [ x"$1" = x"-ps" ]; then
+				fix_config=true
+				pushbase=ssh://xonotic@git.xonotic.org/
+			elif [ x"$1" = x"-ph" ]; then
+				fix_config=true
+				pushbase=http://git.xonotic.org/login/
 			elif [ x"$1" = x"-s" ]; then
 				fix_config=true
 				base=ssh://xonotic@git.xonotic.org/
-				pushbase=
 			elif [ x"$1" = x"-g" ]; then
 				fix_config=true
 				base=git://git.xonotic.org/xonotic/
@@ -549,7 +552,7 @@ case "$cmd" in
 			best)
 				# if we fetched via ssh://, switch to git:// for fetching and keep using ssh:// for pushing
 				case "$base" in
-					ssh://*)
+					ssh://*|*/login/*)
 						pushbase=$base
 						base=git://git.xonotic.org/xonotic/
 						;;
