@@ -504,7 +504,7 @@ case "$cmd" in
 				pushbase=ssh://xonotic@git.xonotic.org/
 			elif [ x"$1" = x"-ph" ]; then
 				fix_config=true
-				pushbase=http://git.xonotic.org/login/
+				pushbase=http://git.xonotic.org/login/xonotic/
 			elif [ x"$1" = x"-s" ]; then
 				fix_config=true
 				base=ssh://xonotic@git.xonotic.org/
