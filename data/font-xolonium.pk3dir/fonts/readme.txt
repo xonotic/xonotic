@@ -62,7 +62,7 @@ ChangeLog
 
 2011-01-17 Severin Meyer <sev.ch@web.de> v1.1
 	Added characters to complete ISO 8859 sets 2,3,4,5,9,10,13,14,16
-    Added additional characters:
+	Added additional characters:
 		Cyrillic U+0400, U+040D, U+0450, U+045D
 		Diacritical marks U+02BC, U+0312
 		Dotlessj U+0237
