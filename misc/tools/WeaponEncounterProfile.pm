@@ -27,7 +27,27 @@ sub load($)
 		/^$/ and next;
 		/^#/ and next;
 		/^\/\// and next;
-		my ($addr, $map, $attackerweapon, $targweapon, $value) = split /\t/, $_;
+		my ($addr, $map, $attackerweapon, $targweapon, $value);
+		if(/^(\S+)\t(\S+)\t(\d+) (\d+)\t(\d+) (\d+)\t(\d+) (\d+) (\S+)$/)
+		{
+			# new format (Xonotic)
+			($addr, $map, $attackerweapon, $targweapon) = ($1, $2, $3, $5);
+			next if $4 and not $ENV{WEAPONPROFILER_WITHBOTS};
+			next if $6 and not $ENV{WEAPONPROFILER_WITHBOTS};
+			$value =
+				$ENV{WEAPONPROFILER_DAMAGE} ? $9 :
+				$ENV{WEAPONPROFILER_HITS} ? $8 :
+				$7;
+		}
+		elsif(/^(\S+)\t(\S+)\t(\d+)\t(\d+)\t(\S+)$/)
+		{
+			# legacy format (Nexuiz)
+			($addr, $map, $attackerweapon, $targweapon, $value) = ($1, $2, $3, $4, $5);
+		}
+		else
+		{
+			next;
+		}
 		$targweapon = int $self->weaponid_from_name($targweapon)
 			if $targweapon ne int $targweapon;
 		$attackerweapon = int $self->weaponid_from_name($attackerweapon)
