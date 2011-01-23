@@ -28,7 +28,7 @@ sub load($)
 		/^#/ and next;
 		/^\/\// and next;
 		my ($addr, $map, $attackerweapon, $targweapon, $value);
-		if(/^(\S+)\t(\S+)\t(\d+) (\d+)\t(\d+) (\d+)\t(\d+) (\d+) (\S+)$/)
+		if(/^([^\t]+)\t(\S+)\t(\d+) (\d+)\t(\d+) (\d+)\t(\d+) (\d+) (\S+)$/)
 		{
 			# new format (Xonotic)
 			($addr, $map, $attackerweapon, $targweapon) = ($1, $2, $3, $5);
@@ -39,13 +39,14 @@ sub load($)
 				$ENV{WEAPONPROFILER_HITS} ? $8 :
 				$7;
 		}
-		elsif(/^(\S+)\t(\S+)\t(\d+)\t(\d+)\t(\S+)$/)
+		elsif(/^([^\t]+)\t(\S+)\t(\d+)\t(\d+)\t(\S+)$/)
 		{
 			# legacy format (Nexuiz)
 			($addr, $map, $attackerweapon, $targweapon, $value) = ($1, $2, $3, $4, $5);
 		}
 		else
 		{
+			print STDERR "UNRECOGNIZED: $_\n";
 			next;
 		}
 		$targweapon = int $self->weaponid_from_name($targweapon)
@@ -132,8 +133,8 @@ our %WeaponMap = (
         12 => ["MinstaNex", "minstanex"],
         13 => ["Grappling Hook", "hookgun"],
         14 => ["Heavy Laser Assault Cannon", "hlac"],
-        15 => ["Tuba", "tuba"],
-        16 => ["Camping Rifle", "campingrifle"],
+        15 => ["@!#%'n Tuba", "tuba"],
+        16 => ["Sniper Rifle", "sniperrifle"],
         17 => ["Fireball", "fireball"],
         18 => ["Seeker", "seeker"],
 );
