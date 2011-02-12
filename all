@@ -1871,7 +1871,7 @@ case "$cmd" in
 			Xonotic/fteqcc \
 			Xonotic/server \
 			Xonotic/key_0.d0pk \
-			Xonotic/data/font-nimbussansl-$stamp.pk3
+			Xonotic/data/font-nimbussansl-$stamp.pk3 \
 			Xonotic/data/font-xolonium-$stamp.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose mkzip0 Xonotic-$stamp.zip \
