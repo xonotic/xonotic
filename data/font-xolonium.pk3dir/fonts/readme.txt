@@ -3,8 +3,8 @@ This information should be distributed along with the Xolonium font
 and any derivative works.
 
 -----------------------------
-Xolonium Font 1.0
-Copyright (C) 2010 Severin Meyer
+Xolonium Font
+Copyright (C) 2011 Severin Meyer
 
 This font was created with
 FontForge <http://fontforge.sf.net>
@@ -36,12 +36,16 @@ along with this font. If not, see <http://www.gnu.org/licenses/>.
 -----------------------------
 Fully covered character sets:
 
-ASCII (Basic modern Latin)
+Unicode Basic Latin
+Unicode Latin-1 Supplement
+Unicode Latin Extended-A
+
 ISO 8859-1 (Western European)
 ISO 8859-2 (Central European)
 ISO 8859-3 (South European, Esperanto)
 ISO 8859-4 (North European)
 ISO 8859-5 (Cyrillic)
+ISO 8859-7 (Greek)
 ISO 8859-9 (Turkish)
 ISO 8859-10 (Nordic)
 ISO 8859-13 (Baltic Rim)
@@ -51,14 +55,26 @@ ISO 8859-16 (South-Eastern European)
 
 Additionally included characters:
 
-Cyrillic characters U+0400, U+040D, U+0450, U+045D
+Dotlessj U+0237
 Diacritical marks U+02BC, U+02C6, U+02DA, U+02DC, U+0312
-Dotless j U+0237
+Cyrillic characters U+0400, U+040D, U+0450, U+045D
 Dashes U+2012-U+2014
 Quotation marks U+2018-U+201F, U+2039, U+203A
-
+General punctuation marks U+2020-U+2022, U+2026, U+2030, U+2044
+Unregistered trademark U+2122
+Mathematical operators U+2202, U+2211, U+2212, U+221A, U+221E, U+2260, U+2264, U+2265
 -----------------------------
 ChangeLog
+
+2011-02-12 Severin Meyer <sev.ch@web.de> v1.2
+	Added Greek characters to complete ISO 8859-7 set
+	Added remaining characters to complete Unicode Latin Extended-A set
+	Added additional characters:
+		General punctuation marks U+2020-U+2022, U+2026, U+2030, U+2044
+		Unregistered trademark U+2122
+		Mathematical operators U+2202, U+2211, U+2212, U+221A, U+221E, U+2260, U+2264, U+2265
+	Revised characters (references are not listed):
+		U+0044 (D) U+00B7 (periodcentered) U+00D0 (Eth) U+0131 (dotlessi)
 
 2011-01-17 Severin Meyer <sev.ch@web.de> v1.1
 	Added characters to complete ISO 8859 sets 2,3,4,5,9,10,13,14,16
@@ -81,5 +97,5 @@ ChangeLog
 	Additional characters: U+0131 U+02C6 U+02C7 U+02D9 U+02DA U+02DB U+02DC
 	All 16 additional Polish characters beyond ISO 8859-1
 
-YYYY-MM-DD name <email> font-version
+YYYY-MM-DD Name <eMail> Version
 	Description
