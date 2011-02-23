@@ -1507,7 +1507,7 @@ case "$cmd" in
 		fi
 		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk | {
 			verbose cd Xonotic
-			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id
+			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id mapping
 			verbose tar xvf -
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32/* . || true
@@ -1546,6 +1546,12 @@ case "$cmd" in
 			verbose sh autogen.sh
 		}
 		rm -f Xonotic/key_15.d0pk
+		{
+			verbose cd mapping
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110223.tar.bz2
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110223-win32-7z.exe
+			# TODO possibly include other tools?
+		}
 		;;
 	release-compile-run)
 		host=$1
@@ -1890,6 +1896,9 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-maps-high.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat-high.pk3
+		verbose mkzip0 Xonotic-$stamp-mappingsuppport.zip \
+			Xonotic/mapping \
+			Xonotic/data/xonotic-$stamp-maps-low.pk3 # TODO add a Radiant build
 		;;
 	release)
 		verbose "$SELF" release-prepare
