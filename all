@@ -1550,6 +1550,10 @@ case "$cmd" in
 			verbose cd mapping
 			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110223.tar.bz2
 			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110223-win32-7z.exe
+			for X in *-7z.exe; do
+				7za x "$X"
+				rm -f "$X"
+			done
 			# TODO possibly include other tools?
 		}
 		;;
