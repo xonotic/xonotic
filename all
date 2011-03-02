@@ -1378,7 +1378,6 @@ case "$cmd" in
 				msg "Unknown arg: $X"
 			fi
 			found=true
-			shift
 		done
 		if ! $found; then
 			rmuntracked=true
