@@ -663,6 +663,9 @@ case "$cmd" in
 					;;
 			esac
 		fi
+		if [ -n "$checkoutflags" ]; then
+			set -- -f "$@" # to make checkself work again
+		fi
 		exists=false
 		for d in $repos; do
 			enter "$d0/$d" verbose
