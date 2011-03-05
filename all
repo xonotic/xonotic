@@ -663,6 +663,9 @@ case "$cmd" in
 					;;
 			esac
 		fi
+		if [ -n "$checkoutflags" ]; then
+			set -- -f "$@" # to make checkself work again
+		fi
 		exists=false
 		for d in $repos; do
 			enter "$d0/$d" verbose
@@ -1378,7 +1381,6 @@ case "$cmd" in
 				msg "Unknown arg: $X"
 			fi
 			found=true
-			shift
 		done
 		if ! $found; then
 			rmuntracked=true
