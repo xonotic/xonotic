@@ -359,7 +359,7 @@ mkzip()
 
 mkzip0()
 {
-	zip -0y "$@"
+	zip -0ry "$@"
 }
 
 mirrorspeed()
@@ -1902,8 +1902,9 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-maps-high.pk3 \
 			Xonotic/data/xonotic-$stamp-music.pk3 \
 			Xonotic/data/xonotic-$stamp-nexcompat-high.pk3
+		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
+			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
-			Xonotic/mapping \
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 # TODO add a Radiant build
 		;;
 	release)
