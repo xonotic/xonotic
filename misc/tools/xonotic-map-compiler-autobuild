@@ -228,7 +228,9 @@ screenshotthemap()
 		if [ -n "$DISPLAY" ]; then
 			misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
 		else
-			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+			#startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+			LD_LIBRARY_PATH=/usr/local/lib/gallium3d \
+			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
 		fi
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
