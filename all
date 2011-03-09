@@ -235,7 +235,7 @@ listrepos()
 		fi
 		# if we have .no file, skip
 		if [ -f "$d.no" ]; then
-			msg "Repository $d disabled by a .no file, delete $p.no to enable"
+			msg "Repository $d disabled by a .no file, delete $d.no to enable"
 			continue
 		fi
 		# if we have matching pk3, skip
@@ -608,6 +608,11 @@ case "$cmd" in
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
 			if [ -d "$d0/$d" ]; then
+				# if we have .no file, skip
+				if [ -f "$d0/$d.no" ]; then
+					msg "Repository $d disabled by a .no file, delete $d.no to enable; thus, not updated"
+					continue
+				fi
 				if $allow_pull; then
 					enter "$d0/$d" verbose
 					r=`git symbolic-ref HEAD`
