@@ -108,7 +108,10 @@ yesno()
 	while [ x"$yesno" != x"y" -a x"$yesno" != x"n" ]; do
 		eval "$2"
 		$ECHO "$1"
-		IFS= read -r yesno
+		if ! IFS= read -r yesno; then
+			yesno=n
+			break
+		fi
 	done
 	[ x"$yesno" = x"y" ]
 }
