@@ -939,7 +939,7 @@ case "$cmd" in
 			fi
 		fi
 
-		enter "$d0/d0_blind_id" verbose
+		verbose cd "$d0/d0_blind_id"
 		if ! $compiled0; then
 			# compilation of crypto library failed
 			# use binaries then, if we can...
@@ -992,20 +992,20 @@ case "$cmd" in
 			verbose make $MAKEFLAGS
 		fi
 
-		enter "$d0/fteqcc" verbose
+		verbose cd "$d0/fteqcc"
 		if $cleanqcc; then
 			verbose make $MAKEFLAGS clean
 		fi
 		verbose make $MAKEFLAGS
 
-		enter "$d0/data/xonotic-data.pk3dir" verbose
+		verbose cd "$d0/data/xonotic-data.pk3dir"
 		if $cleanqc; then
 			verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
 		fi
 		verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
 		# 4 levels up: data, xonotic-data, qcsrc, server
 
-		enter "$d0/darkplaces" verbose
+		verbose cd "$d0/darkplaces"
 		if [ x"$BAD_TARGETS" = x" " ]; then
 			$ECHO "Warning: invalid empty client, default clients will be used."
 		fi
