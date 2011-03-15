@@ -9,6 +9,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 
 ./all run \
 	-nosound \
+	+'vid_soft 1' \
 	+'vid_fullscreen 0' \
 	+'exec effects-ultimate.cfg' \
 	"$@" \
