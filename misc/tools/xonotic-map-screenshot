@@ -11,7 +11,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	-nosound \
 	+'vid_fullscreen 0' \
 	+'exec effects-ultimate.cfg' \
-	+'vid_soft 1; r_damageblur 0; r_motionblur 0; r_bloom 0; r_hdr 0' \
+	+'vid_soft 1' \
 	"$@" \
 	+'r_motionblur 0' \
 	+'r_damageblur 0' \
