@@ -858,10 +858,10 @@ case "$cmd" in
 				-r|-p)
 					case "$1" in
 						-p)
-							debug=release
+							debug=profile
 							;;
 						-r)
-							debug=profile
+							debug=release
 							;;
 					esac
 					export CC="$CC -g"
