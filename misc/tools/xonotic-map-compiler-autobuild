@@ -7,7 +7,7 @@ url_http=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
 build_cachedir="$HOME/xonotic-map-compiler.cache/"
 screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
-build_override="-bsp_timeout 900 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
+build_override="-bsp_timeout 1800 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
 screenshot_override="9 600 +g_ctf 1"
 
 getthemap_fail=false
