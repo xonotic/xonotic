@@ -357,7 +357,10 @@ case "$1" in
 		runmakeindex
 		;;
 	download)
-		cd data/xonotic-maps.pk3dir
+		if ! cd data/xonotic-maps.pk3dir; then
+			echo "data/xonotic-maps.pk3dir does not exist, not downloading"
+			exit 0
+		fi
 		rundownload
 		cd ../..
 		echo "List of maps that got deleted (if any) and currently are in $bspdir.old:"
