@@ -41,26 +41,26 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 		*water*)
 			noLightmap=true
 			isLiquid=true
-			shaderHead="$shaderHead	surfaceparm trans\n	surfaceparm water\n	qer_trans 20\n"
+			shaderHead="$shaderHead	surfaceparm trans$LF	surfaceparm water$LF	qer_trans 20$LF"
 			;;
 		*slime*)
 			noLightmap=true
 			isLiquid=true
-			shaderHead="$shaderHead	surfaceparm trans\n	surfaceparm slime\n	qer_trans 20\n"
+			shaderHead="$shaderHead	surfaceparm trans$LF	surfaceparm slime$LF	qer_trans 20$LF"
 			;;
 		*lava*)
 			noLightmap=true
 			isLiquid=true
-			shaderHead="$shaderHead	surfaceparm trans\n	surfaceparm lava\n	qer_trans 20\n"
+			shaderHead="$shaderHead	surfaceparm trans$LF	surfaceparm lava$LF	qer_trans 20$LF"
 			;;
 		*glass*)
 			noLightmap=true
-			shaderHead="$shaderHead	surfaceparm trans\n"
-			diffuseExtra="$diffuseExtra		blendfunc add\n"
+			shaderHead="$shaderHead	surfaceparm trans$LF"
+			diffuseExtra="$diffuseExtra		blendfunc add$LF"
 			;;
 		*metal*)
 			bounceScale=`echo "$bounceScale + 0.25" | bc -l`
-			shaderHead="$shaderHead	surfaceparm metalsteps\n"
+			shaderHead="$shaderHead	surfaceparm metalsteps$LF"
 			;;
 	esac
 
@@ -68,8 +68,8 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 	case "$F" in
 		*grate*)
 			bounceScale=`echo "$bounceScale + 0.25" | bc -l`
-			shaderHead="$shaderHead	surfaceparm trans\n"
-			diffuseExtra="$diffuseExtra		blendfunc blend\n"
+			shaderHead="$shaderHead	surfaceparm trans$LF"
+			diffuseExtra="$diffuseExtra		blendfunc blend$LF"
 			;;
 	esac
 
@@ -82,7 +82,7 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 	case "$F" in
 		*dirt*|*terrain*|*old*)
 			bounceScale=`echo "$bounceScale - 0.25" | bc -l`
-			shaderHead="$shaderHead	surfaceparm dust\n"
+			shaderHead="$shaderHead	surfaceparm dust$LF"
 			;;
 	esac
 
@@ -98,13 +98,13 @@ find "textures/$1" -type f -path "textures/*/*/*.*" -not -name '*_norm.*' -not -
 	fi
 
 	if ! $noLightmap; then
-		shaderTail="	{\n		map \$lightmap\n		rgbGen identity\n		tcGen lightmap\n		blendfunc filter\n	}"
+		shaderTail="	{$LF		map \$lightmap$LF		rgbGen identity$LF		tcGen lightmap$LF		blendfunc filter$LF	}"
 	fi
 	case "$bounceScale" in
 		1|1.0|1.00)
 			;;
 		*)
-			shaderHead="$shaderHead	q3map_bouncescale $bounceScale\n"
+			shaderHead="$shaderHead	q3map_bouncescale $bounceScale$LF"
 			;;
 	esac
 

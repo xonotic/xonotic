@@ -357,7 +357,7 @@ case "$1" in
 		runmakeindex
 		;;
 	download)
-		if ! cd data/xonotic-maps.pk3dir; then
+		if ! cd data/xonotic-maps.pk3dir >/dev/null 2>&1; then
 			echo "data/xonotic-maps.pk3dir does not exist, not downloading"
 			exit 0
 		fi
