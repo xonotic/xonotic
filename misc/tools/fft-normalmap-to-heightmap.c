@@ -35,7 +35,7 @@
 
 #define TWO_PI (4*atan2(1,1) * 2)
 
-void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset, const double *filter, int filterw, int filterh)
+void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset, const double *filter, int filterw, int filterh, int renormalize)
 {
 	int x, y;
 	int i, j;
@@ -79,6 +79,21 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		imgspace2[(w*y+x)][0] = -ny / nz * h; /* = dz/dy */
 		imgspace2[(w*y+x)][1] = 0;
 #endif
+
+		if(renormalize)
+		{
+			double v = nx * nx + ny * ny + nz * nz;
+			if(v > 0)
+			{
+				v = sqrt(v);
+				nx /= v;
+				ny /= v;
+				nz /= v;
+				map[(w*y+x)*4+2] = floor(nx * 127.5 + 128);
+				map[(w*y+x)*4+1] = floor(ny * 127.5 + 128);
+				map[(w*y+x)*4+0] = floor(nz * 127.5 + 128);
+			}
+		}
 	}
 
 	/* see http://www.gamedev.net/community/forums/topic.asp?topic_id=561430 */
@@ -1018,6 +1033,7 @@ int main(int argc, char **argv)
 	const char *infile, *outfile, *reffile;
 	double scale, offset;
 	int nmaplen, w, h;
+	int renormalize = 0;
 	unsigned char *nmapdata, *nmap, *refmap;
 	const char *filtertype;
 	const double *filter = NULL;
@@ -1060,6 +1076,9 @@ int main(int argc, char **argv)
 		reffile = argv[6];
 	else
 		reffile = NULL;
+
+	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"))
+		renormalize = atoi(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"));
 
 	nmapdata = FS_LoadFile(infile, &nmaplen);
 	if(!nmapdata)
@@ -1122,7 +1141,7 @@ int main(int argc, char **argv)
 			hmap_to_nmap(nmap, image_width, image_height, -scale-1, offset);
 	}
 	else
-		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset, filter, filterw, filterh);
+		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset, filter, filterw, filterh, renormalize);
 
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
 	{
