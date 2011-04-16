@@ -85,10 +85,10 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			double v = nx * nx + ny * ny + nz * nz;
 			if(v > 0)
 			{
-				v = sqrt(v);
-				nx /= v;
-				ny /= v;
-				nz /= v;
+				v = 1/sqrt(v);
+				nx *= v;
+				ny *= v;
+				nz *= v;
 				map[(w*y+x)*4+2] = floor(nx * 127.5 + 128);
 				map[(w*y+x)*4+1] = floor(ny * 127.5 + 128);
 				map[(w*y+x)*4+0] = floor(nz * 127.5 + 128);
