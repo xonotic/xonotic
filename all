@@ -355,20 +355,31 @@ fix_git_config()
 	verbose git config filter.mapclean.smudge "cat"
 }
 
-mkzip()
+mkzipr()
 {
-	archive=$1
-	shift
+	archive=$1; shift
+	find "$@" -exec touch -d "1970-01-01 00:00:00 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
 	ziplist=`mktemp`
 	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
-	7za a -tzip -mx=9 -ms=off -x@"$ziplist" "$archive" "$@" || true
-	zip         -9y           -@<"$ziplist" "$archive"      || true
+	7za a -tzip -mx=9 -x@"$ziplist" "$archive" "$@" || true
+	zip         -9y   -@<"$ziplist" "$archive"      || true
+	rm -f "$ziplist"
+}
+
+mkzip()
+{
+	archive=$1; shift
+	ziplist=`mktemp`
+	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
+	7za a -tzip -mx=9 -x@"$ziplist" "$archive" "$@" || true
+	zip         -9y   -@<"$ziplist" "$archive"      || true
 	rm -f "$ziplist"
 }
 
 mkzip0()
 {
-	zip -0ry "$@"
+	archive=$1; shift
+	zip -0ry "$archive" "$@"
 }
 
 mirrorspeed()
@@ -1835,7 +1846,7 @@ case "$cmd" in
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
-		verbose mkzip "../../$dst" *
+		verbose mkzipr "../../$dst" *
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
 		;;
