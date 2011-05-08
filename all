@@ -1078,7 +1078,7 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		set -- "darkplaces/darkplaces$client" -xonotic -mygames "$@"
+		set -- "darkplaces/darkplaces$client" -xonotic "$@"
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
@@ -1631,15 +1631,6 @@ case "$cmd" in
 				case "${f##*:}" in
 					Xonotic/xonotic*.exe)
 						verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "${f##*:}"
-						(
-							d=`mktemp -d -t rebrand.XXXXXX`
-							cd "$d"
-							$ECHO "-mygames" > darkplaces.opt
-							zip -9r darkplaces.zip darkplaces.opt
-							cat darkplaces.zip
-							cd "$d0"
-							rm -rf "$d"
-						) >> "${f##*:}"
 						;;
 				esac
 			done
