@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>xonotic-osx-agl</string>
+	<string>xonotic-osx-sdl</string>
 	<key>CFBundleIconFile</key>
 	<string>Xonotic</string>
 	<key>CFBundlePackageType</key>
@@ -16,5 +16,10 @@
 	<string>1.0</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.4.0</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>x86_64</key>
+		<string>10.6.0</string>
+	</dict>
 </dict>
 </plist>

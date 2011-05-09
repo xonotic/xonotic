@@ -1,8 +1,0 @@
-#!/bin/sh
-
-export DYLD_LIBRARY_PATH="${0%/*}"
-	# same dir as the executable
-
-set -- "$0"-bin "$@" -notexturenonpoweroftwo
-
-exec "$@"

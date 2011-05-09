@@ -912,7 +912,7 @@ case "$cmd" in
 					TARGETS="sv-$debug sdl-$debug"
 					;;
 			esac
-			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
+			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
 		else
 			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
@@ -1053,8 +1053,8 @@ case "$cmd" in
 			client=
 			export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
-			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/MacOS:$d0/d0_blind_id/.libs"
-			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic-SDL.app/Contents/Frameworks"
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS:$d0/d0_blind_id/.libs"
+			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
 			client=-sdl
 		else
 			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
@@ -1672,11 +1672,7 @@ case "$cmd" in
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks -DSUPPORTIPV6"' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
-			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic-SDL.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
-		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks -DSUPPORTIPV6"' \
-			'' '' \
-			'cl-release' 'darkplaces-agl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-agl-bin'
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
 		verbose "$SELF" release-compile linux32 \
