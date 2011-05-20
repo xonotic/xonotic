@@ -1619,7 +1619,7 @@ case "$cmd" in
 				*)
 					verbose rsync --delete -zLvaSHP "$srcdir"/ "$host:$buildpath/"
 					verbose rsync --delete -zLvaSHP "$depsdir"/ "$host:$buildpath.deps/"
-					verbose ssh "$host" "export LC_ALL=C; ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && nice -`nice` make clean $maketargets $makeflags"
+					verbose ssh "$host" "[ -f /etc/profile ] && . /etc/profile; [ -f ~/.profile ] && . ~/.profile; export LC_ALL=C; ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && nice -`nice` make clean $maketargets $makeflags"
 					for f in $targetfiles; do
 						verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
 					done
