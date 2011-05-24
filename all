@@ -271,7 +271,7 @@ case "$cmd" in
 	release|release-*)
 		export LC_ALL=C
 
-		release_args=$*
+		release_args="$cmd $*"
 		msg "*** $release_args: start"
 		release_starttime=`date +%s`
 		release_end()
