@@ -268,8 +268,19 @@ cmd=$1
 shift
 
 case "$cmd" in
-	release-*)
+	release|release-*)
 		export LC_ALL=C
+
+		release_args=$*
+		echo >&2 "*** $release_args: start"
+		release_starttime=`date +%s`
+		release_end()
+		{
+			release_endtime=`date +%s`
+			release_deltatime=$(($release_endtime - $release_starttime))
+			echo >&2 "*** $release_args: $release_deltatime seconds"
+		}
+		trap release_end EXIT
 		;;
 esac
 
