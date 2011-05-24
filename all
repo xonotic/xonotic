@@ -272,13 +272,13 @@ case "$cmd" in
 		export LC_ALL=C
 
 		release_args=$*
-		echo >&2 "*** $release_args: start"
+		msg "*** $release_args: start"
 		release_starttime=`date +%s`
 		release_end()
 		{
 			release_endtime=`date +%s`
 			release_deltatime=$(($release_endtime - $release_starttime))
-			echo >&2 "*** $release_args: $release_deltatime seconds"
+			msg "*** $release_args: $release_deltatime seconds"
 		}
 		trap release_end EXIT
 		;;
