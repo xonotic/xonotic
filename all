@@ -285,11 +285,11 @@ case "$cmd" in
 		release_timereport()
 		{
 			release_now=`date +%s` # RELEASE NOW!!!
-			release_tempstarttime=$release_now
 			if [ -n "$*" ]; then
 				release_deltatime=$(($release_tempstarttime - $release_now))
 				msg "**** $release_args: $*: $release_deltatime seconds"
 			fi
+			release_tempstarttime=$release_now
 		}
 		;;
 esac
