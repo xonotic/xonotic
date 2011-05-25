@@ -281,6 +281,16 @@ case "$cmd" in
 			msg "*** $release_args: $release_deltatime seconds"
 		}
 		trap release_end EXIT
+		release_tempstarttime=$release_starttime
+		release_timereport()
+		{
+			release_now=`date +%s` # RELEASE NOW!!!
+			release_tempstarttime=$release_now
+			if [ -n "$*" ]; then
+				release_deltatime=$(($release_tempstarttime - $release_now))
+				msg "**** $release_args: $*: $release_deltatime seconds"
+			fi
+		}
 		;;
 esac
 
@@ -1808,7 +1818,9 @@ case "$cmd" in
 				dst="$PWD/$dst"
 				;;
 		esac
+		release_timereport
 		verbose rm -rf Xonotic/temp
+		release_timereport "deleted temp directory"
 		verbose mkdir -p Xonotic/temp
 		{
 			verbose cd "$src"
@@ -1817,6 +1829,7 @@ case "$cmd" in
 			verbose cd Xonotic/temp
 			verbose tar xvf -
 		}
+		release_timereport "extracted data"
 		verbose cd Xonotic/temp
 		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
 			verbose cp ../source/progs.dat .
@@ -1863,10 +1876,14 @@ case "$cmd" in
 			done
 		fi
 		verbose export git_src_repo="$d0/$src" # skip hash-object
+		release_timereport "processed data"
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
+		release_timereport "transformed data"
 		verbose mkzipr "../../$dst" *
+		release_timereport "zipped data"
 		verbose cd ../..
 		verbose rm -rf Xonotic/temp
+		release_timereport "deleted temp directory again"
 		;;
 	release-buildpk3s)
 		stamp=`cat Xonotic/stamp.txt`
