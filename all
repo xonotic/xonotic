@@ -1936,7 +1936,7 @@ case "$cmd" in
 		fi
 		# build the archives
 		verbose mkzip Xonotic-$stamp-engine.zip \
-			Xonotic/*.dll \
+			Xonotic/bin32/*.dll \
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
