@@ -1617,10 +1617,10 @@ case "$cmd" in
 			verbose rm -rf misc/buildfiles
 			verbose rm -rf misc/pki
 		)
-		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces"
-		release_git_extract_dir "fteqcc" "Xonotic/source/fteqcc"
+		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces" .
+		release_git_extract_dir "fteqcc" "Xonotic/source/fteqcc" .
 		release_git_extract_dir "data/xonotic-data.pk3dir" "Xonotic/source" qcsrc Makefile
-		release_git_extract_dir "d0_blind_id" "Xonotic/source/d0_blind_id"
+		release_git_extract_dir "d0_blind_id" "Xonotic/source/d0_blind_id" .
 		(
 			verbose cd Xonotic/source/d0_blind_id
 			verbose sh autogen.sh
@@ -1827,7 +1827,7 @@ case "$cmd" in
 		verbose rm -rf Xonotic/temp
 		release_timereport "deleted temp directory"
 		verbose mkdir -p Xonotic/temp
-		release_git_extract_dir "$src" "Xonotic/temp"
+		release_git_extract_dir "$src" "Xonotic/temp" .
 		release_timereport "extracted data"
 		verbose cd Xonotic/temp
 		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
