@@ -295,13 +295,27 @@ case "$cmd" in
 		{
 			release_src=$1; shift
 			release_dst=$1; shift
-			{
-				verbose cd "$release_src"
-				verbose git archive --format=tar HEAD -- "$@"
-			} | {
-				verbose cd "$release_dst"
-				verbose tar xvf -
-			}
+			# try to create a hardlink
+			if ln -f "$release_src/.git/HEAD" "$release_dst/.hardlink-test"; then
+				rm -f "$release_dst/.hardlink-test"
+				{
+					verbose cd "$release_src"
+					git ls-files HEAD -- "$@"
+				} | {
+					while IFS= read -r F; do
+						case "$F" in */*) mkdir -p "$release_dst/${F%/}" ;; esac
+						verbose ln -f "$release_src/$F" "$release_dst/$F"
+					done
+				}
+			else
+				{
+					verbose cd "$release_src"
+					verbose git archive --format=tar HEAD -- "$@"
+				} | {
+					verbose cd "$release_dst"
+					verbose tar xvf -
+				}
+			fi
 		}
 		;;
 esac
