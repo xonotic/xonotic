@@ -303,7 +303,7 @@ case "$cmd" in
 					git ls-files HEAD -- "$@"
 				} | {
 					while IFS= read -r F; do
-						case "$F" in */*) mkdir -p "$release_dst/${F%/}" ;; esac
+						case "$F" in */*) mkdir -p "$release_dst/${F%/*}" ;; esac
 						verbose ln -f "$release_src/$F" "$release_dst/$F"
 					done
 				}
