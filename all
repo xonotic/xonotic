@@ -1833,11 +1833,12 @@ case "$cmd" in
 					versionstr="$versionstr$RELEASETYPE"
 					;;
 			esac
-			verbose sed -i "
+			verbose sed "
 				s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
 				s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 				s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
-			" defaultXonotic.cfg
+			" < defaultXonotic.cfg > defaultXonotic.cfg.new
+			mv defaultXonotic.cfg.new defaultXonotic.cfg
 			case "$RELEASETYPE" in
 				release)
 					echo "" >> defaultXonotic.cfg
@@ -1847,6 +1848,7 @@ case "$cmd" in
 			esac
 			(
 				verbose cd gfx/menu/luminos
+				verbose rm -f background_l2.tga background_ingame_l2.tga
 				verbose cp "$d0"/mediasource/gfx/menu/luminos_versionbuilder/background_l2.svg .
 				verbose "$d0"/mediasource/gfx/menu/luminos_versionbuilder/versionbuilder "$versionstr"
 				verbose rm background_l2.svg
