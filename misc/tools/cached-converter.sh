@@ -52,15 +52,15 @@ cached()
 		evil=false
 		for infile in "$infile1" "$infile2"; do
 			case "$infile" in
-				*/background_l2.tga)
+				*/background_l2.tga|*/background_ingame_l2.tga)
 					evil=true
 					;;
 			esac
 		done
 		if [ -n "$git_src_repo" ] && ! $evil; then
-			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile1#./}" | grep . ) || git hash-object "$infile1"`
+			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile1#./}" | grep . ) || { echo >&2 "git-rev-parse failed on $infile1"; git hash-object "$infile1"; }`
 			if [ -n "$infile2" ]; then
-				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile2#./}" | grep . ) || git hash-object "$infile2"`
+				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile2#./}" | grep . ) || { echo >&2 "git-rev-parse failed on $infile2"; git hash-object "$infile2"; }`
 			fi
 		else
 			sum=`git hash-object "$infile1"`
