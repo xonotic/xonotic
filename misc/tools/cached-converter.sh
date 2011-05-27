@@ -58,9 +58,9 @@ cached()
 			esac
 		done
 		if [ -n "$git_src_repo" ] && ! $evil; then
-			sum=`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile1#./}" | grep . ) || { echo >&2 "git-rev-parse failed on $infile1"; git hash-object "$infile1"; }`
+			sum=`( cd "$git_src_repo"; git ls-files -s "${infile1#./}" | cut -d ' ' -f 2 | grep . ) || { echo >&2 "git-ls-files failed on $infile1"; git hash-object "$infile1"; }`
 			if [ -n "$infile2" ]; then
-				sum=$sum`( cd "$git_src_repo"; git rev-parse --revs-only HEAD:"${infile2#./}" | grep . ) || { echo >&2 "git-rev-parse failed on $infile2"; git hash-object "$infile2"; }`
+				sum=$sum`( cd "$git_src_repo"; git ls-files -s "${infile2#./}" | cut -d ' ' -f 2 | grep . ) || { echo >&2 "git-ls-files failed on $infile2"; git hash-object "$infile2"; }`
 			fi
 		else
 			sum=`git hash-object "$infile1"`
