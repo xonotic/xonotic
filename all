@@ -291,6 +291,18 @@ case "$cmd" in
 			fi
 			release_tempstarttime=$release_endtime
 		}
+		release_git_extract_dir()
+		{
+			release_src=$1; shift
+			release_dst=$1; shift
+			{
+				verbose cd "$release_src"
+				verbose git archive --format=tar HEAD -- "$@"
+			} | {
+				verbose cd "$release_dst"
+				verbose tar xvf -
+			}
+		}
 		;;
 esac
 
@@ -1580,46 +1592,25 @@ case "$cmd" in
 		else
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 		fi
-		verbose git archive --format=tar HEAD -- Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk | {
+		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk
+		(
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id mapping
-			verbose tar xvf -
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32/* . || true
 			verbose mv misc/buildfiles/win64 bin64 || true
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
 			verbose rm -rf misc/pki
-		}
-		{
-			verbose cd darkplaces
-			verbose git archive --format=tar HEAD
-		} | {
-			verbose cd Xonotic/source/darkplaces
-			verbose tar xvf -
-		}
-		{
-			verbose cd fteqcc
-			verbose git archive --format=tar HEAD
-		} | {
-			verbose cd Xonotic/source/fteqcc
-			verbose tar xvf -
-		}
-		{
-			verbose cd data/xonotic-data.pk3dir
-			verbose git archive --format=tar HEAD -- qcsrc Makefile
-		} | {
-			verbose cd Xonotic/source
-			verbose tar xvf -
-		}
-		{
-			verbose cd d0_blind_id
-			verbose git archive --format=tar HEAD
-		} | {
+		)
+		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces"
+		release_git_extract_dir "fteqcc" "Xonotic/source/fteqcc"
+		release_git_extract_dir "data/xonotic-data.pk3dir" "Xonotic/source" qcsrc Makefile
+		release_git_extract_dir "d0_blind_id" "Xonotic/source/d0_blind_id"
+		(
 			verbose cd Xonotic/source/d0_blind_id
-			verbose tar xvf -
 			verbose sh autogen.sh
-		}
+		)
 		rm -f Xonotic/key_15.d0pk
 		{
 			verbose cd Xonotic/mapping
@@ -1822,13 +1813,7 @@ case "$cmd" in
 		verbose rm -rf Xonotic/temp
 		release_timereport "deleted temp directory"
 		verbose mkdir -p Xonotic/temp
-		{
-			verbose cd "$src"
-			verbose git archive --format=tar HEAD
-		} | {
-			verbose cd Xonotic/temp
-			verbose tar xvf -
-		}
+		release_git_extract_dir "$src" "Xonotic/temp"
 		release_timereport "extracted data"
 		verbose cd Xonotic/temp
 		if [ x"$src" = x"data/xonotic-data.pk3dir" ]; then
