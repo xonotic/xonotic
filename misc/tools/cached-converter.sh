@@ -14,6 +14,17 @@ set -e
 : ${del_src:=false}
 : ${git_src_repo:=}
 
+selfprofile_t0=`date +%s`
+selfprofile_step=init
+selfprofile()
+{
+	selfprofile_t=`date +%s`
+	eval "selfprofile_counter_$selfprofile_step=\$((\$selfprofile_counter_$selfprofile_step+$selfprofile_t))"
+	selfprofile_step=$1
+	eval "selfprofile_counter_$selfprofile_step=\$((\$selfprofile_counter_$selfprofile_step-$selfprofile_t))"
+	selfprofile_t0=$selfprofile_t
+}
+
 me=$0
 case "$me" in
 	*/*)
@@ -46,6 +57,7 @@ cached()
 		keep=true
 	fi
 	options=`echo "$*" | git hash-object --stdin`
+	selfprofile convert_findchecksum
 	if [ x"$infile1/../$infile2" = x"$lastinfiles" ]; then
 		sum=$lastinfileshash
 	else
@@ -70,26 +82,31 @@ cached()
 		fi
 		lastinfileshash=$sum
 	fi
+	selfprofile convert_makecachedir
 	mkdir -p "$CACHEDIR/$method-$options"
 	name1="$CACHEDIR/$method-$options/$sum-1.${outfile1##*.}"
 	[ -z "$outfile2" ] || name2="$CACHEDIR/$method-$options/$sum-2.${outfile2##*.}"
 	tempfile1="${name1%/*}/new-${name1##*/}"
 	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
 	if [ -f "$name1" ] && { [ -z "$outfile2" ] || [ -f "$name2" ]; }; then
+		selfprofile convert_copyoutput
 		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln -f "$name1" "$outfile1" 2>/dev/null || { rm -f "$outfile1" && cp "$name1" "$outfile1"; }; }
 		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln -f "$name2" "$outfile2" 2>/dev/null || { rm -f "$outfile2" && cp "$name2" "$outfile2"; }; }; }
 		conv=true
-	elif "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
+	elif selfprofile convert_makeoutput; "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
 		mv "$tempfile1" "$name1"
 		[ -z "$outfile2" ] || mv "$tempfile2" "$name2"
 		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln -f "$name1" "$outfile1" 2>/dev/null || { rm -f "$outfile1" && cp "$name1" "$outfile1"; }; }
 		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln -f "$name2" "$outfile2" 2>/dev/null || { rm -f "$outfile2" && cp "$name2" "$outfile2"; }; }; }
 		conv=true
 	else
+		selfprofile convert_cleartemp
 		rm -f "$tempfile1"
 		rm -f "$tempfile2"
+		selfprofile convert_finished
 		exit 1
 	fi
+	selfprofile convert_finished
 }
 
 reduce_jpeg2_dds()
@@ -229,6 +246,7 @@ has_alpha()
 
 to_delete=
 for F in "$@"; do
+	selfprofile prepareconvert
 	f=${F%.*}
 
 	echo >&2 "Handling $F..."
@@ -283,7 +301,7 @@ for F in "$@"; do
 			will_jpeg=true
 		fi
 	fi
-
+	selfprofile startconvert
 	case "$F" in
 		*_alpha.jpg)
 			# handle in *.jpg case
@@ -325,6 +343,7 @@ for F in "$@"; do
 			cached "$do_ogg" reduce_wav_ogg "$F" "" "${f}.ogg" "" "$ogg_qual"
 			;;
 	esac
+	selfprofile marktodelete
 	if $del_src; then
 		if $conv; then
 			if ! $keep; then
@@ -333,6 +352,7 @@ for F in "$@"; do
 			fi
 		fi
 	fi
+	selfprofile symlinkfixing
 	# fix up DDS paths by a symbolic link
 	if [ -f "dds/${f}.dds" ]; then
 		if [ -z "${f##./textures/*}" ]; then
@@ -341,7 +361,11 @@ for F in "$@"; do
 			fi
 		fi
 	fi
+	selfprofile looping
 done
+
 for F in $to_delete; do
 	rm -f "$F"
 done
+selfprofile finished_time
+set | grep ^selfprofile_counter_ >&2
