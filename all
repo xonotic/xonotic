@@ -771,10 +771,8 @@ case "$cmd" in
 			else
 				b=`repobranch "$d"`
 				if git rev-parse "refs/heads/$b" >/dev/null 2>&1; then
-					exists=true
 					verbose git checkout $checkoutflags "$b"
 				elif git rev-parse "refs/remotes/$remote/$b" >/dev/null 2>&1; then
-					exists=true
 					verbose git checkout $checkoutflags --track -b "$b" "$remote/$b"
 				else
 					$ECHO "WTF? Not even branch $b doesn't exist in $d"
