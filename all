@@ -1940,7 +1940,8 @@ case "$cmd" in
 		crypto_libs=`find Xonotic -name \*d0_rijndael\*.so -o -name \*d0_rijndael\*.dylib -o -name \*d0_rijndael\*.dll -o -name \*d0_rijndael\*.c`
 		if [ -n "$crypto_libs" ]; then
 			verbose mkzip Xonotic-$stamp-crypto.zip \
-				$crypto_libs
+				$crypto_libs \
+				COPYING GPL-2 GPL-3
 			rm -f $crypto_libs
 		fi
 		# build the archives
@@ -1950,7 +1951,8 @@ case "$cmd" in
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe \
-			Xonotic/source/darkplaces/
+			Xonotic/source/darkplaces/ \
+			COPYING GPL-2 GPL-3
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/fteqcc/ \

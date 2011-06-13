@@ -1,0 +1,12 @@
+Xonotic Licensing
+=================
+
+All source files are under the GPL version 2 or any later version, at your
+choice.
+
+Linux and Windows binaries however link to a library that is under the LGPL
+version 3 with the "or any later version" clause. Thus, they can only be
+distributed under the GPL version 3 or any later version, at your choice.
+
+The two relevant licenses are provided in the files GPL-2 and GPL-3 in this
+package.
