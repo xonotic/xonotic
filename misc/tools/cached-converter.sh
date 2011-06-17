@@ -121,8 +121,8 @@ cached()
 	[ -z "$outfile2" ] || tempfile2="${name2%/*}/new-${name2##*/}"
 	if [ -f "$name1" ] && { [ -z "$outfile2" ] || [ -f "$name2" ]; }; then
 		selfprofile convert_copyoutput
-		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln -f "$name1" "$outfile1" 2>/dev/null || { rm -f "$outfile1" && cp "$name1" "$outfile1"; }; }
-		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln -f "$name2" "$outfile2" 2>/dev/null || { rm -f "$outfile2" && cp "$name2" "$outfile2"; }; }; }
+		case "$outfile1" in */*) mkdir -p "${outfile1%/*}"; esac && { ln -vf "$name1" "$outfile1" || { rm -f "$outfile1" && cp "$name1" "$outfile1"; }; }
+		[ -z "$outfile2" ] || { case "$outfile2" in */*) mkdir -p "${outfile2%/*}"; esac && { ln -vf "$name2" "$outfile2" || { rm -f "$outfile2" && cp "$name2" "$outfile2"; }; }; }
 		conv=true
 	elif selfprofile convert_makeoutput; "$method" "$infile1" "$infile2" "$tempfile1" "$tempfile2" "$@"; then
 		mv "$tempfile1" "$name1"
