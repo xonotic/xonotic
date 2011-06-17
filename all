@@ -1604,7 +1604,7 @@ case "$cmd" in
 		else
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk
+		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id mapping
@@ -1941,7 +1941,7 @@ case "$cmd" in
 		if [ -n "$crypto_libs" ]; then
 			verbose mkzip Xonotic-$stamp-crypto.zip \
 				$crypto_libs \
-				COPYING GPL-2 GPL-3
+				Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 			rm -f $crypto_libs
 		fi
 		# build the archives
@@ -1952,7 +1952,7 @@ case "$cmd" in
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe \
 			Xonotic/source/darkplaces/ \
-			COPYING GPL-2 GPL-3
+			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/fteqcc/ \
