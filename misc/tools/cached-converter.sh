@@ -288,7 +288,9 @@ for F in "$@"; do
 
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
+	will_ogg=$do_ogg
 	case "$f" in
+		./sounds/misc/talk*.wav) will_ogg=false ;; # engine "feature"
 		*_bump) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
 		./models/sprites/*) will_dds=false ;;
@@ -365,13 +367,13 @@ for F in "$@"; do
 			rm -f "$F.hasalpha"
 			;;
 		*.ogg)
-			cached "$do_ogg" reduce_ogg_ogg "$F" "" "$F" "" "$ogg_qual"
+			cached "$will_ogg" reduce_ogg_ogg "$F" "" "$F" "" "$ogg_qual"
 			;;
 		./sound/misc/null.wav)
 			# never convert this one
 			;;
 		*.wav)
-			cached "$do_ogg" reduce_wav_ogg "$F" "" "${f}.ogg" "" "$ogg_qual"
+			cached "$will_ogg" reduce_wav_ogg "$F" "" "${f}.ogg" "" "$ogg_qual"
 			;;
 	esac
 	selfprofile marktodelete
