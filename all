@@ -1977,6 +1977,8 @@ case "$cmd" in
 			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
+		verbose mkzip Xonotic-$stamp-high.zip \
+			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-high.zip \
 			Xonotic/data/xonotic-$stamp-data-high.pk3 \
 			Xonotic/data/xonotic-$stamp-maps-high.pk3 \
@@ -1985,7 +1987,7 @@ case "$cmd" in
 		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
-			Xonotic/data/xonotic-$stamp-maps-low.pk3 # TODO add a Radiant build
+			Xonotic/data/xonotic-$stamp-maps-low.pk3
 		;;
 	release)
 		verbose "$SELF" release-prepare
