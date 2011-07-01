@@ -2008,7 +2008,7 @@ case "$cmd" in
 		$ECHO "  $SELF checkout|switch <remote>/<branch>"
 		$ECHO "  $SELF clean [-m] [-f | -fu | -fU] [-r] [-D]"
 		$ECHO "  $SELF clean --reclone"
-		$ECHO "  $SELF compile [-c] [-r|-p] [-0]"
+		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|agl|dedicated]"
 		$ECHO "  $SELF each|foreach [-k] command..."
 		$ECHO "  $SELF fix_upstream_rebase"
 		$ECHO "  $SELF keygen"
