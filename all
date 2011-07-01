@@ -2014,7 +2014,6 @@ case "$cmd" in
 		$ECHO "  $SELF keygen"
 		$ECHO "  $SELF merge"
 		$ECHO "  $SELF push|commit [-s]"
-		$ECHO "  $SELF release"
 		$ECHO "  $SELF restore-patches"
 		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
 		$ECHO "  $SELF save-patches"
