@@ -1627,8 +1627,8 @@ case "$cmd" in
 		rm -f Xonotic/key_15.d0pk
 		{
 			verbose cd Xonotic/mapping
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110630.tar.bz2
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110630-win32-7z.exe
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110701.tar.bz2
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110701-win32-7z.exe
 			for X in *-7z.exe; do
 				7za x "$X"
 				rm -f "$X"
