@@ -16,7 +16,7 @@ use File::Temp;
 	our $Q3MAP2      = '/home/rpolzer/Games/Xonotic/netradiant/install/q3map2.x86';
 
 	# General flags for q3map2 (for example -threads 4)
-	our $Q3MAP2FLAGS = '-fs_forbiddenpath xonotic-data.pk3 -fs_forbiddenpath xonotic-data.pk3dir -fs_forbiddenpath xonotic-nexcompat.pk3 -fs_forbiddenpath xonotic-nexcompat.pk3dir';
+	our $Q3MAP2FLAGS = '-fs_forbiddenpath xonotic*-data*.pk3* -fs_forbiddenpath xonotic*-nexcompat*.pk3*';
 
 	# Default flags for the -bsp stage
 	our $BSPFLAGS    = '-meta -maxarea -samplesize 8 -mv 1000000 -mi 6000000';
