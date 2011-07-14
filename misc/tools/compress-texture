@@ -85,6 +85,14 @@ case "$tool" in
 		esac
 		nvcompress $f "$@" "$src" "$dst"
 		;;
+	s2tc)
+		case "$format" in
+			dxt1) f="-t DXT1" ;;
+			dxt3) f="-t DXT3" ;;
+			dxt5) f="-t DXT5" ;;
+		esac
+		s2tc $f "$@" -i "$src" -o "$dst"
+		;;
 esac
 
 if [ -n "$fourcchack" ]; then
