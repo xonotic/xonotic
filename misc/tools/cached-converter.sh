@@ -308,6 +308,20 @@ for F in "$@"; do
 			;;
 	esac
 
+	# configure S2TC
+	case "$f" in
+		*_norm)
+			export S2TC_COLORDIST_MODE=NORMALMAP
+			export S2TC_RANDOM_COLORS=256
+			export S2TC_REFINE_COLORS=LOOP
+			;;
+		*)
+			export S2TC_COLORDIST_MODE=SRGB_MIXED
+			export S2TC_RANDOM_COLORS=64
+			export S2TC_REFINE_COLORS=LOOP
+			;;
+	esac
+
 	# for deluxemaps, lightmaps and normalmaps, enforce high jpeg quality (like on alpha channels)
 	if [ "$jqual_a" -gt "$jqual_rgb" ]; then
 		case "$f" in
