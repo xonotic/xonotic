@@ -295,7 +295,6 @@ for F in "$@"; do
 	case "$f" in
 		./sounds/misc/talk*.wav) will_ogg=false ;; # engine "feature"
 		*_bump) will_dds=false ;;
-		*_norm) will_dds=false ;; # bad quality
 		./models/player/*) will_dds=false ;;
 		./models/sprites/*) will_dds=false ;;
 		./textures/*) ;;
