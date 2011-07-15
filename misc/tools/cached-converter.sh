@@ -13,6 +13,9 @@ set -e
 : ${ogg_qual:=1}
 : ${del_src:=false}
 : ${git_src_repo:=}
+: ${dds_noalpha:=dxt1}
+: ${dds_prealpha:=dxt4}
+: ${dds_sepalpha:=dxt5}
 
 selfprofile_t0=`date +%s`
 selfprofile_step=init
@@ -146,7 +149,7 @@ reduce_jpeg2_dds()
 	ia=$1; shift
 	o=$1; shift; shift 
 	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
-	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
+	"$meprefix"compress-texture "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_jpeg2_dds_premul()
@@ -155,7 +158,7 @@ reduce_jpeg2_dds_premul()
 	ia=$1; shift
 	o=$1; shift; shift 
 	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
-	"$meprefix"compress-texture "$dds_tool" dxt4 "$tmpdir/x.tga" "$o" $1
+	"$meprefix"compress-texture "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_jpeg2_jpeg2()
@@ -215,7 +218,7 @@ reduce_rgba_dds()
 	i=$1; shift; shift
 	o=$1; shift; shift
 	convert "$i" "$tmpdir/x.tga" && \
-	"$meprefix"compress-texture "$dds_tool" dxt5 "$tmpdir/x.tga" "$o" $1
+	"$meprefix"compress-texture "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgba_dds_premul()
@@ -223,7 +226,7 @@ reduce_rgba_dds_premul()
 	i=$1; shift; shift
 	o=$1; shift; shift
 	convert "$i" "$tmpdir/x.tga" && \
-	"$meprefix"compress-texture "$dds_tool" dxt4 "$tmpdir/x.tga" "$o" $1
+	"$meprefix"compress-texture "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgba_jpeg2()
@@ -248,7 +251,7 @@ reduce_rgb_dds()
 	i=$1; shift; shift
 	o=$1; shift; shift
 	convert "$i" "$tmpdir/x.tga" && \
-	"$meprefix"compress-texture "$dds_tool" dxt1 "$tmpdir/x.tga" "$o" $1
+	"$meprefix"compress-texture "$dds_tool" "$dds_noalpha" "$tmpdir/x.tga" "$o" $1
 }
 
 reduce_rgb_jpeg()
