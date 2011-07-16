@@ -150,9 +150,16 @@ pickdxta()
 	pd_i=$1; shift
 	pd_o=$1; shift
 	for pd_dd in $pd_d; do
-		if [ -f "$pd_o".dds ]; then
+		if [ -f "$pd_o" ]; then
 			"$meprefix"compress-texture "$pd_t" "$pd_dd" "$pd_i" "$pd_o".tmp.dds "$@"
-			pd_psnr_tmp=`compare -channel alpha -metric PSNR "$pd_i" "$pd_o".tmp.dds NULL:`
+			pd_psnr_tmp=`compare -channel alpha -metric PSNR "$pd_i" "$pd_o".tmp.dds NULL: 2>&1`
+			case "$pd_psnr_tmp" in
+				[0-9.]*)
+					;;
+				*)
+					pd_psnr_tmp=999.9
+					;;
+			esac
 			echo >&2 "$pd_dd: $pd_psnr_tmp dB"
 			pd_psnr_diff=`echo "($pd_psnr_tmp) - ($pd_psnr)" | bc -l`
 			case "$pd_psnr_diff" in
@@ -171,7 +178,14 @@ pickdxta()
 			esac
 		else
 			"$meprefix"compress-texture "$pd_t" "$pd_dd" "$pd_i" "$pd_o" "$@"
-			pd_psnr=`compare -channel alpha -metric PSNR "$pd_i" "$pd_o" NULL:`
+			pd_psnr=`compare -channel alpha -metric PSNR "$pd_i" "$pd_o" NULL: 2>&1`
+			case "$pd_psnr" in
+				[0-9.]*)
+					;;
+				*)
+					pd_psnr=999.9
+					;;
+			esac
 			echo >&2 "$pd_dd: $pd_psnr dB"
 			echo >&2 "PICKED (first)"
 		fi
