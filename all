@@ -380,7 +380,7 @@ fix_upstream_rebase_mergefail()
 
 fix_git_config()
 {
-	if ! [ -d ".git" ]; then
+	if ! [ -f ".git/config" ]; then
 		$ECHO "Not a git repository. Bailing out to not cause damage."
 		exit 1
 	fi
@@ -698,7 +698,7 @@ case "$cmd" in
 			url=`repourl "$d"`
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
-			if [ -d "$d0/$d" ]; then
+			if [ -f "$d0/$d/.git/config" ]; then
 				# if we have .no file, skip
 				if [ -f "$d0/$d.no" ]; then
 					msg "Repository $d disabled by a .no file, delete $d.no to enable; thus, not updated"
@@ -726,6 +726,14 @@ case "$cmd" in
 					cd "$d0"
 				fi
 			else
+				if [ -d "$d0/$d" ]; then
+					if yesno "$d0/$d is in the way, get rid of it?"; then
+						verbose rm -rf "$d0/$d"
+					else
+						echo "Note: $d0/$d will stay broken."
+						continue
+					fi
+				fi
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
 				fix_git_config "$url" "$pushurl"
