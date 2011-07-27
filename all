@@ -520,7 +520,7 @@ case "$cmd" in
 			url=`repourl "$d"`
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
-			if [ -d "$d0/$d" ]; then
+			if [ -f "$d0/$d/.git/config" ]; then
 				verbose cd "$d0/$d"
 				fix_git_config "$url" "$pushurl"
 				cd "$d0"
@@ -727,7 +727,7 @@ case "$cmd" in
 				fi
 			else
 				if [ -d "$d0/$d" ]; then
-					if yesno "$d0/$d is in the way, get rid of it?"; then
+					if yesno "$d0/$d is in the way, get rid of it and reclone?"; then
 						verbose rm -rf "$d0/$d"
 					else
 						echo "Note: $d0/$d will stay broken."
