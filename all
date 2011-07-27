@@ -380,6 +380,10 @@ fix_upstream_rebase_mergefail()
 
 fix_git_config()
 {
+	if ! [ -d ".git" ]; then
+		$ECHO "Not a git repository. Bailing out to not cause damage."
+		exit 1
+	fi
 	verbose git config remote.origin.url "$1"
 	if [ -n "$2" ]; then
 		verbose git config remote.origin.pushurl "$2"
