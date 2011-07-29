@@ -487,18 +487,23 @@ for(@ARGV)
 		open my $fh, ">", $outfile
 			or die "$outfile: $!";
 		print $fh $header;
-		my $pos = 17 * 8 + tell($fh) + length $msg;
+		my $msgalign = [0, 3, 2, 1]->[length($msg) % 4];
+		my $pos = 17 * 8 + tell($fh) + length($msg) + $msgalign;
 		for(@bsp)
 		{
+			my $align = [0, 3, 2, 1]->[length($_->[2]) % 4];
 			$_->[0] = $pos;
 			$_->[1] = length $_->[2];
 			$pos += $_->[1];
 			print $fh pack "VV", $_->[0], $_->[1];
 		}
 		print $fh $msg;
+		print $fh "\x00" x $msgalign;
 		for(@bsp)
 		{
+			my $align = [0, 3, 2, 1]->[length($_->[2]) % 4];
 			print $fh $_->[2];
+			print $fh "\x00" x $align;
 		}
 		close $fh;
 		print STDERR "Wrote $outfile\n";
