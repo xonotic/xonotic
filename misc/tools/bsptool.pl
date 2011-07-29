@@ -218,12 +218,14 @@ for(@ARGV)
 {
 	if(/^-i$/) # info
 	{
-		my $total = 17 * 8 + 8 + length($msg);
+		my $msgalign = [0, 3, 2, 1]->[length($msg) % 4];
+		my $total = 17 * 8 + 8 + length($msg) + $msgalign;
 		my $max = 0;
 		for(0..@bsp-1)
 		{
 			my $nl = length $bsp[$_]->[2];
-			$total += $nl;
+			my $align = [0, 3, 2, 1]->[$nl % 4];
+			$total += $nl + $align;
 			print "BSP lump $_ ($lumpname[$_]): offset $bsp[$_]->[0] length $bsp[$_]->[1] newlength $nl\n";
 			my $endpos = $bsp[$_]->[0] + $bsp[$_]->[1];
 			$max = $endpos if $max < $endpos;
@@ -494,7 +496,7 @@ for(@ARGV)
 			my $align = [0, 3, 2, 1]->[length($_->[2]) % 4];
 			$_->[0] = $pos;
 			$_->[1] = length $_->[2];
-			$pos += $_->[1];
+			$pos += $_->[1] + $align;
 			print $fh pack "VV", $_->[0], $_->[1];
 		}
 		print $fh $msg;
