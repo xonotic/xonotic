@@ -380,6 +380,10 @@ fix_upstream_rebase_mergefail()
 
 fix_git_config()
 {
+	if ! [ -f ".git/config" ]; then
+		$ECHO "Not a git repository. Bailing out to not cause damage."
+		exit 1
+	fi
 	verbose git config remote.origin.url "$1"
 	if [ -n "$2" ]; then
 		verbose git config remote.origin.pushurl "$2"
@@ -516,7 +520,7 @@ case "$cmd" in
 			url=`repourl "$d"`
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
-			if [ -d "$d0/$d" ]; then
+			if [ -f "$d0/$d/.git/config" ]; then
 				verbose cd "$d0/$d"
 				fix_git_config "$url" "$pushurl"
 				cd "$d0"
@@ -694,7 +698,7 @@ case "$cmd" in
 			url=`repourl "$d"`
 			pushurl=`repopushurl "$d"`
 			branch=`repobranch "$d"`
-			if [ -d "$d0/$d" ]; then
+			if [ -f "$d0/$d/.git/config" ]; then
 				# if we have .no file, skip
 				if [ -f "$d0/$d.no" ]; then
 					msg "Repository $d disabled by a .no file, delete $d.no to enable; thus, not updated"
@@ -722,6 +726,14 @@ case "$cmd" in
 					cd "$d0"
 				fi
 			else
+				if [ -d "$d0/$d" ]; then
+					if yesno "$d0/$d is in the way, get rid of it and reclone?"; then
+						verbose rm -rf "$d0/$d"
+					else
+						echo "Note: $d0/$d will stay broken."
+						continue
+					fi
+				fi
 				verbose git clone "$url" "$d0/$d"
 				enter "$d0/$d" verbose
 				fix_git_config "$url" "$pushurl"
