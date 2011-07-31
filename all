@@ -1035,7 +1035,7 @@ case "$cmd" in
 		fi
 		if [ -z "$MAKEFLAGS" ]; then
 			if [ -f /proc/cpuinfo ]; then
-				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo`+0))
+				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo || true`+0))
 				if [ $ncpus -gt 1 ]; then
 					MAKEFLAGS=-j$ncpus
 				fi
