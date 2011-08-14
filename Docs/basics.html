@@ -3,80 +3,44 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="author" content="Tyler Mulligan of www.detrition.net a.k.a -z- of www.nexuizninjaz.com" />
-<meta name="Description" content="Nexuiz is a free open-source fast paced first person shooter (FPS) that runs on Windows, Linux and OSX.  Nexuiz utilizes the darkplaces engine modeled after the Quake series." />
-<meta name="Keywords" content="Nexuiz, Nexiuz, first person shooter, darkplaces, open-source game, open source game, free game, linux game, deathmatch, death match, ctf, quake, alientrap, alien trap, ninjaz" />
-<title>Nexuiz - A free open-source fast paced first person shooter (FPS) for Windows, Linux and OSX</title>
+<title>Xonotic</title>
 <link rel="stylesheet" href="htmlfiles/style.css" type="text/css"></link>
-<link rel="shortcut icon" href="favicon.ico"></link>
 </head>
 <body>
 <div id="container">
 	<div id="left">
-		<div id="logo">
-
-			<a href="http://www.nexuiz.com" title="Nexuiz - Simple, fast, intense and completely free"><img src="htmlfiles/img/nexuiz_logo.jpg" alt="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." width="201" height="193" border="0" title="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." /></a>
-		</div>
 		<!-- Sidebar -->
 	  <div id="sidebar">
-			<a href="news.php" title="Latest Nexuiz News"><img src="htmlfiles/img/headers/latest_news.gif" alt="Latest News" width="168" height="16" border="0" class="imgHeader" style="margin-top:0;" title="Latest Nexuiz News" /></a>
-			<div id="news">
-			  <div class="newsPost">
-						<h1><a href="http://nexuiz.com/news.php" title="Two Nexuiz 1v1 Tourneys">nexuiz.com/news - for nexuiz news updates</a></h1>
-			  </div>
-		</div>
-			<!-- Downloads -->
-			<a href="downloads.php" title="Nexuiz Downloads (Game, Maps)"><img src="htmlfiles/img/headers/downloads.gif" alt="Downloads" width="145" height="15" border="0" class="imgHeader" title="Downloads" /></a>
-			<a id="download_nexuiz" href="http://www.sourceforge.net/projects/nexuiz/" title="Download Nexuiz from Source Forge - Left Click">&nbsp;</a>
-			<!--<a id="download_q3_mappack" href="http://downloads.sourceforge.net/nexuiz/nexmappack_r2.zip" title="Download Nexuiz Q3 Mappack from Source
-			Forge - Left Click">&nbsp;</a>-->
-			<h2 class="page"><a href="http://nexuiz.com/downloads.php" title="Nexuiz Download Mirrors">Mirrors -&gt;</a></h2>
-			<!-- Help Wanted -->
-
-			<img src="htmlfiles/img/headers/help_wanted.gif" alt="Help Wanted" width="165" height="15" class="imgHeader" title="Help Wanted" />			
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="donate_form"> <input name="cmd" value="_s-xclick" type="hidden" />
-			<a id="donate" href="javascript:document.donate_form.submit();" title="Help The Aliens, Please Donate">&nbsp;</a>
-			<noscript>
-				<!-- It not an elegant solution but I don't expect many users to arrive with JS turned off -->
-				<input name="submit" type="image" src="htmlfiles/img/donate_button_noscript.jpg" alt="Help this project - Donate to the aliens" width="166" height="43" /> 
-			</noscript>
-			<h2 class="page"><a href="http://nexuiz.com/donators.php" title="Those who have donated to Nexuiz">Donators -&gt;</a></h2>
-			<input name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----" type="hidden" /></form>
-			
-		  <!-- Created By -->
-		  <img src="htmlfiles/img/headers/created_by.gif" alt="Created By" width="145" height="15" class="imgHeader" title="Created By" />
-
-	  <a id="alien_trap" href="http://www.alientrap.org" title="Developed by Alien Trap" target="_blank">&nbsp;</a>	  </div>
+	  	  </div>
 		<!-- end sidebar -->	</div><!-- end left -->
 	<div id="right">
 		<div id="header">
-			<a href="http://nexuiz.com" title="Nexuiz - Simple, fast, intense and completely free"><img src="htmlfiles/img/nexuiz_header.jpg" alt="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." width="766" height="107" border="0" title="Nexuiz - Simple, fast, intense and completely free" /></a>
 		</div>
 		<div id="menu">
 			<ul>
 
-				<li class="first"><a href="../readme.html" title="Nexuiz - Latest News">About </a></li>
-				<li><a href="basics.html" title="Nexuiz - Media (Screenshots, videos and graphics)">Nexuiz Basics</a></li>
-				<li><a href="say-esc.html" title="Nexuiz Information  (General, System Requirements)">Say Escapes</a></li>
-				<li><a href="irc.html" title="Nexuiz - Downloads (Game, Maps)">IRC</a></li>
-				<li><a href="faq.html" title="Official Nexuiz FAQ">FAQ</a></li>
+				<li class="first"><a href="../readme.html" title="Xonotic - Latest News">About </a></li>
+				<li><a href="basics.html" title="Xonotic - Media (Screenshots, videos and graphics)">Xonotic Basics</a></li>
+				<li><a href="say-esc.html" title="Xonotic Information  (General, System Requirements)">Say Escapes</a></li>
+				<li><a href="irc.html" title="Xonotic - Downloads (Game, Maps)">IRC</a></li>
+				<li><a href="faq.html" title="Official Xonotic FAQ">FAQ</a></li>
 				<li class="first"></li>
 				<li class="first"></li>
 		  </ul>		</div>
-		<p id="tagline">Nexuiz is a <b>free</b> open-source first person shooter that runs on <b>Windows</b>, <b>Linux</b> and <b>OSX</b>.</p>
+		<p id="tagline">Xonotic is a <b>free</b> open-source first person shooter that runs on <b>Windows</b>, <b>Linux</b> and <b>OSX</b>.</p>
 	  <div id="content">
 <div class="body">
 
-<br><center><h1><a name="AFT-top">Nexuiz Basics explained</a></h1></center>
-<center><a class="link" href="http://nexuiz.com">http://nexuiz.com</a>&nbsp;&nbsp;<a class="link" href="http://alientrap.org">http://alientrap.org</a></center>
+<br><center><h1><a name="AFT-top">Xonotic Basics explained</a></h1></center>
+<center><a class="link" href="http://xonotic.org">http://xonotic.org</a></center>
 <hr>
 <p class="Body">
-This file attempts to cover all of the fundamental principles and techniques for playing Nexuiz in particular, though it will largely apply to any first person shooter.
+This file attempts to cover all of the fundamental principles and techniques for playing Xonotic in particular, though it will largely apply to any first person shooter.
 </p>
 <!-- Start SectLevel1 -->
 <h2><a name="_Getting Comfortable_"><strong>Getting Comfortable</strong></a></h2>
 <p class="Body">
-The most important thing when playing is 'to feel good'.  You need to be comfortable with how the game feels, and how it works, in order to play well.  This means being able to concentrate on the game play itself, without being disturbed by in-game distractions or by various sorts of handicaps.  This guide provides a systematic but very brief introduction to Nexuiz, with a view to increasing your effectiveness in-game, straight off the mark.
+The most important thing when playing is 'to feel good'.  You need to be comfortable with how the game feels, and how it works, in order to play well.  This means being able to concentrate on the game play itself, without being disturbed by in-game distractions or by various sorts of handicaps.  This guide provides a systematic but very brief introduction to Xonotic, with a view to increasing your effectiveness in-game, straight off the mark.
 </p>
 <!-- Start SectLevel2 -->
 <h3><a name="''Reducing Clutter''"><em>Reducing Clutter</em></a></h3>
@@ -87,7 +51,7 @@ Especially when playing against others the first thing you need to ensure is tha
 Similarly, eye-candy can make the game very appealing to look at, but can also act to obscure in-game events - the flares and smoke caused by rockets, for example, can make spotting your target much more difficult in the heat of battle.  Eye-candy also incurs performance hits on slower machines, which can make playing difficult.  Bloom might be nice to look at, but it is often just distracting when playing.  So again, many players disable some of the visual effects, so as to make the game easier to play in this regard (things to turn off include <em>Bloom</em>, <em>HDR</em>, <em>Gloss</em>, <em>Coronas</em> and all the Realtime stuff in the <em>settings/effects</em> menu).  Although it may seem as if removing visual (and audio) effects will make the game less immersive by reducing the mood which the game designers were aiming for, in the long run it will make it much more rewarding and fun to play.  Darkness and shadows can create creepiness and realism, but you simply don't notice these things in a fast-paced multi player battle.  On the contrary, they make it harder to spot opponents or items and end up being frustrating.  Better to play the game in campaign mode with full visual effects to see how pretty it can be, and then, once you're over the initial craving for eye-candy, start tuning the game to be more functional in multi player.
 </p>
 <p class="Body">
-In this regard, one of the first things to adjust is the brightness and contrast (in the <em>settings/video</em> menu), so that shadows are not too impenetrable, and areas of alternating light and dark don't create difficulties in tracking opponents.  It's also worthwhile to try increasing you field of view (fov) - the amount you can see to the left and right.  By default, Nexuiz uses a fov of 90 degrees.  Increasing this improves your peripheral vision, but also makes everything seem smaller and thus reduces your ability to aim.  Decreasing it has the opposite effect.  Most gamers find a nice balance somewhere around fov 100-120.  You can find the fov control in the <em>multiplayer/player setup</em> menu.
+In this regard, one of the first things to adjust is the brightness and contrast (in the <em>settings/video</em> menu), so that shadows are not too impenetrable, and areas of alternating light and dark don't create difficulties in tracking opponents.  It's also worthwhile to try increasing you field of view (fov) - the amount you can see to the left and right.  By default, Xonotic uses a fov of 90 degrees.  Increasing this improves your peripheral vision, but also makes everything seem smaller and thus reduces your ability to aim.  Decreasing it has the opposite effect.  Most gamers find a nice balance somewhere around fov 100-120.  You can find the fov control in the <em>multiplayer/player setup</em> menu.
 </p>
 <!--End Section 2-->
 <h3><a name="''Controlling Your Character''"><em>Controlling Your Character</em></a></h3>
@@ -133,7 +97,7 @@ Also bear in mind that people try to evade projectiles; and it is even comparati
 To put up a good fight you need to survive an attack, so make sure you pick up health and armor lying around the map.  This will also ensure that your opponents are deprived of these, so it will be easier for you to frag them.  To do this effectively you will have to learn where those items are, and try to get them before someone else does.  Armor and health items reappear 30 seconds after they were taken.  You can use this to your advantage by timing your pickups - look at the scoreboard to see the current map time, and then use this to predict when items will respawn.  This way, you can develop patterns on the map so that you're always around when an item respawns.  However, be careful - patterns make you predictable, and your opponent can also use the timer!  If you keep grabbing the armor or health, he will use this against you by lying an ambush.
 </p>
 <p class="Body">
-The health and armor system in Nexuiz is different to other games in that it tends toward an equilibrium of 100 health and 100 armor.  You can collect as much health and armor as you like, but it will degenerate toward these values.  The more health and armor you have, the faster it will degenerate - but when you pick them up the degeneration stops momentarily.  Because of this, you can't just load up on health and armor and head off into battle - you need to constantly replenish to remain strong.  On the converse, though, when your health is below 100 it will slowly <em>re</em>generate (armor will not).  The lower it is, the faster it will replenish.  This regeneration stops for a few seconds if you are hurt, so just running away after a fight helps staying alive but is usually not enough to restore you to useful battle ready levels again - you have to wait a while to regain your full health, and so picking up health after a fight is still important.
+The health and armor system in Xonotic is different to other games in that it tends toward an equilibrium of 100 health and 100 armor.  You can collect as much health and armor as you like, but it will degenerate toward these values.  The more health and armor you have, the faster it will degenerate - but when you pick them up the degeneration stops momentarily.  Because of this, you can't just load up on health and armor and head off into battle - you need to constantly replenish to remain strong.  On the converse, though, when your health is below 100 it will slowly <em>re</em>generate (armor will not).  The lower it is, the faster it will replenish.  This regeneration stops for a few seconds if you are hurt, so just running away after a fight helps staying alive but is usually not enough to restore you to useful battle ready levels again - you have to wait a while to regain your full health, and so picking up health after a fight is still important.
 </p>
 <p class="Body">
 In regard to the previous point of working a map to control items, and also shooting at where your opponent will be, it's important to try to predict where on the map your opponents are even when you can't directly see them.  First, try to listen for them; secondly, learn the maps so you know the most useful routes and the most popular areas to which people tend to gravitate.  It gives you a marked advantage to be able to say, &quot;I saw or heard someone pick up an armor, so they must be at such-and-such location, and from there he can only go to this place or that place.&quot; Just shooting something to the likely places your opponent will be - a rocket or a grenade for example - can often result in either a surprise kill, or in surprise damage which you can then follow up.  Don't underestimate how likely a well-aimed educated guess is to hit someone.  Maybe he'll walk into it - rockets can be hard to see coming, and grenades lying on the floor or spammed into a small space can be really hard to avoid.  Once you've hurt him you'll hear the tink of your damage, and you will also know for sure were he is and can finish him off.  You can pretty much 'lock down' a map by picking up items, and making sure others have a hard time getting around which will also mess with their concentration.
@@ -141,13 +105,13 @@ In regard to the previous point of working a map to control items, and also shoo
 <!--End Section 2-->
 <h3><a name="''Using Weapons Effectively''"><em>Using Weapons Effectively</em></a></h3>
 <p class="Body">
-Among the items you can pick up are the weapons.  Some of them are very unique to Nexuiz, and to get the most out of them you need to be familiar with every aspect of how they work - including the rate of fire, the damage per hit, the spread and speed of the payload, and so on.
+Among the items you can pick up are the weapons.  Some of them are very unique to Xonotic, and to get the most out of them you need to be familiar with every aspect of how they work - including the rate of fire, the damage per hit, the spread and speed of the payload, and so on.
 </p>
 <p class="Body">
-Almost all weapons in Nexuiz have two firing modes, so make sure you know both.  You normally (depending on game-mode) start equipped with two weapons: the Laser and the shotgun.  You can bind these weapons to a key at the <em>settings/input</em> menu or in the console using the command <em>bind key &quot;impulse <strong>n</strong>&quot;</em>, where n is the number of the weapon.
+Almost all weapons in Xonotic have two firing modes, so make sure you know both.  You normally (depending on game-mode) start equipped with two weapons: the Laser and the shotgun.  You can bind these weapons to a key at the <em>settings/input</em> menu or in the console using the command <em>bind key &quot;impulse <strong>n</strong>&quot;</em>, where n is the number of the weapon.
 </p>
 <table style="border: 0"><tr><td style="border: 0; vertical-align: top; text-align: left"><img src="htmlfiles/weaponimg/thirdperson-laser.png" alt="laser"></td><td style="border: 0"><p class="Body">
-The <strong>Laser</strong> is not often used as a weapon, as it does not do much damage - but it's a useful tool to move around the map, because it has a significant push.  The 'explosion' from its projectile will push you and other players around a lot.  The trick to using it to move around is to use this push to gain speed or to do huge jumps.  For an easy start, take the Laser, look down at the floor, and press fire.  It will push you high into the air.  If you press jump and fire at the same time, you will get even higher - but it depends on the timing, and, for more advanced jumps, also on the angle you fire at the floor, as well as how fast and in which direction you move.  For example if you just run forwards, look down and press fire it will catapult you forward with great speed.  Play around with it, and watch others, and you will learn a very useful skill in Nexuiz.  The secondary fire mode of the Laser switches back to the last used weapon.  The Laser does not use up any ammo.
+The <strong>Laser</strong> is not often used as a weapon, as it does not do much damage - but it's a useful tool to move around the map, because it has a significant push.  The 'explosion' from its projectile will push you and other players around a lot.  The trick to using it to move around is to use this push to gain speed or to do huge jumps.  For an easy start, take the Laser, look down at the floor, and press fire.  It will push you high into the air.  If you press jump and fire at the same time, you will get even higher - but it depends on the timing, and, for more advanced jumps, also on the angle you fire at the floor, as well as how fast and in which direction you move.  For example if you just run forwards, look down and press fire it will catapult you forward with great speed.  Play around with it, and watch others, and you will learn a very useful skill in Xonotic.  The secondary fire mode of the Laser switches back to the last used weapon.  The Laser does not use up any ammo.
 </p>
 </td><td style="border: 0; vertical-align: bottom; text-align: right"><img src="htmlfiles/weaponimg/firstperson-laser.png" alt="laser"></td></tr><tr><td style="border: 0; vertical-align: top; text-align: left"><img src="htmlfiles/weaponimg/thirdperson-hookgun.png" alt="hookgun"></td><td style="border: 0"><p class="Body">
 The <strong>Grappling Hook</strong> is an other movement tool.  The primary mode attaches itself to all sorts of solid objects and will pull you there to move through the map like spider man.  You can get very fast that way or reach spots you would not get to by other means.  The secondary firemode drops a small gravity bomb that will affect enemy players and also releases a lot of smoke which will make you harder to see and hit.  The gravity bomb uses cell ammo.  There is also a mutator that adds a off-hand hook which can be used all the time, uses no ammo but only does the pulling part.
@@ -189,11 +153,11 @@ The <strong>Hagar</strong> can be compared to the plasma gun from Quake3.  It ha
 The <strong>Rocket Launcher</strong> is a little different from that of other games, in that the rockets move relatively slowly.  The primary fire mode shoots a slow-moving, high-damage rocket projectile at a medium rate of fire.  The secondary fire mode will explode all your flying rockets at once.  This means that you don't need to hit your opponent directly - just get the rocket <em>near</em> him, and use the secondary fire to cause splash damage which will badly hurt him.  The Rocket Launcher uses rocket ammo which is shared with the Mortar, T.A.G. and the Hagar.
 </p>
 </td><td style="border: 0; vertical-align: bottom; text-align: right"><img src="htmlfiles/weaponimg/firstperson-rl.png" alt="rl"></td></tr></table><p class="Body">
-Now that you know all the guns you also have to understand that in Nexuiz each projectile can be set off by explosions.  So its possible to blow up the rocket an opponent is shooting at you.  A good strategy against someone with a rocketlauncher is to spam him with the hagar.  Chances are high you make his own rocket explode shortly after he launched it and hurt him which his own weapon!
+Now that you know all the guns you also have to understand that in Xonotic each projectile can be set off by explosions.  So its possible to blow up the rocket an opponent is shooting at you.  A good strategy against someone with a rocketlauncher is to spam him with the hagar.  Chances are high you make his own rocket explode shortly after he launched it and hurt him which his own weapon!
 Also note that some objects are affected / pushed by explosion like the keys in Keyhunt or the flags in Capture the Flag.
 </p>
 <p class="Body">
-A special feature in Nexuiz is that walls do not block explosions, so you can't hide behind them.  Similarly, if you know that someone is on the floor above you, shoot at the ceiling, and with a little luck the explosion might hurt him.  This <em>can</em> be changed by a server admin, but the default allows for more fun; and it's also nice to see how good people are at guessing where their opponents are.  Furthermore bullets are ballistic, which means they are affected by gravity much like real bullets and can also pierce walls and enemies like real bullets.  That enables you to hit several enemies or enemies behind walls/floors up to a certain thickness.
+A special feature in Xonotic is that walls do not block explosions, so you can't hide behind them.  Similarly, if you know that someone is on the floor above you, shoot at the ceiling, and with a little luck the explosion might hurt him.  This <em>can</em> be changed by a server admin, but the default allows for more fun; and it's also nice to see how good people are at guessing where their opponents are.  Furthermore bullets are ballistic, which means they are affected by gravity much like real bullets and can also pierce walls and enemies like real bullets.  That enables you to hit several enemies or enemies behind walls/floors up to a certain thickness.
 </p>
 <!--End Section 2-->
 <h3><a name="''Using Jumping Effectively''"><em>Using Jumping Effectively</em></a></h3>
@@ -201,18 +165,18 @@ A special feature in Nexuiz is that walls do not block explosions, so you can't 
 You will need to be able to get around the map quickly and efficiently if you are to hunt down your opponents, and collect items well.  As already mentioned, the Laser is useful for jumping and gaining speed - but you can use all explosive weapons for a similar effect.  Other weapons, however, will cause (much) more damage to your health, and not all offer the same strong push as the Laser.  The rocket launcher will push you twice as far, but you will also take <em>lots</em> more damage.  The mortar has the same push as the Laser, but its explosion is bigger so the timing and the right angle are less of an issue.  For this reason, the mortar is better for a beginner to learn these sorts of jumps.
 </p>
 <p class="Body">
-You should also know that you gain a bit extra speed moving forward simply by jumping.  When you walk, there is friction from the floor which keeps you at a constant speed.  If you jump as you walk, the amount of time you touch the floor is considerably less, and so the friction does not slow you down as much.  The longer or rather more often you jump, the faster you go.  The most simple way to do this is to run forward, jump, and then while you are in the air release and repress/hold the jump button.  Your character will jump again the moment he lands, without you having to worry about timing hitting the jump key.  Just repeat it a few times and you will notice you get faster and faster.  Unlike other games, Nexuiz does not need you to do this with strange key combinations or even with circular movements of the mouse - trying to do these will generally make you slower.  The only time that strafe-jumping (holding one of the strafe-keys while jumping) is useful is for the very first jump you make.  This can increase your jump speed a little - although not by much and its complicated to learn.
+You should also know that you gain a bit extra speed moving forward simply by jumping.  When you walk, there is friction from the floor which keeps you at a constant speed.  If you jump as you walk, the amount of time you touch the floor is considerably less, and so the friction does not slow you down as much.  The longer or rather more often you jump, the faster you go.  The most simple way to do this is to run forward, jump, and then while you are in the air release and repress/hold the jump button.  Your character will jump again the moment he lands, without you having to worry about timing hitting the jump key.  Just repeat it a few times and you will notice you get faster and faster.  Unlike other games, Xonotic does not need you to do this with strange key combinations or even with circular movements of the mouse - trying to do these will generally make you slower.  The only time that strafe-jumping (holding one of the strafe-keys while jumping) is useful is for the very first jump you make.  This can increase your jump speed a little - although not by much and its complicated to learn.
 </p>
 <p class="Body">
 Another useful thing to know about movement is that if you are flying/jumping, you can release the forward key and instead press the left or right key, and turn your mouse in the same direction.  Doing so will turn or 'bend' your jump in this direction.  This is a useful trick to get around corners, to become less predictable, and also to avoid having to stop jumping to change direction.  After getting used to this you can get around maps very fast and maintain a high speed.
 </p>
 <p class="Body">
-Both the speed jumping and the turning require a certain amount of practice, but they are easy to learn - especially compared to the trick jumping found in games like Quake 3 CPMA or Enemy Territory.  However, there is another trick in Nexuiz that does not need any practice at all: the ramp jump.  Just walk up a ramp or slope, and jump.  That jump will get you higher and further than if you had jumped on flat ground.  You can reach some interesting spots by doing this, and ramp jumps can be effectively combined with speed jumping to achieve some remarkable acrobatics which can be very useful for taking shortcuts and thus dominating a map effectively.  It takes some time to learn the good spots were these four tricks can be used to the maximum effectiveness - again, experiment yourself, watch others, and ask around in-game or on the Nexuiz forums (<a class="link" href="http://www.alientrap.org/forum">http://www.alientrap.org/forum</a>).
+Both the speed jumping and the turning require a certain amount of practice, but they are easy to learn - especially compared to the trick jumping found in games like Quake 3 CPMA or Enemy Territory.  However, there is another trick in Xonotic that does not need any practice at all: the ramp jump.  Just walk up a ramp or slope, and jump.  That jump will get you higher and further than if you had jumped on flat ground.  You can reach some interesting spots by doing this, and ramp jumps can be effectively combined with speed jumping to achieve some remarkable acrobatics which can be very useful for taking shortcuts and thus dominating a map effectively.  It takes some time to learn the good spots were these four tricks can be used to the maximum effectiveness - again, experiment yourself, watch others, and ask around in-game or on the Xonotic forums (<a class="link" href="http://www.xonotic.org/forum">http://www.xonotic.org/forum</a>).
 </p>
 <!--End Section 2-->
 <h3><a name="''The Console''"><em>The Console</em></a></h3>
 <p class="Body">
-Games generally have a great many settings which can be changed or tweaked to give you the best advantage.  A lot of these aren't included in the game menus, which are limited by space and intended to give only a quick and compact view of the most important options.  For all the other variables, you have the in-game console.  This is like a command line inside the game.  You can enter commands to connect to a server, vote for options on the server, or to change variables like your name or various graphic effects.  You can access the console by pressing shift-escape, and you can close it again by pressing escape.  Lots of info is available on the official Nexuiz forum regarding the effective use of the console, but probably the most important in multiplayer is using it for voting, which will be briefly covered here:
+Games generally have a great many settings which can be changed or tweaked to give you the best advantage.  A lot of these aren't included in the game menus, which are limited by space and intended to give only a quick and compact view of the most important options.  For all the other variables, you have the in-game console.  This is like a command line inside the game.  You can enter commands to connect to a server, vote for options on the server, or to change variables like your name or various graphic effects.  You can access the console by pressing shift-escape, and you can close it again by pressing escape.  Lots of info is available on the official Xonotic forum regarding the effective use of the console, but probably the most important in multiplayer is using it for voting, which will be briefly covered here:
 </p>
 <p class="Body">
 When you are on a server, open the console and type <em>vhelp</em>.  This will display a short help regarding voting, and also tell you what can be voted on the server.  By default, things you can vote for include the timelimit and the map played.  By entering <em>vcall timelimit -1</em> you call a vote to set the timelimit to -1, which means to end the current map and play the next one.  Or, as another example, <em>vcall chmap aggressor</em> will start a vote to switch to the map 'Aggressor'.  This vote is printed to every player on the server, who can then accept or reject it.  To accept a vote, press F1 (or type in <em>vyes</em> at the console); to reject it, press F2 (or enter <em>vno</em> at the console).  If more then 50% of the players currently on the server accept a vote, the vote is passed and whichever setting has been polled will change.  And in this example the current map will end and the next map will begin.  It does not hurt to tell people to press F1/F2, as some still do not know about it.
@@ -220,7 +184,7 @@ When you are on a server, open the console and type <em>vhelp</em>.  This will d
 <!--End Section 2-->
 <h3><a name="''Game Types''"><em>Game Types</em></a></h3>
 <p class="Body">
-Nexuiz supports several different game modes and some smaller changes called mutators.  Both are displayed when you connect to a server.
+Xonotic supports several different game modes and some smaller changes called mutators.  Both are displayed when you connect to a server.
 </p>
 <!--End Section 2-->
 <h3><a name="''Modes''"><em>Modes</em></a></h3>
@@ -231,7 +195,7 @@ Nexuiz supports several different game modes and some smaller changes called mut
 <li>Team Deathmatch (TDM) is similar, but pits teams of players against each other.  Only shoot players with a different color than yourself.  Look at your gun to see your color.  The team with the most frags wins.</li>
 </ul>
 <ul>
-<li>Capture The Flag (CTF) is a team match in which you have two teams, two bases, and two flags.  You have to get into the enemy base, grab their flag, and bring it back to your own flag to score.  Scoring gives the most points, normal fragging and returning the flag gives some points.  The team with the most points wins.  CTF is a surprisingly complicated game mode, so see the comprehensive CTF guide in the Nexuiz forum for more information (<a class="link" href="http://alientrap.org/forum/viewtopic.php?t=849">http://alientrap.org/forum/viewtopic.php?t=849</a>).</li>
+<li>Capture The Flag (CTF) is a team match in which you have two teams, two bases, and two flags.  You have to get into the enemy base, grab their flag, and bring it back to your own flag to score.  Scoring gives the most points, normal fragging and returning the flag gives some points.  The team with the most points wins. </li>
 </ul>
 <ul>
 <li>Minstagib is an improved instagib.  You can pick up lives, so you can survive two shots, and you can pick up an item to become almost invisible.  This is were the minstanex got its name from.</li>
@@ -249,16 +213,16 @@ Nexuiz supports several different game modes and some smaller changes called mut
 <li>Arena mode is similar to deathmatch, but it only puts two players into a map, with the others waiting in a queue.  When one of both is fragged the next one in the queue will play against the winner.</li>
 </ul>
 <ul>
-<li>Keyhunt (KH) is a new team mode in Nexuiz 2.3.  Each team has one key and the goal is the collect all keys.  The team with the most points wins.  You get small points for fragging, fragging a keycarrier and picking up a key but you should go for the BIG points you get when <em>one team has all the keys and all the keycarriers meet</em>.  Of course it also works when ONE player gets all the keys for his team but this is <em>much</em> harder.</li>
+<li>Keyhunt (KH) is a new team mode in Xonotic 2.3.  Each team has one key and the goal is the collect all keys.  The team with the most points wins.  You get small points for fragging, fragging a keycarrier and picking up a key but you should go for the BIG points you get when <em>one team has all the keys and all the keycarriers meet</em>.  Of course it also works when ONE player gets all the keys for his team but this is <em>much</em> harder.</li>
 </ul>
 <ul>
-<li>Onslaught (ONS) is a new team mode in Nexuiz 2.4.  Each team has a powergenerator and the goal is to destroy the enemies generator.  Each generator and all except one checkpoint in the map are protected by an forcefield which is powered by nearby checkpoint.  Your team has to start at the one unprotected checkpoint and work your way up to the enemies generator.  Find the perfect balance between attacking the enemies checkpoints/generator and protecting your own.</li>
+<li>Onslaught (ONS) is a new team mode in Xonotic 2.4.  Each team has a powergenerator and the goal is to destroy the enemies generator.  Each generator and all except one checkpoint in the map are protected by an forcefield which is powered by nearby checkpoint.  Your team has to start at the one unprotected checkpoint and work your way up to the enemies generator.  Find the perfect balance between attacking the enemies checkpoints/generator and protecting your own.</li>
 </ul>
 <ul>
-<li>Assault (AS) is a similar team mode and also new in Nexuiz 2.4.  There are objects in the map, only one is active at a time and you have to complete that one to unlock the next objective.  One round ends if the last objective is completed or timelimit is hit.  After the round the teams swap the attackers/defender roles.</li>
+<li>Assault (AS) is a similar team mode and also new in Xonotic 2.4.  There are objects in the map, only one is active at a time and you have to complete that one to unlock the next objective.  One round ends if the last objective is completed or timelimit is hit.  After the round the teams swap the attackers/defender roles.</li>
 </ul>
 <ul>
-<li>Race is a new mode for all the quick people in Nexuiz 2.5.  The goal is to race through the level as fast as possible.  A timer is set off at the startline and stopped at the endline.  Checkpoints in between give you an update on your time and compared to the top player.  There are three different race modes:</li>
+<li>Race is a new mode for all the quick people in Xonotic 2.5.  The goal is to race through the level as fast as possible.  A timer is set off at the startline and stopped at the endline.  Checkpoints in between give you an update on your time and compared to the top player.  There are three different race modes:</li>
 </ul>
 <ul>
 <ul>
@@ -301,44 +265,11 @@ There are some more of these mutators, but those are the most important ones.
 <p class="Body">
 A list of useful links:
 <ul>
-<li>The official Nexuiz forum: <a class="link" href="http://alientrap.org/forum">http://alientrap.org/forum</a></li>
+<li>The official Xonotic forum: <a class="link" href="http://xonotic.org/forum">http://xonotic.org/forum</a></li>
 </ul>
 </p>
 <ul>
-<li>The semiofficial Nexuiz wiki: <a class="link" href="http://alientrap.org/wiki">http://alientrap.org/wiki</a></li>
-</ul>
-<ul>
-<li>The official Nexuiz ladder: <a class="link" href="http://planetnexuiz.com/ladder">http://planetnexuiz.com/ladder</a></li>
-</ul>
-<ul>
-<li>The Official Nexuiz tournaments: <a class="link" href="http://planetnexuiz.com/tourney">http://planetnexuiz.com/tourney</a></li>
-</ul>
-<ul>
-<li>General Nexuiz Tips and Tricks: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=90">http://alientrap.org/forum/viewtopic.php?t=90</a></li>
-</ul>
-<ul>
-<li>How to get more help via IRC: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=497">http://alientrap.org/forum/viewtopic.php?t=497</a></li>
-</ul>
-<ul>
-<li>CTF guide and ctf MAPS guide: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=849">http://alientrap.org/forum/viewtopic.php?t=849</a></li>
-</ul>
-<ul>
-<li>Team communication explained: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=555">http://alientrap.org/forum/viewtopic.php?t=555</a></li>
-</ul>
-<ul>
-<li>A few useful jumps: <a class="link" href="http://esteel.planetnexuiz.de/nexuiz/demos/jumps.pk3">http://esteel.planetnexuiz.de/nexuiz/demos/jumps.pk3</a>  (copy the file into Nexuiz/data and you should find the demos in the demos menu)</li>
-</ul>
-<ul>
-<li>FPS settings: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=1628">http://alientrap.org/forum/viewtopic.php?t=1628</a></li>
-</ul>
-<ul>
-<li>A list of all available variables in Nexuiz: <a class="link" href="http://alientrap.org/wiki/pmwiki.php?n=Main.GameTweaks">http://alientrap.org/wiki/pmwiki.php?n=Main.GameTweaks</a></li>
-</ul>
-<ul>
-<li>A list of all available commands in Nexuiz: <a class="link" href="http://alientrap.org/wiki/pmwiki.php?n=Main.ConsoleCommands">http://alientrap.org/wiki/pmwiki.php?n=Main.ConsoleCommands</a></li>
-</ul>
-<ul>
-<li>Some info about generic strategy in games: <a class="link" href="http://alientrap.org/forum/viewtopic.php?t=3496">http://alientrap.org/forum/viewtopic.php?t=3496</a></li>
+<li>The official Xonotic wiki: <a class="link" href="http://dev.xonotic.org/wiki">http://dev.xonotic.org/wiki</a></li>
 </ul>
 <!--End Section 2-->
 <!-- End SectLevel2 -->
@@ -346,33 +277,22 @@ A list of useful links:
 <!-- End SectLevel1 -->
 <hr>
 <br>
-<p align="right"> <small>This document was generated using <a class="link" href="http://www.maplefish.com/todd/aft.html">AFT v5.096</a></small> </p>
+<p align="right"> <small>This document was generated using <a class="link" href="http://www.maplefish.com/todd/aft.html">AFT v5.097</a></small> </p>
 		  <p><br style="clear:left" />
         </p>
 	  </div>
 	  <!-- end content -->
 		<div id="footer">
-			<p id="ninja"><a href="http://www.detrition.net" title="Tyler Mulligan's Working Portfolio" target="_blank">page created by</a> <a href="http://www.nexuizninjaz.com" title="Nexuiz Ninjaz - Practicing the ninja arts of Nexuiz" target="_blank">a ninja</a></p>
-			<ul>
-
-				<li class="first"><a href="http://alientrap.org/nexuiz/news.php" title="Nexuiz - Latest News">News</a></li>
-				<li><a href="http://alientrap.org/nexuiz/media.php" title="Nexuiz - Media (Screenshots, videos and graphics)">Media</a></li>
-				<li><a href="http://alientrap.org/nexuiz/information.php" title="Nexuiz Information  (General, System Requirements)">Info</a></li>
-				<li><a href="http://alientrap.org/nexuiz/team.php" title="The Nexuiz Team">Team</a></li>
-				<li><a href="http://alientrap.org/nexuiz/links.php" title="Nexuiz Links">Links</a></li>
-				<li><a href="http://alientrap.org/forum/index.php?c=3" title="Official Nexuiz Forums" target="_blank">Forums</a></li>
-				<li><a href="http://planetnexuiz.com/ladder/" title="Nexuiz Ladder" target="_blank">Ladder</a></li>
-				<li><a href="http://planetnexuiz.com/tourney/" title="Nexuiz Tournaments" target="_blank">Tournament</a></li>
-			</ul>		</div><!-- end footer -->
-		<p class="subFooter">Come to the Nexuiz IRC channel: <a href="irc://irc.quakenet.org/nexuiz" title="#nexuiz on irc.quakenet.org">#nexuiz on irc.quakenet.org</a> or the team channel: <a href="irc://irc.anynet.org/alientrap" title="#alientrap on irc.anynet.org">#alientrap on irc.anynet.org</a></p>
+		</div>
+		<!-- end footer -->
+		<p class="subFooter">Come to the Xonotic IRC channel: <a href="irc://irc.quakenet.org/xonotic" title="#xonotic on irc.quakenet.org">#xonotic on irc.quakenet.org</a> or the team channel: <a href="irc://irc.freenode.net/xonotic" title="#xonotic on irc.freenode.net">#xonotic on irc.freenode.net</a></p>
 
 		<div id="valid">
 			<a id="valid_css" href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
 			<a id="valid_xhtml" href="http://validator.w3.org/check?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
-			<p>&copy; 2004-2008 Nexuiz.com</p>
-		</div>
+			<p>&copy; 2009-2011 Xonotic.org</p>
+	  </div>
 	</div><!-- end right -->
-</div>
 </div>
 </body>
 </html>
