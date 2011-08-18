@@ -128,7 +128,7 @@ sub Evaluate($)
 	my %allweps;
 	while(my ($k, $v) = each %$matrix)
 	{
-		for(my ($k2, $v2) = each %$v)
+		while(my ($k2, $v2) = each %$v)
 		{
 			next if $k eq $k2;
 			next if !$v2;
