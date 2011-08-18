@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname='libd0_blind_id.so.0'
+dlname=''
 
 # Names of this library.
-library_names='libd0_blind_id.so.0.0.0 libd0_blind_id.so.0 libd0_blind_id.so'
+library_names=''
 
 # The name of the static archive.
 old_library='libd0_blind_id.a'
@@ -17,7 +17,7 @@ old_library='libd0_blind_id.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' /usr/lib64/libgmp.la'
+dependency_libs=' -L/tmp/Darkplaces.build.linux64.deps/lib /tmp/g/lib/libgmp.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -28,7 +28,7 @@ age=0
 revision=0
 
 # Is this an already installed library?
-installed=no
+installed=yes
 
 # Should we warn about portability when linking against -modules?
 shouldnotlink=no
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/usr/local/lib'
+libdir='/tmp/d0c/lib'
