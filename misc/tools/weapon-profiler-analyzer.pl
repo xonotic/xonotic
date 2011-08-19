@@ -302,21 +302,24 @@ sub out_html_cache($@)
 	{
 		# open out file
 		my ($addr, $type, $map, @columns) = @data;
-		$addr ||= ':any';
-		$type ||= ':any';
-		$map ||= ':any';
-		mkdir "$type";
-		mkdir "$type/$map";
-		open $out_html_cache_fh, ">", "$type/$map/$addr"
-			or warn "open $type/$map/$addr: $!";
-		select $out_html_cache_fh;
+		if(!defined $addr)
+		{
+			$type ||= ':any';
+			$map ||= ':any';
+			mkdir "$type";
+			open $out_html_cache_fh, ">", "$type/$map"
+				or warn "open $type/$map: $!";
+			select $out_html_cache_fh;
+		}
 	}
-	out_html($event, @data);
+	out_html($event, @data)
+		if defined $out_html_cache_fh;
 	if($event eq 'endmatrix')
 	{
 		# close out file
 		select STDOUT;
 		close $out_html_cache_fh;
+		undef $out_html_cache_fh;
 	}
 }
 
