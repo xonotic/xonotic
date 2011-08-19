@@ -191,10 +191,11 @@ sub out_text($@)
 	}
 	elsif($event eq 'startmatrix')
 	{
-		my ($addr, $map, @columns) = @data;
+		my ($addr, $type, $map, @columns) = @data;
 		$addr ||= 'any';
 		$map ||= 'any';
-		print "For server @{[$addr || 'any']} map @{[$map || 'any']}:\n";
+		$type ||= 'any';
+		print "For server $addr type $type map $map:\n";
 	}
 	elsif($event eq 'startrow')
 	{
@@ -242,10 +243,11 @@ sub out_html($@)
 	}
 	elsif($event eq 'startmatrix')
 	{
-		my ($addr, $map, @columns) = @data;
+		my ($addr, $type, $map, @columns) = @data;
 		$addr ||= 'any';
+		$type ||= 'any';
 		$map ||= 'any';
-		print "<h2>For server @{[$addr || 'any']} map @{[$map || 'any']}:</h2>\n";
+		print "<h2>For server $addr type $type map $map</h2>\n";
 		print "<table><tr><th>Weapon</th><th>Rating</th>\n";
 		printf '<th><img width=70 height=80 src="http://svn.icculus.org/*checkout*/nexuiz/trunk/Docs/htmlfiles/weaponimg/thirdperson-%s.png" alt="%s"></th>', $stats->weaponid_to_model($_), $stats->weaponid_to_name($_) for @columns;
 		print "</tr>\n";
@@ -298,12 +300,12 @@ LoadData();
 $out->(start => ());
 $stats->allstats(sub
 {
-	my ($addr, $map, $data) = @_;
+	my ($addr, $type, $map, $data) = @_;
 	my $values = Evaluate $data;
 	my $valid = defined [values %$values]->[0];
 	my @weapons_sorted = sort { $valid ? $values->{$b} <=> $values->{$a} : $a <=> $b } keys %$values;
 	my $min = undef;
-	$out->(startmatrix => ($addr, $map, @weapons_sorted));
+	$out->(startmatrix => ($addr, $type, $map, @weapons_sorted));
 	for my $row(@weapons_sorted)
 	{
 		$out->(startrow => $row, ($valid ? $values->{$row} : undef));
