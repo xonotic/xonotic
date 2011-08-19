@@ -318,7 +318,8 @@ sub out_html_cache($@)
 	{
 		# close out file
 		select STDOUT;
-		close $out_html_cache_fh;
+		close $out_html_cache_fh
+			if defined $out_html_cache_fh;
 		undef $out_html_cache_fh;
 	}
 }
