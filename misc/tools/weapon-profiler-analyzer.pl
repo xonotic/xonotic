@@ -294,7 +294,36 @@ sub out_html($@)
 	}
 }
 
-my $out = $ENV{html} ? \&out_html : \&out_text;
+my $out_html_cache_fh;
+sub out_html_cache($@)
+{
+	my ($event, @data) = @_;
+	if($event eq 'startmatrix')
+	{
+		# open out file
+		my ($addr, $type, $map, @columns) = @data;
+		$addr ||= ':any';
+		$type ||= ':any';
+		$map ||= ':any';
+		mkdir "$type";
+		mkdir "$type/$map";
+		open $out_html_cache_fh, ">", "$type/$map/$addr"
+			or warn "open $type/$map/$addr: $!";
+		select $out_html_cache_fh;
+	}
+	out_html($event, @data);
+	if($event eq 'endmatrix')
+	{
+		# close out file
+		select STDOUT;
+		close $out_html_cache_fh;
+	}
+}
+
+my $out =
+	$ENV{html_cache} ? \&out_html_cache :
+	$ENV{html}       ? \&out_html       :
+	\&out_text;
 
 LoadData();
 $out->(start => ());
