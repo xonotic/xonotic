@@ -108,7 +108,7 @@ sub allstats($$)
 {
 	my ($self, $callback) = @_;
 	# send global stats
-	$callback->(undef, undef, $self->{allstats});
+	$callback->(undef, undef, undef, $self->{allstats});
 	# send per-host stats
 	while(my ($k, $v) = each %{$self->{addrstats}})
 	{
