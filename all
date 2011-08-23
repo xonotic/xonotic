@@ -1887,7 +1887,7 @@ case "$cmd" in
 					versionstr="$versionstr$RELEASETYPE"
 					;;
 			esac
-			if [ $gv -lt 900 ]; then
+			if [ $gv -lt 9900 ]; then
 				# pre-1.0: compatible with any other pre-1.0
 				verbose sed "
 					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
