@@ -35,12 +35,18 @@
 #include <mmsystem.h>
 #include <stdio.h>
 #include <malloc.h>
+#include <stdint.h>
 
 #define srandom(_seed)  srand(_seed)
 #define random()        rand()
 #define sleep(_ms)      Sleep(_ms)
 
 inline void ProcessPlugins(int n) {}
+
+#define strncasecmp(a,b,c)  strncmp(a,b,c)
+#define strcasecmp(a,b) strcmp(a,b)
+#define strnicmp(a,b,c)		strncasecmp(a,b,c)
+#define HAVE_SINF 1
 
 #else
 
