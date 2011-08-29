@@ -1668,8 +1668,8 @@ case "$cmd" in
 		rm -f Xonotic/key_15.d0pk
 		{
 			verbose cd Xonotic/mapping
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110701.tar.bz2
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110701-win32-7z.exe
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110819.tar.bz2
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110819-win32-7z.exe
 			for X in *-7z.exe; do
 				7za x "$X"
 				rm -f "$X"
@@ -1887,7 +1887,7 @@ case "$cmd" in
 					versionstr="$versionstr$RELEASETYPE"
 					;;
 			esac
-			if [ $gv -lt 900 ]; then
+			if [ $gv -lt 9900 ]; then
 				# pre-1.0: compatible with any other pre-1.0
 				verbose sed "
 					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
