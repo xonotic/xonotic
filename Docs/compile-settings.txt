@@ -1,20 +1,20 @@
-This file contains the q3map2 compile settings used to compile the maps that are part of Nexuiz.
+This file contains the q3map2 compile settings used to compile the maps that are part of Xonotic.
 There are also compile-scripts for some maps (mapname.sh). 
-They can be found in your Nexuiz/data/maps folder
+They can be found in your Xonotic/data/maps folder
 
 ------------
 Standard
 ------------
 
-"...q3map2.exe" -meta "...nexuizmap.map"
-"...q3map2.exe" -vis "...nexuizmap.bsp"
-"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...nexuizmap.bsp"
+"...q3map2.exe" -meta "...xonoticmap.map"
+"...q3map2.exe" -vis "...xonoticmap.bsp"
+"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...xonoticmap.bsp"
 
 ------------
 Only update the entities.
 ------------
 
-"...q3map2.exe" -onlyents "...nexuizmap.map"
+"...q3map2.exe" -onlyents "...xonoticmap.map"
 
 ------------
 bloodprison.map
