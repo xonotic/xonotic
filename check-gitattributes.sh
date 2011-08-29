@@ -9,14 +9,20 @@ ISTEXT=" crlf=input"
 LF="
 "
 eol=`cat .gitattributes`
-find . -name .git -prune -o \( -type f -print \) | {
+find . -name .git -prune -o -name xonotic-nexcompat.pk3dir -prune -o \( -type f -print \) | {
 	unseen=`echo "$eol" | cut -d ' ' -f 1 | grep .`
 	neweol=
 	while IFS= read -r LINE; do
 		nam=${LINE##*/}
 		case "$nam" in
+			*.txt.*)
+				nam="*.txt.*"
+				;;
+			*.db.*)
+				nam="*.db.*"
+				;;
 			*.*)
-				nam=*.${nam##*.}
+				nam="*.${nam##*.}"
 				;;
 		esac
 		t=`file -b --mime-type "$LINE"`
