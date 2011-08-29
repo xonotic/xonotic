@@ -31,7 +31,7 @@
 	  <div id="content">
 <div class="body">
 
-<br><center><h1><a name="AFT-top">Xonotic 0.2 FAQ</a></h1></center>
+<br><center><h1><a name="AFT-top">Xonotic 0.5 FAQ</a></h1></center>
 <center><a class="link" href="http://xonotic.com">http://xonotic.com</a></center>
 <hr>
 <!--  AFT Table of Contents (auto generated) -->
@@ -154,7 +154,7 @@ For Linux users: you need to have libcurl installed, otherwise you won't be able
 <!--End Section 2-->
 <h3><a name="How to report crashes">How to report crashes</a></h3>
 <p class="Body">
-Alientrap wants to ensure everyone has a pleasant time playing Xonotic, so if you have problems we would like to ask you to report them and thus help solve them.  Especially crash reports can be very helpful.  See below for how to contact Alientrap (<a class="link" href="#Where can i get more help?">Where can i get more help?</a>)
+Register at <a class="link" href="http://dev.xonotic.org">http://dev.xonotic.org</a> and submit a bug report.
 </p>
 <p class="Body">
 On Mac: IS THERE AN EASY WAY?
@@ -249,7 +249,7 @@ If you follow the tutorial mentioned above you do not need this command line arg
 <!--End Section 2-->
 <h3><a name="Is there some kind of rcon?">Is there some kind of rcon?</a></h3>
 <p class="Body">
-Yes starting with Xonotic 2.0 there is rcon (QuakeWorld compatible).  To use it you must enter <tt>rcon_password &lt;password&gt;</tt> in the server console or server config file.  The Xonotic client has to set the same password in the same fashion.  You can then issue commands with <tt>rcon &lt;command&gt;</tt> if you are connected to the server or will have to set <tt>rcon_address &lt;ip/hostname&gt;</tt> or <tt>rcon_address &lt;ip/hostname&gt;:&lt;port&gt;</tt> to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
+Yes there is a QuakeWorld compatible rcon.  To use it you must enter <tt>rcon_password &lt;password&gt;</tt> in the server console or server config file.  The Xonotic client has to set the same password in the same fashion.  You can then issue commands with <tt>rcon &lt;command&gt;</tt> if you are connected to the server or will have to set <tt>rcon_address &lt;ip/hostname&gt;</tt> or <tt>rcon_address &lt;ip/hostname&gt;:&lt;port&gt;</tt> to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
 </p>
 <!--End Section 2-->
 <h3><a name="How can I kick people who are using special characters in their names?">How can I kick people who are using special characters in their names?</a></h3>
@@ -263,21 +263,18 @@ Enter <tt>status</tt> at the server console.  You will see a list of all players
 <!-- Start SectLevel2 -->
 <h3><a name="How can I create or edit Xonotic maps?">How can I create or edit Xonotic maps?</a></h3>
 <p class="Body">
-You need <a class="link" href="http://icculus.org/netradiant/">NetRadiant</a>, a stabilized Q3 map editor. For convenience, a snapshot configured for Xonotic is included in <tt>extra/</tt> for Windows and MAC-Intel, but the program is not officially supported by Alientrap.
+You need <a class="link" href="http://icculus.org/netradiant/">NetRadiant</a>, a stabilized Q3 map editor. For convenience, a snapshot configured for Xonotic is included in <tt>extra/</tt> for Windows and MAC-Intel, but the program is not officially supported by Xonotic.
 </p>
 <!--End Section 2-->
 <h3><a name="Where can I get latest development versions of the source code?">Where can I get latest development versions of the source code?</a></h3>
 <p class="Body">
-<strong>Engine:</strong> instructions are available at <a class="link" href="http://icculus.org/twilight/darkplaces/download.html">http://icculus.org/twilight/darkplaces/download.html</a> look for <tt>Accessing the SVN server</tt> (you will need a <a class="link" href="http://subversion.tigris.org/project_packages.html">svn client</a>, beta builds are available <a class="link" href="http://icculus.org/twilight/darkplaces/files/">here</a>)
+Please refer to <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access">http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access</a>
 </p>
 <p class="Body">
-<strong>Game data:</strong> to check out the Xonotic svn, you'll need a <a class="link" href="http://subversion.tigris.org/project_packages.html">svn client</a>.  To check out the repository with a command line svn client, do
+<strong>Game data:</strong> to check out Xonotic git, you'll need a <a class="link" href="http://git-scm.com/">git client</a>.  
 </p>
-<div class="block"><pre>
-svn co svn://svn.icculus.org/xonotic/trunk/
-</pre></div>
 <p class="Body">
-To compile the game code you need <a class="link" href="http://sourceforge.net/project/showfiles.php?group_id=116842&amp;package_id=129507">fteqcc</a>.  Just download it and run it 3 times, once in <tt>data/qcsrc/menu</tt>, once in <tt>data/qcsrc/server</tt> and once in <tt>data/qcsrc/client</tt>.  Alternatively a Makefile is available in <tt>data/</tt> to perform directly the operation.
+For more information on how to compile the game please see <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Repository">http://dev.xonotic.org/projects/xonotic/wiki/Repository</a><strong>Access#Cloning-the-repository-and-compiling and <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Compiling">http://dev.xonotic.org/projects/xonotic/wiki/Compiling</a></strong>In_Windows
 </p>
 <!--End Section 2-->
 <!-- End SectLevel2 -->

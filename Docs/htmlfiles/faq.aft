@@ -2,7 +2,7 @@
 #--- WARNING: ALWAYS RUN AFT TWICE! (otherwise the toc is missing/not up to date)
 #--- use AFT v5.096 or later (http://www.maplefish.com/todd/aft.html)
 
-#---SET xversion=0.2
+#---SET xversion=0.5
 #---SET zipname=xonotic-<version>.zip
 
 *Title: Xonotic %xversion% FAQ
@@ -152,7 +152,7 @@ The default port is 26000 UDP.  You can change that in the |Multiplayer / Create
 If you follow the tutorial mentioned above you do not need this command line argument as it will be done in the config file created for the server.  To add the command line argument on Windows, create a new shortcut to |xonotic.exe| or |xonotic-dedicated.exe| and right click on it.  Select properties and |-port <port>| in the "Target:" line.  Be sure that the "Start in:" line contains the full path to your Xonotic folder and click "OK".  The parameter will be used if you start Xonotic via that new shortcut.
 
 ** Is there some kind of rcon?
-Yes starting with Xonotic 2.0 there is rcon (QuakeWorld compatible).  To use it you must enter |rcon__password <password>| in the server console or server config file.  The Xonotic client has to set the same password in the same fashion.  You can then issue commands with |rcon <command>| if you are connected to the server or will have to set |rcon__address <ip/hostname>| or |rcon__address <ip/hostname>:<port>| to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
+Yes there is a QuakeWorld compatible rcon.  To use it you must enter |rcon__password <password>| in the server console or server config file.  The Xonotic client has to set the same password in the same fashion.  You can then issue commands with |rcon <command>| if you are connected to the server or will have to set |rcon__address <ip/hostname>| or |rcon__address <ip/hostname>:<port>| to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
 
 ** How can I kick people who are using special characters in their names?
 Enter |status| at the server console.  You will see a list of all players.  In front of their names you will see a number (the player id).  You can kick the player you don't like with |kick # <player id> <reason>| (notice the space after #).
@@ -163,12 +163,8 @@ Enter |status| at the server console.  You will see a list of all players.  In f
 You need [NetRadiant (http://icculus.org/netradiant/)], a stabilized Q3 map editor. For convenience, a snapshot configured for Xonotic is included in |extra/| for Windows and MAC-Intel, but the program is not officially supported by Xonotic.
 
 ** Where can I get latest development versions of the source code?
-_Engine:_ instructions are available at http://icculus.org/twilight/darkplaces/download.html look for |Accessing the SVN server| (you will need a [svn client (http://subversion.tigris.org/project_packages.html)], beta builds are available [here (http://icculus.org/twilight/darkplaces/files/)])
+Please refer to http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access
 
-_Game data:_ to check out the Xonotic svn, you'll need a [svn client (http://subversion.tigris.org/project_packages.html)].  To check out the repository with a command line svn client, do
+_Game data:_ to check out Xonotic git, you'll need a [git client (http://git-scm.com/)].  
 
-^<<
-svn co svn://svn.icculus.org/xonotic/trunk/
-^>>
-
-To compile the game code you need [fteqcc (http://sourceforge.net/project/showfiles.php?group\_id=116842&package\_id=129507)].  Just download it and run it 3 times, once in |data/qcsrc/menu|, once in |data/qcsrc/server| and once in |data/qcsrc/client|.  Alternatively a Makefile is available in |data/| to perform directly the operation.
+For more information on how to compile the game please see http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access#Cloning-the-repository-and-compiling and http://dev.xonotic.org/projects/xonotic/wiki/Compiling_In_Windows

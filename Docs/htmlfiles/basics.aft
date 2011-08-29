@@ -130,7 +130,7 @@ You should also know that you gain a bit extra speed moving forward simply by ju
 
 Another useful thing to know about movement is that if you are flying/jumping, you can release the forward key and instead press the left or right key, and turn your mouse in the same direction.  Doing so will turn or 'bend' your jump in this direction.  This is a useful trick to get around corners, to become less predictable, and also to avoid having to stop jumping to change direction.  After getting used to this you can get around maps very fast and maintain a high speed.
 
-Both the speed jumping and the turning require a certain amount of practice, but they are easy to learn - especially compared to the trick jumping found in games like Quake 3 CPMA or Enemy Territory.  However, there is another trick in Xonotic that does not need any practice at all: the ramp jump.  Just walk up a ramp or slope, and jump.  That jump will get you higher and further than if you had jumped on flat ground.  You can reach some interesting spots by doing this, and ramp jumps can be effectively combined with speed jumping to achieve some remarkable acrobatics which can be very useful for taking shortcuts and thus dominating a map effectively.  It takes some time to learn the good spots were these four tricks can be used to the maximum effectiveness - again, experiment yourself, watch others, and ask around in-game or on the Xonotic forums (http://www.xonotic.org/forum).
+Both the speed jumping and the turning require a certain amount of practice, but they are easy to learn - especially compared to the trick jumping found in games like Quake 3 CPMA or Enemy Territory.  However, there is another trick in Xonotic that does not need any practice at all: the ramp jump.  Just walk up a ramp or slope, and jump.  That jump will get you higher and further than if you had jumped on flat ground.  You can reach some interesting spots by doing this, and ramp jumps can be effectively combined with speed jumping to achieve some remarkable acrobatics which can be very useful for taking shortcuts and thus dominating a map effectively.  It takes some time to learn the good spots were these four tricks can be used to the maximum effectiveness - again, experiment yourself, watch others, and ask around in-game or on the Xonotic forums (http://forums.xonotic.org/).
 
 **''The Console''
 Games generally have a great many settings which can be changed or tweaked to give you the best advantage.  A lot of these aren't included in the game menus, which are limited by space and intended to give only a quick and compact view of the most important options.  For all the other variables, you have the in-game console.  This is like a command line inside the game.  You can enter commands to connect to a server, vote for options on the server, or to change variables like your name or various graphic effects.  You can access the console by pressing shift-escape, and you can close it again by pressing escape.  Lots of info is available on the official Xonotic forum regarding the effective use of the console, but probably the most important in multiplayer is using it for voting, which will be briefly covered here:
@@ -157,13 +157,13 @@ Xonotic supports several different game modes and some smaller changes called mu
 
 	*Arena mode is similar to deathmatch, but it only puts two players into a map, with the others waiting in a queue.  When one of both is fragged the next one in the queue will play against the winner.
 
-	*Keyhunt (KH) is a new team mode in Xonotic 2.3.  Each team has one key and the goal is the collect all keys.  The team with the most points wins.  You get small points for fragging, fragging a keycarrier and picking up a key but you should go for the BIG points you get when ''one team has all the keys and all the keycarriers meet''.  Of course it also works when ONE player gets all the keys for his team but this is ''much'' harder.
+	*In Keyhunt (KH) each team has one key and the goal is the collect all keys.  The team with the most points wins.  You get small points for fragging, fragging a keycarrier and picking up a key but you should go for the BIG points you get when ''one team has all the keys and all the keycarriers meet''.  Of course it also works when ONE player gets all the keys for his team but this is ''much'' harder.
 
-	*Onslaught (ONS) is a new team mode in Xonotic 2.4.  Each team has a powergenerator and the goal is to destroy the enemies generator.  Each generator and all except one checkpoint in the map are protected by an forcefield which is powered by nearby checkpoint.  Your team has to start at the one unprotected checkpoint and work your way up to the enemies generator.  Find the perfect balance between attacking the enemies checkpoints/generator and protecting your own.
+	*On the mode Onslaught (ONS) each team has a power generator and the goal is to destroy the enemies generator.  Each generator and all except one checkpoint in the map are protected by an forcefield which is powered by nearby checkpoint.  Your team has to start at the one unprotected checkpoint and work your way up to the enemies generator.  Find the perfect balance between attacking the enemies checkpoints/generator and protecting your own.
 
-	*Assault (AS) is a similar team mode and also new in Xonotic 2.4.  There are objects in the map, only one is active at a time and you have to complete that one to unlock the next objective.  One round ends if the last objective is completed or timelimit is hit.  After the round the teams swap the attackers/defender roles.
+	*Assault (AS) is a similar team mode.  There are objects in the map, only one is active at a time and you have to complete that one to unlock the next objective.  One round ends if the last objective is completed or timelimit is hit.  After the round the teams swap the attackers/defender roles.
 
-	*Race is a new mode for all the quick people in Xonotic 2.5.  The goal is to race through the level as fast as possible.  A timer is set off at the startline and stopped at the endline.  Checkpoints in between give you an update on your time and compared to the top player.  There are three different race modes:
+	*Race is a game mode for all the quick Xonotic players.  The goal is to race through the level as fast as possible.  A timer is set off at the startline and stopped at the endline.  Checkpoints in between give you an update on your time and compared to the top player.  There are three different race modes:
 
 		*Qualifying mode saves each player's fastest lap time and the player with the fastest time wins. When you die, you respawn in front of the startline.  Players can't interact in this mode. They walk through each other and can't shoot at the others.
 
@@ -187,7 +187,7 @@ Xonotic supports several different game modes and some smaller changes called mu
 There are some more of these mutators, but those are the most important ones.
 
 A list of useful links:
-	*The official Xonotic forum: {+http://xonotic.org/forum+}
+	*The official Xonotic forum: {+http://forums.xonotic.org/+}
 
 	*The official Xonotic wiki: {+http://dev.xonotic.org/wiki+}
 
