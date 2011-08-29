@@ -11,8 +11,8 @@ cvars for further tuning:
    cl_curl_maxdownloads         maximum number of downloads at once (default: 1)
    cl_curl_maxspeed             maximum total speed in KiB/s (default: 100)
 
-Downloaded packages end up in |Nexuiz/data/dlcache/| or
-|~/.nexuiz/data/dlcache/| and are only used till you exit Nexuiz.
+Downloaded packages end up in |Xonotic/data/dlcache/| or
+|~/.xonotic/data/dlcache/| and are only used till you exit Xonotic.
  If you want to play them localy or use them to setup a server of your
 own you can "accept" the packages by moving it one level up - right
 next to your config.cfg.
@@ -57,9 +57,9 @@ URL, the package will not be offered for download.
 INFORMATION FOR MIRROR/MAP SERVER ADMINS:
 
 The Referer is always set to dp://serverhost:serverport/, the User-Agent
-always starts with "Nexuiz". Look at this sample log line:
+always starts with "Xonotic". Look at this sample log line:
 
-141.2.16.3 - - [06/Jun/2006:19:43:14 +0000] "GET /~polzer/temp/nexmaps.php?filename=o-fun.pk3 HTTP/1.1" 302 - "dp://141.2.16.3:26000/" "Nexuiz Linux 21:26:17 Jun  6 2006"
+141.2.16.3 - - [06/Jun/2006:19:43:14 +0000] "GET /~polzer/temp/nexmaps.php?filename=o-fun.pk3 HTTP/1.1" 302 - "dp://141.2.16.3:26000/" "Xonotic Linux 21:26:17 Jun  6 2006"
 
 
 If you want to set up a redirection service, here is a sample PHP code for you
@@ -85,8 +85,8 @@ function bailout($code, $title, $message)
 $filename = $_GET['filename'];
 
 $useragent = getenv("HTTP_USER_AGENT");
-if(strpos($useragent, "Nexuiz ") !== 0)
-    bailout(403, "Forbidden", "You're not a Nexuiz client.");
+if(strpos($useragent, "Xonotic ") !== 0)
+    bailout(403, "Forbidden", "You're not a Xonotic client.");
     
 $url = findmap($filename);
 if(!$url)
