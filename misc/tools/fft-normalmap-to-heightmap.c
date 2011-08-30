@@ -35,7 +35,18 @@
 
 #define TWO_PI (4*atan2(1,1) * 2)
 
-void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset, const double *filter, int filterw, int filterh, int renormalize, double highpass)
+int floatcmp(const void *a_, const void *b_)
+{
+	float a = *(float *)a_;
+	float b = *(float *)b_;
+	if(a < b)
+		return -1;
+	if(a > b)
+		return +1;
+	return 0;
+}
+
+void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h, double scale, double offset, const double *filter, int filterw, int filterh, int renormalize, double highpass, int use_median)
 {
 	int x, y;
 	int i, j;
@@ -293,6 +304,38 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		 */
 		scale = 2 / (vmax - vmin);
 		offset = -(vmax + vmin) / (vmax - vmin);
+	}
+	else if(use_median)
+	{
+		// negative scale = match median to offset
+
+		fprintf(stderr, "Calculating median...\n");
+
+		float *medianbuf = malloc(sizeof(float) * w * h);
+		float vmed;
+
+		fprintf(stderr, "  converting...\n");
+		/* renormalize, find min/max */
+		for(y = 0; y < h; ++y)
+		for(x = 0; x < w; ++x)
+		{
+#ifdef C99
+			v = creal(imgspace1[(w*y+x)]);
+#else
+			v = (imgspace1[(w*y+x)][0]);
+#endif
+			medianbuf[w*y+x] = v;
+		}
+		fprintf(stderr, "  sorting...\n");
+		qsort(medianbuf, w*h, sizeof(*medianbuf), floatcmp);
+		fprintf(stderr, "  done.\n");
+		if(w*h % 2)
+			vmed = medianbuf[(w*h-1)/2];
+		else
+			vmed = (medianbuf[(w*h)/2] + medianbuf[(w*h-2)/2]) * 0.5;
+
+		// we actually want (v - vmed) * scale + offset
+		offset -= vmed * scale;
 	}
 
 	printf("Min: %f\nAvg: %f\nMax: %f\nScale: %f\nOffset: %f\nScaled-Min: %f\nScaled-Avg: %f\nScaled-Max: %f\n", 
@@ -1049,6 +1092,7 @@ int main(int argc, char **argv)
 	const char *infile, *outfile, *reffile;
 	double scale, offset;
 	int nmaplen, w, h;
+	int use_median = 0;
 	int renormalize = 0;
 	double highpass = 0;
 	unsigned char *nmapdata, *nmap, *refmap;
@@ -1094,10 +1138,13 @@ int main(int argc, char **argv)
 	else
 		reffile = NULL;
 
+	// experimental features
 	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"))
 		renormalize = atoi(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"));
 	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_HIGHPASS"))
 		highpass = atof(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_HIGHPASS"));
+	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_USE_MEDIAN"))
+		use_median = atof(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_USE_MEDIAN"));
 
 	nmapdata = FS_LoadFile(infile, &nmaplen);
 	if(!nmapdata)
@@ -1160,7 +1207,7 @@ int main(int argc, char **argv)
 			hmap_to_nmap(nmap, image_width, image_height, -scale-1, offset);
 	}
 	else
-		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset, filter, filterw, filterh, renormalize, highpass);
+		nmap_to_hmap(nmap, refmap, image_width, image_height, scale, offset, filter, filterw, filterh, renormalize, highpass, use_median);
 
 	if(!Image_WriteTGABGRA(outfile, image_width, image_height, nmap))
 	{
