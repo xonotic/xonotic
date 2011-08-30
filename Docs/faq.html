@@ -3,81 +3,46 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="author" content="Tyler Mulligan of www.detrition.net a.k.a -z- of www.nexuizninjaz.com" />
-<meta name="Description" content="Nexuiz is a free open-source fast paced first person shooter (FPS) that runs on Windows, Linux and OSX.  Nexuiz utilizes the darkplaces engine modeled after the Quake series." />
-<meta name="Keywords" content="Nexuiz, Nexiuz, first person shooter, darkplaces, open-source game, open source game, free game, linux game, deathmatch, death match, ctf, quake, alientrap, alien trap, ninjaz" />
-<title>Nexuiz - A free open-source fast paced first person shooter (FPS) for Windows, Linux and OSX</title>
+<title>Xonotic</title>
 <link rel="stylesheet" href="htmlfiles/style.css" type="text/css"></link>
-<link rel="shortcut icon" href="favicon.ico"></link>
 </head>
 <body>
 <div id="container">
 	<div id="left">
-		<div id="logo">
-
-			<a href="http://www.nexuiz.com" title="Nexuiz - Simple, fast, intense and completely free"><img src="htmlfiles/img/nexuiz_logo.jpg" alt="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." width="201" height="193" border="0" title="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." /></a>
-		</div>
 		<!-- Sidebar -->
 	  <div id="sidebar">
-			<a href="news.php" title="Latest Nexuiz News"><img src="htmlfiles/img/headers/latest_news.gif" alt="Latest News" width="168" height="16" border="0" class="imgHeader" style="margin-top:0;" title="Latest Nexuiz News" /></a>
-			<div id="news">
-			  <div class="newsPost">
-						<h1><a href="http://nexuiz.com/news.php" title="Two Nexuiz 1v1 Tourneys">nexuiz.com/news - for nexuiz news updates</a></h1>
-			  </div>
-		</div>
-			<!-- Downloads -->
-			<a href="downloads.php" title="Nexuiz Downloads (Game, Maps)"><img src="htmlfiles/img/headers/downloads.gif" alt="Downloads" width="145" height="15" border="0" class="imgHeader" title="Downloads" /></a>
-			<a id="download_nexuiz" href="http://www.sourceforge.net/projects/nexuiz/" title="Download Nexuiz from Source Forge - Left Click">&nbsp;</a>
-			<!--<a id="download_q3_mappack" href="http://downloads.sourceforge.net/nexuiz/nexmappack_r2.zip" title="Download Nexuiz Q3 Mappack from Source
-			Forge - Left Click">&nbsp;</a>-->
-			<h2 class="page"><a href="http://nexuiz.com/downloads.php" title="Nexuiz Download Mirrors">Mirrors -&gt;</a></h2>
-			<!-- Help Wanted -->
-
-			<img src="htmlfiles/img/headers/help_wanted.gif" alt="Help Wanted" width="165" height="15" class="imgHeader" title="Help Wanted" />			
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" name="donate_form"> <input name="cmd" value="_s-xclick" type="hidden" />
-			<a id="donate" href="javascript:document.donate_form.submit();" title="Help The Aliens, Please Donate">&nbsp;</a>
-			<noscript>
-				<!-- It not an elegant solution but I don't expect many users to arrive with JS turned off -->
-				<input name="submit" type="image" src="htmlfiles/img/donate_button_noscript.jpg" alt="Help this project - Donate to the aliens" width="166" height="43" /> 
-			</noscript>
-			<h2 class="page"><a href="http://nexuiz.com/donators.php" title="Those who have donated to Nexuiz">Donators -&gt;</a></h2>
-			<input name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----" type="hidden" /></form>
-			
-		  <!-- Created By -->
-		  <img src="htmlfiles/img/headers/created_by.gif" alt="Created By" width="145" height="15" class="imgHeader" title="Created By" />
-
-	  <a id="alien_trap" href="http://www.alientrap.org" title="Developed by Alien Trap" target="_blank">&nbsp;</a>	  </div>
+	  	  </div>
 		<!-- end sidebar -->	</div><!-- end left -->
 	<div id="right">
 		<div id="header">
-			<a href="http://nexuiz.com" title="Nexuiz - Simple, fast, intense and completely free"><img src="htmlfiles/img/nexuiz_header.jpg" alt="Nexuiz is a free open-source fast paced first person shooter that runs on Windows, Linux and OSX." width="766" height="107" border="0" title="Nexuiz - Simple, fast, intense and completely free" /></a>
 		</div>
 		<div id="menu">
 			<ul>
 
-				<li class="first"><a href="../readme.html" title="Nexuiz - Latest News">About </a></li>
-				<li><a href="basics.html" title="Nexuiz - Media (Screenshots, videos and graphics)">Nexuiz Basics</a></li>
-				<li><a href="say-esc.html" title="Nexuiz Information  (General, System Requirements)">Say Escapes</a></li>
-				<li><a href="irc.html" title="Nexuiz - Downloads (Game, Maps)">IRC</a></li>
-				<li><a href="faq.html" title="Official Nexuiz FAQ">FAQ</a></li>
+			<!--	<li class="first"><a href="../readme.html" title="Xonotic - Latest News">About </a></li>
+				<li><a href="basics.html" title="Xonotic - Media (Screenshots, videos and graphics)">Xonotic Basics</a></li>
+				<li><a href="say-esc.html" title="Xonotic Information  (General, System Requirements)">Say Escapes</a></li>
+				<li><a href="irc.html" title="Xonotic - Downloads (Game, Maps)">IRC</a></li>
+				<li><a href="faq.html" title="Official Xonotic FAQ">FAQ</a></li>
+			-->
 				<li class="first"></li>
 				<li class="first"></li>
 		  </ul>		</div>
-		<p id="tagline">Nexuiz is a <b>free</b> open-source first person shooter that runs on <b>Windows</b>, <b>Linux</b> and <b>OSX</b>.</p>
+		<p id="tagline">Xonotic is a <b>free</b> open-source first person shooter that runs on <b>Windows</b>, <b>Linux</b> and <b>OSX</b>.</p>
 	  <div id="content">
 <div class="body">
 
-<br><center><h1><a name="AFT-top">Nexuiz 2.5 FAQ</a></h1></center>
-<center><a class="link" href="http://nexuiz.com">http://nexuiz.com</a>&nbsp;&nbsp;<a class="link" href="http://alientrap.org">http://alientrap.org</a></center>
+<br><center><h1><a name="AFT-top">Xonotic 0.5 FAQ</a></h1></center>
+<center><a class="link" href="http://xonotic.com">http://xonotic.com</a></center>
 <hr>
 <!--  AFT Table of Contents (auto generated) -->
 <ul>
 <li> <a class="link" href="#Troubleshooting">Troubleshooting</a></li>
 <ul>
-<li> <a class="link" href="#How do I install Nexuiz?">How do I install Nexuiz?</a></li>
-<li> <a class="link" href="#When I start Nexuiz all I see is a black screen or a black screen with some checkered squares">When I start Nexuiz all I see is a black screen or a black screen with some checkered squares</a></li>
+<li> <a class="link" href="#How do I install Xonotic?">How do I install Xonotic?</a></li>
+<li> <a class="link" href="#When I start Xonotic all I see is a black screen or a black screen with some checkered squares">When I start Xonotic all I see is a black screen or a black screen with some checkered squares</a></li>
 <li> <a class="link" href="#Using Linux I only see the map but no players and items">Using Linux I only see the map but no players and items</a></li>
-<li> <a class="link" href="#When I start Nexuiz my screen is flickering">When I start Nexuiz my screen is flickering</a></li>
+<li> <a class="link" href="#When I start Xonotic my screen is flickering">When I start Xonotic my screen is flickering</a></li>
 <li> <a class="link" href="#How can I speed up my frame rate?">How can I speed up my frame rate?</a></li>
 <li> <a class="link" href="#The sound is broken, it crackles and stutters">The sound is broken, it crackles and stutters</a></li>
 <li> <a class="link" href="#Mouse is too slow and sensitivity is at top (on Mac / Linux)">Mouse is too slow and sensitivity is at top (on Mac / Linux)</a></li>
@@ -89,7 +54,7 @@
 <li> <a class="link" href="#General questions">General questions</a></li>
 <ul>
 <li> <a class="link" href="#How do I install new maps?">How do I install new maps?</a></li>
-<li> <a class="link" href="#How can I place a shortcut to Nexuiz on my Linux desktop?">How can I place a shortcut to Nexuiz on my Linux desktop?</a></li>
+<li> <a class="link" href="#How can I place a shortcut to Xonotic on my Linux desktop?">How can I place a shortcut to Xonotic on my Linux desktop?</a></li>
 <li> <a class="link" href="#How do I open the console?">How do I open the console?</a></li>
 <li> <a class="link" href="#What console commands/variables are there?">What console commands/variables are there?</a></li>
 <li> <a class="link" href="#How can I use colors in my nickname and messages?">How can I use colors in my nickname and messages?</a></li>
@@ -104,7 +69,7 @@
 </ul>
 <li> <a class="link" href="#Development">Development</a></li>
 <ul>
-<li> <a class="link" href="#How can I create or edit Nexuiz maps?">How can I create or edit Nexuiz maps?</a></li>
+<li> <a class="link" href="#How can I create or edit Xonotic maps?">How can I create or edit Xonotic maps?</a></li>
 <li> <a class="link" href="#Where can I get latest development versions of the source code?">Where can I get latest development versions of the source code?</a>
 
 </li>
@@ -114,35 +79,35 @@
 <!-- Start SectLevel1 -->
 <h2><a name="Troubleshooting">Troubleshooting</a></h2>
 <!-- Start SectLevel2 -->
-<h3><a name="How do I install Nexuiz?">How do I install Nexuiz?</a></h3>
+<h3><a name="How do I install Xonotic?">How do I install Xonotic?</a></h3>
 <p class="Body">
-Just unzip the <tt>nexuiz-&lt;version&gt;.zip</tt> file.  You can do this with any archive program (like <a class="link" href="http://7zip.org">7zip</a>).  It's very important to keep the directory structure while unpacking (in WinZip this option is called &quot;Use folder names&quot;).  The directory structure should look like this afterwards:
+Just unzip the <tt>xonotic-&lt;version&gt;.zip</tt> file.  You can do this with any archive program (like <a class="link" href="http://7zip.org">7zip</a>).  It's very important to keep the directory structure while unpacking (in WinZip this option is called &quot;Use folder names&quot;).  The directory structure should look like this afterwards:
 <div class="block"><pre>
-Nexuiz/
+Xonotic/
 |-- Docs/
 |-- data/
 |   |-- common-spog.pk3
 |   `-- data*.pk3
-|-- Nexuiz.app/
-|-- Nexuiz-SDL.app/
+|-- Xonotic.app/
+|-- Xonotic-SDL.app/
 |-- server/
 |   `-- *
 |-- sources/
 |-- *.exe
 |-- *.dll
-`-- nexuiz-linux-*
+`-- xonotic-linux-*
 </pre></div>
 </p>
 <!--End Section 2-->
-<h3><a name="When I start Nexuiz all I see is a black screen or a black screen with some checkered squares">When I start Nexuiz all I see is a black screen or a black screen with some checkered squares</a></h3>
+<h3><a name="When I start Xonotic all I see is a black screen or a black screen with some checkered squares">When I start Xonotic all I see is a black screen or a black screen with some checkered squares</a></h3>
 <p class="Body">
 This happens when the engine can't load the data*.pk3 file or has trouble to initialize OpenGL.  The reasons could be:
 <ol>
-<li> you unpacked the zip file without folder names (see <a class="link" href="#How do I install Nexuiz?">How do I install Nexuiz?</a>)</li>
-<li> on Linux: the current directory is not your Nexuiz/ folder.  See <a class="link" href="#How can I place a shortcut to Nexuiz on my Linux desktop?">How can I place a shortcut to Nexuiz on my Linux desktop?</a> on how to fix this</li>
-<li> on Mac: you tried to extract and move the files from a Nexuiz update and it deleted the old files.  When using the mac GUI please be sure to move only the files not the folders as that will delete the old files or use the mv console command which will not delete the old files</li>
+<li> you unpacked the zip file without folder names (see <a class="link" href="#How do I install Xonotic?">How do I install Xonotic?</a>)</li>
+<li> on Linux: the current directory is not your Xonotic/ folder.  See <a class="link" href="#How can I place a shortcut to Xonotic on my Linux desktop?">How can I place a shortcut to Xonotic on my Linux desktop?</a> on how to fix this</li>
+<li> on Mac: you tried to extract and move the files from a Xonotic update and it deleted the old files.  When using the mac GUI please be sure to move only the files not the folders as that will delete the old files or use the mv console command which will not delete the old files</li>
 <li> the engine could not initialize OpenGL.  Please install the latest drivers for your graphic card.  You will probably find one for your card there: <a class="link" href="http://intel.com">intel</a> <a class="link" href="http://ati.com">ati</a> <a class="link" href="http://nvidia.com">nvidia</a></li>
-<li> your download might be corrupted, please download Nexuiz again</li>
+<li> your download might be corrupted, please download Xonotic again</li>
 </ol>
 </p>
 <!--End Section 2-->
@@ -155,7 +120,7 @@ This happens when the engine has trouble to initialize OpenGL.  The reasons coul
 </ol>
 </p>
 <!--End Section 2-->
-<h3><a name="When I start Nexuiz my screen is flickering">When I start Nexuiz my screen is flickering</a></h3>
+<h3><a name="When I start Xonotic my screen is flickering">When I start Xonotic my screen is flickering</a></h3>
 <p class="Body">
 This is known to happen on Windows with Intel graphic chips and is a bug in the graphics drivers.  A workaround is to set <tt>Flip-Policiy</tt> to <tt>blit</tt>.  Open the control panel, there should be an icon called <tt>Intel(R) GMA driver</tt> (or something like that), double click it. Click on <tt>3D Settings</tt> to find the screen with those settings.
 </p>
@@ -168,44 +133,43 @@ Some graphic cards (mostly ATI or quite old cards) run A LOT faster if you disab
 <!--End Section 2-->
 <h3><a name="The sound is broken, it crackles and stutters">The sound is broken, it crackles and stutters</a></h3>
 <p class="Body">
-Try run <tt>nexuiz-sdl.exe</tt> instead of <tt>nexuiz.exe</tt> (on Windows).  Adding the command line options <tt>-sndspeed 48000</tt> and/or <tt>-sndstereo</tt> can also help on some systems (on Linux, Mac, Windows).
+Try run <tt>xonotic-sdl.exe</tt> instead of <tt>xonotic.exe</tt> (on Windows).  Adding the command line options <tt>-sndspeed 48000</tt> and/or <tt>-sndstereo</tt> can also help on some systems (on Linux, Mac, Windows).
 </p>
 <!--End Section 2-->
 <h3><a name="Mouse is too slow and sensitivity is at top (on Mac / Linux)">Mouse is too slow and sensitivity is at top (on Mac / Linux)</a></h3>
 <p class="Body">
-Mac: The default mouse acceleration on Mac is very high and strange.  The Nexuiz defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Nexuiz defaults.  Try to disable the option <tt>Turn off OS mouse acceleration</tt> in the <tt>Settings / Input</tt> menu.  Or the same via console: <tt>apple_mouse_noaccel 0; vid_restart</tt> (<a class="link" href="#How do I open the console?">How do I open the console?</a>)
+Mac: The default mouse acceleration on Mac is very high and strange.  The Xonotic defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Xonotic defaults.  Try to disable the option <tt>Turn off OS mouse acceleration</tt> in the <tt>Settings / Input</tt> menu.  Or the same via console: <tt>apple_mouse_noaccel 0; vid_restart</tt> (<a class="link" href="#How do I open the console?">How do I open the console?</a>)
 Linux: A similar problem can arise on Linux.  Its also <tt>Turn off OS mouse acceleration</tt> in the <tt>Settings / Input</tt> menu but the console command is different: <tt>vid_dga 0; vid_restart</tt> (<a class="link" href="#How do I open the console?">How do I open the console?</a>)
 </p>
 <!--End Section 2-->
 <h3><a name="I can't switch to 32 bit color depth (on Windows)">I can't switch to 32 bit color depth (on Windows)</a></h3>
 <p class="Body">
-Check if your desktop color depth is set to 32 bits per pixel.  If it's just set to 16, Nexuiz can't switch to 32 bit mode.
+Check if your desktop color depth is set to 32 bits per pixel.  If it's just set to 16, Xonotic can't switch to 32 bit mode.
 </p>
 <!--End Section 2-->
 <h3><a name="When I join a server or after a map change I see nothing but a black screen, but I can still move and shoot">When I join a server or after a map change I see nothing but a black screen, but I can still move and shoot</a></h3>
 <p class="Body">
-This is probably because you don't have the map that's running on the server.  As Nexuiz supports map/content download the server might not be be setup (correctly) to support this and you will have to get the map the old fashioned way.  Those servers should have a download URL in their name or welcome message.  There is also a <a class="link" href="http://alientrap.org/wiki/pmwiki.php?n=Main.CustomMaps">wiki page</a> dedicated to new maps.
+This is probably because you don't have the map that's running on the server.  As Xonotic supports map/content download the server might not be be setup (correctly) to support this and you will have to get the map the old fashioned way.  Those servers should have a download URL in their name or welcome message.  There is also a <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Maps">wiki page</a> dedicated to new maps.
 For Linux users: you need to have libcurl installed, otherwise you won't be able to download any maps.  libcurl should be available in any Linux distribution, just search for &quot;libcurl&quot; and install it in your distribution's package manager.
 </p>
 <!--End Section 2-->
 <h3><a name="How to report crashes">How to report crashes</a></h3>
 <p class="Body">
-Alientrap wants to ensure everyone has a pleasant time playing Nexuiz, so if you have problems we would like to ask you to report them and thus help solve them.  Especially crash reports can be very helpful.  See below for how to contact Alientrap (<a class="link" href="#Where can i get more help?">Where can i get more help?</a>)
+Register at <a class="link" href="http://dev.xonotic.org">http://dev.xonotic.org</a> and submit a bug report.
 </p>
 <p class="Body">
-<strong>On Mac</strong>: IS THERE AN EASY WAY? </p>
-<p class="Body">
-<strong>On Linux</strong>: In a xterm, <tt>cd</tt> into your Nexuiz installation directory, start <tt>catchsegv ./nexuiz-linux-686-sdl -condebug -developer &gt; crash.txt 2&gt;&amp;1</tt> and give the file crash.txt to the developers.  Note that you can also use <tt>./nexuiz-linux-686-glx</tt> or if you have a 64bit system <tt>./nexuiz-linux-x86_64-sdl</tt> and <tt>./nexuiz-linux-x86_64-glx</tt>
+On Mac: IS THERE AN EASY WAY?
 </p>
 <p class="Body">
-<strong>On Windows</strong>: Click Start-&gt;Run, and enter drwtsn32, click Ok in the next window, run Nexuiz and wait for the crash.  Then go to <tt>C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson</tt> there should be a file called &quot;drwtsn32.log&quot;, give that file along with the engine's build date to the developers.  You'll see that date when you open the ingame console (<a class="link" href="#How do I open the console?">How do I open the console?</a>).  Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
-<br />
-<strong>This method is not availible in Windows Vista or Windows 7.</strong><br />
+On Linux: In a xterm, <tt>cd</tt> into your Xonotic installation directory, start <tt>catchsegv ./xonotic-linux-686-sdl -condebug -developer &gt; crash.txt 2&gt;&amp;1</tt> and give the file crash.txt to the developers.  Note that you can also use <tt>./xonotic-linux-686-glx</tt> or if you have a 64bit system <tt>./xonotic-linux-x86_64-sdl</tt> and <tt>./xonotic-linux-x86_64-glx</tt>
+</p>
+<p class="Body">
+On Windows: Click Start-&gt;Run, and enter drwtsn32, click Ok in the next window, run Xonotic and wait for the crash.  Then go to <tt>C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson</tt> there should be a file called &quot;drwtsn32.log&quot;, give that file along with the engine's build date to the developers.  You'll see that date when you open the ingame console (<a class="link" href="#How do I open the console?">How do I open the console?</a>).  Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
 </p>
 <!--End Section 2-->
 <h3><a name="Where can I get more help?">Where can I get more help?</a></h3>
 <p class="Body">
-Visit <a class="link" href="http://alientrap.org/forum">the official Nexuiz forum</a> there is a <a class="link" href="http://alientrap.org/forum/viewforum.php?f=3">support and bug report area</a>.  Or get on <a class="link" href="http://en.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> to chat with other or ask for help.  There is the normal users channel (irc://irc.quakenet.org/nexuiz) and the developers channel (irc://irc.anynet.org/alientrap)
+Visit <a class="link" href="http://xonotic.org/forum">the official Xonotic forum</a> there is a <a class="link" href="http://dev.xonotic.org">support and bug report area</a>.  Or get on <a class="link" href="http://en.wikipedia.org/wiki/Internet_Relay_Chat">IRC</a> to chat with other or ask for help.  There is the normal users channel (irc://irc.quakenet.org/xonotic) and the developers channel (irc://irc.freenode.net/xonotic)
 </p>
 <!--End Section 2-->
 <!-- End SectLevel2 -->
@@ -214,13 +178,13 @@ Visit <a class="link" href="http://alientrap.org/forum">the official Nexuiz foru
 <!-- Start SectLevel2 -->
 <h3><a name="How do I install new maps?">How do I install new maps?</a></h3>
 <p class="Body">
-Maps usually ship as *.pk3 file.  All you have to do is to copy this file to the <tt>Nexuiz/data/</tt> (on Linux, Mac, Windows) OR <tt>~/.nexuiz/data/</tt> (on Linux, Mac) directory.
-Map packages that were downloaded from a server during playing end up in <tt>Nexuiz/data/dlcache/</tt> or <tt>~/.nexuiz/data/dlcache/</tt> and are only used till you exit Nexuiz. If you want to play them locally or use them to setup a server of your own you can &quot;accept&quot; the packages by moving it one level up - right next to your config.cfg.
+Maps usually ship as *.pk3 file.  All you have to do is to copy this file to the <tt>Xonotic/data/</tt> (on Linux, Mac, Windows) OR <tt>~/.xonotic/data/</tt> (on Linux, Mac) directory.
+Map packages that were downloaded from a server during playing end up in <tt>Xonotic/data/dlcache/</tt> or <tt>~/.xonotic/data/dlcache/</tt> and are only used till you exit Xonotic. If you want to play them locally or use them to setup a server of your own you can &quot;accept&quot; the packages by moving it one level up - right next to your config.cfg.
 </p>
 <!--End Section 2-->
-<h3><a name="How can I place a shortcut to Nexuiz on my Linux desktop?">How can I place a shortcut to Nexuiz on my Linux desktop?</a></h3>
+<h3><a name="How can I place a shortcut to Xonotic on my Linux desktop?">How can I place a shortcut to Xonotic on my Linux desktop?</a></h3>
 <p class="Body">
-Use the script <tt>nexuiz-linux-sdl.sh</tt> or <tt>nexuiz-linux-glx.sh</tt> instead of the binaries.  The scripts will use the correct <tt>working directory</tt>,choose the right version (32 or 64 bit) and also allow you to start a extra X server.
+Use the script <tt>xonotic-linux-sdl.sh</tt> or <tt>xonotic-linux-glx.sh</tt> instead of the binaries.  The scripts will use the correct <tt>working directory</tt>,choose the right version (32 or 64 bit) and also allow you to start a extra X server.
 </p>
 <!--End Section 2-->
 <h3><a name="How do I open the console?">How do I open the console?</a></h3>
@@ -230,7 +194,10 @@ Press <tt>[shift]+[escape]</tt>.  To close it press <tt>[escape]</tt>.  While pl
 <!--End Section 2-->
 <h3><a name="What console commands/variables are there?">What console commands/variables are there?</a></h3>
 <p class="Body">
-You can get a list of variables by entering <tt>cvarlist</tt> on the console (<a class="link" href="#How do I open the console?">How do I open the console?</a>).  <tt>cmdlist</tt> will give you a list of available commands.  An annotated version of that output can be found at the <a class="link" href="http://alientrap.org/wiki/pmwiki.php?n=Main.ConsoleCommands">Nexuiz wiki</a>.
+You can get a list of variables by entering <tt>cvarlist</tt> on the console (<a class="link" href="#How do I open the console?">How do I open the console?</a>).  <tt>cmdlist</tt> will give you a list of available commands.  
+</p>
+<p class="Body">
+#An annotated version of that output can be found at the <a class="link" href="http://xx.org/wiki/pmwiki.php?n=Main.ConsoleCommands">Xonotic wiki</a>.
 </p>
 <!--End Section 2-->
 <h3><a name="How can I use colors in my nickname and messages?">How can I use colors in my nickname and messages?</a></h3>
@@ -260,9 +227,9 @@ Colors can be used in nicknames and chat messages via two ways: Either the simpl
 <!--End Section 2-->
 <h3><a name="How do I watch/record demos?">How do I watch/record demos?</a></h3>
 <p class="Body">
-Demos are recordings of matches that you have played. To automatically record a demo each time you play enable the option <tt>Record demos while playing</tt> in the <tt>Multiplayer / Demos</tt> menu. Or if you just want to record some matches open the console and type <tt>rec &lt;demos/name&gt;</tt> before playing. That is before starting a game or connecting to a server. The demo file will then be stored in <tt>Nexuiz/data/demos/&lt;name&gt;.dem</tt> (on Windows) or <tt>~/.nexuiz/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac).
-If you downloaded a demo, copy it to <tt>Nexuiz/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac, Windows) or <tt>~/.nexuiz/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac).  You might have to create this directory if you have never recorded a demo before.
-To watch demos you can choose a demo file in the <tt>Multiplayer / Demos</tt> and click the play button. Also you can watch demos typing <tt>ply &lt;demos/name&gt;</tt> in the console (<a class="link" href="#How do I open the console?">How do I open the console?</a>). You can list all your demo files by typing <tt>dem</tt> on the console.  Some useful key bindings for viewing demos and making videos are listed <a class="link" href="http://www.alientrap.org/forum/viewtopic.php?p=357#357">here</a>.  A simple way to automatically record demos can be found <a class="link" href="http://www.alientrap.org/forum/viewtopic.php?t=90">here</a>.
+Demos are recordings of matches that you have played. To automatically record a demo each time you play enable the option <tt>Record demos while playing</tt> in the <tt>Multiplayer / Demos</tt> menu. Or if you just want to record some matches open the console and type <tt>rec &lt;demos/name&gt;</tt> before playing. That is before starting a game or connecting to a server. The demo file will then be stored in <tt>Xonotic/data/demos/&lt;name&gt;.dem</tt> (on Windows) or <tt>~/.xonotic/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac).
+If you downloaded a demo, copy it to <tt>Xonotic/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac, Windows) or <tt>~/.xonotic/data/demos/&lt;name&gt;.dem</tt> (on Linux, Mac).  You might have to create this directory if you have never recorded a demo before.
+To watch demos you can choose a demo file in the <tt>Multiplayer / Demos</tt> and click the play button. Also you can watch demos typing <tt>ply &lt;demos/name&gt;</tt> in the console (<a class="link" href="#How do I open the console?">How do I open the console?</a>). You can list all your demo files by typing <tt>dem</tt> on the console.  
 </p>
 <!--End Section 2-->
 <!-- End SectLevel2 -->
@@ -272,18 +239,18 @@ To watch demos you can choose a demo file in the <tt>Multiplayer / Demos</tt> an
 <h3><a name="How do I start a server?">How do I start a server?</a></h3>
 <p class="Body">
 Use the <tt>Multiplayer / Create</tt> menu to start a <tt>listen server</tt>.  You will always have to play yourself in a <tt>listen server</tt>.
-If you want to create a server without being forced to play yourself please take a look at the file <tt>readme.txt</tt> in the <tt>Nexuiz/server/</tt> directory where the <tt>dedicated server</tt> is explained.
+If you want to create a server without being forced to play yourself please take a look at the file <tt>readme.txt</tt> in the <tt>Xonotic/server/</tt> directory where the <tt>dedicated server</tt> is explained.
 </p>
 <!--End Section 2-->
 <h3><a name="Which ports do I have to open in firewall/forward from my router to run a server?">Which ports do I have to open in firewall/forward from my router to run a server?</a></h3>
 <p class="Body">
-The default port is 26000 UDP.  You can change that in the <tt>Multiplayer / Create</tt> menu or by starting Nexuiz with the parameter <tt>-port &lt;port&gt;</tt> or having a line <tt>port &lt;port&gt;</tt> in the server config file.
-If you follow the tutorial mentioned above you do not need this command line argument as it will be done in the config file created for the server.  To add the command line argument on Windows, create a new shortcut to <tt>nexuiz.exe</tt> or <tt>nexuiz-dedicated.exe</tt> and right click on it.  Select properties and <tt>-port &lt;port&gt;</tt> in the &quot;Target:&quot; line.  Be sure that the &quot;Start in:&quot; line contains the full path to your Nexuiz folder and click &quot;OK&quot;.  The parameter will be used if you start Nexuiz via that new shortcut.
+The default port is 26000 UDP.  You can change that in the <tt>Multiplayer / Create</tt> menu or by starting Xonotic with the parameter <tt>-port &lt;port&gt;</tt> or having a line <tt>port &lt;port&gt;</tt> in the server config file.
+If you follow the tutorial mentioned above you do not need this command line argument as it will be done in the config file created for the server.  To add the command line argument on Windows, create a new shortcut to <tt>xonotic.exe</tt> or <tt>xonotic-dedicated.exe</tt> and right click on it.  Select properties and <tt>-port &lt;port&gt;</tt> in the &quot;Target:&quot; line.  Be sure that the &quot;Start in:&quot; line contains the full path to your Xonotic folder and click &quot;OK&quot;.  The parameter will be used if you start Xonotic via that new shortcut.
 </p>
 <!--End Section 2-->
 <h3><a name="Is there some kind of rcon?">Is there some kind of rcon?</a></h3>
 <p class="Body">
-Yes starting with Nexuiz 2.0 there is rcon (QuakeWorld compatible).  To use it you must enter <tt>rcon_password &lt;password&gt;</tt> in the server console or server config file.  The Nexuiz client has to set the same password in the same fashion.  You can then issue commands with <tt>rcon &lt;command&gt;</tt> if you are connected to the server or will have to set <tt>rcon_address &lt;ip/hostname&gt;</tt> or <tt>rcon_address &lt;ip/hostname&gt;:&lt;port&gt;</tt> to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
+Yes there is a QuakeWorld compatible rcon.  To use it you must enter <tt>rcon_password &lt;password&gt;</tt> in the server console or server config file.  The Xonotic client has to set the same password in the same fashion.  You can then issue commands with <tt>rcon &lt;command&gt;</tt> if you are connected to the server or will have to set <tt>rcon_address &lt;ip/hostname&gt;</tt> or <tt>rcon_address &lt;ip/hostname&gt;:&lt;port&gt;</tt> to point to the server.  There are also external rcon tools but make sure you use a QW compatible rcon tool.
 </p>
 <!--End Section 2-->
 <h3><a name="How can I kick people who are using special characters in their names?">How can I kick people who are using special characters in their names?</a></h3>
@@ -295,23 +262,20 @@ Enter <tt>status</tt> at the server console.  You will see a list of all players
 <!--End Section 1-->
 <h2><a name="Development">Development</a></h2>
 <!-- Start SectLevel2 -->
-<h3><a name="How can I create or edit Nexuiz maps?">How can I create or edit Nexuiz maps?</a></h3>
+<h3><a name="How can I create or edit Xonotic maps?">How can I create or edit Xonotic maps?</a></h3>
 <p class="Body">
-You need <a class="link" href="http://icculus.org/netradiant/">NetRadiant</a>, a stabilized Q3 map editor. For convenience, a snapshot configured for Nexuiz is included in <tt>extra/</tt> for Windows and MAC-Intel, but the program is not officially supported by Alientrap.
+You need <a class="link" href="http://icculus.org/netradiant/">NetRadiant</a>, a stabilized Q3 map editor. For convenience, a snapshot configured for Xonotic is included in <tt>extra/</tt> for Windows and MAC-Intel, but the program is not officially supported by Xonotic.
 </p>
 <!--End Section 2-->
 <h3><a name="Where can I get latest development versions of the source code?">Where can I get latest development versions of the source code?</a></h3>
 <p class="Body">
-<strong>Engine:</strong> instructions are available at <a class="link" href="http://icculus.org/twilight/darkplaces/download.html">http://icculus.org/twilight/darkplaces/download.html</a> look for <tt>Accessing the SVN server</tt> (you will need a <a class="link" href="http://subversion.tigris.org/project_packages.html">svn client</a>, beta builds are available <a class="link" href="http://icculus.org/twilight/darkplaces/files/">here</a>)
+Please refer to <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access">http://dev.xonotic.org/projects/xonotic/wiki/Repository_Access</a>
 </p>
 <p class="Body">
-<strong>Game data:</strong> to check out the Nexuiz svn, you'll need a <a class="link" href="http://subversion.tigris.org/project_packages.html">svn client</a>.  To check out the repository with a command line svn client, do
+<strong>Game data:</strong> to check out Xonotic git, you'll need a <a class="link" href="http://git-scm.com/">git client</a>.  
 </p>
-<div class="block"><pre>
-svn co svn://svn.icculus.org/nexuiz/trunk/
-</pre></div>
 <p class="Body">
-To compile the game code you need <a class="link" href="http://sourceforge.net/project/showfiles.php?group_id=116842&amp;package_id=129507">fteqcc</a>.  Just download it and run it 3 times, once in <tt>data/qcsrc/menu</tt>, once in <tt>data/qcsrc/server</tt> and once in <tt>data/qcsrc/client</tt>.  Alternatively a Makefile is available in <tt>data/</tt> to perform directly the operation.
+For more information on how to compile the game please see <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Repository">http://dev.xonotic.org/projects/xonotic/wiki/Repository</a><strong>Access#Cloning-the-repository-and-compiling and <a class="link" href="http://dev.xonotic.org/projects/xonotic/wiki/Compiling">http://dev.xonotic.org/projects/xonotic/wiki/Compiling</a></strong>In_Windows
 </p>
 <!--End Section 2-->
 <!-- End SectLevel2 -->
@@ -319,33 +283,20 @@ To compile the game code you need <a class="link" href="http://sourceforge.net/p
 <!-- End SectLevel1 -->
 <hr>
 <br>
-<p align="right"> <small>This document was generated using <a class="link" href="http://www.maplefish.com/todd/aft.html">AFT v5.096</a></small> </p>
+<p align="right"> <small>This document was generated using <a class="link" href="http://www.maplefish.com/todd/aft.html">AFT v5.097</a></small> </p>
 		  <p><br style="clear:left" />
         </p>
 	  </div>
 	  <!-- end content -->
 		<div id="footer">
-			<p id="ninja"><a href="http://www.detrition.net" title="Tyler Mulligan's Working Portfolio" target="_blank">page created by</a> <a href="http://www.nexuizninjaz.com" title="Nexuiz Ninjaz - Practicing the ninja arts of Nexuiz" target="_blank">a ninja</a></p>
-			<ul>
-
-				<li class="first"><a href="http://alientrap.org/nexuiz/news.php" title="Nexuiz - Latest News">News</a></li>
-				<li><a href="http://alientrap.org/nexuiz/media.php" title="Nexuiz - Media (Screenshots, videos and graphics)">Media</a></li>
-				<li><a href="http://alientrap.org/nexuiz/information.php" title="Nexuiz Information  (General, System Requirements)">Info</a></li>
-				<li><a href="http://alientrap.org/nexuiz/team.php" title="The Nexuiz Team">Team</a></li>
-				<li><a href="http://alientrap.org/nexuiz/links.php" title="Nexuiz Links">Links</a></li>
-				<li><a href="http://alientrap.org/forum/index.php?c=3" title="Official Nexuiz Forums" target="_blank">Forums</a></li>
-				<li><a href="http://planetnexuiz.com/ladder/" title="Nexuiz Ladder" target="_blank">Ladder</a></li>
-				<li><a href="http://planetnexuiz.com/tourney/" title="Nexuiz Tournaments" target="_blank">Tournament</a></li>
-			</ul>		</div><!-- end footer -->
-		<p class="subFooter">Come to the Nexuiz IRC channel: <a href="irc://irc.quakenet.org/nexuiz" title="#nexuiz on irc.quakenet.org">#nexuiz on irc.quakenet.org</a> or the team channel: <a href="irc://irc.anynet.org/alientrap" title="#alientrap on irc.anynet.org">#alientrap on irc.anynet.org</a></p>
+		</div>
+		<!-- end footer -->
+		<p class="subFooter">Come to the Xonotic IRC channel: <a href="irc://irc.quakenet.org/xonotic" title="#xonotic on irc.quakenet.org">#xonotic on irc.quakenet.org</a> or the team channel: <a href="irc://irc.freenode.net/xonotic" title="#xonotic on irc.freenode.net">#xonotic on irc.freenode.net</a></p>
 
 		<div id="valid">
-			<a id="valid_css" href="http://jigsaw.w3.org/css-validator/validator?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
-			<a id="valid_xhtml" href="http://validator.w3.org/check?uri=http%3A%2F%2Falientrap.org%2Fnexuiz%2Findex.php">&nbsp;</a>
-			<p>&copy; 2004-2008 Nexuiz.com</p>
-		</div>
+			<p>&copy; 2009-2011 Xonotic.org</p>
+	  </div>
 	</div><!-- end right -->
-</div>
 </div>
 </body>
 </html>

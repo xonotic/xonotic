@@ -1,5 +1,5 @@
 body {
-background:#000 url('img/background.jpg') 0 0 repeat-x;
+background:#000 0 0 repeat-x;
 text-align:center;
 margin:0;
 padding:0;
@@ -27,10 +27,10 @@ height:193px;
 }
 #header {
 width:766px;
-height:114px;
+height:0px;
 }
 #menu {
-background:url('img/menu_bg.jpg') 0 0 no-repeat;
+/* background:url('img/menu_bg.jpg') 0 0 no-repeat; */
 width:766px;
 height:30px;
 font-size:15px;
@@ -45,7 +45,7 @@ margin:0;
 padding:5px 0 0 8px;
 }
 #menu li {
-background:url('img/menu_div.jpg') 0 3px no-repeat;
+/* background:url('img/menu_div.jpg') 0 3px no-repeat; */
 display:inline;
 padding:0 1px 0 9px;
 margin:0;
@@ -70,7 +70,7 @@ color:#848690;
 text-align:center;
 }
 #content {
-background:url('img/body_bg.jpg') 0 0 no-repeat;
+/* background:url('img/body_bg.jpg') 0 0 no-repeat; */
 width:746px;
 min-height:520px;
 height:auto !important;
@@ -205,7 +205,6 @@ text-decoration:none;
 text-decoration:underline;
 }
 #content a#see_more {
-	background: url('img/see_more.jpg') 0 0 no-repeat;
 	display: block;
 	height:120px;
 	width:150px;
@@ -228,7 +227,7 @@ border: 2px solid #333;
 border: 2px solid #ccc;
 } 
 #sidebar {
-background:url('img/sidebar_bg.jpg') 0 0 no-repeat;
+/* background:url('img/sidebar_bg.jpg') 0 0 no-repeat; */
 width:166px;
 height:560px;
 margin:10px 0 0 8px;
@@ -287,7 +286,7 @@ font-size:11px;
 color:#556;
 }
 #footer {
-background:url('img/footer_bg.jpg') 0 0 no-repeat;
+/* background:url('img/footer_bg.jpg') 0 0 no-repeat; */
 width:766px;
 height:30px;
 font-size:10px;
@@ -355,18 +354,14 @@ margin:0;
 	height:43px;
 	width:171px;
 }
-#sidebar a#download_nexuiz {
-	background: url('img/download_nexuiz.jpg') 0 0 no-repeat;
-}
 #sidebar a#download_q3_mappack {
 	background: url('img/download_q3_mappack.jpg') 0 0 no-repeat;
 }
-#sidebar a:hover#download_nexuiz, #sidebar a:hover#download_q3_mappack {
+#sidebar a:hover#sidebar a:hover#download_q3_mappack {
 	background-position: -171px 0;
 }
 
 #sidebar a#donate {
-	background: url('img/donate_button.jpg') 0 0 no-repeat;
 	display: block;
 	height:43px;
 	width:166px;
@@ -377,7 +372,6 @@ margin:0;
 }
 
 #sidebar a#alien_trap {
-	background: url('img/alien_trap_logo.jpg') 0 0 no-repeat;
 	display: block;
 	height:184px;
 	width:152px;
@@ -404,13 +398,11 @@ margin:0;
 #valid a#valid_css {
 	position:absolute;
 	left:4px;
-	background: url('img/css.png') 0 0 no-repeat;
 	text-decoration:none;
 }
 #valid a#valid_xhtml {
 	position:absolute;
 	left:86px;
-	background: url('img/xhtml10.png') 0 0 no-repeat;
 	text-decoration:none;
 }
 #valid a:hover#valid_css, #valid a:hover#valid_xhtml {
