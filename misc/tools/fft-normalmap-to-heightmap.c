@@ -18,7 +18,7 @@
  */
 
 #undef C99
-#if __STDC_VERSION__ >= 199901L
+#if __STDC_VERSION__ >= 199901L || __cplusplus__
 #define C99
 #endif
 
@@ -53,15 +53,15 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	double fx, fy;
 	double ffx, ffy;
 	double nx, ny, nz;
-	double v, vmin, vmax;
+	double v, vmin, vmed, vmax;
 #ifndef C99
 	double save;
 #endif
-
-	fftw_complex *imgspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
+	float *medianbuf = (float *) malloc(w*h * sizeof(*medianbuf));
+	fftw_complex *imgspace1 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *imgspace2 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace1 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace2 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_plan i22f2 = fftw_plan_dft_2d(h, w, imgspace2, freqspace2, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -123,8 +123,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			fy -= 1;
 		if(filter)
 		{
-			// discontinous case
-			// we must invert whatever "filter" would do on (x, y)!
+			/* discontinous case; we must invert whatever "filter" would do on (x, y)! */
 #ifdef C99
 			fftw_complex response_x = 0;
 			fftw_complex response_y = 0;
@@ -136,14 +135,16 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 					response_y += filter[(i + filterh / 2) * filterw + j + filterw / 2] * cexp(-_Complex_I * TWO_PI * (i * fx + j * fy));
 				}
 
-			// we know:
-			//   fourier(df/dx)_xy = fourier(f)_xy * response_x
-			//   fourier(df/dy)_xy = fourier(f)_xy * response_y
-			// mult by conjugate of response_x, response_y:
-			//   conj(response_x) * fourier(df/dx)_xy = fourier(f)_xy * |response_x^2|
-			//   conj(response_y) * fourier(df/dy)_xy = fourier(f)_xy * |response_y^2|
-			// and
-			//   fourier(f)_xy = (conj(response_x) * fourier(df/dx)_xy + conj(response_y) * fourier(df/dy)_xy) / (|response_x|^2 + |response_y|^2)
+			/*
+			 * we know:
+			 *   fourier(df/dx)_xy = fourier(f)_xy * response_x
+			 *   fourier(df/dy)_xy = fourier(f)_xy * response_y
+			 * mult by conjugate of response_x, response_y:
+			 *   conj(response_x) * fourier(df/dx)_xy = fourier(f)_xy * |response_x^2|
+			 *   conj(response_y) * fourier(df/dy)_xy = fourier(f)_xy * |response_y^2|
+			 * and
+			 *   fourier(f)_xy = (conj(response_x) * fourier(df/dx)_xy + conj(response_y) * fourier(df/dy)_xy) / (|response_x|^2 + |response_y|^2)
+			 */
 
 			sum = cabs(response_x) * cabs(response_x) + cabs(response_y) * cabs(response_y);
 
@@ -182,7 +183,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		}
 		else
 		{
-			// continuous integration case
+			/* continuous integration case */
 			/* these must have the same sign as fx and fy (so ffx*fx + ffy*fy is nonzero), otherwise do not matter */
 			/* it basically decides how artifacts are distributed */
 			ffx = fx;
@@ -210,7 +211,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		{
 			double f1 = (fabs(fx)*highpass);
 			double f2 = (fabs(fy)*highpass);
-			// if either of them is < 1, phase out (min at 0.5)
+			/* if either of them is < 1, phase out (min at 0.5) */
 			double f =
 				(f1 <= 0.5 ? 0 : (f1 >= 1 ? 1 : ((f1 - 0.5) * 2.0)))
 				*
@@ -227,7 +228,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	fftw_execute(f12i1);
 
 	/* renormalize, find min/max */
-	vmin = vmax = 0;
+	vmin = vmed = vmax = 0;
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
 	{
@@ -235,14 +236,22 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 		v = creal(imgspace1[(w*y+x)] /= pow(w*h, 1.5));
 #else
 		v = (imgspace1[(w*y+x)][0] /= pow(w*h, 1.5));
-		// imgspace1[(w*y+x)][1] /= pow(w*h, 1.5);
-		// this value is never used
+		/*
+		 * imgspace1[(w*y+x)][1] /= pow(w*h, 1.5);
+		 * this value is never used
+		 */
 #endif
 		if(v < vmin || (x == 0 && y == 0))
 			vmin = v;
 		if(v > vmax || (x == 0 && y == 0))
 			vmax = v;
+		medianbuf[w*y+x] = v;
 	}
+	qsort(medianbuf, w*h, sizeof(*medianbuf), floatcmp);
+	if(w*h % 2)
+		vmed = medianbuf[(w*h-1)/2];
+	else
+		vmed = (medianbuf[(w*h)/2] + medianbuf[(w*h-2)/2]) * 0.5;
 
 	if(refmap)
 	{
@@ -307,39 +316,15 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	}
 	else if(use_median)
 	{
-		// negative scale = match median to offset
-
-		fprintf(stderr, "Calculating median...\n");
-
-		float *medianbuf = malloc(sizeof(float) * w * h);
-		float vmed;
-
-		fprintf(stderr, "  converting...\n");
-		/* renormalize, find min/max */
-		for(y = 0; y < h; ++y)
-		for(x = 0; x < w; ++x)
-		{
-#ifdef C99
-			v = creal(imgspace1[(w*y+x)]);
-#else
-			v = (imgspace1[(w*y+x)][0]);
-#endif
-			medianbuf[w*y+x] = v;
-		}
-		fprintf(stderr, "  sorting...\n");
-		qsort(medianbuf, w*h, sizeof(*medianbuf), floatcmp);
-		fprintf(stderr, "  done.\n");
-		if(w*h % 2)
-			vmed = medianbuf[(w*h-1)/2];
-		else
-			vmed = (medianbuf[(w*h)/2] + medianbuf[(w*h-2)/2]) * 0.5;
-
-		// we actually want (v - vmed) * scale + offset
+		/*
+		 * negative scale = match median to offset
+		 * we actually want (v - vmed) * scale + offset
+		 */
 		offset -= vmed * scale;
 	}
 
-	printf("Min: %f\nAvg: %f\nMax: %f\nScale: %f\nOffset: %f\nScaled-Min: %f\nScaled-Avg: %f\nScaled-Max: %f\n", 
-		vmin, 0.0, vmax, scale, offset, vmin * scale + offset, offset, vmax * scale + offset);
+	printf("Min: %f\nAvg: %f\nMed: %f\nMax: %f\nScale: %f\nOffset: %f\nScaled-Min: %f\nScaled-Avg: %f\nScaled-Med: %f\nScaled-Max: %f\n", 
+		vmin, 0.0, vmed, vmax, scale, offset, vmin * scale + offset, offset, vmed * scale + offset, vmax * scale + offset);
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -354,7 +339,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 			v = -1;
 		if(v > 1)
 			v = 1;
-		map[(w*y+x)*4+3] = floor(128.5 + 127 * v);
+		map[(w*y+x)*4+3] = floor(128.5 + 127 * v); /* in heightmaps, we avoid pixel value 0 as many imaging apps cannot handle it */
 	}
 
 	fftw_destroy_plan(i12f1);
@@ -365,6 +350,7 @@ void nmap_to_hmap(unsigned char *map, const unsigned char *refmap, int w, int h,
 	fftw_free(freqspace1);
 	fftw_free(imgspace2);
 	fftw_free(imgspace1);
+	free(medianbuf);
 }
 
 void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
@@ -377,10 +363,10 @@ void hmap_to_nmap(unsigned char *map, int w, int h, int src_chan, double scale)
 	double save;
 #endif
 
-	fftw_complex *imgspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *imgspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *freqspace1 = fftw_malloc(w*h * sizeof(fftw_complex));
-	fftw_complex *freqspace2 = fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *imgspace1 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *imgspace2 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace1 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
+	fftw_complex *freqspace2 = (fftw_complex *) fftw_malloc(w*h * sizeof(fftw_complex));
 	fftw_plan i12f1 = fftw_plan_dft_2d(h, w, imgspace1, freqspace1, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_plan f12i1 = fftw_plan_dft_2d(h, w, freqspace1, imgspace1, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_plan f22i2 = fftw_plan_dft_2d(h, w, freqspace2, imgspace2, FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -500,7 +486,7 @@ void hmap_to_nmap_local(unsigned char *map, int w, int h, int src_chan, double s
 	double nx, ny, nz;
 	double v;
 	int i, j;
-	double *img_reduced = malloc(w*h * sizeof(double));
+	double *img_reduced = (double *) malloc(w*h * sizeof(double));
 
 	for(y = 0; y < h; ++y)
 	for(x = 0; x < w; ++x)
@@ -563,7 +549,7 @@ unsigned char *FS_LoadFile(const char *fn, int *len)
 		return NULL;
 	for(;;)
 	{
-		buf = realloc(buf, *len + 65536);
+		buf = (unsigned char *) realloc(buf, *len + 65536);
 		if(!buf)
 		{
 			fclose(f);
@@ -1058,14 +1044,14 @@ static const double filter_prewitt3[3][3] = {
 	{ -1/6.0, 0, 1/6.0 }
 };
 
-// pathologic for inverting
+/* pathologic for inverting */
 static const double filter_sobel3[3][3] = {
 	{ -1/8.0, 0, 1/8.0 },
 	{ -2/8.0, 0, 2/8.0 },
 	{ -1/8.0, 0, 1/8.0 }
 };
 
-// pathologic for inverting
+/* pathologic for inverting */
 static const double filter_sobel5[5][5] = {
 	{ -1/128.0,  -2/128.0, 0,  2/128.0, 1/128.0 },
 	{ -4/128.0,  -8/128.0, 0,  8/128.0, 4/128.0 },
@@ -1074,7 +1060,7 @@ static const double filter_sobel5[5][5] = {
 	{ -1/128.0,  -2/128.0, 0,  2/128.0, 1/128.0 }
 };
 
-// pathologic for inverting
+/* pathologic for inverting */
 static const double filter_prewitt5[5][5] = {
 	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
 	{ -1/40.0, -2/40.0, 0, 2/40.0, 1/40.0 },
@@ -1138,13 +1124,13 @@ int main(int argc, char **argv)
 	else
 		reffile = NULL;
 
-	// experimental features
+	/* experimental features */
 	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"))
 		renormalize = atoi(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_RENORMALIZE"));
 	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_HIGHPASS"))
 		highpass = atof(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_HIGHPASS"));
 	if(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_USE_MEDIAN"))
-		use_median = atof(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_USE_MEDIAN"));
+		use_median = atoi(getenv("FFT_NORMALMAP_TO_HEIGHTMAP_USE_MEDIAN"));
 
 	nmapdata = FS_LoadFile(infile, &nmaplen);
 	if(!nmapdata)
