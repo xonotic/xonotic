@@ -41,4 +41,4 @@ extraoffset=`echo "($realmedian + $ofs / $realscale)" | bc -l`
 #
 extraoffset=`echo "(127.0 / 255.0) * (1 - $extraoffset)" | bc -l`
 
-echo "dpoffsetmapping - $extrascale $extraoffset"
+echo "	dpoffsetmapping - $extrascale $extraoffset"
