@@ -39,6 +39,6 @@ extraoffset=`echo "($realmedian + $ofs / $realscale)" | bc -l`
 #
 # we need p_d^-1(p_t(x)) = 1 - (128 + 127 * x) / 255
 #
-extraoffset=`echo "(127.0 / 255.0) * (1 - $extraoffset)" | bc -l`
+extraoffset="match8 "`echo "128 + 127 * $extraoffset" | bc -l`
 
 echo "	dpoffsetmapping - $extrascale $extraoffset"
