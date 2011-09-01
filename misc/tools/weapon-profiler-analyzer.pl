@@ -255,7 +255,7 @@ sub out_html($@)
 	elsif($event eq 'startrow')
 	{
 		my ($row, $val) = @data;
-		printf '<tr><th><img width=128 height=64 src="http://de.git.xonotic.org/?p=xonotic/xonotic.git;a=blob_plain;f=Docs/htmlfiles/weaponimg/%s_1st.png" alt="%s"></th><th align=right>%s</th>', $stats->weaponid_to_model($row), $stats->weaponid_to_name($row), defined $val ? sprintf("%8.5f", $val) : "N/A";
+		printf '<tr><th><img width=96 height=64 src="http://de.git.xonotic.org/?p=xonotic/xonotic.git;a=blob_plain;f=Docs/htmlfiles/weaponimg/%s_1st.png" alt="%s"></th><th align=right>%s</th>', $stats->weaponid_to_model($row), $stats->weaponid_to_name($row), defined $val ? sprintf("%8.5f", $val) : "N/A";
 	}
 	elsif($event eq 'cell')
 	{
