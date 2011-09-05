@@ -1852,6 +1852,29 @@ case "$cmd" in
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
+	release-buildpk3-transform-mapping)
+		dir=$1
+		verbose cd "$dir"
+		# remove stuff radiant has no use for
+		verbose find . -name \*_norm.\* -exec rm -f {} \;
+		verbose find . -name \*_bump.\* -exec rm -f {} \;
+		verbose find . -name \*_glow.\* -exec rm -f {} \;
+		verbose find . -name \*_gloss.\* -exec rm -f {} \;
+		verbose find . -name \*_pants.\* -exec rm -f {} \;
+		verbose find . -name \*_shirt.\* -exec rm -f {} \;
+		verbose find . -name \*_reflect.\* -exec rm -f {} \;
+		verbose find . -not \( -name \*.tga -o -name \*.png -o -name \*.jpg \) -exec rm -f {} \;
+		# texture: convert to jpeg and dds
+		# music: reduce bitrate
+		verbose export do_jpeg=true
+		verbose export jpeg_qual_rgb=80
+		verbose export jpeg_qual_a=97
+		verbose export do_dds=false
+		verbose export do_ogg=true
+		verbose export ogg_qual=1
+		verbose export del_src=true
+		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
+		;;
 	release-buildpk3)
 		src=$1
 		dst=$2
@@ -1959,7 +1982,7 @@ case "$cmd" in
 		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir                  raw ''
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir                     raw ''
 		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '-high'        low '-low' normaldds ''
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '-high'        low '-low' normaldds ''
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '-high'        low '-low' normaldds '' mapping '-mapping'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                     raw '' low '-low'
 		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir  normal '-high'                   normaldds ''
 		;;
@@ -2028,7 +2051,7 @@ case "$cmd" in
 		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
-			Xonotic/data/xonotic-$stamp-maps-low.pk3
+			Xonotic/data/xonotic-$stamp-maps-mapping.pk3
 		;;
 	release)
 		verbose "$SELF" release-prepare
