@@ -22,6 +22,7 @@ Operations are:
   Information requests:
     -i                print info about the BSP file
     -xlumpname        extract a lump (see -i)
+    -S                list used shaders
 
   Changes:
     -dlumpname        delete a lump (see -i)
@@ -32,6 +33,7 @@ Operations are:
     -lpng             externalize the lightmaps as PNG
     -ltga             externalize the lightmaps as TGA
     -mMESSAGE         set the BSP file comment message
+    -Sfrom=to         replace a texture (shader) by name (already replaced shaders are not touched)
 
   Save commands:
     -o                actually apply the changes to the BSP
@@ -93,7 +95,11 @@ sub DecodeLump($@)
 			$spec .= "$2$3 ";
 			my $f = $1;
 			my $n = $3;
-			if($n eq '')
+			if($2 eq 'a')
+			{
+				push @decoders, sub { ($item->{$f} = $data[$idx++]) =~ s/\0//g; };
+			}
+			elsif($n eq '')
 			{
 				push @decoders, sub { $item->{$f} = $data[$idx++]; };
 			}
@@ -141,7 +147,11 @@ sub EncodeLump($@)
 			my $spec = "$2$3";
 			my $f = $1;
 			my $n = $3;
-			if($n eq '')
+			if($2 eq 'a')
+			{
+				push @encoders, sub { $data .= pack $spec, $item->{$f}; };
+			}
+			elsif($n eq '')
 			{
 				push @encoders, sub { $data .= pack $spec, $item->{$f}; };
 			}
@@ -480,6 +490,30 @@ for(@ARGV)
 		die "invalid lump $1 to extract"
 			unless defined $id;
 		print $bsp[$id]->[2];
+	}
+	elsif(/^-S(.*)=(.*)$/)
+	{
+		my $from = $1;
+		my $to = $2;
+		our @replaced = ();
+		my @l = DecodeLump $bsp[$lumpid{textures}]->[2], qw/name=a64 flags=V contents=V/;
+		for(0..@l-1)
+		{
+			next if $replaced[$_];
+			if($l[$_]->{name} eq $from)
+			{
+				$replaced[$_] = 1;
+				$l[$_]->{name} = $to;
+			}
+		}
+		$bsp[$lumpid{textures}]->[2] = EncodeLump \@l, qw/name=a64 flags=V contents=V/;
+	}
+	elsif(/^-S$/)
+	{
+		for(DecodeLump $bsp[$lumpid{textures}]->[2], qw/name=a64 flags=V contents=V/)
+		{
+			print "$_->{name}\n";
+		}
 	}
 	elsif(/^-o(.+)?$/) # write the final BSP file
 	{
