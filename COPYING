@@ -1,8 +1,36 @@
 Xonotic Licensing
 =================
 
-All source files are under the GPL version 2 or any later version, at your
-choice.
+
+Scope
+-----
+
+This licensing document pertains to:
+
+- Official Xonotic releases
+
+- The Team Xonotic-owned branches (i.e. those whose name does not contain a
+  slash, like "master" and "div0-stable") of the repositories on
+  git://git.xonotic.org/xonotic/ including all their ancestor commits
+
+Team Xonotic does not make any guarantees for licensing or legal status of any
+content not as part of official Xonotic releases or Team Xonotic-owned
+branches, such as:
+
+- Files downloaded from a web server by Xonotic (e.g. automatic map downloads)
+
+- Branches of our repository that are owned by a user of the repository, and
+  thus not owned by Team Xonotic (these branches are always prefixed with user
+  name and a slash, as in "divVerent/")
+
+For status of such content, please contact its author.
+
+
+Licensing Grant
+---------------
+
+All source files (as defined by the respective license) in scope of this
+document are under the GPL version 2 or any later version, at your choice.
 
 Linux and Windows binaries however link to a library that is under the LGPL
 version 3 with the "or any later version" clause. Thus, they can only be
@@ -10,3 +38,11 @@ distributed under the GPL version 3 or any later version, at your choice.
 
 The two relevant licenses are provided in the files GPL-2 and GPL-3 in this
 package.
+
+
+Source Code Download
+--------------------
+
+Current and past Xonotic source, including tagged commits containing source
+matching any official Xonotic release, is available on
+git://git.xonotic.org/xonotic/
