@@ -2009,6 +2009,10 @@ case "$cmd" in
 			rm -f $crypto_libs
 		fi
 		# build the archives
+		verbose mkzip Xonotic-$stamp-enginesource.zip \
+			Xonotic/source/darkplaces/ \
+			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
+		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-engine.zip
 		verbose mkzip Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin32/*.dll \
