@@ -2019,9 +2019,7 @@ case "$cmd" in
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \
-			Xonotic/xonotic.exe \
-			Xonotic/source/darkplaces/ \
-			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
+			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/fteqcc/ \
