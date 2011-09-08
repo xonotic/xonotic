@@ -14,8 +14,8 @@ This licensing document pertains to:
   git://git.xonotic.org/xonotic/ including all their ancestor commits
 
 Team Xonotic does not make any guarantees for licensing or legal status of any
-content not as part of official Xonotic releases or Team Xonotic-owned
-branches, such as:
+content not distributed as part of official Xonotic releases or Team
+Xonotic-owned branches, such as:
 
 - Files downloaded from a web server by Xonotic (e.g. automatic map downloads)
 
@@ -46,3 +46,21 @@ Source Code Download
 Current and past Xonotic source, including tagged commits containing source
 matching any official Xonotic release, is available on
 git://git.xonotic.org/xonotic/
+
+
+Contributions
+-------------
+
+By committing data/files, you agree to license all the changes/additions
+contained in your commits to Team Xonotic under the terms of the General Public
+License version 2, with the "any later version" clause active. In particular,
+you guarantee that you have acquired all the necessary rights from possible
+other copyright holders to be able to license your work under this license. Any
+submission which does not fulfill this condition may lead to legal action
+against the submitter.
+
+Exceptions however may be made on request, but in any case, Team Xonotic must
+be allowed to distribute the changes as part of the git repository, and others
+must be allowed to redistribute it in form of cloned git repositories. As
+stated above, no guarantees are made by Team Xonotic about licensing status of
+such branches.
