@@ -2031,6 +2031,11 @@ case "$cmd" in
 			Xonotic/key_0.d0pk \
 			Xonotic/data/font-nimbussansl-$stamp.pk3 \
 			Xonotic/data/font-xolonium-$stamp.pk3
+		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
+		verbose mkzip Xonotic-$stamp-source.zip \
+			Xonotic/source/fteqcc/ \
+			Xonotic/source/qcsrc/ \
+			Xonotic/misc/logos
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose mkzip0 Xonotic-$stamp.zip \
 			Xonotic/data/xonotic-$stamp-data.pk3 \
