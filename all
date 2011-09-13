@@ -583,29 +583,26 @@ case "$cmd" in
 		;;
 	update|pull)
 		allow_pull=true
-		fix_config=false
 		location=current
+		oldbase=$base
+		oldpushbase=$pushbase
 		while :; do
 			if [ x"$1" = x"-N" ]; then
 				allow_pull=false
 			elif [ x"$1" = x"-p" ]; then
-				fix_config=true
-				pushbase=ssh://xonotic@git.xonotic.org/
+				pushbase=ssh://xonotic@push.git.xonotic.org/
 			elif [ x"$1" = x"-ps" ]; then
-				fix_config=true
-				pushbase=ssh://xonotic@git.xonotic.org/
+				pushbase=ssh://xonotic@push.git.xonotic.org/
 			elif [ x"$1" = x"-ph" ]; then
-				fix_config=true
-				pushbase=http://git.xonotic.org/login/xonotic/
+				pushbase=http://push.git.xonotic.org/login/xonotic/
 			elif [ x"$1" = x"-s" ]; then
-				fix_config=true
-				base=ssh://xonotic@git.xonotic.org/
+				base=ssh://xonotic@push.git.xonotic.org/
 			elif [ x"$1" = x"-g" ]; then
-				fix_config=true
 				base=git://git.xonotic.org/xonotic/
+				location=best
 			elif [ x"$1" = x"-h" ]; then
-				fix_config=true
 				base=http://git.xonotic.org/xonotic/
+				location=best
 			elif [ x"$1" = x"-l" ]; then
 				case "$2" in
 					nl) ;;
@@ -624,7 +621,6 @@ case "$cmd" in
 						exit 1
 						;;
 				esac
-				fix_config=true
 				location=$2
 				shift
 			else
@@ -681,17 +677,16 @@ case "$cmd" in
 		esac
 		if [ -n "$location" ]; then
 			base=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
-			pushbase=`$ECHO "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://$location.git.xonotic.org/,"`
 		else
 			base=`$ECHO "$base" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
-			pushbase=`$ECHO "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://git.xonotic.org/,"`
 		fi
-		if $fix_config; then
+		pushbase=`$ECHO "$pushbase" | sed "s,://\(.*\.\)\?git.xonotic.org/,://xonotic@push.git.xonotic.org/,"`
+		if [ x"$base" != x"$oldbase" ] || [ x"$pushbase" != x"$oldpushbase" ]; then
 			url=`repourl .`
 			pushurl=`repopushurl .`
 			fix_git_config "$url" "$pushurl"
-		fi
-		if $allow_pull || $fix_config; then
+			"$SELF" fix_config
+		elif $allow_pull; then
 			"$SELF" fix_config
 		fi
 		for d in $repos; do
