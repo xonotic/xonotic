@@ -586,6 +586,10 @@ case "$cmd" in
 		location=current
 		oldbase=$base
 		oldpushbase=$pushbase
+		# transition old URLs
+		if [ x"$base" = x"ssh://xonotic@push.git.xonotic.org/" ]; then
+			base=ssh://xonotic@push.git.xonotic.org/
+		fi
 		while :; do
 			if [ x"$1" = x"-N" ]; then
 				allow_pull=false
