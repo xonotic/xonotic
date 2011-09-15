@@ -6,6 +6,25 @@ use Image::Magick;
 use POSIX qw/floor ceil/;
 
 my @lumpname = qw/entities textures planes nodes leafs leaffaces leafbrushes models brushes brushsides vertices triangles effects faces lightmaps lightgrid pvs advertisements/;
+my %lumpsize = (
+	textures => 72,
+	planes => 16,
+	nodes => 36,
+	leafs => 48,
+	leaffaces => 4,
+	leafbrushes => 4,
+	models => 40,
+	brushes => 12,
+	brushsides => 8,
+	vertices => 44,
+	triangles => 4,
+	effects => 72,
+	faces => 104,
+	lightmaps => 49152,
+	lightgrid => 8,
+	advertisements => 128
+);
+
 my %lumpid = map { $lumpname[$_] => $_ } 0..@lumpname-1;
 my $msg = "";
 my @bsp;
@@ -236,7 +255,11 @@ for(@ARGV)
 			my $nl = length $bsp[$_]->[2];
 			my $align = [0, 3, 2, 1]->[$nl % 4];
 			$total += $nl + $align;
-			print "BSP lump $_ ($lumpname[$_]): offset $bsp[$_]->[0] length $bsp[$_]->[1] newlength $nl\n";
+			my $l = $bsp[$_]->[1];
+			my $szi = $lumpsize{$lumpname[$_]};
+			my $li = $szi ? " (" . ($l / $szi) . ")" : "";
+			my $nli = $szi ? " (" . ($nl / $szi) . ")" : "";
+			print "BSP lump $_ ($lumpname[$_]): offset $bsp[$_]->[0] length $l$li newlength $nl$nli\n";
 			my $endpos = $bsp[$_]->[0] + $bsp[$_]->[1];
 			$max = $endpos if $max < $endpos;
 		}
