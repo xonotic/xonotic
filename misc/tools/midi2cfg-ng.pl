@@ -107,6 +107,7 @@ sub botconfig_read($)
 			}
 			elsif(/^transpose (\d+)/)
 			{
+				$currentbot->{transpose} ||= 0;
 				$currentbot->{transpose} += $1;
 			}
 			elsif(/^channels (.*)/)
@@ -150,7 +151,7 @@ sub botconfig_read($)
 		}
 		elsif(/^bot (.*)/)
 		{
-			$currentbot = ($bots{$1} ||= {count => 0, transpose => 0});
+			$currentbot = ($bots{$1} ||= {count => 0});
 		}
 		elsif(/^raw (.*)/)
 		{
@@ -270,7 +271,7 @@ sub busybot_note_off_bot($$$$)
 	#print STDERR "note off $bot:$time:$channel:$note\n";
 	return 1
 		if $channel == 10;
-	my $cmds = $bot->{notes_off}->{$note - $bot->{transpose} - $transpose};
+	my $cmds = $bot->{notes_off}->{$note - ($bot->{transpose} || 0) - $transpose};
 	return 1
 		if not defined $cmds; # note off cannot fail
 	$bot->{busy} = 0;
@@ -294,8 +295,8 @@ sub busybot_note_on_bot($$$$$)
 	}
 	else
 	{
-		$cmds = $bot->{notes_on}->{$note - $bot->{transpose} - $transpose};
-		$cmds_off = $bot->{notes_off}->{$note - $bot->{transpose} - $transpose};
+		$cmds = $bot->{notes_on}->{$note - ($bot->{transpose} || 0) - $transpose};
+		$cmds_off = $bot->{notes_off}->{$note - ($bot->{transpose} || 0) - $transpose};
 	}
 	return -1 # I won't play this note
 		if not defined $cmds;
