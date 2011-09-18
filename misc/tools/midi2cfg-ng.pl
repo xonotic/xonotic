@@ -8,6 +8,7 @@ use MIDI;
 use MIDI::Opus;
 use Storable;
 
+use constant SYS_TICRATE => 0.033333;
 use constant MIDI_FIRST_NONCHANNEL => 17;
 use constant MIDI_DRUMS_CHANNEL => 10;
 
@@ -144,6 +145,11 @@ sub botconfig_read($)
 				$super = $currentbot->{percussion}->{$1};
 				$currentbot->{percussion}->{$1} = $appendref = [];
 			}
+			elsif(/^vocals$/)
+			{
+				$super = $currentbot->{vocals};
+				$currentbot->{vocals} = $appendref = [];
+			}
 			else
 			{
 				print "unknown command: $_\n";
@@ -185,12 +191,12 @@ sub busybot_cmd_bot_test($$@)
 	my $botbusytime = defined $bot->{busytimer} ? $bot->{busytimer} : -1;
 
 	return 0
-		if $time < $botbusytime;
+		if $time < $botbusytime + SYS_TICRATE;
 	
 	my $mintime = (@commands && ($commands[0]->[0] eq 'time')) ? $commands[0]->[1] : 0;
 
 	return 0
-		if $time + $mintime < $bottime;
+		if $time + $mintime < $bottime + SYS_TICRATE;
 	
 	return 1;
 }
@@ -288,13 +294,25 @@ sub busybot_note_on_bot($$$$$)
 		if defined $bot->{channels} and not $bot->{channels}->{$channel};
 	my $cmds;
 	my $cmds_off;
-	if($channel == 10)
+	if($channel <= 0)
 	{
+		# vocals
+		$cmds = $bot->{vocals};
+		$cmds_off = undef;
+		if(defined $cmds)
+		{
+			$cmds = [ map { [ map { $_ eq '%s' ? $note : $_ } @$_ ] } @$cmds ];
+		}
+	}
+	elsif($channel == 10)
+	{
+		# percussion
 		$cmds = $bot->{percussion}->{$note};
 		$cmds_off = undef;
 	}
 	else
 	{
+		# music
 		$cmds = $bot->{notes_on}->{$note - ($bot->{transpose} || 0) - $transpose};
 		$cmds_off = $bot->{notes_off}->{$note - ($bot->{transpose} || 0) - $transpose};
 	}
@@ -348,6 +366,8 @@ sub busybot_note_off($$$)
 
 	#print STDERR "note off $time:$channel:$note\n";
 
+	return 0
+		if $channel <= 0;
 	return 0
 		if $channel == 10;
 
@@ -498,6 +518,31 @@ sub ConvertMIDI($$)
 			push @allmidievents, [$command, $tick, $sequence++, $track, @data];
 		}
 	}
+
+	if(open my $fh, "$filename.vocals")
+	{
+		my $scale = 1;
+		my $shift = 0;
+		for(<$fh>)
+		{
+			chomp;
+			my ($tick, $file) = split /\s+/, $_;
+			if($tick eq 'scale')
+			{
+				$scale = $file;
+			}
+			elsif($tick eq 'shift')
+			{
+				$shift = $file;
+			}
+			else
+			{
+				push @allmidievents, ['note_on', $tick * $scale + $shift, $sequence++, -1, -1, $file];
+				push @allmidievents, ['note_off', $tick * $scale + $shift, $sequence++, -1, -1, $file];
+			}
+		}
+	}
+
 	@allmidievents = sort { $a->[1] <=> $b->[1] or $a->[2] <=> $b->[2] } @allmidievents;
 
 	my %midinotes = ();
@@ -513,9 +558,9 @@ sub ConvertMIDI($$)
 		{
 			my $chan = $_->[4] + 1;
 			$note_min = $_->[5]
-				if not defined $note_min or $_->[5] < $note_min and $chan != 10;
+				if $chan != 10 and $chan > 0 and (not defined $note_min or $_->[5] < $note_min);
 			$note_max = $_->[5]
-				if not defined $note_max or $_->[5] > $note_max and $chan != 10;
+				if $chan != 10 and $chan > 0 and (not defined $note_max or $_->[5] > $note_max);
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
