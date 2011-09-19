@@ -8,7 +8,10 @@ use MIDI;
 use MIDI::Opus;
 use Storable;
 
+# workaround for possible refire time problems
 use constant SYS_TICRATE => 0.033333;
+#use constant SYS_TICRATE => 0;
+
 use constant MIDI_FIRST_NONCHANNEL => 17;
 use constant MIDI_DRUMS_CHANNEL => 10;
 
@@ -294,6 +297,8 @@ sub busybot_note_on_bot($$$$$)
 		if defined $bot->{channels} and not $bot->{channels}->{$channel};
 	my $cmds;
 	my $cmds_off;
+	my $k0;
+	my $k1;
 	if($channel <= 0)
 	{
 		# vocals
@@ -303,18 +308,24 @@ sub busybot_note_on_bot($$$$$)
 		{
 			$cmds = [ map { [ map { $_ eq '%s' ? $note : $_ } @$_ ] } @$cmds ];
 		}
+		$k0 = "vocals";
+		$k1 = $channel;
 	}
 	elsif($channel == 10)
 	{
 		# percussion
 		$cmds = $bot->{percussion}->{$note};
 		$cmds_off = undef;
+		$k0 = "percussion";
+		$k1 = $note;
 	}
 	else
 	{
 		# music
 		$cmds = $bot->{notes_on}->{$note - ($bot->{transpose} || 0) - $transpose};
 		$cmds_off = $bot->{notes_off}->{$note - ($bot->{transpose} || 0) - $transpose};
+		$k0 = "note";
+		$k1 = $note - ($bot->{transpose} || 0) - $transpose;
 	}
 	return -1 # I won't play this note
 		if not defined $cmds;
@@ -348,6 +359,7 @@ sub busybot_note_on_bot($$$$$)
 		#++$busy;
 		#print STDERR "BUSY: $busy bots (ON)\n";
 	}
+	++$bot->{seen}{$k0}{$k1};
 	return 1;
 }
 
@@ -606,9 +618,31 @@ sub ConvertMIDI($$)
 sub Deallocate()
 {
 	print STDERR "Bots allocated:\n";
+	my %notehash;
+	my %counthash;
 	for(@busybots_allocated)
 	{
 		print STDERR "$_->{id} is a $_->{classname}\n";
+		++$counthash{$_->{classname}};
+		while(my ($type, $notehash) = each %{$_->{seen}})
+		{
+			while(my ($k, $v) = each %$notehash)
+			{
+				$notehash{$_->{classname}}{$type}{$k} += $v;
+			}
+		}
+	}
+	for my $cn(sort keys %counthash)
+	{
+		print STDERR "$counthash{$cn} bots of $cn have played:\n";
+		for my $type(sort keys %{$notehash{$cn}})
+		{
+			for my $note(sort { $a <=> $b } keys %{$notehash{$cn}{$type}})
+			{
+				my $cnt = $notehash{$cn}{$type}{$note};
+				print STDERR "  $type $note ($cnt times)\n";
+			}
+		}
 	}
 	for(@busybots_allocated)
 	{
