@@ -186,20 +186,73 @@ sub botconfig_read($)
 my $busybots_orig = botconfig_read $config;
 
 
-sub busybot_cmd_bot_test($$@)
+# returns: ($mintime, $maxtime, $busytime)
+sub busybot_cmd_bot_cmdinfo(@)
 {
-	my ($bot, $time, @commands) = @_;
+	my (@commands) = @_;
+
+	my $mintime = undef;
+	my $maxtime = undef;
+	my $busytime = undef;
+
+	for(@commands)
+	{
+		if($_->[0] eq 'time')
+		{
+			$mintime = $_->[1]
+				if not defined $mintime or $_->[1] < $mintime;
+			$maxtime = $_->[1] + SYS_TICRATE
+				if not defined $maxtime or $_->[1] > $maxtime;
+		}
+		elsif($_->[0] eq 'busy')
+		{
+			$busytime = $_->[1] + SYS_TICRATE;
+		}
+	}
+
+	return ($mintime, $maxtime, $busytime);
+}
+
+sub busybot_cmd_bot_matchtime($$$@)
+{
+	my ($bot, $targettime, $targetbusytime, @commands) = @_;
+
+	# I want to execute @commands so that I am free on $targettime and $targetbusytime
+	# when do I execute it then?
+
+	my ($mintime, $maxtime, $busytime) = busybot_cmd_bot_cmdinfo @commands;
+
+	my $tstart_max = defined $maxtime ? $targettime - $maxtime : $targettime;
+	my $tstart_busy = defined $busytime ? $targetbusytime - $busytime : $targettime;
+
+	return $tstart_max < $tstart_busy ? $tstart_max : $tstart_busy;
+}
+
+# TODO function to find out whether, and when, to insert a command before another command to make it possible
+# (note-off before note-on)
+
+sub busybot_cmd_bot_test($$$@)
+{
+	my ($bot, $time, $force, @commands) = @_;
 
 	my $bottime = defined $bot->{timer} ? $bot->{timer} : -1;
 	my $botbusytime = defined $bot->{busytimer} ? $bot->{busytimer} : -1;
 
-	return 0
-		if $time < $botbusytime + SYS_TICRATE;
-	
-	my $mintime = (@commands && ($commands[0]->[0] eq 'time')) ? $commands[0]->[1] : 0;
+	my ($mintime, $maxtime, $busytime) = busybot_cmd_bot_cmdinfo @commands;
 
-	return 0
-		if $time + $mintime < $bottime + SYS_TICRATE;
+	if($time < $botbusytime)
+	{
+		warn "FORCE: $time < $botbusytime"
+			if $force;
+		return $force;
+	}
+	
+	if(defined $mintime and $time + $mintime < $bottime)
+	{
+		warn "FORCE: $time + $mintime < $bottime"
+			if $force;
+		return $force;
+	}
 	
 	return 1;
 }
@@ -213,11 +266,15 @@ sub busybot_cmd_bot_execute($$@)
 		if($_->[0] eq 'time')
 		{
 			$commands .= sprintf "sv_cmd bot_cmd %d wait_until %f\n", $bot->{id}, $time + $_->[1];
-			$bot->{timer} = $time + $_->[1];
+			if($bot->{timer} > $time + $_->[1] + SYS_TICRATE)
+			{
+				#use Carp; carp "Negative wait: $bot->{timer} <= @{[$time + $_->[1] + SYS_TICRATE]}";
+			}
+			$bot->{timer} = $time + $_->[1] + SYS_TICRATE;
 		}
 		elsif($_->[0] eq 'busy')
 		{
-			$bot->{busytimer} = $time + $_->[1];
+			$bot->{busytimer} = $time + $_->[1] + SYS_TICRATE;
 		}
 		elsif($_->[0] eq 'buttons')
 		{
@@ -278,32 +335,34 @@ sub busybot_note_off_bot($$$$)
 {
 	my ($bot, $time, $channel, $note) = @_;
 	#print STDERR "note off $bot:$time:$channel:$note\n";
-	return 1
-		if $channel == 10;
-	my $cmds = $bot->{notes_off}->{$note - ($bot->{transpose} || 0) - $transpose};
+	my ($busychannel, $busynote, $cmds) = @{$bot->{busy}};
 	return 1
 		if not defined $cmds; # note off cannot fail
-	$bot->{busy} = 0;
-	#--$busy;
-	#print STDERR "BUSY: $busy bots (OFF)\n";
-	busybot_cmd_bot_execute $bot, $time + $notetime, @$cmds; 
+	die "Wrong note-off?!?"
+		if $busychannel != $channel || $busynote ne $note;
+	$bot->{busy} = undef;
+
+	my $t = $time + $notetime;
+	my ($mintime, $maxtime, $busytime) = busybot_cmd_bot_cmdinfo @$cmds;
+
+	# perform note-off "as soon as we can"
+	$t = $bot->{busytimer}
+		if $t < $bot->{busytimer};
+	$t = $bot->{timer} - $mintime
+		if $t < $bot->{timer} - $mintime;
+
+	busybot_cmd_bot_execute $bot, $t, @$cmds; 
 	return 1;
 }
 
-sub busybot_note_on_bot($$$$$)
+sub busybot_get_cmds_bot($$$)
 {
-	my ($bot, $time, $channel, $note, $init) = @_;
-	return -1 # I won't play on this channel
-		if defined $bot->{channels} and not $bot->{channels}->{$channel};
-	my $cmds;
-	my $cmds_off;
-	my $k0;
-	my $k1;
+	my ($bot, $channel, $note) = @_;
+	my ($k0, $k1, $cmds, $cmds_off) = (undef, undef, undef, undef);
 	if($channel <= 0)
 	{
 		# vocals
 		$cmds = $bot->{vocals};
-		$cmds_off = undef;
 		if(defined $cmds)
 		{
 			$cmds = [ map { [ map { $_ eq '%s' ? $note : $_ } @$_ ] } @$cmds ];
@@ -315,7 +374,6 @@ sub busybot_note_on_bot($$$$$)
 	{
 		# percussion
 		$cmds = $bot->{percussion}->{$note};
-		$cmds_off = undef;
 		$k0 = "percussion";
 		$k1 = $note;
 	}
@@ -327,6 +385,17 @@ sub busybot_note_on_bot($$$$$)
 		$k0 = "note";
 		$k1 = $note - ($bot->{transpose} || 0) - $transpose;
 	}
+	return ($cmds, $cmds_off, $k0, $k1);
+}
+
+sub busybot_note_on_bot($$$$$$)
+{
+	my ($bot, $time, $channel, $note, $init, $force) = @_;
+	return -1 # I won't play on this channel
+		if defined $bot->{channels} and not $bot->{channels}->{$channel};
+
+	my ($cmds, $cmds_off, $k0, $k1) = busybot_get_cmds_bot($bot, $channel, $note);
+
 	return -1 # I won't play this note
 		if not defined $cmds;
 	return 0
@@ -335,7 +404,7 @@ sub busybot_note_on_bot($$$$$)
 	if($init)
 	{
 		return 0
-			if not busybot_cmd_bot_test $bot, $time + $notetime, @$cmds; 
+			if not busybot_cmd_bot_test $bot, $time + $notetime, $force, @$cmds; 
 		busybot_cmd_bot_execute $bot, 0, ['cmd', 'wait', $timeoffset_preinit];
 		busybot_cmd_bot_execute $bot, 0, ['barrier'];
 		busybot_cmd_bot_execute $bot, 0, @{$bot->{init}}
@@ -345,19 +414,18 @@ sub busybot_note_on_bot($$$$$)
 		{
 			busybot_intermission_bot $bot;
 		}
+		# we always did a barrier, so we know this works
 		busybot_cmd_bot_execute $bot, $time + $notetime, @$cmds; 
 	}
 	else
 	{
 		return 0
-			if not busybot_cmd_bot_test $bot, $time + $notetime, @$cmds; 
+			if not busybot_cmd_bot_test $bot, $time + $notetime, $force, @$cmds; 
 		busybot_cmd_bot_execute $bot, $time + $notetime, @$cmds; 
 	}
 	if(defined $cmds and defined $cmds_off)
 	{
-		$bot->{busy} = 1;
-		#++$busy;
-		#print STDERR "BUSY: $busy bots (ON)\n";
+		$bot->{busy} = [$channel, $note, $cmds_off];
 	}
 	++$bot->{seen}{$k0}{$k1};
 	return 1;
@@ -376,7 +444,7 @@ sub busybot_note_off($$$)
 {
 	my ($time, $channel, $note) = @_;
 
-	#print STDERR "note off $time:$channel:$note\n";
+#	print STDERR "note off $time:$channel:$note\n";
 
 	return 0
 		if $channel <= 0;
@@ -402,22 +470,26 @@ sub busybot_note_on($$$)
 		busybot_note_off $time, $channel, $note;
 	}
 
-	#print STDERR "note on $time:$channel:$note\n";
+#	print STDERR "note on $time:$channel:$note\n";
 
 	my $overflow = 0;
 
+	my @epicfailbots = ();
+
 	for(unsort @busybots_allocated)
 	{
-		my $canplay = busybot_note_on_bot $_, $time, $channel, $note, 0;
+		my $canplay = busybot_note_on_bot $_, $time, $channel, $note, 0, 0;
 		if($canplay > 0)
 		{
 			$notechannelbots{$channel}{$note} = $_;
 			return 1;
 		}
-		$overflow = 1
+		push @epicfailbots, $_
 			if $canplay == 0;
 		# wrong
 	}
+
+	my $needalloc = 0;
 
 	for(unsort keys %$busybots)
 	{
@@ -425,23 +497,93 @@ sub busybot_note_on($$$)
 		my $bot = Storable::dclone $busybots->{$_};
 		$bot->{id} = @busybots_allocated + 1;
 		$bot->{classname} = $_;
-		my $canplay = busybot_note_on_bot $bot, $time, $channel, $note, 1;
+		my $canplay = busybot_note_on_bot $bot, $time, $channel, $note, 1, 0;
 		if($canplay > 0)
 		{
-			die "noalloc\n"
-				if $noalloc;
-			--$busybots->{$_}->{count};
-			$notechannelbots{$channel}{$note} = $bot;
-			push @busybots_allocated, $bot;
-			return 1;
+			if($noalloc)
+			{
+				$needalloc = 1;
+			}
+			else
+			{
+				--$busybots->{$_}->{count};
+				$notechannelbots{$channel}{$note} = $bot;
+				push @busybots_allocated, $bot;
+				return 1;
+			}
 		}
 		die "Fresh bot cannot play stuff"
 			if $canplay == 0;
 	}
 
-	if($overflow)
+	if(@epicfailbots)
+	{
+		# we cannot add a new bot to play this
+		# we could try finding a bot that could play this, and force him to stop the note!
+
+		my @candidates = (); # contains: [$bot, $score, $offtime]
+
+		# put in all currently busy bots that COULD play this, if they did a note-off first
+		for my $bot(@epicfailbots)
+		{
+			next
+				if $busybots->{$bot->{classname}}->{count} != 0;
+			next
+				unless $bot->{busy};
+			my ($busy_chan, $busy_note, $busy_cmds_off) = @{$bot->{busy}};
+			next
+				unless $busy_cmds_off;
+			my ($cmds, $cmds_off, $k0, $k1) = busybot_get_cmds_bot $bot, $channel, $note;
+			next
+				unless $cmds;
+			my ($mintime, $maxtime, $busytime) = busybot_cmd_bot_cmdinfo @$cmds;
+
+			my $noteofftime = busybot_cmd_bot_matchtime $bot, $time + $notetime + $mintime, $time, @$busy_cmds_off;
+			next
+				if $noteofftime < $bot->{busytimer};
+			next
+				if $noteofftime + $mintime < $bot->{timer};
+
+			my $score = 0;
+			# prefer turning off long notes
+			$score +=  100 * ($noteofftime - $bot->{timer});
+			# prefer turning off low notes
+			$score +=    1 * (-$note);
+			# prefer turning off notes that already play on another channel
+			$score += 1000 * (grep { $_ != $busy_chan && $notechannelbots{$_}{$busy_note} && $notechannelbots{$_}{$busy_note}{busy} } keys %notechannelbots);
+
+			push @candidates, [$bot, $score, $noteofftime];
+		}
+
+		# we found one?
+
+		if(@candidates)
+		{
+			@candidates = sort { $a->[1] <=> $b->[1] } @candidates;
+			my ($bot, $score, $offtime) = @{(pop @candidates)};
+			my $oldchan = $bot->{busy}->[0];
+			my $oldnote = $bot->{busy}->[1];
+			busybot_note_off $offtime - $notetime, $oldchan, $oldnote;
+			my $canplay = busybot_note_on_bot $bot, $time, $channel, $note, 0, 1;
+			die "Canplay but not?"
+				if $canplay <= 0;
+			warn "Made $channel:$note play by stopping $oldchan:$oldnote";
+			$notechannelbots{$channel}{$note} = $bot;
+			return 1;
+		}
+	}
+
+	die "noalloc\n"
+		if $needalloc;
+
+	if(@epicfailbots)
 	{
 		warn "Not enough bots to play this (when playing $channel:$note)";
+#		for(@epicfailbots)
+#		{
+#			my $b = $_->{busy};
+#			warn "$_->{classname} -> @{[$b ? qq{$b->[0]:$b->[1]} : 'none']} @{[$_->{timer} - $notetime]} ($time)\n";
+#		}
 	}
 	else
 	{
@@ -576,7 +718,7 @@ sub ConvertMIDI($$)
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
-				busybot_note_off($t, $chan, $_->[5]);
+				busybot_note_off($t - SYS_TICRATE, $chan, $_->[5]);
 			}
 			busybot_note_on($t, $chan, $_->[5]);
 			++$notes_stuck;
@@ -588,7 +730,7 @@ sub ConvertMIDI($$)
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
-				busybot_note_off($t, $chan, $_->[5]);
+				busybot_note_off($t - SYS_TICRATE, $chan, $_->[5]);
 			}
 			$midinotes{$chan}{$_->[5]} = 0;
 		}
