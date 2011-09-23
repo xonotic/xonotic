@@ -238,7 +238,7 @@ sub busybot_cmd_bot_cmdinfo(@)
 			$mintime = $_->[1]
 				if not defined $mintime or $_->[1] < $mintime;
 			$maxtime = $_->[1] + SYS_TICRATE
-				if not defined $maxtime or $_->[1] > $maxtime;
+				if not defined $maxtime or $_->[1] + SYS_TICRATE > $maxtime;
 		}
 		elsif($_->[0] eq 'busy')
 		{
@@ -575,12 +575,13 @@ sub busybot_note_on($$$$)
 			next
 				unless $cmds;
 			my ($mintime, $maxtime, $busytime) = busybot_cmd_bot_cmdinfo @$cmds;
+			my ($mintime_off, $maxtime_off, $busytime_off) = busybot_cmd_bot_cmdinfo @$busy_cmds_off;
 
-			my $noteofftime = busybot_cmd_bot_matchtime $bot, $time + $notetime + $mintime, $time, @$busy_cmds_off;
+			my $noteofftime = busybot_cmd_bot_matchtime $bot, $time + $notetime + $mintime, $time + $notetime, @$busy_cmds_off;
 			next
 				if $noteofftime < $bot->{busytimer};
 			next
-				if $noteofftime + $mintime < $bot->{timer};
+				if $noteofftime + $mintime_off < $bot->{timer};
 
 			my $score = 0;
 			# prefer turning off long notes
