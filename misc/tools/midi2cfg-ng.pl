@@ -15,9 +15,17 @@ use constant SYS_TICRATE => 0.033333;
 use constant MIDI_FIRST_NONCHANNEL => 17;
 use constant MIDI_DRUMS_CHANNEL => 10;
 
-die "Usage: $0 filename.conf timeoffset_preinit timeoffset_postinit timeoffset_predone timeoffset_postdone timeoffset_preintermission timeoffset_postintermission midifile1 transpose1 midifile2 transpose2 ..."
-	unless @ARGV > 7 and @ARGV % 2;
-my ($config, $timeoffset_preinit, $timeoffset_postinit, $timeoffset_predone, $timeoffset_postdone, $timeoffset_preintermission, $timeoffset_postintermission, @midilist) = @ARGV;
+die "Usage: $0 filename.conf midifile1 transpose1 midifile2 transpose2 ..."
+	unless @ARGV > 1 and @ARGV % 2;
+
+my $timeoffset_preinit = 2;
+my $timeoffset_postinit = 2;
+my $timeoffset_predone = 2;
+my $timeoffset_postdone = 2;
+my $timeoffset_preintermission = 2;
+my $timeoffset_postintermission = 2;
+
+my ($config, @midilist) = @ARGV;
 
 sub unsort(@)
 {
@@ -118,6 +126,10 @@ sub botconfig_read($)
 			{
 				$currentbot->{channels} = { map { $_ => 1 } split /\s+/, $1 };
 			}
+			elsif(/^programs (.*)/)
+			{
+				$currentbot->{programs} = { map { $_ => 1 } split /\s+/, $1 };
+			}
 			elsif(/^init$/)
 			{
 				$super = $currentbot->{init};
@@ -165,6 +177,30 @@ sub botconfig_read($)
 		elsif(/^raw (.*)/)
 		{
 			$precommands .= "$1\n";
+		}
+		elsif(/^timeoffset_preinit (.*)/)
+		{
+			$timeoffset_preinit = $1;
+		}
+		elsif(/^timeoffset_postinit (.*)/)
+		{
+			$timeoffset_postinit = $1;
+		}
+		elsif(/^timeoffset_predone (.*)/)
+		{
+			$timeoffset_predone = $1;
+		}
+		elsif(/^timeoffset_postdone (.*)/)
+		{
+			$timeoffset_postdone = $1;
+		}
+		elsif(/^timeoffset_preintermission (.*)/)
+		{
+			$timeoffset_preintermission = $1;
+		}
+		elsif(/^timeoffset_postintermission (.*)/)
+		{
+			$timeoffset_postintermission = $1;
 		}
 		else
 		{
@@ -388,11 +424,13 @@ sub busybot_get_cmds_bot($$$)
 	return ($cmds, $cmds_off, $k0, $k1);
 }
 
-sub busybot_note_on_bot($$$$$$)
+sub busybot_note_on_bot($$$$$$$)
 {
-	my ($bot, $time, $channel, $note, $init, $force) = @_;
+	my ($bot, $time, $channel, $program, $note, $init, $force) = @_;
 	return -1 # I won't play on this channel
 		if defined $bot->{channels} and not $bot->{channels}->{$channel};
+#	return -1 # I won't play this program
+#		if defined $bot->{programs} and not $bot->{programs}->{$program};
 
 	my ($cmds, $cmds_off, $k0, $k1) = busybot_get_cmds_bot($bot, $channel, $note);
 
@@ -461,9 +499,9 @@ sub busybot_note_off($$$)
 	return 0;
 }
 
-sub busybot_note_on($$$)
+sub busybot_note_on($$$$)
 {
-	my ($time, $channel, $note) = @_;
+	my ($time, $channel, $program, $note) = @_;
 
 	if($notechannelbots{$channel}{$note})
 	{
@@ -478,7 +516,7 @@ sub busybot_note_on($$$)
 
 	for(unsort @busybots_allocated)
 	{
-		my $canplay = busybot_note_on_bot $_, $time, $channel, $note, 0, 0;
+		my $canplay = busybot_note_on_bot $_, $time, $channel, $program, $note, 0, 0;
 		if($canplay > 0)
 		{
 			$notechannelbots{$channel}{$note} = $_;
@@ -497,7 +535,7 @@ sub busybot_note_on($$$)
 		my $bot = Storable::dclone $busybots->{$_};
 		$bot->{id} = @busybots_allocated + 1;
 		$bot->{classname} = $_;
-		my $canplay = busybot_note_on_bot $bot, $time, $channel, $note, 1, 0;
+		my $canplay = busybot_note_on_bot $bot, $time, $channel, $program, $note, 1, 0;
 		if($canplay > 0)
 		{
 			if($noalloc)
@@ -564,7 +602,7 @@ sub busybot_note_on($$$)
 			my $oldchan = $bot->{busy}->[0];
 			my $oldnote = $bot->{busy}->[1];
 			busybot_note_off $offtime - $notetime, $oldchan, $oldnote;
-			my $canplay = busybot_note_on_bot $bot, $time, $channel, $note, 0, 1;
+			my $canplay = busybot_note_on_bot $bot, $time, $channel, $program, $note, 0, 1;
 			die "Canplay but not?"
 				if $canplay <= 0;
 			warn "Made $channel:$note play by stopping $oldchan:$oldnote";
@@ -700,9 +738,9 @@ sub ConvertMIDI($$)
 	@allmidievents = sort { $a->[1] <=> $b->[1] or $a->[2] <=> $b->[2] } @allmidievents;
 
 	my %midinotes = ();
-	my $note_min = undef;
-	my $note_max = undef;
 	my $notes_stuck = 0;
+	my %notes_seen = ();
+	my %programs = ();
 	my $t = 0;
 	for(@allmidievents)
 	{
@@ -711,16 +749,14 @@ sub ConvertMIDI($$)
 		if($_->[0] eq 'note_on')
 		{
 			my $chan = $_->[4] + 1;
-			$note_min = $_->[5]
-				if $chan != 10 and $chan > 0 and (not defined $note_min or $_->[5] < $note_min);
-			$note_max = $_->[5]
-				if $chan != 10 and $chan > 0 and (not defined $note_max or $_->[5] > $note_max);
+			++$notes_seen{$chan}{$_->[5]}
+				if $chan != 10 and $chan > 0;
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
 				busybot_note_off($t - SYS_TICRATE, $chan, $_->[5]);
 			}
-			busybot_note_on($t, $chan, $_->[5]);
+			busybot_note_on($t, $chan, $programs{$chan} || 1, $_->[5]);
 			++$notes_stuck;
 			$midinotes{$chan}{$_->[5]} = 1;
 		}
@@ -734,13 +770,64 @@ sub ConvertMIDI($$)
 			}
 			$midinotes{$chan}{$_->[5]} = 0;
 		}
+		elsif($_->[0] eq 'patch_change')
+		{
+			my $chan = $_->[4] + 1;
+			my $program = $_->[5] + 1;
+			$programs{$chan} = $program;
+		}
 	}
 
 	print STDERR "For file $filename:\n";
-	print STDERR "  Range of notes: $note_min .. $note_max\n";
-	print STDERR "  Safe transpose range: @{[$note_max - 19]} .. @{[$note_min + 13]}\n";
-	print STDERR "  Unsafe transpose range: @{[$note_max - 27]} .. @{[$note_min + 18]}\n";
 	print STDERR "  Stuck notes: $notes_stuck\n";
+
+	for my $testtranspose(-127..127)
+	{
+		my $toohigh = 0;
+		my $toolow = 0;
+		my $good = 0;
+		for my $channel(sort keys %notes_seen)
+		{
+			for my $note(sort keys %{$notes_seen{$channel}})
+			{
+				my $cnt = $notes_seen{$channel}{$note};
+				my $votehigh = 0;
+				my $votelow = 0;
+				my $votegood = 0;
+				for(@busybots_allocated)
+				{
+					next # I won't play on this channel
+						if defined $_->{channels} and not $_->{channels}->{$channel};
+#					next # I won't play this program
+#						if defined $bot->{programs} and not $bot->{programs}->{$program};
+					my $transposed = $note - ($_->{transpose} || 0) - $testtranspose;
+					if(exists $_->{notes_on}{$transposed})
+					{
+						++$votegood;
+					}
+					else
+					{
+						++$votehigh if $transposed >= 0;
+						++$votelow if $transposed < 0;
+					}
+				}
+				if($votegood)
+				{
+					$good += $cnt;
+				}
+				elsif($votelow >= $votehigh)
+				{
+					$toolow += $cnt;
+				}
+				else
+				{
+					$toohigh += $cnt;
+				}
+			}
+		}
+		next if !$toohigh != !$toolow;
+		print STDERR "  Transpose $testtranspose: $toohigh too high, $toolow too low, $good good\n";
+	}
 
 	while(my ($k1, $v1) = each %midinotes)
 	{
