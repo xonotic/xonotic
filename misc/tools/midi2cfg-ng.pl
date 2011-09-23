@@ -429,8 +429,8 @@ sub busybot_note_on_bot($$$$$$$)
 	my ($bot, $time, $channel, $program, $note, $init, $force) = @_;
 	return -1 # I won't play on this channel
 		if defined $bot->{channels} and not $bot->{channels}->{$channel};
-#	return -1 # I won't play this program
-#		if defined $bot->{programs} and not $bot->{programs}->{$program};
+	return -1 # I won't play this program
+		if defined $bot->{programs} and not $bot->{programs}->{$program};
 
 	my ($cmds, $cmds_off, $k0, $k1) = busybot_get_cmds_bot($bot, $channel, $note);
 
@@ -749,7 +749,7 @@ sub ConvertMIDI($$)
 		if($_->[0] eq 'note_on')
 		{
 			my $chan = $_->[4] + 1;
-			++$notes_seen{$chan}{$_->[5]}
+			++$notes_seen{$chan}{($programs{$chan} || 1)}{$_->[5]}
 				if $chan != 10 and $chan > 0;
 			if($midinotes{$chan}{$_->[5]})
 			{
@@ -788,40 +788,43 @@ sub ConvertMIDI($$)
 		my $good = 0;
 		for my $channel(sort keys %notes_seen)
 		{
-			for my $note(sort keys %{$notes_seen{$channel}})
+			for my $program(sort keys %{$notes_seen{$channel}})
 			{
-				my $cnt = $notes_seen{$channel}{$note};
-				my $votehigh = 0;
-				my $votelow = 0;
-				my $votegood = 0;
-				for(@busybots_allocated)
+				for my $note(sort keys %{$notes_seen{$channel}{$program}})
 				{
-					next # I won't play on this channel
-						if defined $_->{channels} and not $_->{channels}->{$channel};
-#					next # I won't play this program
-#						if defined $bot->{programs} and not $bot->{programs}->{$program};
-					my $transposed = $note - ($_->{transpose} || 0) - $testtranspose;
-					if(exists $_->{notes_on}{$transposed})
+					my $cnt = $notes_seen{$channel}{$program}{$note};
+					my $votehigh = 0;
+					my $votelow = 0;
+					my $votegood = 0;
+					for(@busybots_allocated)
 					{
-						++$votegood;
+						next # I won't play on this channel
+							if defined $_->{channels} and not $_->{channels}->{$channel};
+						next # I won't play this program
+							if defined $_->{programs} and not $_->{programs}->{$program};
+						my $transposed = $note - ($_->{transpose} || 0) - $testtranspose;
+						if(exists $_->{notes_on}{$transposed})
+						{
+							++$votegood;
+						}
+						else
+						{
+							++$votehigh if $transposed >= 0;
+							++$votelow if $transposed < 0;
+						}
+					}
+					if($votegood)
+					{
+						$good += $cnt;
+					}
+					elsif($votelow >= $votehigh)
+					{
+						$toolow += $cnt;
 					}
 					else
 					{
-						++$votehigh if $transposed >= 0;
-						++$votelow if $transposed < 0;
+						$toohigh += $cnt;
 					}
-				}
-				if($votegood)
-				{
-					$good += $cnt;
-				}
-				elsif($votelow >= $votehigh)
-				{
-					$toolow += $cnt;
-				}
-				else
-				{
-					$toohigh += $cnt;
 				}
 			}
 		}
