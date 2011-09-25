@@ -750,8 +750,7 @@ sub ConvertMIDI($$)
 		if($_->[0] eq 'note_on')
 		{
 			my $chan = $_->[4] + 1;
-			++$notes_seen{$chan}{($programs{$chan} || 1)}{$_->[5]}
-				if $chan != 10 and $chan > 0;
+			++$notes_seen{$chan}{($programs{$chan} || 1)}{$_->[5]};
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
@@ -789,6 +788,7 @@ sub ConvertMIDI($$)
 		my $good = 0;
 		for my $channel(sort keys %notes_seen)
 		{
+			next if $channel == 10 or $channel < 0;
 			for my $program(sort keys %{$notes_seen{$channel}})
 			{
 				for my $note(sort keys %{$notes_seen{$channel}{$program}})
@@ -831,6 +831,30 @@ sub ConvertMIDI($$)
 		}
 		next if !$toohigh != !$toolow;
 		print STDERR "  Transpose $testtranspose: $toohigh too high, $toolow too low, $good good\n";
+	}
+
+	for my $program(sort keys %{$notes_seen{10}})
+	{
+		for my $note(sort keys %{$notes_seen{10}{$program}})
+		{
+			my $cnt = $notes_seen{10}{$program}{$note};
+			my $votegood = 0;
+			for(@busybots_allocated)
+			{
+				next # I won't play on this channel
+					if defined $_->{channels} and not $_->{channels}->{10};
+				next # I won't play this program
+					if defined $_->{programs} and not $_->{programs}->{$program};
+				if(exists $_->{percussion}{$note})
+				{
+					++$votegood;
+				}
+			}
+			if(!$votegood)
+			{
+				print STDERR "Failed percussion $note ($cnt times)\n";
+			}
+		}
 	}
 
 	while(my ($k1, $v1) = each %midinotes)
