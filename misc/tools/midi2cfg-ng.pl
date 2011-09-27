@@ -297,6 +297,8 @@ sub busybot_cmd_bot_execute($$@)
 {
 	my ($bot, $time, @commands) = @_;
 
+	$bot->{lastuse} = $time;
+
 	for(@commands)
 	{
 		if($_->[0] eq 'time')
@@ -340,7 +342,7 @@ sub busybot_cmd_bot_execute($$@)
 		elsif($_->[0] eq 'barrier')
 		{
 			$commands .= sprintf "sv_cmd bot_cmd %d barrier\n", $bot->{id};
-			$bot->{timer} = $bot->{busytimer} = 0;
+			$bot->{lastuse} = $bot->{timer} = $bot->{busytimer} = 0;
 		}
 		elsif($_->[0] eq 'raw')
 		{
@@ -514,7 +516,7 @@ sub busybot_note_on($$$$)
 
 	my @epicfailbots = ();
 
-	for(unsort @busybots_allocated)
+	for(map { $_->[1] } sort { $a->[1]->{lastuse} <=> $b->[1]->{lastuse} or $a->[0] <=> $b->[0] } map { [rand, $_] } @busybots_allocated)
 	{
 		my $canplay = busybot_note_on_bot $_, $time, $channel, $program, $note, 0, 0;
 		if($canplay > 0)
