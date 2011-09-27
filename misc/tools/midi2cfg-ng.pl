@@ -473,7 +473,7 @@ sub busybot_note_on_bot($$$$$$$)
 	}
 	++$bot->{seen}{$k0}{$k1};
 
-	if($bot->{lastuse} && $channel == $bot->{lastchannel})
+	if(($bot->{lastuse} // -666) >= $time - $time_forgetfulness && $channel == $bot->{lastchannel})
 	{
 		$bot->{lastchannelsequence} += 1;
 	}
