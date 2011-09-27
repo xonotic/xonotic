@@ -521,7 +521,7 @@ sub botsort($$$$@)
 		}
 		sort
 		{
-			$a->[1] <=> $b->[1]
+			$b->[1] <=> $a->[1]
 			or
 			($a->[0]->{lastuse} // -666) <=> ($b->[0]->{lastuse} // -666)
 			or
@@ -543,6 +543,11 @@ sub botsort($$$$@)
 							++$q;
 						}
 					}
+				}
+				else
+				{
+					# better leave this one alone
+					--$q;
 				}
 			}
 			[$_, $q, rand]
@@ -805,7 +810,7 @@ sub ConvertMIDI($$)
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
-				busybot_note_off($t - SYS_TICRATE, $chan, $_->[5]);
+				busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $_->[5]);
 			}
 			busybot_note_on($t, $chan, $programs{$chan} || 1, $_->[5]);
 			++$notes_stuck;
@@ -817,7 +822,7 @@ sub ConvertMIDI($$)
 			if($midinotes{$chan}{$_->[5]})
 			{
 				--$notes_stuck;
-				busybot_note_off($t - SYS_TICRATE, $chan, $_->[5]);
+				busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $_->[5]);
 			}
 			$midinotes{$chan}{$_->[5]} = 0;
 		}
