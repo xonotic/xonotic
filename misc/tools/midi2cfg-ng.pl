@@ -473,10 +473,19 @@ sub busybot_note_on_bot($$$$$$$)
 	}
 	++$bot->{seen}{$k0}{$k1};
 
+	if($bot->{lastuse} && $channel == $bot->{lastchannel})
+	{
+		$bot->{lastchannelsequence} += 1;
+	}
+	else
+	{
+		$bot->{lastchannelsequence} = 1;
+	}
 	$bot->{lastuse} = $time;
 	$bot->{lastchannel} = $channel;
-	$bot->{lastprogram} = $program;
-	$bot->{lastnote} = $note;
+
+#	print STDERR "$time $bot->{id} $channel:$note\n"
+#		if $channel == 11;
 
 	return 1;
 }
@@ -534,15 +543,7 @@ sub botsort($$$$@)
 			{
 				if($channel == $_->{lastchannel})
 				{
-					++$q;
-					if($program == $_->{lastprogram})
-					{
-						++$q;
-						if($note == $_->{lastnote})
-						{
-							++$q;
-						}
-					}
+					$q += $_->{lastchannelsequence};
 				}
 				else
 				{
