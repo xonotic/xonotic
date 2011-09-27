@@ -24,6 +24,7 @@ my $timeoffset_predone = 2;
 my $timeoffset_postdone = 2;
 my $timeoffset_preintermission = 2;
 my $timeoffset_postintermission = 2;
+my $time_forgetfulness = 1.5;
 
 my ($config, @midilist) = @ARGV;
 
@@ -202,6 +203,10 @@ sub botconfig_read($)
 		{
 			$timeoffset_postintermission = $1;
 		}
+		elsif(/^time_forgetfulness (.*)/)
+		{
+			$time_forgetfulness = $1;
+		}
 		else
 		{
 			print "unknown command: $_\n";
@@ -297,8 +302,6 @@ sub busybot_cmd_bot_execute($$@)
 {
 	my ($bot, $time, @commands) = @_;
 
-	$bot->{lastuse} = $time;
-
 	for(@commands)
 	{
 		if($_->[0] eq 'time')
@@ -342,7 +345,8 @@ sub busybot_cmd_bot_execute($$@)
 		elsif($_->[0] eq 'barrier')
 		{
 			$commands .= sprintf "sv_cmd bot_cmd %d barrier\n", $bot->{id};
-			$bot->{lastuse} = $bot->{timer} = $bot->{busytimer} = 0;
+			$bot->{timer} = $bot->{busytimer} = 0;
+			undef $bot->{lastuse};
 		}
 		elsif($_->[0] eq 'raw')
 		{
@@ -468,6 +472,12 @@ sub busybot_note_on_bot($$$$$$$)
 		$bot->{busy} = [$channel, $note, $cmds_off];
 	}
 	++$bot->{seen}{$k0}{$k1};
+
+	$bot->{lastuse} = $time;
+	$bot->{lastchannel} = $channel;
+	$bot->{lastprogram} = $program;
+	$bot->{lastnote} = $note;
+
 	return 1;
 }
 
@@ -501,6 +511,45 @@ sub busybot_note_off($$$)
 	return 0;
 }
 
+sub botsort($$$$@)
+{
+	my ($time, $channel, $program, $note, @bots) = @_;
+	return
+		map
+		{
+			$_->[0]
+		}
+		sort
+		{
+			$a->[1] <=> $b->[1]
+			or
+			($a->[0]->{lastuse} // -666) <=> ($b->[0]->{lastuse} // -666)
+			or
+			$a->[2] <=> $b->[2]
+		}
+		map
+		{
+			my $q = 0;
+			if($_->{lastuse} >= $time - $time_forgetfulness)
+			{
+				if($channel == $_->{lastchannel})
+				{
+					++$q;
+					if($program == $_->{lastprogram})
+					{
+						++$q;
+						if($note == $_->{lastnote})
+						{
+							++$q;
+						}
+					}
+				}
+			}
+			[$_, $q, rand]
+		}
+		@bots;
+}
+
 sub busybot_note_on($$$$)
 {
 	my ($time, $channel, $program, $note) = @_;
@@ -516,7 +565,7 @@ sub busybot_note_on($$$$)
 
 	my @epicfailbots = ();
 
-	for(map { $_->[1] } sort { $a->[1]->{lastuse} <=> $b->[1]->{lastuse} or $a->[0] <=> $b->[0] } map { [rand, $_] } @busybots_allocated)
+	for(botsort $time, $channel, $program, $note, @busybots_allocated)
 	{
 		my $canplay = busybot_note_on_bot $_, $time, $channel, $program, $note, 0, 0;
 		if($canplay > 0)
