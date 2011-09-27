@@ -530,7 +530,7 @@ sub botsort($$$$@)
 		map
 		{
 			my $q = 0;
-			if($_->{lastuse} >= $time - $time_forgetfulness)
+			if(($_->{lastuse} // -666) >= $time - $time_forgetfulness)
 			{
 				if($channel == $_->{lastchannel})
 				{
