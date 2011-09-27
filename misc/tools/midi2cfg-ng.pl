@@ -548,7 +548,7 @@ sub botsort($$$$@)
 				else
 				{
 					# better leave this one alone
-					--$q;
+					$q -= $_->{lastchannelsequence};
 				}
 			}
 			[$_, $q, rand]
