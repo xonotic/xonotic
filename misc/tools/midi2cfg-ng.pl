@@ -539,16 +539,19 @@ sub botsort($$$$@)
 		map
 		{
 			my $q = 0;
-			if(($_->{lastuse} // -666) >= $time - $time_forgetfulness)
+			if($channel != 10) # percussion just should do round robin
 			{
-				if($channel == $_->{lastchannel})
+				if(($_->{lastuse} // -666) >= $time - $time_forgetfulness)
 				{
-					$q += $_->{lastchannelsequence};
-				}
-				else
-				{
-					# better leave this one alone
-					$q -= $_->{lastchannelsequence};
+					if($channel == $_->{lastchannel})
+					{
+						$q += $_->{lastchannelsequence};
+					}
+					else
+					{
+						# better leave this one alone
+						$q -= $_->{lastchannelsequence};
+					}
 				}
 			}
 			[$_, $q, rand]
