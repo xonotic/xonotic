@@ -857,7 +857,7 @@ sub ConvertMIDI($$)
 					my $votehigh = 0;
 					my $votelow = 0;
 					my $votegood = 0;
-					for(@busybots_allocated)
+					for(@busybots_allocated, grep { $_->{count} > 0 } values %$busybots)
 					{
 						next # I won't play on this channel
 							if defined $_->{channels} and not $_->{channels}->{$channel};
