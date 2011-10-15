@@ -993,6 +993,8 @@ for(;;)
 		my @preallocate_new = map { $_->{classname} } @busybots_allocated;
 		if(@preallocate_new == @preallocate)
 		{
+			print "sv_cmd bot_cmd reset\n";
+			print "sv_cmd bot_cmd setbots @{[scalar @preallocate_new]}\n";
 			print "$precommands$commands";
 			exit 0;
 		}
