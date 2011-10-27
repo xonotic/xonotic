@@ -17,7 +17,7 @@ old_library='libd0_blind_id.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/tmp/Darkplaces.build.linux32.deps/lib /tmp/gg/lib/libgmp.la'
+dependency_libs=' -L/tmp/d0_blind_id.deps/lib/ /tmp/gg/lib/libgmp.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/tmp/d0c/lib'
+libdir='/usr/local/lib'

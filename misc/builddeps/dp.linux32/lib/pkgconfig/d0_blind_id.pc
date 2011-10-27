@@ -1,4 +1,4 @@
-prefix=/tmp/d0c
+prefix=/usr/local
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: Blind-ID
 Description: Library for user identification using RSA blind signatures
 Requires: 
-Version: 0.3
+Version: 0.4
 Libs: -L${libdir} -ld0_blind_id
 Cflags: -I${includedir}/d0_blind_id

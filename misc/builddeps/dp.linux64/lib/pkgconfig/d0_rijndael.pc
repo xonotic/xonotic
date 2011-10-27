@@ -1,4 +1,4 @@
-prefix=/tmp/d0c
+prefix=/usr/local
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: Rijndael
 Description: Library for Rijndael encryption
 Requires: 
-Version: 0.3
+Version: 0.4
 Libs: -L${libdir} -ld0_rijndael
 Cflags: -I${includedir}/d0_blind_id
