@@ -15,7 +15,7 @@ all:
 
 .PHONY: clean
 clean:
-	./all compile -c
+	./all clean
 
 .PHONY: install-data-git
 install-data-git: all
