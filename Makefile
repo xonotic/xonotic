@@ -62,9 +62,9 @@ install-engine-git:
 	$(INSTALL) xonotic-linux-glx.sh $(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(LIBDIR)/xonotic-linux-sdl.sh
 	$(INSTALL) xonotic-linux-dedicated.sh $(LIBDIR)/xonotic-linux-dedicated.sh
-	$(INSTALL) darkplaces/xonotic-sdl $(LIBDIR)/xonotic-$(ARCH)-sdl
-	$(INSTALL) darkplaces/xonotic-glx $(LIBDIR)/xonotic-$(ARCH)-glx
-	$(INSTALL) darkplaces/xonotic-dedicated $(LIBDIR)/xonotic-$(ARCH)-dedicated
+	$(INSTALL) darkplaces/darkplaces-sdl $(LIBDIR)/xonotic-$(ARCH)-sdl
+	$(INSTALL) darkplaces/darkplaces-glx $(LIBDIR)/xonotic-$(ARCH)-glx
+	$(INSTALL) darkplaces/darkplaces-dedicated $(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 .PHONY: install-engine-zip
 install-engine-zip:
