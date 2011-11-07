@@ -266,6 +266,8 @@ sub color_dpfix($)
 #   Connection:
 #     $conn->sockname() returns a connection type specific representation
 #       string of the local address, or undef if not applicable.
+#     $conn->peername() returns a connection type specific representation
+#       string of the remote address, or undef if not applicable.
 #     $conn->send("string") sends something over the connection.
 #     $conn->recv() receives a string from the connection, or returns "" if no
 #       data is available.
@@ -338,6 +340,14 @@ sub sockname($)
 {
 	my ($self) = @_;
 	my ($port, $addr) = sockaddr_in $self->{sock}->sockname();
+	return "@{[inet_ntoa $addr]}:$port";
+}
+
+# $sock->peername() returns the remote address of the socket.
+sub peername($)
+{
+	my ($self) = @_;
+	my ($port, $addr) = sockaddr_in $self->{sock}->peername();
 	return "@{[inet_ntoa $addr]}:$port";
 }
 
@@ -740,6 +750,7 @@ our %config = (
 	dp_password => undef,
 	dp_status_delay => 30,
 	dp_server_from_wan => "",
+	dp_listen_from_server => "", 
 	dp_utf8_enable => $color_utf8_enable,
 	irc_local => "",
 
@@ -751,6 +762,16 @@ our %config = (
 
 	plugins => "",
 );
+
+sub pickip($$)
+{
+	my ($wan, $lan) = @_;
+	return $wan
+		if $wan =~ /:\d+$/;
+	return $wan
+		if $lan !~ /:(\d+)$/;
+	return "$wan:$1";
+}
 
 
 
@@ -764,7 +785,7 @@ sub xon_slotsstring()
 		my $slots = $store{slots_max} - $store{slots_active};
 		my $slots_s = ($slots == 1) ? '' : 's';
 		$slotsstr = " ($slots free slot$slots_s)";
-		my $s = $config{dp_server_from_wan} || $config{dp_server};
+		my $s = pickip($config{dp_server_from_wan}, $config{dp_server});
 		$slotsstr .= "; join now: \002xonotic +connect $s"
 			if $slots >= 1 and not $store{lms_blocked};
 	}
@@ -821,6 +842,7 @@ $SIG{TERM} = sub {
 $channels{irc} = new Channel::Line(new Connection::Socket(tcp => $config{irc_local} => $config{irc_server} => 6667));
 $channels{dp} = new Channel::QW(my $dpsock = new Connection::Socket(udp => $config{dp_listen} => $config{dp_server} => 26000), $config{dp_password}, $config{dp_secure}, $config{dp_secure_challengetimeout});
 $config{dp_listen} = $dpsock->sockname();
+$config{dp_server} = $dpsock->peername();
 print "Listening on $config{dp_listen}\n";
 
 $channels{irc}->throttle(0.5, 5);
@@ -1075,8 +1097,8 @@ sub cond($)
 	[ dp => q{"log_dest_udp" is "([^"]*)" \["[^"]*"\]} => sub {
 		my ($dest) = @_;
 		my @dests = split ' ', $dest;
-		return 0 if grep { $_ eq $config{dp_listen} } @dests;
-		out dp => 0, 'log_dest_udp "' . join(" ", @dests, $config{dp_listen}) . '"';
+		return 0 if grep { $_ eq pickip($config{dp_listen_from_server}, $config{dp_listen}) } @dests;
+		out dp => 0, 'log_dest_udp "' . join(" ", @dests, pickip($config{dp_listen_from_server}, $config{dp_listen})) . '"';
 		return 0;
 	} ],
 
@@ -1404,7 +1426,7 @@ sub cond($)
 	# remove myself from the log destinations and exit everything
 	[ dp => q{quitting rcon2irc (??{$store{quitcookie}}): log_dest_udp is (.*) *} => sub {
 		my ($dest) = @_;
-		my @dests = grep { $_ ne $config{dp_listen} } split ' ', $dest;
+		my @dests = grep { $_ ne pickip($config{dp_listen_from_server}, $config{dp_listen}) } split ' ', $dest;
 		out dp => 0, 'log_dest_udp "' . join(" ", @dests) . '"';
 		exit 0;
 		return 0;
