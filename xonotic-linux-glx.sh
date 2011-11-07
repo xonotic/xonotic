@@ -7,6 +7,7 @@ link=`readlink "${0}"`
 cd "${path}"
 
 case "${0##*/}" in
+  *dedicated*)	mode="dedicated" ;;
   *sdl*)	mode="sdl" ;;
   *)		mode="glx" ;;
 esac

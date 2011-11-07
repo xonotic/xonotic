@@ -857,7 +857,7 @@ sub ConvertMIDI($$)
 					my $votehigh = 0;
 					my $votelow = 0;
 					my $votegood = 0;
-					for(@busybots_allocated)
+					for(@busybots_allocated, grep { $_->{count} > 0 } values %$busybots)
 					{
 						next # I won't play on this channel
 							if defined $_->{channels} and not $_->{channels}->{$channel};
@@ -993,6 +993,8 @@ for(;;)
 		my @preallocate_new = map { $_->{classname} } @busybots_allocated;
 		if(@preallocate_new == @preallocate)
 		{
+			print "sv_cmd bot_cmd reset\n";
+			print "sv_cmd bot_cmd setbots @{[scalar @preallocate_new]}\n";
 			print "$precommands$commands";
 			exit 0;
 		}

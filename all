@@ -224,10 +224,9 @@ listrepos()
 	for d in $repos; do
 		p="${d%dir}"
 		f="`repoflags "$d"`"
-		# if we have the dir, always keep it
-		if [ -d "$d" ]; then
-			msg "Repository $d enabled because it already exists"
-			$ECHO "$d"
+		# if we have .no file, skip
+		if [ -f "$d.no" ]; then
+			msg "Repository $d disabled by a .no file, delete $d.no to enable"
 			continue
 		fi
 		# if .yes file exists, always keep it
@@ -236,9 +235,10 @@ listrepos()
 			$ECHO "$d"
 			continue
 		fi
-		# if we have .no file, skip
-		if [ -f "$d.no" ]; then
-			msg "Repository $d disabled by a .no file, delete $d.no to enable"
+		# if we have the dir, always keep it
+		if [ -d "$d" ]; then
+			msg "Repository $d enabled because it already exists"
+			$ECHO "$d"
 			continue
 		fi
 		# if we have matching pk3, skip
