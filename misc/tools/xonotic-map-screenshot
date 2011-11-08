@@ -9,6 +9,8 @@ count=`yes x | head -n "$count" | tr -cd x`
 
 ./all run \
 	-nosound \
+	+'locksession 0' \
+	+'scr_screenshot_timestamp 0' \
 	+'vid_fullscreen 0' \
 	+'exec effects-ultimate.cfg' \
 	+'vid_soft 1' \

@@ -230,7 +230,7 @@ screenshotthemap()
 		else
 			#startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
 			#startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -gl_driver /usr/local/lib/gallium3d/libGL.so -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
-			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"set scr_screenshot_timestamp 0" +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
+			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
 		fi
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
