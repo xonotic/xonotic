@@ -20,12 +20,18 @@ goto xonotic
 	..\..\..\all update
 	goto end
 :xonoticdata
-	if exist ..\..\..\data\xonotic-rsync-data-low.pk3 goto xonoticdatalow
-	if exist ..\..\..\data\xonotic-*-data-low.pk3 goto xonoticdatalowfuzzy
-	if exist ..\..\..\data\xonotic-rsync-data-high.pk3 goto xonoticdatahigh
-	if exist ..\..\..\data\xonotic-*-data-high.pk3 goto xonoticdatahighfuzzy
-	if exist ..\..\..\data\xonotic-rsync-data.pk3 goto xonoticdatanormal
-	if exist ..\..\..\data\xonotic-*-data.pk3 goto xonoticdatanormalfuzzy
+	if exist ..\..\..\misc\tools\rsync-updater\rsync.exe goto xonoticdatarsync
+	echo FATAL: rsync not in misc\tools\rsync-updater. This update script cannot be used.
+	goto end
+:xonoticdatarsync
+	set PATH=misc\tools\rsync-updater;%PATH%
+	cd ..\..\..
+	if exist data\xonotic-rsync-data-low.pk3 goto xonoticdatalow
+	if exist data\xonotic-*-data-low.pk3 goto xonoticdatalowfuzzy
+	if exist data\xonotic-rsync-data-high.pk3 goto xonoticdatahigh
+	if exist data\xonotic-*-data-high.pk3 goto xonoticdatahighfuzzy
+	if exist data\xonotic-rsync-data.pk3 goto xonoticdatanormal
+	if exist data\xonotic-*-data.pk3 goto xonoticdatanormalfuzzy
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatalow
@@ -50,7 +56,7 @@ goto xonotic
 		set options=%options% -y
 		goto endxonoticdata
 :endxonoticdata
-	set target=..\..\..
+	set target=./
 	goto endxonotic
 :xonotic
 	set url=rsync://beta.xonotic.org/autobuild-Xonotic/
