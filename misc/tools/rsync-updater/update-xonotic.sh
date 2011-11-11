@@ -13,7 +13,7 @@ if [ -d "Xonotic-low" ]; then
 elif [ -d "Xonotic-high" ]; then
 	url="rsync://beta.xonotic.org/autobuild-Xonotic-high/"
 	target="Xonotic-high/"
-elif [ -d "../../../data/.git" ]; then
+elif [ -d "../../../.git" ]; then
 	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
 	exec ../../../all update
 elif [ -d "../../../data" ]; then

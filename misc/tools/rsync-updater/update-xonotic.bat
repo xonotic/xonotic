@@ -4,7 +4,7 @@ set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
 if exist Xonotic-low goto xonoticlow
 if exist Xonotic-high goto xonotichigh
-if exist ..\..\..\data\.git goto xonoticdatagit
+if exist ..\..\..\.git goto xonoticdatagit
 if exist ..\..\..\data goto xonoticdata
 goto xonotic
 :xonoticlow
