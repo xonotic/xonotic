@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ -d "${0%/*}" ]; then
+	cd "${0%/*}"
+fi
+
 if ! which rsync >/dev/null; then
 	echo >&2 "FATAL: rsync not found, please install the rsync package"
 	exit 1

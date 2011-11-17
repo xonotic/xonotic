@@ -1,5 +1,7 @@
 @echo off
 
+cd %~dp0
+
 set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
 if exist Xonotic-low goto xonoticlow
