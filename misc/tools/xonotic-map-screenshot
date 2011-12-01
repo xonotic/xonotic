@@ -27,4 +27,5 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+"defer \"$watchdog\" quit" \
 	+"map \"$map\"" \
 	+'timelimit 0' \
-	+'fraglimit 0'
+	+'fraglimit 0' \
+	</dev/null
