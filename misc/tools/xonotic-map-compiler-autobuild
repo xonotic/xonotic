@@ -163,7 +163,7 @@ buildthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
-	if HEAD "$url$M-$blobhash.pk3"; then
+	if lwp-request -m HEAD "$url$M-$blobhash.pk3"; then
 		continue
 	fi
 
@@ -213,7 +213,7 @@ screenshotthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
-	if HEAD "$url$M-$blobhash/"; then
+	if lwp-request -m HEAD "$url$M-$blobhash/"; then
 		continue
 	fi
 
