@@ -230,10 +230,10 @@ screenshotthemap()
 		else
 			case "$DRIVER" in
 				gl)
-					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override $DRIVERFLAGS +"scr_screenshot_name \"$M-\"" -- :8
 					;;
 				soft|*)
-					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"vid_soft 1" +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
+					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"vid_soft 1" $DRIVERFLAGS +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
 					;;
 			esac
 		fi
