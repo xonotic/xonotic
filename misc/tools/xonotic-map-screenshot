@@ -13,7 +13,6 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'scr_screenshot_timestamp 0' \
 	+'vid_fullscreen 0' \
 	+'exec effects-ultimate.cfg' \
-	+'vid_soft 1' \
 	"$@" \
 	+'r_motionblur 0' \
 	+'r_damageblur 0' \

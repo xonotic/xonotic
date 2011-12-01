@@ -228,9 +228,14 @@ screenshotthemap()
 		if [ -n "$DISPLAY" ]; then
 			misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
 		else
-			#startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
-			#startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -gl_driver /usr/local/lib/gallium3d/libGL.so -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
-			startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
+			case "$DRIVER" in
+				gl)
+					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"scr_screenshot_name \"$M-\"" -- :8
+					;;
+				soft|*)
+					startx "$PWD/misc/tools/xonotic-map-screenshot" "$M" $screenshot_override +"vid_soft 1" +"scr_screenshot_name \"$M-\"" -- /usr/bin/Xvfb :8 -screen 0 1024x768x24
+					;;
+			esac
 		fi
 	)
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
