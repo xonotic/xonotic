@@ -66,9 +66,9 @@ use_magnet_to_acquire_checksum_faster()
 	if [ -n "$magnet" ]; then
 		magnet=${magnet#* }
 		magnet=${magnet%% *}
-		sum=$sum$magnet
+		echo "$magnet"
 	else
-		sum=$sum`git hash-object "$1"`
+		git hash-object "$1"
 	fi
 }
 
@@ -88,10 +88,9 @@ acquire_checksum()
 			esac
 		done
 		if [ -n "$git_src_repo" ] && ! $_a_e; then
-			_a_s=
-			use_magnet_to_acquire_checksum_faster "${1#./}"
+			_a_s=`use_magnet_to_acquire_checksum_faster "${1#./}"`
 			if [ -n "$2" ]; then
-				use_magnet_to_acquire_checksum_faster "${2#./}"
+				_a_s=$_a_s`use_magnet_to_acquire_checksum_faster "${2#./}"`
 			fi
 		else
 			_a_s=`git hash-object "$1"`

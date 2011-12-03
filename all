@@ -1952,8 +1952,8 @@ case "$cmd" in
 		release_timereport "processed data"
 		verbose "$SELF" release-buildpk3-transform-$transform "Xonotic/temp"
 		release_timereport "transformed data"
-		#find . -type f -size +4k | verbose "$d0"/misc/tools/symlink-deduplicate.sh
-		#release_timereport "deduplicated data"
+		find . -type f -size +4k | verbose "$d0"/misc/tools/symlink-deduplicate.sh
+		release_timereport "deduplicated data"
 		verbose mkzipr "../../$dst" *
 		release_timereport "zipped data"
 		verbose cd ../..
