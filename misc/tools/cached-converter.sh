@@ -74,6 +74,37 @@ use_magnet_to_acquire_checksum_faster()
 
 lastinfiles=
 lastinfileshash=
+acquire_checksum()
+{
+	if [ x"$1/../$2" = x"$lastinfiles" ]; then
+		_a_s=$lastinfileshash
+	else
+		_a_e=false
+		for _a_f in "$1" "$2"; do
+			case "$_a_f" in
+				*/background_l2.tga|*/background_ingame_l2.tga)
+					_a_e=true
+					;;
+			esac
+		done
+		if [ -n "$git_src_repo" ] && ! $_a_e; then
+			_a_s=
+			use_magnet_to_acquire_checksum_faster "${1#./}"
+			if [ -n "$2" ]; then
+				use_magnet_to_acquire_checksum_faster "${2#./}"
+			fi
+		else
+			_a_s=`git hash-object "$1"`
+			if [ -n "$2" ]; then
+				_a_s=$_a_s`git hash-object "$2"`
+			fi
+		fi
+		lastinfileshash=$_a_s
+		lastinfiles="$1/../$2"
+	fi
+	echo "$_a_s"
+}
+
 cached()
 {
 	flag=$1; shift
@@ -91,31 +122,7 @@ cached()
 	fi
 	options=`echo "$*" | git hash-object --stdin`
 	selfprofile convert_findchecksum
-	if [ x"$infile1/../$infile2" = x"$lastinfiles" ]; then
-		sum=$lastinfileshash
-	else
-		evil=false
-		for infile in "$infile1" "$infile2"; do
-			case "$infile" in
-				*/background_l2.tga|*/background_ingame_l2.tga)
-					evil=true
-					;;
-			esac
-		done
-		if [ -n "$git_src_repo" ] && ! $evil; then
-			sum=
-			use_magnet_to_acquire_checksum_faster "${infile1#./}"
-			if [ -n "$infile2" ]; then
-				use_magnet_to_acquire_checksum_faster "${infile2#./}"
-			fi
-		else
-			sum=`git hash-object "$infile1"`
-			if [ -n "$infile2" ]; then
-				sum=$sum`git hash-object "$infile2"`
-			fi
-		fi
-		lastinfileshash=$sum
-	fi
+	sum=`acquire_checksum "$infile1" "$infile2"`
 	selfprofile convert_makecachedir
 	mkdir -p "$CACHEDIR/$method-$options"
 	name1="$CACHEDIR/$method-$options/$sum-1.${outfile1##*.}"
