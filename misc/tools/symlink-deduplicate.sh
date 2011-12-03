@@ -108,8 +108,8 @@ while IFS= read -r L; do
 	eval first=\$first_$s
 	if [ -n "$first" ]; then
 		first_r=`make_relative_path "$L" "$first"`
-		ln -vsnf "$first_r" "$L"
 		killed=$((`stat -c %s "$L"` + $killed))
+		ln -vsnf "$first_r" "$L"
 	else
 		eval first_$s=\$L
 	fi
