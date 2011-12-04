@@ -766,8 +766,11 @@ our %config = (
 sub pickip($$)
 {
 	my ($wan, $lan) = @_;
+	# $wan shall override $lan
+	return $lan
+		if not length $wan;
 	return $wan
-		if $wan =~ /:\d+$/;
+		if $wan =~ /:\d+$/; # full override
 	return $wan
 		if $lan !~ /:(\d+)$/;
 	return "$wan:$1";
