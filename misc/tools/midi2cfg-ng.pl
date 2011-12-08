@@ -803,39 +803,95 @@ sub ConvertMIDI($$)
 	my %notes_seen = ();
 	my %programs = ();
 	my $t = 0;
+	my %sustain = ();
+
+	my $note_on = sub
+	{
+		my ($ev) = @_;
+		my $chan = $ev->[4] + 1;
+		++$notes_seen{$chan}{($programs{$chan} || 1)}{$ev->[5]};
+		if($midinotes{$chan}{$ev->[5]})
+		{
+			--$notes_stuck;
+			busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $ev->[5]);
+		}
+		busybot_note_on($t, $chan, $programs{$chan} || 1, $ev->[5]);
+		++$notes_stuck;
+		$midinotes{$chan}{$ev->[5]} = 1;
+	};
+
+	my $note_off = sub
+	{
+		my ($ev) = @_;
+		my $chan = $ev->[4] + 1;
+		if(exists $sustain{$chan})
+		{
+			push @{$sustain{$chan}}, $ev;
+			return;
+		}
+		if($midinotes{$chan}{$ev->[5]})
+		{
+			--$notes_stuck;
+			busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $ev->[5]);
+		}
+		$midinotes{$chan}{$ev->[5]} = 0;
+	};
+
+	my $patch_change = sub
+	{
+		my ($ev) = @_;
+		my $chan = $ev->[4] + 1;
+		my $program = $ev->[5] + 1;
+		$programs{$chan} = $program;
+	};
+
+	my $sustain_change = sub
+	{
+		my ($ev) = @_;
+		my $chan = $ev->[4] + 1;
+		if($ev->[6] == 0)
+		{
+			# release all currently not pressed notes
+			my $s = $sustain{$chan};
+			delete $sustain{$chan};
+			for(@{($s || [])})
+			{
+				$note_off->($_);
+			}
+		}
+		else
+		{
+			# no more note-off
+			$sustain{$chan} = [];
+		}
+	};
+
 	for(@allmidievents)
 	{
 		$t = $tick2sec->($_->[1]);
-		my $track = $_->[3];
+		# my $track = $_->[3];
 		if($_->[0] eq 'note_on')
 		{
-			my $chan = $_->[4] + 1;
-			++$notes_seen{$chan}{($programs{$chan} || 1)}{$_->[5]};
-			if($midinotes{$chan}{$_->[5]})
-			{
-				--$notes_stuck;
-				busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $_->[5]);
-			}
-			busybot_note_on($t, $chan, $programs{$chan} || 1, $_->[5]);
-			++$notes_stuck;
-			$midinotes{$chan}{$_->[5]} = 1;
+			$note_on->($_);
 		}
 		elsif($_->[0] eq 'note_off')
 		{
-			my $chan = $_->[4] + 1;
-			if($midinotes{$chan}{$_->[5]})
-			{
-				--$notes_stuck;
-				busybot_note_off($t - SYS_TICRATE - 0.001, $chan, $_->[5]);
-			}
-			$midinotes{$chan}{$_->[5]} = 0;
+			$note_off->($_);
 		}
 		elsif($_->[0] eq 'patch_change')
 		{
-			my $chan = $_->[4] + 1;
-			my $program = $_->[5] + 1;
-			$programs{$chan} = $program;
+			$patch_change->($_);
 		}
+		elsif($_->[0] eq 'control_change' && $_->[5] == 64) # sustain pedal
+		{
+			$sustain_change->($_);
+		}
+	}
+
+	# fake events for releasing pedal
+	for(keys %sustain)
+	{
+		$sustain_change->(['control_change', $t, undef, undef, $_ - 1, 64, 0]);
 	}
 
 	print STDERR "For file $filename:\n";
