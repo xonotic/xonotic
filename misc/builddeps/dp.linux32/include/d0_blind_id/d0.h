@@ -30,7 +30,7 @@
  * SUCH DAMAGE.
  *
  * $Format:commit %H$
- * $Id: a6b551ba6968466f5bf1003bd1f000cd29beb698 $
+ * $Id: 0f9b41999f2a57f07067272a8b89919394c4b04f $
  */
 
 #ifndef __D0_H__
@@ -58,6 +58,7 @@ extern d0_unlockmutex_t *d0_unlockmutex;
 
 void d0_setmallocfuncs(d0_malloc_t *m, d0_free_t *f);
 void d0_setmutexfuncs(d0_createmutex_t *c, d0_destroymutex_t *d, d0_lockmutex_t *l, d0_unlockmutex_t *u);
+void d0_initfuncs(void); // initializes them, this needs to be only called internally once
 
 extern const char *d0_bsd_license_notice;
 

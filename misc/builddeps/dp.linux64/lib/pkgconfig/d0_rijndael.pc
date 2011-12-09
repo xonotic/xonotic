@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: Rijndael
 Description: Library for Rijndael encryption
 Requires: 
-Version: 0.4
+Version: 0.5
 Libs: -L${libdir} -ld0_rijndael
 Cflags: -I${includedir}/d0_blind_id
