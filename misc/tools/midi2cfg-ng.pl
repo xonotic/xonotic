@@ -344,7 +344,7 @@ sub busybot_cmd_bot_execute($$@)
 		}
 		elsif($_->[0] eq 'aim_random')
 		{
-			$commands .= sprintf "sv_cmd bot_cmd %d aim %f 0 %f\n", $bot->{id}, $_->[1] + rand($_->[2] - $_->[1]), $_->[3];
+			$commands .= sprintf "sv_cmd bot_cmd %d aim \"%f 0 %f\"\n", $bot->{id}, $_->[1] + rand($_->[2] - $_->[1]), $_->[3];
 		}
 		elsif($_->[0] eq 'barrier')
 		{
