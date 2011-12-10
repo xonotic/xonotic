@@ -800,7 +800,19 @@ sub ConvertMIDI($$)
 		}
 	}
 
+	# sort events
 	@allmidievents = sort { $a->[1] <=> $b->[1] or $a->[2] <=> $b->[2] } @allmidievents;
+
+	# find the first interesting event
+	my $shift = [grep { $_->[0] eq 'note_on' } @allmidievents]->[0][1];
+	die "No notes!"
+		unless defined $shift;
+
+	# shift times by first event, no boring waiting
+	$_->[0] = ($_->[0] < $shift ? 0 : $_->[0] - $shift) for @tempi;
+	$_->[1] = ($_->[1] < $shift ? 0 : $_->[1] - $shift) for @allmidievents;
+
+	# fix event list
 
 	my %midinotes = ();
 	my $notes_stuck = 0;
