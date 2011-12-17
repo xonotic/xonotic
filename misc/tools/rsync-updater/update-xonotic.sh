@@ -62,8 +62,10 @@ case `uname`:`uname -m` in
 		excludes="$excludes --exclude=/Xonotic*.app"
 		excludes="$excludes --exclude=/xonotic-osx-*"
 		excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
-		excludes="$excludes --exclude=/xonotic-linux32-*"
-		excludes="$excludes --exclude=/fteqcc/fteqcc.linux32"
+		if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
+			excludes="$excludes --exclude=/xonotic-linux32-*"
+			excludes="$excludes --exclude=/fteqcc/fteqcc.linux32"
+		fi
 		;;
 	Linux:i?86)
 		excludes="$excludes --exclude=/Xonotic*.app"
