@@ -75,7 +75,7 @@ set excludes=%excludes% --exclude=/fteqcc/fteqcc.osx
 
 if "%ProgramFiles(x86)%" == "" goto bit32
 :bit64
-	if "%XONOTIC_INCLUDE_32BIT%" != "" goto endbit
+	if not "%XONOTIC_INCLUDE_32BIT%" == "" goto endbit
 	set excludes=%excludes% --exclude=/xonotic.exe
 	set excludes=%excludes% --exclude=/xonotic-sdl.exe
 	set excludes=%excludes% --exclude=/xonotic-dedicated.exe
