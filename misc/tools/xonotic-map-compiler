@@ -134,6 +134,16 @@ while(@ARGV)
 	{
 		$options->{order} = [split /\s*,\s*/, shift @ARGV];
 	}
+	elsif($_ eq '-sRGB')
+	{
+		push @{$options->{bsp}}, "-sRGBtex", "-sRGBcolor";
+		push @{$options->{light}}, "-sRGBtex", "-sRGBcolor", "-sRGBlight";
+	}
+	elsif($_ eq '-nosRGB')
+	{
+		push @{$options->{bsp}}, "-nosRGBtex", "-nosRGBcolor";
+		push @{$options->{light}}, "-nosRGBtex", "-nosRGBcolor", "-nosRGBlight";
+	}
 	elsif($_ =~ /^--no(-.*)/)
 	{
 		if($curmode eq 'maps')
