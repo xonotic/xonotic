@@ -759,6 +759,7 @@ our %config = (
 	irc_admin_quote_re => "",
 
 	irc_reconnect_delay => 300,
+	irc_commands => "",
 
 	plugins => "",
 );
@@ -1062,10 +1063,17 @@ sub irc_joinstage($)
 			# we get here again when Q asks us
 		}
 	}
+
+	for(split / *; */, $store{irc_commands})
+	{
+		s/\$nick/$store{irc_nick}/g;
+		out irc => 1, $_;
+	}
 	
 	# if we get here, we are on IRC
 	$store{irc_joined_channel} = 1;
 	schedule sub {
+		# wait 1 sec to let stuff calm down
 		out irc => 1, "JOIN $config{irc_channel}";
 	} => 1;
 	return 0;
@@ -1379,7 +1387,10 @@ sub cond($)
 
 		if ($nick eq $store{irc_nick}) {
 			$store{irc_maxlen} = 510 - length($hostmask);
-			$store{irc_joined_channel} = 1;
+			if($store{irc_joined_channel} == 1)
+			{
+				$store{irc_joined_channel} = 2;
+			}
 			print "* detected maximum line length for channel messages: $store{irc_maxlen}\n";
 		}
 
