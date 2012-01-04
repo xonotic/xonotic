@@ -10,7 +10,8 @@ set -e
 : ${do_dds:=true}
 : ${dds_tool:=compressonator-dxtc}
 : ${do_ogg:=false}
-: ${ogg_qual:=1}
+: ${ogg_ogg:=true}
+: ${ogg_qual:=2}
 : ${del_src:=false}
 : ${git_src_repo:=}
 : ${dds_noalpha:=dxt1}
@@ -347,6 +348,11 @@ for F in "$@"; do
 	will_jpeg=$do_jpeg
 	will_dds=$do_dds
 	will_ogg=$do_ogg
+	if ! $ogg_ogg; then
+		case "$f" in
+			*.ogg) will_ogg=false ;;
+		esac
+	fi
 	case "$f" in
 		./sounds/misc/talk*.wav) will_ogg=false ;; # engine "feature"
 		*_bump) will_dds=false ;;

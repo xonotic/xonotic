@@ -1802,7 +1802,8 @@ case "$cmd" in
 		verbose export jpeg_qual_rgb=97
 		verbose export jpeg_qual_a=99
 		verbose export do_dds=false
-		verbose export do_ogg=false
+		verbose export do_ogg=true
+		verbose export ogg_ogg=false
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
@@ -1818,6 +1819,7 @@ case "$cmd" in
 		verbose export do_dds=true
 		verbose export dds_flags=
 		verbose export do_ogg=true
+		verbose export ogg_ogg=false
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
