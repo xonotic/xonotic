@@ -226,7 +226,7 @@ screenshotthemap()
 	(
 		cd ../..
 		if [ -n "$DISPLAY" ]; then
-			misc/tools/xonotic-map-screenshot "$M" $screenshot_override +"scr_screenshot_name \"$M-\""
+			misc/tools/xonotic-map-screenshot "$M" $screenshot_override $DRIVERFLAGS +"scr_screenshot_name \"$M-\""
 		else
 			case "$DRIVER" in
 				gl)
