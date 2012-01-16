@@ -23,6 +23,8 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'sv_cheats 2' \
 	+'sv_gravity 0' \
 	+'r_nolerp 1' \
+	+'sv_clientcommand_antispam_time -999' \
+	+'sv_clientcommand_antispam_count 999' \
 	+'set catchme "catchme_"' \
 	+"alias catchme_$count \"quit\"" \
 	+'alias NARF "sv_cmd nextframe cl_cmd nextframe $*"' \
