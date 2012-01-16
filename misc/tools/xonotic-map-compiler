@@ -137,12 +137,14 @@ while(@ARGV)
 	elsif($_ eq '-sRGB')
 	{
 		push @{$options->{bsp}}, "-sRGBtex", "-sRGBcolor";
-		push @{$options->{light}}, "-sRGBtex", "-sRGBcolor", "-sRGBlight";
+		push @{$options->{light}}, "-sRGBtex", "-sRGBcolor", "-sRGBlight"
+			if defined $options->{light};
 	}
 	elsif($_ eq '-nosRGB')
 	{
 		push @{$options->{bsp}}, "-nosRGBtex", "-nosRGBcolor";
-		push @{$options->{light}}, "-nosRGBtex", "-nosRGBcolor", "-nosRGBlight";
+		push @{$options->{light}}, "-nosRGBtex", "-nosRGBcolor", "-nosRGBlight"
+			if defined $options->{light};
 	}
 	elsif($_ =~ /^--no(-.*)/)
 	{
