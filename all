@@ -587,8 +587,11 @@ case "$cmd" in
 		oldbase=$base
 		oldpushbase=$pushbase
 		# transition old URLs
-		if [ x"$base" = x"ssh://xonotic@push.git.xonotic.org/" ]; then
+		if [ x"$base" = x"ssh://xonotic@git.xonotic.org/" ]; then
 			base=ssh://xonotic@push.git.xonotic.org/
+		fi
+		if [ x"$pushbase" = x"ssh://xonotic@git.xonotic.org/" ]; then
+			pushbase=ssh://xonotic@push.git.xonotic.org/
 		fi
 		while :; do
 			if [ x"$1" = x"-N" ]; then
