@@ -223,6 +223,7 @@ screenshotthemap()
 	fi
 
 	rm -rf ~/.xonotic
+	mkdir -p ~/.xonotic
 	(
 		cd ../..
 		if [ -n "$DISPLAY" ]; then
