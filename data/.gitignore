@@ -1,6 +1,6 @@
 xonotic-*.pk3dir
 *.pk3
-benchmark.log
+*.log
 gfx
 maps
 scripts

@@ -27,17 +27,21 @@ if [ x"$1" != x"--yes" ]; then
 fi
 
 set -x
-rm -f data/benchmark.log
+rm -f data/*.log
 ./all clean --reclone
 ./all compile -r
-USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable || true
-./all clean -r -f
 (
-	cd darkplaces
-	git checkout div0-stable-pred3d9 || git checkout -t origin/div0-stable-pred3d9 || exit 1
-)
-./all compile -r
-USE_GDB=no ./all run "$@" -nohome -benchmarkruns 3 -benchmark demos/the-big-keybench.dem +//div0-stable-pred3d9 || true
+	set -x
+	for e in omg low med normal high ultra ultimate; do
+		USE_GDB=no \
+		./all run \
+			+exec effects-$e.cfg \
+			"$@" \
+			-nohome \
+			-benchmarkruns 4 -benchmarkruns_skipfirst \
+			-benchmark demos/the-big-keybench.dem
+	done
+) >data/engine.log 2>&1
 ./all clean -r -f -u
 set +x
 
@@ -48,7 +52,7 @@ echo " - memory size"
 echo " - graphics card (which vendor, which model)"
 echo " - operating system (including whether it is 32bit or 64bit)"
 echo " - graphics driver version"
-echo " - the following info:"
+echo " - the file "
 cat data/benchmark.log
 echo
 echo "Thank you"
