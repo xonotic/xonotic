@@ -6,7 +6,7 @@ echo "The Big Benchmark"
 echo " ================="
 echo
 echo "WARNING: running this script will destroy ANY local changes you"
-echo "might have on the repository."
+echo "might have on the repository that haven't been pushed yet."
 echo
 if [ x"$1" != x"--yes" ]; then
 	echo "Are you absolutely sure you want to run this?"
