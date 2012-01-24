@@ -52,7 +52,6 @@ echo " - memory size"
 echo " - graphics card (which vendor, which model)"
 echo " - operating system (including whether it is 32bit or 64bit)"
 echo " - graphics driver version"
-echo " - the file "
-cat data/benchmark.log
+echo " - the files benchmark.log and engine.log in the data directory"
 echo
 echo "Thank you"
