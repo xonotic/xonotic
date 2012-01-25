@@ -6,9 +6,8 @@ echo The Big Benchmark
 echo  =================
 echo.
 if not exist all goto nogit
-echo The ./all script was detected here.
-echo Please use the-big-benchmark.sh instead!
-exit
+echo For Git builds, please use the-big-benchmark.sh instead!
+goto end
 :nogit
 del data\benchmark.log
 del data\engine.log
@@ -54,4 +53,5 @@ echo  - graphics driver version
 echo  - the file benchmark.log in the data directory
 echo
 echo Thank you
+:end
 pause
