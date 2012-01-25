@@ -30,8 +30,6 @@ if [ -f ./all ]; then
 	fi
 fi
 
-set -x
-
 rm -f data/benchmark.log
 rm -f data/engine.log
 if [ -f ./all ]; then
@@ -39,11 +37,7 @@ if [ -f ./all ]; then
 	./all compile -r
 	set -- ./all run "$@"
 elif [ -z "$*" ]; then
-	
 	case "`uname`" in
-		MINGW*|Win*)
-			set -- ./xonotic.exe
-			;;
 		Darwin)
 			set -- ./Xonotic.app/Contents/MacOS/xonotic-osx-sdl
 			;;
@@ -53,6 +47,8 @@ elif [ -z "$*" ]; then
 		*)
 			echo "OS not detected. Usage:"
 			echo "  $0 how-to-run-xonotic"
+			echo "On Windows when using a release build or an autobuild,"
+			echo "use the-big-benchmark.bat instead!"
 			exit 1
 			;;
 	esac
