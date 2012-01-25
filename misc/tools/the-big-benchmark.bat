@@ -11,9 +11,10 @@ goto end
 :nogit
 del data\benchmark.log
 del data\engine.log
-if "%1" == "" then goto noarg
+if "%1" == "" goto noarg
 set xonotic=%1
 goto postarg
+:noarg
 if "%ProgramFiles(x86)%" == "" goto bit32
 :bit64
 set xonotic=xonotic-64.exe
