@@ -26,7 +26,7 @@ goto postarg
 echo. > data/engine.log
 echo Engine log follows: >> data/engine.log
 echo  =================== >> data/engine.log
-set p=-nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
+set p=+developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
 echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% >> data/engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% >> data/engine.log 2>&1

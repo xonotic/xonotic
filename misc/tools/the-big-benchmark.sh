@@ -62,6 +62,7 @@ fi
 		USE_GDB=no \
 		"$@" \
 			+exec effects-$e.cfg \
+			+developer 1 \
 			-nohome \
 			-benchmarkruns 4 -benchmarkruns_skipfirst \
 			-benchmark demos/the-big-keybench.dem
