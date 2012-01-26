@@ -52,7 +52,7 @@ echo  - graphics card (which vendor, which model)
 echo  - operating system (including whether it is 32bit or 64bit)
 echo  - graphics driver version
 echo  - the file benchmark.log in the data directory
-echo
+echo.
 echo Thank you
 :end
 pause
