@@ -92,8 +92,12 @@ if "%ProgramFiles(x86)%" == "" goto bit32
 	goto endbit
 :endbit
 
-rsync %options% %excludes% %url% %target%
-chmod -R a+x %target%
+del /s %TEMP%\xonotic-rsync-updater
+mkdir %TEMP%\xonotic-rsync-updater
+for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
+%TEMP%\xonotic-rsync-updater\rsync %options% %excludes% %url% %target%
+%TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
+del /s %TEMP%\xonotic-rsync-updater
 
 :end
 pause
