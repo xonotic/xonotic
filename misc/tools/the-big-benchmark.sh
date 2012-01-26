@@ -2,6 +2,9 @@
 
 set -e
 
+if [ -d "${0%/*}" ]; then
+	cd "${0%/*}"
+fi
 cd ../..
 
 echo "The Big Benchmark"
