@@ -67,6 +67,7 @@ goto xonotic
 :endxonotic
 
 set excludes=
+if not "%XONOTIC_INCLUDE_ALL%" == "" goto endbit
 set excludes=%excludes% --exclude=/xonotic-linux*
 set excludes=%excludes% --exclude=/xonotic-osx-*
 set excludes=%excludes% --exclude=/Xonotic*.app

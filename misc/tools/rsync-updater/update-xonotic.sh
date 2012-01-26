@@ -47,36 +47,38 @@ else
 fi
 
 excludes=
-excludes="$excludes --exclude=/*.exe"
-excludes="$excludes --exclude=/fteqcc/*.exe"
-excludes="$excludes --exclude=/bin32"
-excludes="$excludes --exclude=/*.dll"
-excludes="$excludes --exclude=/bin64"
+if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
+	excludes="$excludes --exclude=/*.exe"
+	excludes="$excludes --exclude=/fteqcc/*.exe"
+	excludes="$excludes --exclude=/bin32"
+	excludes="$excludes --exclude=/*.dll"
+	excludes="$excludes --exclude=/bin64"
 
-case `uname`:`uname -m` in
-	Darwin:*)
-		excludes="$excludes --exclude=/xonotic-linux*"
-		excludes="$excludes --exclude=/fteqcc/fteqcc.linux*"
-		;;
-	Linux:x86_64)
-		excludes="$excludes --exclude=/Xonotic*.app"
-		excludes="$excludes --exclude=/xonotic-osx-*"
-		excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
-		if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
-			excludes="$excludes --exclude=/xonotic-linux32-*"
-			excludes="$excludes --exclude=/fteqcc/fteqcc.linux32"
-		fi
-		;;
-	Linux:i?86)
-		excludes="$excludes --exclude=/Xonotic*.app"
-		excludes="$excludes --exclude=/xonotic-osx-*"
-		excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
-		excludes="$excludes --exclude=/xonotic-linux64-*"
-		excludes="$excludes --exclude=/fteqcc/fteqcc.linux64"
-		;;
-	*)
-		echo >&2 "WARNING: Could not detect architecture - downloading all architectures"
-		;;
-esac
+	case `uname`:`uname -m` in
+		Darwin:*)
+			excludes="$excludes --exclude=/xonotic-linux*"
+			excludes="$excludes --exclude=/fteqcc/fteqcc.linux*"
+			;;
+		Linux:x86_64)
+			excludes="$excludes --exclude=/Xonotic*.app"
+			excludes="$excludes --exclude=/xonotic-osx-*"
+			excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
+			if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
+				excludes="$excludes --exclude=/xonotic-linux32-*"
+				excludes="$excludes --exclude=/fteqcc/fteqcc.linux32"
+			fi
+			;;
+		Linux:i?86)
+			excludes="$excludes --exclude=/Xonotic*.app"
+			excludes="$excludes --exclude=/xonotic-osx-*"
+			excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
+			excludes="$excludes --exclude=/xonotic-linux64-*"
+			excludes="$excludes --exclude=/fteqcc/fteqcc.linux64"
+			;;
+		*)
+			echo >&2 "WARNING: Could not detect architecture - downloading all architectures"
+			;;
+	esac
+fi
 
 rsync $options $excludes "$url" "$target"
