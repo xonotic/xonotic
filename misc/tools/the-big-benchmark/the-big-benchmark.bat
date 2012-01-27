@@ -88,6 +88,13 @@ type data\benchmark.log >> data\the-big-benchmark.log
 
 del data\benchmark.log
 del data\engine.log
+
+if exist data\the-big-benchmark.log goto logisgood
+echo.
+echo The benchmark has been aborted. No log file has been written.
+goto end
+
+:logisgood
 echo.
 echo Please provide the the following info to the Xonotic developers:
 echo  - CPU speed

@@ -69,10 +69,16 @@ for e in omg low med normal high ultra ultimate; do
 	cat data/engine.log >> data/the-big-benchmark.log
 	cat benchmark.log >> data/the-big-benchmark.log
 done
-rm -f data/benchmark.log
-rm -f data/engine.log
 if [ -f ./all ]; then
 	./all clean -r -f -u
+fi
+
+rm -f data/benchmark.log
+rm -f data/engine.log
+if ! [ -f data/the-big-benchmark.log ]; then
+	echo
+	echo "The benchmark has been aborted. No log file has been written."
+	exit
 fi
 
 echo
