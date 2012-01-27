@@ -2,6 +2,10 @@
 
 cd %~dp0
 
+del /s /y %TEMP%\xonotic-rsync-updater
+mkdir %TEMP%\xonotic-rsync-updater
+for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
+
 set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
 if exist Xonotic-low goto xonoticlow
@@ -93,12 +97,12 @@ if "%ProgramFiles(x86)%" == "" goto bit32
 	goto endbit
 :endbit
 
-del /s %TEMP%\xonotic-rsync-updater
+del /s /y %TEMP%\xonotic-rsync-updater
 mkdir %TEMP%\xonotic-rsync-updater
 for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 %TEMP%\xonotic-rsync-updater\rsync %options% %excludes% %url% %target%
 %TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
-del /s %TEMP%\xonotic-rsync-updater
 
 :end
+del /s /y %TEMP%\xonotic-rsync-updater
 pause
