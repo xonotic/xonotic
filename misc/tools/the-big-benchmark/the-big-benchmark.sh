@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -e
 
 if [ -d "${0%/*}" ]; then
 	cd "${0%/*}"
@@ -74,7 +74,6 @@ rm -f data/engine.log
 if [ -f ./all ]; then
 	./all clean -r -f -u
 fi
-set +x
 
 echo
 echo "Please provide the the following info to the Xonotic developers:"
