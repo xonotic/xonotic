@@ -1,11 +1,11 @@
 #!/bin/sh
 
-set -e
+set -ex
 
 if [ -d "${0%/*}" ]; then
 	cd "${0%/*}"
 fi
-cd ../..
+cd ../../..
 
 echo "The Big Benchmark"
 echo " ================="
@@ -33,11 +33,10 @@ if [ -f ./all ]; then
 	fi
 fi
 
-rm -f data/benchmark.log
-rm -f data/engine.log
 if [ -f ./all ]; then
 	./all clean --reclone
 	./all compile -r
+	export USE_GDB=no
 	set -- ./all run "$@"
 elif [ -z "$*" ]; then
 	case "`uname`" in
@@ -56,22 +55,21 @@ elif [ -z "$*" ]; then
 			;;
 	esac
 fi
-(
- 	echo
-	echo "Engine log follows:"
-	echo " ==================="
-	set -x
-	for e in omg low med normal high ultra ultimate; do
-		USE_GDB=no \
-		"$@" \
-			+exec effects-$e.cfg \
-			+developer 1 \
-			-nohome \
-			-benchmarkruns 4 -benchmarkruns_skipfirst \
-			-benchmark demos/the-big-keybench.dem
-	done
-) >data/engine.log 2>&1
-cat data/engine.log >> data/benchmark.log
+rm -f data/the-big-benchmark.log
+rm -f data/benchmark.log
+rm -f data/engine.log
+p="+developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos\the-big-keybench.dem"
+for e in omg low med normal high ultra ultimate; do
+	rm -f data/benchmark.log
+	echo + "$@" +exec effects-$e.cfg $p > data/engine.log
+	"$@" +exec effects-$e.cfg $p >>data/engine.log 2>&1
+	if grep -xF ']quit' data/engine.log >/dev/null; then
+		break
+	fi
+	cat data/engine.log >> data/the-big-benchmark.log
+	cat benchmark.log >> data/the-big-benchmark.log
+done
+rm -f data/benchmark.log
 rm -f data/engine.log
 if [ -f ./all ]; then
 	./all clean -r -f -u
@@ -85,6 +83,6 @@ echo " - memory size"
 echo " - graphics card (which vendor, which model)"
 echo " - operating system (including whether it is 32bit or 64bit)"
 echo " - graphics driver version"
-echo " - the file benchmark.log in the data directory"
+echo " - the file the-big-benchmark.log in the data directory"
 echo
 echo "Thank you"
