@@ -67,7 +67,7 @@ for e in omg low med normal high ultra ultimate; do
 		break
 	fi
 	cat data/engine.log >> data/the-big-benchmark.log
-	cat benchmark.log >> data/the-big-benchmark.log
+	cat data/benchmark.log >> data/the-big-benchmark.log
 done
 if [ -f ./all ]; then
 	./all clean -r -f -u
