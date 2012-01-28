@@ -2,7 +2,7 @@
 
 if "%1" == "did-copy" goto copied
 cd %~dp0
-del /s /q %TEMP%\xonotic-rsync-updater
+rmdir /s /q %TEMP%\xonotic-rsync-updater
 mkdir %TEMP%\xonotic-rsync-updater
 for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 %TEMP%\xonotic-rsync-updater\update-xonotic did-copy
@@ -106,4 +106,4 @@ for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 
 :end
 pause
-del /s /q %TEMP%\xonotic-rsync-updater
+rmdir /s /q %TEMP%\xonotic-rsync-updater
