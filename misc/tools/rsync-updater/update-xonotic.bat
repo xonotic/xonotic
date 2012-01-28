@@ -6,8 +6,6 @@ del /s /q %TEMP%\xonotic-rsync-updater
 mkdir %TEMP%\xonotic-rsync-updater
 for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 %TEMP%\xonotic-rsync-updater\update-xonotic did-copy
-del /s /q %TEMP%\xonotic-rsync-updater
-pause
 exit
 
 :copied
@@ -107,3 +105,5 @@ for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 %TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
 
 :end
+pause
+del /s /q %TEMP%\xonotic-rsync-updater
