@@ -16,68 +16,68 @@ goto postarg
 :noarg
 if "%ProgramFiles(x86)%" == "" goto bit32
 :bit64
-set xonotic=xonotic-64.exe
+set xonotic=xonotic-x64.exe
 goto postarg
 :bit32
 set xonotic=xonotic.exe
 goto postarg
 :postarg
 
-del data\the-big-benchmark.log
-del data\benchmark.log
-del data\engine.log
+if exist data\the-big-benchmark.log del data\the-big-benchmark.log
+if exist data\benchmark.log del data\benchmark.log
+if exist data\engine.log del data\engine.log
 set p=+developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-low.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-low.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-low.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-med.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-med.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-med.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-normal.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-normal.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-normal.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-high.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-high.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-high.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultra.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultra.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultra.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
 
-del data/benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultimate.cfg %p% >> data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultimate.cfg %p% > data\engine.log
 %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultimate.cfg %p% >> data\engine.log 2>&1
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
@@ -86,8 +86,8 @@ type data\benchmark.log >> data\the-big-benchmark.log
 
 :done
 
-del data\benchmark.log
-del data\engine.log
+if exist data\benchmark.log del data\benchmark.log
+if exist data\engine.log del data\engine.log
 
 if exist data\the-big-benchmark.log goto logisgood
 echo.
