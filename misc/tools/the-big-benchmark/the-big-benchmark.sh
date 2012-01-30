@@ -12,7 +12,8 @@ echo " ================="
 echo
 if [ -f ./all ]; then
 	echo "WARNING: running this script will destroy ANY local changes you"
-	echo "might have on the repository that haven't been pushed yet."
+	echo "might have on the repository that haven't been pushed or stored"
+	echo "in a local branch yet."
 	echo
 	if [ x"$1" != x"--yes" ]; then
 		echo "Are you absolutely sure you want to run this?"
@@ -34,7 +35,7 @@ if [ -f ./all ]; then
 fi
 
 if [ -f ./all ]; then
-	./all clean --reclone
+	./all clean -fU -m -r
 	./all compile -r
 	export USE_GDB=no
 	set -- ./all run "$@"
@@ -58,7 +59,7 @@ fi
 rm -f data/the-big-benchmark.log
 rm -f data/benchmark.log
 rm -f data/engine.log
-p="+developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
+p="+r_texture_dds_load 1 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
 for e in omg low med normal high ultra ultimate; do
 	rm -f data/benchmark.log
 	echo + "$@" +exec effects-$e.cfg $p > data/engine.log
@@ -70,7 +71,7 @@ for e in omg low med normal high ultra ultimate; do
 	cat data/benchmark.log >> data/the-big-benchmark.log
 done
 if [ -f ./all ]; then
-	./all clean -r -f -u
+	./all clean -r
 fi
 
 rm -f data/benchmark.log

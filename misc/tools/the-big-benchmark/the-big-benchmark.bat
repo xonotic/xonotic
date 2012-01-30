@@ -26,7 +26,7 @@ goto postarg
 if exist data\the-big-benchmark.log del data\the-big-benchmark.log
 if exist data\benchmark.log del data\benchmark.log
 if exist data\engine.log del data\engine.log
-set p=+developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
+set p=+r_texture_dds_load 1 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
 if exist data\benchmark.log del data\benchmark.log
 echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% > data\engine.log
