@@ -63,7 +63,7 @@ for e in omg low med normal high ultra ultimate; do
 	rm -f data/benchmark.log
 	echo + "$@" +exec effects-$e.cfg $p > data/engine.log
 	"$@" +exec effects-$e.cfg $p >>data/engine.log 2>&1 || true
-	if grep -xF ']quit' data/engine.log >/dev/null; then
+	if grep '\]quit' data/engine.log >/dev/null; then
 		break
 	fi
 	cat data/engine.log >> data/the-big-benchmark.log
