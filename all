@@ -235,6 +235,12 @@ listrepos()
 			$ECHO "$d"
 			continue
 		fi
+		# remove broken clones so they don't mess up stuff
+		if [ x"$d" != x"." ] && [ -d "$d" ] && ! [ -d "$d/.git" ]; then
+			msg "$d exists but has no .git subdir. Probably a broken clone. Deleting."
+			verbose rm -rf "$d"
+			continue
+		fi
 		# if we have the dir, always keep it
 		if [ -d "$d" ]; then
 			msg "Repository $d enabled because it already exists"
