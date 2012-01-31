@@ -1,7 +1,14 @@
 @echo off
 
+if "%1" == "did-copy" goto copied
 cd %~dp0
+rmdir /s /q %TEMP%\xonotic-rsync-updater
+mkdir %TEMP%\xonotic-rsync-updater
+for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
+%TEMP%\xonotic-rsync-updater\update-xonotic did-copy
+exit
 
+:copied
 set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
 if exist Xonotic-low goto xonoticlow
@@ -67,6 +74,7 @@ goto xonotic
 :endxonotic
 
 set excludes=
+if not "%XONOTIC_INCLUDE_ALL%" == "" goto endbit
 set excludes=%excludes% --exclude=/xonotic-linux*
 set excludes=%excludes% --exclude=/xonotic-osx-*
 set excludes=%excludes% --exclude=/Xonotic*.app
@@ -92,8 +100,10 @@ if "%ProgramFiles(x86)%" == "" goto bit32
 	goto endbit
 :endbit
 
-rsync %options% %excludes% %url% %target%
-chmod -R a+x %target%
+for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
+%TEMP%\xonotic-rsync-updater\rsync %options% %excludes% %url% %target%
+%TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
 
 :end
 pause
+rmdir /s /q %TEMP%\xonotic-rsync-updater

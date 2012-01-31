@@ -919,7 +919,7 @@ sub irc_error()
 		$store{irc_nick} = "";
 		schedule sub {
 			my ($timer) = @_;
-			out dp => 0, 'sv_cmd bans', 'status 1', 'log_dest_udp';
+			out dp => 0, 'sv_cmd banlist', 'status 1', 'log_dest_udp';
 			$store{status_waiting} = -1;
 		} => 1;
 		# this will clear irc_error_active
@@ -1775,7 +1775,7 @@ out dp => 0, 'echo "Unknown command \"rcon2irc_eval\""'; # assume the server has
 # not containing our own IP:port, or by rcon2irc_eval not being a defined command).
 schedule sub {
 	my ($timer) = @_;
-	out dp => 0, 'sv_cmd bans', 'status 1', 'log_dest_udp', 'rcon2irc_eval set dummy 1';
+	out dp => 0, 'sv_cmd banlist', 'status 1', 'log_dest_udp', 'rcon2irc_eval set dummy 1';
 	$store{status_waiting} = -1;
 	schedule $timer => (exists $store{dp_hostname} ? $config{dp_status_delay} : 1);;
 } => 1;

@@ -593,8 +593,11 @@ case "$cmd" in
 		oldbase=$base
 		oldpushbase=$pushbase
 		# transition old URLs
-		if [ x"$base" = x"ssh://xonotic@push.git.xonotic.org/" ]; then
+		if [ x"$base" = x"ssh://xonotic@git.xonotic.org/" ]; then
 			base=ssh://xonotic@push.git.xonotic.org/
+		fi
+		if [ x"$pushbase" = x"ssh://xonotic@git.xonotic.org/" ]; then
+			pushbase=ssh://xonotic@push.git.xonotic.org/
 		fi
 		while :; do
 			if [ x"$1" = x"-N" ]; then
@@ -1673,8 +1676,8 @@ case "$cmd" in
 		rm -f Xonotic/key_15.d0pk
 		{
 			verbose cd Xonotic/mapping
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110819.tar.bz2
-			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20110819-win32-7z.exe
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120114.tar.bz2
+			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120114-win32-7z.exe
 			for X in *-7z.exe; do
 				7za x "$X"
 				rm -f "$X"
@@ -1808,7 +1811,8 @@ case "$cmd" in
 		verbose export jpeg_qual_rgb=97
 		verbose export jpeg_qual_a=99
 		verbose export do_dds=false
-		verbose export do_ogg=false
+		verbose export do_ogg=true
+		verbose export ogg_ogg=false
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
@@ -1824,6 +1828,7 @@ case "$cmd" in
 		verbose export do_dds=true
 		verbose export dds_flags=
 		verbose export do_ogg=true
+		verbose export ogg_ogg=false
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
