@@ -202,6 +202,7 @@ Here is an example entry in a .ent file that includes colored text and 3 teams:
 "model" "models/domination/dom_red.md3"
 }
 {
+"classname" "dom_team"
 "netname" "^3Yellow Team"
 "cnt" "12"
 "noise" ""
@@ -209,6 +210,7 @@ Here is an example entry in a .ent file that includes colored text and 3 teams:
 "model" "models/domination/dom_yellow.md3"
 }
 {
+"classname" "dom_team"
 "netname" "^6Pink Team"
 "cnt" "9"
 "noise" ""
