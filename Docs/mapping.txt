@@ -112,7 +112,7 @@ Gametype        | Syntax                                                        
 Deathmatch      | gametype dm [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
 Team Deathmatch | gametype tdm [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams
 Domination      | gametype dom [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams, only if map has no dom_team ents
-CTF             | gametype ctf [timelimit=...] [pointlimit=...] [caplimit=...] [leadlimit=...]                             | pointlimit if g_ctf_win_mode is 2, otherwise caplimit
+CTF             | gametype ctf [timelimit=...] [caplimit=...] [leadlimit=...]                                              |
 Runematch       | gametype rune [timelimit=...] [pointlimit=...] [leadlimit=...]                                           |
 LMS             | gametype lms [timelimit=...] [lives=...] [leadlimit=...]                                                 |
 Arena           | gametype arena [timelimit=...] [pointlinit=...] [leadlimit=...]                                          |
@@ -122,7 +122,9 @@ Onslaught       | gametype ons [timelimit=...]                                  
 Race            | gametype rc [timelimit=...] [qualifying_timelimit=...] [laplimit=...] [teamlaplimit=...] [leadlimit=...] | g_race_teams: teamlaplimit is used instead of laplimit
 CTS             | gametype cts [timelimit=...] [skill=...]                                                                 | never uses points
 CA              | gametype ca [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
-Nexball         | gametype dm [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
+Nexball         | gametype nb [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
+Freeze Tag      | gametype ft [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 |
+Keepaway        | gametype ka [timelimit=...] [pointlimit=...]                                                             |
 
 
 ===============
