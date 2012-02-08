@@ -1,9 +1,12 @@
 #!/bin/sh
 
 path=`dirname "${0}"`
-link=`readlink "${0}"`
 
-[ -n "${link}" ] && path=`dirname "${link}"`
+# (we cannot follow symlinks here, since we
+#  link -sdl.sh and -dedicated.sh to -glx.sh)
+#link=`readlink "${0}"`
+#[ -n "${link}" ] && path=`dirname "${link}"`
+
 cd "${path}"
 
 case "${0##*/}" in
