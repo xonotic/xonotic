@@ -5,10 +5,14 @@ cd %~dp0
 rmdir /s /q %TEMP%\xonotic-rsync-updater
 mkdir %TEMP%\xonotic-rsync-updater
 for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
-%TEMP%\xonotic-rsync-updater\update-xonotic did-copy
+%TEMP%\xonotic-rsync-updater\%~n0 did-copy
 exit
 
 :copied
+
+set buildtype=release
+if "%~n0" == "update-to-autobuild" set buildtype=autobuild
+
 set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
 if exist Xonotic-low goto xonoticlow
@@ -17,11 +21,11 @@ if exist ..\..\..\.git goto xonoticdatagit
 if exist ..\..\..\data goto xonoticdata
 goto xonotic
 :xonoticlow
-	set url=rsync://beta.xonotic.org/autobuild-Xonotic-low/
+	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
 	set target=Xonotic-low/
 	goto endxonotic
 :xonotichigh
-	set url=rsync://beta.xonotic.org/autobuild-Xonotic-high/
+	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
 	set target=Xonotic-high/
 	goto endxonotic
 :xonoticdatagit
@@ -44,31 +48,31 @@ goto xonotic
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatalow
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic-low/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
 		goto endxonoticdata
 :xonoticdatalowfuzzy
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic-low/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
 		set options=%options% -y
 		goto endxonoticdata
 :xonoticdatahigh
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic-high/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
 		goto endxonoticdata
 :xonoticdatahighfuzzy
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic-high/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
 		set options=%options% -y
 		goto endxonoticdata
 :xonoticdatanormal
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 		goto endxonoticdata
 :xonoticdatanormalfuzzy
-		set url=rsync://beta.xonotic.org/autobuild-Xonotic/
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 		set options=%options% -y
 		goto endxonoticdata
 :endxonoticdata
 	set target=./
 	goto endxonotic
 :xonotic
-	set url=rsync://beta.xonotic.org/autobuild-Xonotic/
+	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 	set target=Xonotic/
 	goto endxonotic
 :endxonotic
