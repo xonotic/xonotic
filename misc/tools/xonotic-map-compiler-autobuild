@@ -238,7 +238,7 @@ screenshotthemap()
 					;;
 			esac
 		fi
-	) >~/.xonotic/autoscreenshot.log 2>&1
+	) 2>&1
 	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
 		if [ -n "$IRCSPAM" ]; then
 			#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
