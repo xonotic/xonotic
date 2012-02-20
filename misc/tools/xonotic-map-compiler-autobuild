@@ -238,19 +238,16 @@ screenshotthemap()
 					;;
 			esac
 		fi
-	) >~/.xonotic/autoscreenshot.log 2>&1
-	if ! mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
-		if [ -n "$IRCSPAM" ]; then
-			#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
-			ss2spam "$M" "$url?d" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
-		fi
-		return 1
-	fi
-	mv ~/.xonotic/autoscreenshot.log "$M-$blobhash"/ || true
-	if [ -n "$IRCSPAM" ]; then
-		#ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 0 > "maps/$M.ircss"
+	) 2>&1 | tee ~/.xonotic/autoscreenshot.log
+	good=false
+	if mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
 		ss2spam "$M" "$url?d" "$REFNAME" "$commithash" 0 > "maps/$M.ircss"
+	else
+		mkdir "$M-$blobhash"
+		ss2spam "$M" "$url?d" "$REFNAME" "$commithash" 1 > "maps/$M.ircss"
 	fi
+	mv "maps/$M.ircss" "$M-$blobhash"/
+	mv ~/.xonotic/autoscreenshot.log "$M-$blobhash"/ || mkdir -p "$M-$blobhash"
 	chmod 1777 "$M-$blobhash"
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
@@ -258,6 +255,7 @@ screenshotthemap()
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "maps/$M.ircss"
 	fi
+	return 1
 }
 
 getthemap()
