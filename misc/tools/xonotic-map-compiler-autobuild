@@ -253,7 +253,7 @@ screenshotthemap()
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
-		$IRCSPAM < "maps/$M.ircss"
+		$IRCSPAM < "$M-$blobhash/$M.ircss"
 	fi
 	return 1
 }
