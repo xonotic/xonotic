@@ -13,8 +13,9 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'locksession 0' \
 	+'scr_screenshot_timestamp 0' \
 	+'vid_fullscreen 0' \
-	+'exec effects-high.cfg' \
+	+'exec effects-ultra.cfg' \
 	"$@" \
+	+'sv_precacheplayermodels 0' \
 	+'r_motionblur 0' \
 	+'r_damageblur 0' \
 	+'r_letterbox -1' \
