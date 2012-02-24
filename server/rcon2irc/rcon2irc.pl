@@ -752,6 +752,7 @@ our %config = (
 	dp_server_from_wan => "",
 	dp_listen_from_server => "", 
 	dp_utf8_enable => $color_utf8_enable,
+	dp_timinglog => "",
 	irc_local => "",
 
 	irc_admin_password => "",
@@ -1728,6 +1729,15 @@ sub cond($)
 		my ($all, $cpu, $lost, $avg, $max, $sdev) = @_;
 		return 0 # don't complain when just on the voting screen
 			if !$store{playing};
+		if(length $config{dp_timinglog})
+		{
+			open my $fh, '>>', $config{dp_timinglog}
+				or warn "open >> $config{dp_timinglog}: $!";
+			print $fh "@{[time]} $cpu $lost $avg $max $sdev\n"
+				or warn "print >> $config{dp_timinglog}: $!";
+			close $fh
+				or warn "close >> $config{dp_timinglog}: $!";
+		}
 		return 0 # don't complain if it was less than 0.5%
 			if $lost < 0.5;
 		return 0 # don't complain if nobody is looking
