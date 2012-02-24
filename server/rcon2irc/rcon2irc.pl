@@ -1733,7 +1733,7 @@ sub cond($)
 		{
 			open my $fh, '>>', $config{dp_timinglog}
 				or warn "open >> $config{dp_timinglog}: $!";
-			print $fh "@{[time]} $cpu $lost $avg $max $sdev\n"
+			print $fh "@{[time]} $cpu $lost $avg $max $sdev $store{slots_active}\n"
 				or warn "print >> $config{dp_timinglog}: $!";
 			close $fh
 				or warn "close >> $config{dp_timinglog}: $!";
