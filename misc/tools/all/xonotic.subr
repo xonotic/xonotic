@@ -1,0 +1,311 @@
+handled=true
+case "$cmd" in
+	update-maps)
+		misc/tools/xonotic-map-compiler-autobuild download
+		;;
+	compile)
+		cleand0=false
+		cleandp=false
+		cleanqcc=false
+		cleanqc=false
+		compiled0=false
+		debug=debug
+		snowleopardhack=false
+		if [ -z "$CC" ]; then
+			export CC="gcc"
+		fi
+		export CC="$CC -DSUPPORTIPV6"
+		while :; do
+			case "$1" in
+				-0)
+					compiled0=true
+					shift
+					;;
+				-c)
+					cleand0=true
+					cleandp=true
+					cleanqcc=true
+					cleanqc=true
+					shift
+					;;
+				-r|-p)
+					case "$1" in
+						-p)
+							debug=profile
+							;;
+						-r)
+							debug=release
+							;;
+					esac
+					export CC="$CC -g"
+					case "`$CC -dumpversion`" in
+						[5-9]*|[1-9][0-9]*|4.[3-9]*|4.[1-9][0-9]*)
+							# gcc 4.3 or higher
+							# -march=native is broken < 4.3
+							if $CC -mtune=native -march=native misc/tools/conftest.c -o conftest >/dev/null 2>&1; then
+								export CC="$CC -mtune=native -march=native"
+							fi
+							;;
+					esac
+					if [ -n "$WE_HATE_OUR_USERS" ]; then
+						export CC="$CC -fno-common"
+					fi
+					shift
+					;;
+				*)
+					break
+					;;
+			esac
+		done
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			TARGETS="sv-$debug cl-$debug"
+		elif [ x"`uname`" = x"Darwin" ]; then
+			case "`uname -r`" in
+				?.*)
+					TARGETS="sv-$debug cl-$debug sdl-$debug"
+					;;
+				*)
+					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
+					snowleopardhack=true
+					TARGETS="sv-$debug sdl-$debug"
+					;;
+			esac
+			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
+		else
+			TARGETS="sv-$debug cl-$debug sdl-$debug"
+		fi
+		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
+			# if we give the command make the arg "", it will surely fail (invalid filename),
+			# so better handle it as an empty client option
+			BAD_TARGETS=" "
+			shift
+		elif [ -n "$1" ]; then
+			BAD_TARGETS=
+			TARGETS_SAVE=$TARGETS
+			TARGETS=
+			for X in $1; do
+				case "$X" in
+					sdl)
+						TARGETS="$TARGETS sdl-debug"
+						;;
+					agl)
+						TARGETS="$TARGETS cl-debug"
+						if $snowleopardhack; then
+							export CC="$CC -arch i386"
+						fi
+						;;
+					glx|wgl)
+						TARGETS="$TARGETS cl-debug"
+						;;
+					dedicated)
+						TARGETS="$TARGETS sv-debug"
+						;;
+					*)
+						BAD_TARGETS="$BAD_TARGETS $X"
+						;;
+				esac
+			done
+			if [ -n "$TARGETS" ]; then # at least a valid client
+				shift
+			else # no valid client, let's assume this option is not meant to be a client then
+				TARGETS=$TARGETS_SAVE
+				BAD_TARGETS=
+			fi
+		fi
+		if [ -z "$MAKEFLAGS" ]; then
+			if [ -f /proc/cpuinfo ]; then
+				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo || true`+0))
+				if [ $ncpus -gt 1 ]; then
+					MAKEFLAGS=-j$ncpus
+				fi
+			fi
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw LIB_JPEG= CFLAGS_LIBJPEG="
+			fi
+		fi
+
+		
+		if ! verbose $CC misc/tools/conftest.c -o conftest; then
+			msg ""
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~ COMPILER ~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~_...._~~~~~~~~~~"
+			msg "~~~~~~~~~~~,-'     \\\`-._~~~~~~"
+			msg "~~~~~~~~~~/     --. ><  \\~~~~~"
+			msg "~~~~~~~~~/      (*)> -<: \\~~~~"
+			msg "~~~~~~~~~(     ^~-'  (*) )~~~~"
+			msg "~~~~~~~~~\\        ^+-_/  |~~~~"
+			msg "~~~~~~~~~~\\       {vvv}  |~~~~"
+			msg "~~~~~~~~~~,\\    , {^^^},/~~~~~"
+			msg "~~~~~~~~,/  \`---.....-'~~W~~~~"
+			msg "~~~~~~,/   \\_____/_\\_W~~/~~~~~"
+			msg "~~~~~/          /~~~\\__/~~~~~~"
+			msg "~~~~/          /~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~ Y U NO COMPILE ~~~~~~~"
+			msg "~~~~~~~~~~~~ CODE ~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg ""
+			exit 1
+		fi
+		rm -f conftest
+
+		verbose cd "$d0/d0_blind_id"
+		if ! $compiled0; then
+			# compilation of crypto library failed
+			# use binaries then, if we can...
+			mkdir -p .libs
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libd0_rijndael"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+			else
+				case "`uname`" in
+					Linux)
+						case `uname -m` in
+							x86_64)
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
+								;;
+							*86)
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
+								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
+								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
+								;;
+							*)
+								compiled0=true
+								;;
+						esac
+						;;
+					Darwin)
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
+						;;
+					*)
+						compiled0=true
+						;;
+				esac
+			fi
+		fi
+		if $compiled0; then
+			if $cleand0; then
+				if [ -f Makefile ]; then
+					verbose make $MAKEFLAGS distclean
+				fi
+			fi
+			if ! [ -f Makefile ]; then
+				verbose sh autogen.sh
+				verbose ./configure
+			fi
+			verbose make $MAKEFLAGS
+		fi
+
+		verbose cd "$d0/fteqcc"
+		if $cleanqcc; then
+			verbose make $MAKEFLAGS clean
+		fi
+		verbose make $MAKEFLAGS
+
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		if $cleanqc; then
+			verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
+		fi
+		verbose make FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
+
+		verbose cd "$d0/darkplaces"
+		if [ x"$BAD_TARGETS" = x" " ]; then
+			$ECHO "Warning: invalid empty client, default clients will be used."
+		fi
+		if $cleandp; then
+			verbose make $MAKEFLAGS clean
+		fi
+		for T in $TARGETS; do
+			verbose make $MAKEFLAGS STRIP=: "$@" "$T"
+		done
+		for T in $BAD_TARGETS; do
+			$ECHO "Warning: discarded invalid client $T."
+		done
+
+		verbose "$SELF" update-maps
+		;;
+	run)
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			client=
+			export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
+		elif [ x"`uname`" = x"Darwin" ]; then
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS:$d0/d0_blind_id/.libs"
+			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
+			client=-sdl
+		else
+			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
+			client=-sdl
+		fi
+		case "$1" in
+			sdl|glx|agl|dedicated)
+				client=-$1
+				shift
+				;;
+			wgl)
+				client=
+				shift
+				;;
+		esac
+		if ! [ -x "darkplaces/darkplaces$client" ]; then
+			if [ -x "darkplaces/darkplaces$client.exe" ]; then
+				client=$client.exe
+			else
+				$ECHO "Client darkplaces/darkplaces$client not found, aborting"
+				exit 1
+			fi
+		fi
+		set -- "darkplaces/darkplaces$client" -xonotic "$@"
+
+		# if pulseaudio is running: USE IT
+		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
+			if ps -C pulseaudio >/dev/null; then
+				if ldd /usr/lib/libSDL.so 2>/dev/null | grep pulse >/dev/null; then
+					export SDL_AUDIODRIVER=pulse
+				fi
+			fi
+		fi
+
+		binary=$1
+
+		if [ x"$USE_GDB" = x"yes" ]; then
+			set -- gdb --args "$@"
+		elif [ x"$USE_GDB" = x"core" ] && which gdb >/dev/null 2>&1; then
+			set -- gdb --batch -x savecore.gdb --args "$@"
+		elif which catchsegv >/dev/null 2>&1; then
+			set -- catchsegv "$@"
+		fi
+		rm -f xonotic.core
+		"$@" || true
+		if [ -f xonotic.core ]; then
+			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
+				gdb "$binary" xonotic.core
+			#elif yesno "You did not want to examine the core dump. Do you want to provide it - including your DarkPlaces checkout - to the Xonotic developers?"; then
+			#	tar cvzf xonotic.core.tar.gz xonotic.core darkplaces/*.c darkplaces/*.h
+			#	# somehow send it
+			#	rm -f xonotic.core.tar.gz
+			else
+				$ECHO "The core dump can be examined later by"
+				$ECHO "  gdb $binary xonotic.core"
+			fi
+			exit 1
+		fi
+		;;
+	help)
+		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|agl|dedicated]"
+		$ECHO "  $SELF update-maps"
+		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		handled=false
+		;;
+	*)
+		handled=false
+		;;
+esac
