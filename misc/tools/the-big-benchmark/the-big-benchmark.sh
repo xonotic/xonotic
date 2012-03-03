@@ -59,7 +59,7 @@ fi
 rm -f data/the-big-benchmark.log
 rm -f data/benchmark.log
 rm -f data/engine.log
-p="+r_texture_dds_load 1 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
+p="+r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
 for e in omg low med normal high ultra ultimate; do
 	rm -f data/benchmark.log
 	echo + "$@" +exec effects-$e.cfg $p > data/engine.log
