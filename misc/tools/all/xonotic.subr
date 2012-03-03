@@ -113,11 +113,9 @@ case "$cmd" in
 			fi
 		fi
 		if [ -z "$MAKEFLAGS" ]; then
-			if [ -f /proc/cpuinfo ]; then
-				ncpus=$((`grep -c '^processor	:' /proc/cpuinfo || true`+0))
-				if [ $ncpus -gt 1 ]; then
-					MAKEFLAGS=-j$ncpus
-				fi
+			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+			if [ $ncpus -gt 1 ]; then
+				MAKEFLAGS=-j$ncpus
 			fi
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
 				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw LIB_JPEG= CFLAGS_LIBJPEG="
