@@ -660,6 +660,9 @@ case "$cmd" in
 					bra=`git config "branch.$r.merge" || $ECHO "$r"`
 					upstream="$rem/${bra#refs/heads/}"
 					if $fetchupstream; then
+						for t in `git tag`; do
+							verbose git tag -d "$t"
+						done
 						verbose git fetch "$rem"
 						verbose git remote prune "$rem"
 					fi
