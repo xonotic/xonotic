@@ -172,7 +172,7 @@ buildthemap()
 	git checkout -f "$commithash"
 
 	if [ -n "$IRCSPAM" ]; then
-		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM
+		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM || true
 	fi
 	t0=`date +%s`
 	(
@@ -202,7 +202,7 @@ buildthemap()
 	rsync -vaSHP "$M-$blobhash.pk3" "$M-full-$blobhash.pk3" "$url_ssh"
 	rsync -vaSHP "$M.pk3" "$M-full.pk3" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
-		$IRCSPAM < "maps/$M.irc"
+		$IRCSPAM < "maps/$M.irc" || true
 	fi
 }
 
@@ -253,7 +253,7 @@ screenshotthemap()
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
-		$IRCSPAM < "$M-$blobhash/$M.ircss"
+		$IRCSPAM < "$M-$blobhash/$M.ircss" || true
 	fi
 }
 
