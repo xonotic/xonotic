@@ -660,7 +660,7 @@ case "$cmd" in
 					bra=`git config "branch.$r.merge" || $ECHO "$r"`
 					upstream="$rem/${bra#refs/heads/}"
 					if $fetchupstream; then
-						for t in `git tag`; do
+						for t in `git tag -l "xonotic-v"*`; do
 							verbose git tag -d "$t"
 						done
 						verbose git fetch "$rem"
