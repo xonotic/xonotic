@@ -95,6 +95,14 @@ release_common()
 		archive=$1; shift
 		zip -0ry "$archive" "$@"
 	}
+	getversion()
+	{
+		gv=`grep "^gameversion " "$1/defaultXonotic.cfg" | awk '{ print $2 }'`
+		major=$(($gv / 10000))
+		minor=$((($gv / 100) - ($major * 100)))
+		patch=$(($gv - ($major * 10000) - ($minor * 100)))
+		versionstr="$major.$minor.$patch"
+	}
 }
 
 handled=true
@@ -148,6 +156,8 @@ case "$cmd" in
 				;;
 			release)
 				msg "Building a FINISHED RELEASE"
+				getversion data/xonotic-data.pk3dir
+				verbose "$SELF" each -k git tag -m "TEMP TAG" -f "xonotic-v$versionstr"
 				;;
 			*)
 				msg "Building a $RELEASETYPE"
@@ -432,11 +442,7 @@ case "$cmd" in
 			verbose cp ../source/csprogs.dat .
 			verbose cp ../source/menu.dat .
 			verbose rm -rf qcsrc
-			gv=`grep "^gameversion " "defaultXonotic.cfg" | awk '{ print $2 }'`
-			major=$(($gv / 10000))
-			minor=$((($gv / 100) - ($major * 100)))
-			patch=$(($gv - ($major * 10000) - ($minor * 100)))
-			versionstr="$major.$minor.$patch"
+			getversion .
 			case "$RELEASETYPE" in
 				release)
 					;;
