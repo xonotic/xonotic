@@ -52,16 +52,8 @@ release_common()
 	mkzipr()
 	{
 		archive=$1; shift
-		case "$RELEASETYPE" in
-			release)
-				sevenzipflags=-mx=9
-				zipflags=-9
-				;;
-			*)
-				sevenzipflags=-mx=1
-				zipflags=-1
-				;;
-		esac
+		sevenzipflags=-mx=9
+		zipflags=-9
 		find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
 		ziplist=`mktemp`
 		find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
@@ -73,16 +65,8 @@ release_common()
 	mkzip()
 	{
 		archive=$1; shift
-		case "$RELEASETYPE" in
-			release)
-				sevenzipflags=-mx=9
-				zipflags=-9
-				;;
-			*)
-				sevenzipflags=-mx=1
-				zipflags=-1
-				;;
-		esac
+		sevenzipflags=-mx=9
+		zipflags=-9
 		ziplist=`mktemp`
 		find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
 		7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
