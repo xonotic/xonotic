@@ -568,6 +568,7 @@ case "$cmd" in
 			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
+			Xonotic/source/d0_blind_id/ \
 			Xonotic/source/fteqcc/ \
 			Xonotic/source/qcsrc/ \
 			Xonotic/Docs \
@@ -579,6 +580,7 @@ case "$cmd" in
 			Xonotic/data/font-xolonium-$stamp.pk3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
 		verbose mkzip Xonotic-$stamp-source.zip \
+			Xonotic/source/d0_blind_id/ \
 			Xonotic/source/fteqcc/ \
 			Xonotic/source/qcsrc/ \
 			Xonotic/misc/logos
