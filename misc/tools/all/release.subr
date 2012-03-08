@@ -532,12 +532,12 @@ case "$cmd" in
 		;;
 	release-pack)
 		release_common
-		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir                  raw ''
-		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir                     raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir       normal '-high'        low '-low' normaldds ''
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir       normal '-high'        low '-low' normaldds '' mapping '-mapping'
-		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir                     raw '' low '-low'
-		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir  normal '-high'                   normaldds ''
+		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir  raw ''
+		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping'
+		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw '' low '-low'
+		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                   normaldds ''
 		;;
 	release-pack-needsx11)
 		release_common
@@ -600,19 +600,11 @@ case "$cmd" in
 			Xonotic/data/xonotic-$pk3stamp-maps.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-nexcompat.pk3
-		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
+		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
 		verbose mkzip0 Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$pk3stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-maps-low.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-music-low.pk3
-		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
-		verbose mkzip Xonotic-$stamp-high.zip \
-			Xonotic/mapping
-		verbose mkzip0 Xonotic-$stamp-high.zip \
-			Xonotic/data/xonotic-$pk3stamp-data-high.pk3 \
-			Xonotic/data/xonotic-$pk3stamp-maps-high.pk3 \
-			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
-			Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3
 		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
