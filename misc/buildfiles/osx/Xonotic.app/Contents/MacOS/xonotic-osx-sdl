@@ -7,8 +7,8 @@ export DYLD_LIBRARY_PATH="${0%/*}"
 set -- "$0"-bin "$@" -notexturenonpoweroftwo
 
 case "`sw_vers -productVersion`" in
-	# OSX Lion has problems with SDL and running fullscreen, hence we force windowed mode
-	10.7.[0-9]*)
+	# OSX Lion up to 10.7.2 has problems with SDL and running fullscreen, hence we force windowed mode
+	10.7.[0-2])
 		exec "$@" +vid_fullscreen 0
 		;;
 	# shell pattern for "10.6 and higher"
