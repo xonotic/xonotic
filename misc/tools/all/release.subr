@@ -512,16 +512,16 @@ case "$cmd" in
 		;;
 	release-buildpk3s)
 		release_common
-		stamp=`cat Xonotic/pk3stamp.txt`
+		pk3stamp=`cat Xonotic/pk3stamp.txt`
 		src=$1
 		shift
 		dst=${src%.pk3dir}
 		case "$dst" in
 			data/xonotic-*)
-				dst="data/xonotic-$stamp-${dst#data/xonotic-}"
+				dst="data/xonotic-$pk3stamp-${dst#data/xonotic-}"
 				;;
 			*)
-				dst="$dst-$stamp"
+				dst="$dst-$pk3stamp"
 				;;
 		esac
 		while [ "$#" -gt 1 ]; do
@@ -553,6 +553,7 @@ case "$cmd" in
 	release-zip)
 		release_common
 		stamp=`cat Xonotic/stamp.txt`
+		pk3stamp=`cat Xonotic/pk3stamp.txt`
 		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
 		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
 		# let's pass crypto import laws of some nasty countries
@@ -585,8 +586,8 @@ case "$cmd" in
 			Xonotic/fteqcc \
 			Xonotic/server \
 			Xonotic/key_0.d0pk \
-			Xonotic/data/font-nimbussansl-$stamp.pk3 \
-			Xonotic/data/font-xolonium-$stamp.pk3
+			Xonotic/data/font-nimbussansl-$pk3stamp.pk3 \
+			Xonotic/data/font-xolonium-$pk3stamp.pk3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
 		verbose mkzip Xonotic-$stamp-source.zip \
 			Xonotic/source/d0_blind_id/ \
@@ -595,27 +596,27 @@ case "$cmd" in
 			Xonotic/misc/logos
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp.zip
 		verbose mkzip0 Xonotic-$stamp.zip \
-			Xonotic/data/xonotic-$stamp-data.pk3 \
-			Xonotic/data/xonotic-$stamp-maps.pk3 \
-			Xonotic/data/xonotic-$stamp-music.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat.pk3
+			Xonotic/data/xonotic-$pk3stamp-data.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-maps.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-nexcompat.pk3
 		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
 		verbose mkzip0 Xonotic-$stamp-low.zip \
-			Xonotic/data/xonotic-$stamp-data-low.pk3 \
-			Xonotic/data/xonotic-$stamp-maps-low.pk3 \
-			Xonotic/data/xonotic-$stamp-music-low.pk3
+			Xonotic/data/xonotic-$pk3stamp-data-low.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-maps-low.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-music-low.pk3
 		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-high.zip
 		verbose mkzip Xonotic-$stamp-high.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-high.zip \
-			Xonotic/data/xonotic-$stamp-data-high.pk3 \
-			Xonotic/data/xonotic-$stamp-maps-high.pk3 \
-			Xonotic/data/xonotic-$stamp-music.pk3 \
-			Xonotic/data/xonotic-$stamp-nexcompat-high.pk3
+			Xonotic/data/xonotic-$pk3stamp-data-high.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-maps-high.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
+			Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3
 		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
-			Xonotic/data/xonotic-$stamp-maps-mapping.pk3
+			Xonotic/data/xonotic-$pk3stamp-maps-mapping.pk3
 		;;
 	release)
 		release_common
