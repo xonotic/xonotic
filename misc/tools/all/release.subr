@@ -167,8 +167,17 @@ case "$cmd" in
 		verbose mkdir -p Xonotic
 		if [ -n "$RELEASEDATE" ]; then
 			verbose $ECHO "$RELEASEDATE" > Xonotic/stamp.txt
+			case "$RELEASETYPE" in
+				release)
+					verbose $ECHO "${RELEASEDATE%_*}" > Xonotic/pk3stamp.txt
+					;;
+				*)
+					verbose $ECHO "$RELEASEDATE" > Xonotic/pk3stamp.txt
+					;;
+			esac
 		else
 			verbose date +%Y%m%d > Xonotic/stamp.txt
+			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
 		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
@@ -503,7 +512,7 @@ case "$cmd" in
 		;;
 	release-buildpk3s)
 		release_common
-		stamp=`cat Xonotic/stamp.txt`
+		stamp=`cat Xonotic/pk3stamp.txt`
 		src=$1
 		shift
 		dst=${src%.pk3dir}
