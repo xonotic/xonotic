@@ -148,23 +148,25 @@ case "$output" in
 		;;
 	*)
 		rm -f "$output"
-		echo "$result" | while IFS= read -r line; do
-			echo >&2 "extracting $line..."
-			dline=./$line
-			mkdir -p "$tempdir/${dline%/*}"
-			unzip -p "$to" "$line" > "$tempdir/$line" # this may create an empty file - don't care, DP handles this as deletion
-		done
-		case "$output" in
-			/*)
-				;;
-			*)
-				output=`pwd`/$output
-				;;
-		esac
-		cd "$tempdir"
-		#zip -9r "$output" .
-		7za a -tzip -mx=9 "$output" .
-		cd ..
+		if [ -n "$result" ]; then
+			echo "$result" | while IFS= read -r line; do
+				echo >&2 "extracting $line..."
+				dline=./$line
+				mkdir -p "$tempdir/${dline%/*}"
+				unzip -p "$to" "$line" > "$tempdir/$line" # this may create an empty file - don't care, DP handles this as deletion
+			done
+			case "$output" in
+				/*)
+					;;
+				*)
+					output=`pwd`/$output
+					;;
+			esac
+			cd "$tempdir"
+			#zip -9r "$output" .
+			7za a -tzip -mx=9 "$output" .
+			cd ..
+		fi
 		;;
 esac
 

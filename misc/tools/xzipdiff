@@ -1,0 +1,52 @@
+#!/bin/sh
+
+from=$1
+to=$2
+output=$3
+case "$from" in /*) ;; *) from=`pwd`/$from ;; esac
+case "$to" in /*) ;; *) to=`pwd`/$to ;; esac
+case "$output" in /*) ;; *) output=`pwd`/$output ;; esac
+
+excludes="
+	data/xonotic-*-data.pk3
+	data/xonotic-*-maps.pk3
+	data/xonotic-*-music.pk3
+	data/xonotic-*-nexcompat.pk3
+"
+
+makepatchname()
+{
+	wildcard=$1
+	fromname=$2
+	toname=$3
+	prefix=${wildcard##*\*}
+	suffix=${wildcard%\**}
+	fromversion=${fromname#$prefix}
+	fromversion=${fromversion%$suffix}
+	toversion=${fromname#$prefix}
+	toversion=${fromversion%$suffix}
+	echo "$prefix$fromversion"patch"$toversion$suffix"
+}
+
+zipdiff -f "$from" -t "$to" -o "$output" -x "$excludes"
+
+tempdir=`mktemp -d -t zipdiff.XXXXXX`
+cd "$tempdir"
+
+for x in $excludes; do
+	mkdir a b c
+	(cd a && unzip "$from" "$x")
+	fromname=`find a/ -type f`; fromname=${fromname#a/}
+	(cd b && unzip "$to" "$x")
+	toname=`find b/ -type f`; toname=${toname#b/}
+	patchname=`makepatchname "$x" "$fromname" "$toname"`
+	patchdir="c/$patchname"; patchdir=${patchdir%/*}
+	mkdir -p "$patchdir"
+	zipdiff -f a/"$fromname" -t b/"$toname" -o c/"$patchname"
+	if [ -f c/"$patchname" ]; then
+		(cd c && zip -0r "$output" "$patchname")
+	fi
+	rm -rf a b c
+done
+
+rm -rf "$tempdir"
