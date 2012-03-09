@@ -8,10 +8,13 @@ case "$to" in /*) ;; *) to=`pwd`/$to ;; esac
 case "$output" in /*) ;; *) output=`pwd`/$output ;; esac
 
 excludes="
-	data/xonotic-*-data.pk3
-	data/xonotic-*-maps.pk3
-	data/xonotic-*-music.pk3
-	data/xonotic-*-nexcompat.pk3
+	Xonotic/data/xonotic-*-data.pk3
+	Xonotic/data/xonotic-*-maps.pk3
+	Xonotic/data/xonotic-*-music.pk3
+	Xonotic/data/xonotic-*-nexcompat.pk3
+	Xonotic/data/xonotic-*-data-low.pk3
+	Xonotic/data/xonotic-*-maps-low.pk3
+	Xonotic/data/xonotic-*-music-low.pk3
 "
 
 makepatchname()
@@ -19,12 +22,12 @@ makepatchname()
 	wildcard=$1
 	fromname=$2
 	toname=$3
-	prefix=${wildcard##*\*}
-	suffix=${wildcard%\**}
+	prefix=${wildcard%%\**}
+	suffix=${wildcard#*\*}
 	fromversion=${fromname#$prefix}
 	fromversion=${fromversion%$suffix}
-	toversion=${fromname#$prefix}
-	toversion=${fromversion%$suffix}
+	toversion=${toname#$prefix}
+	toversion=${toversion%$suffix}
 	echo "$prefix$fromversion"patch"$toversion$suffix"
 }
 
