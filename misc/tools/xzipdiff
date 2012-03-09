@@ -31,7 +31,7 @@ makepatchname()
 	echo "$prefix$fromversion"patch"$toversion$suffix"
 }
 
-zipdiff -f "$from" -t "$to" -o "$output" -x "$excludes"
+zipdiff -z "zip -9r" -f "$from" -t "$to" -o "$output" -x "$excludes"
 
 tempdir=`mktemp -d -t zipdiff.XXXXXX`
 cd "$tempdir"
@@ -45,7 +45,7 @@ for x in $excludes; do
 	patchname=`makepatchname "$x" "$fromname" "$toname"`
 	patchdir="c/$patchname"; patchdir=${patchdir%/*}
 	mkdir -p "$patchdir"
-	zipdiff -f a/"$fromname" -t b/"$toname" -o c/"$patchname"
+	zipdiff -z "zip -9r" -f a/"$fromname" -t b/"$toname" -o c/"$patchname"
 	if [ -f c/"$patchname" ]; then
 		(cd c && zip -0r "$output" "$patchname")
 	fi

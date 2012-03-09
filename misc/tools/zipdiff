@@ -14,6 +14,7 @@ output=
 from=
 to=
 excludes=
+ziptool="7za a -tzip -mx=9"
 
 while [ $# -gt 0 ]; do
 	o=$1
@@ -33,6 +34,10 @@ while [ $# -gt 0 ]; do
 			;;
 		-x)
 			excludes="$excludes $1"
+			shift
+			;;
+		-z)
+			ziptool=$1
 			shift
 			;;
 		*)
@@ -163,8 +168,7 @@ case "$output" in
 					;;
 			esac
 			cd "$tempdir"
-			#zip -9r "$output" .
-			7za a -tzip -mx=9 "$output" .
+			$ziptool "$output" .
 			cd ..
 		fi
 		;;
