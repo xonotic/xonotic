@@ -177,7 +177,7 @@ case "$output" in
 				mkdir -p "$tempdir/${dline%/*}"
 				unzip "$to" "$line"
 			done
-			$ziptool "$output" .
+			$ziptool "$output" *
 			cd ..
 		fi
 		;;
