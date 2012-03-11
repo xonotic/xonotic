@@ -171,6 +171,7 @@ case "$output" in
 				dline=./$line
 				mkdir -p "$tempdir/${dline%/*}"
 				unzip -p "$to" "$line" > "$tempdir/$line" # this may create an empty file - don't care, DP handles this as deletion
+				# FIXME permissions
 			done
 			case "$output" in
 				/*)
