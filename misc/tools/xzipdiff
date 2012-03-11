@@ -34,6 +34,7 @@ makepatchname()
 }
 
 zipdiff -f "$from" -t "$to" -o "$output" -x "$excludes"
+# or maybe just include ALL not excluded files from $to in $output?
 
 tempdir=`mktemp -d -t zipdiff.XXXXXX`
 cd "$tempdir"
