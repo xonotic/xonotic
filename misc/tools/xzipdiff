@@ -15,6 +15,8 @@ excludes="
 	Xonotic/data/xonotic-*-data-low.pk3
 	Xonotic/data/xonotic-*-maps-low.pk3
 	Xonotic/data/xonotic-*-music-low.pk3
+	Xonotic/data/font-nimbussansl-*.pk3
+	Xonotic/data/font-xolonium-*.pk3
 "
 
 makepatchname()
