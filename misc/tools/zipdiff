@@ -61,6 +61,10 @@ done
 [ -n "$from" ] || usage
 [ -n "$to" ] || usage
 
+case "$output" in '') ;; /*) ;; *) output=`pwd`/$output ;; esac
+case "$from" in /*) ;; *) from=`pwd`/$from ;; esac
+case "$to" in /*) ;; *) to=`pwd`/$to ;; esac
+
 found()
 {
 	type=$1
@@ -166,21 +170,13 @@ case "$output" in
 	*)
 		rm -f "$output"
 		if [ -n "$result" ]; then
+			cd "$tempdir"
 			echo "$result" | while IFS= read -r line; do
 				echo >&2 "extracting $line..."
 				dline=./$line
 				mkdir -p "$tempdir/${dline%/*}"
-				unzip -p "$to" "$line" > "$tempdir/$line" # this may create an empty file - don't care, DP handles this as deletion
-				# FIXME permissions
+				unzip "$to" "$line"
 			done
-			case "$output" in
-				/*)
-					;;
-				*)
-					output=`pwd`/$output
-					;;
-			esac
-			cd "$tempdir"
 			$ziptool "$output" .
 			cd ..
 		fi
