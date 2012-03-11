@@ -14,7 +14,19 @@ output=
 from=
 to=
 excludes=
-ziptool="7za a -tzip -mx=9"
+ziptool="mkzip"
+
+mkzip()
+{
+	archive=$1; shift
+	sevenzipflags=-mx=9
+	zipflags=-9
+	ziplist=`mktemp`
+	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
+	7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
+	zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
+	rm -f "$ziplist"
+}
 
 while [ $# -gt 0 ]; do
 	o=$1
