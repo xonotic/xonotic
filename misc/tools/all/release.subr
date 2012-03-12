@@ -52,6 +52,10 @@ release_common()
 	mkzipr()
 	{
 		archive=$1; shift
+
+		# get rid of this hack once we have done large enough changes
+		# to be no longer rsync compatible (and then enable the below
+		# code)
 		sevenzipflags=-mx=9
 		zipflags=-9
 		find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
@@ -60,25 +64,28 @@ release_common()
 		7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
 		zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
 		rm -f "$ziplist"
+
+		#zipflags=-1r
+		#find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
+		#zip $zipflags -y "$archive" "$@" || true
+		#advzip -4 "$archive"
 	}
 
 	mkzip()
 	{
 		archive=$1; shift
-		sevenzipflags=-mx=9
-		zipflags=-9
-		ziplist=`mktemp`
-		find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
-		7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
-		zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
-		rm -f "$ziplist"
+		zipflags=-1ry
+		zip $zipflags "$archive" "$@" || true
+		advzip -z -4 "$archive"
 	}
 
 	mkzip0()
 	{
 		archive=$1; shift
-		zip -0ry "$archive" "$@"
+		zipflags=-0ry
+		zip $zipflags "$archive" "$@" || true
 	}
+
 	getversion()
 	{
 		gv=`grep "^gameversion " "$1/defaultXonotic.cfg" | awk '{ print $2 }'`
