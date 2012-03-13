@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 usage()
 {
 	cat <<EOF
@@ -19,13 +21,9 @@ ziptool="mkzip"
 mkzip()
 {
 	archive=$1; shift
-	sevenzipflags=-mx=9
-	zipflags=-9
-	ziplist=`mktemp`
-	find "$@" -xtype f \( -executable -or -type l \) -print > "$ziplist"
-	7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
-	zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
-	rm -f "$ziplist"
+	zipflags=-1ry
+	zip $zipflags "$archive" "$@" || true
+	advzip -z -4 "$archive"
 }
 
 while [ $# -gt 0 ]; do
