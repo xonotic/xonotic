@@ -60,16 +60,32 @@ rm -f data/the-big-benchmark.log
 rm -f data/benchmark.log
 rm -f data/engine.log
 p="+r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
+
 for e in omg low med normal high ultra ultimate; do
+	echo "Benchmarking on $e"
 	rm -f data/benchmark.log
 	echo + "$@" +exec effects-$e.cfg $p > data/engine.log
 	"$@" +exec effects-$e.cfg $p >>data/engine.log 2>&1 || true
+	grep "^MED: " data/engine.log # print results to the terminal
 	if grep '\]quit' data/engine.log >/dev/null; then
 		break
 	fi
 	cat data/engine.log >> data/the-big-benchmark.log
 	cat data/benchmark.log >> data/the-big-benchmark.log
+	if [ x"$e" = x"med" ]; then
+		if grep 'checking for OpenGL 2\.0 core features\.\.\.  not detected' data/engine.log; then
+			echo "OpenGL 2.0 or later required for Normal quality and higher, exiting."
+			break
+		fi
+	fi
+	if [ x"$e" = x"high" ]; then
+		if grep 'vid_soft 1' data/engine.log; then
+			echo "Software rendering does not support Ultra and Ultimate quality settings, exiting."
+			break
+		fi
+	fi
 done
+
 if [ -f ./all ]; then
 	./all clean -r
 fi
