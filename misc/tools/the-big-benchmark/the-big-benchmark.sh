@@ -59,6 +59,8 @@ fi
 rm -f data/the-big-benchmark.log
 rm -f data/benchmark.log
 rm -f data/engine.log
+
+# for next version of benchmark: remove +cl_playerdetailreduction 0 and add +showfps 1
 p="+r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
 
 for e in omg low med normal high ultra ultimate; do
