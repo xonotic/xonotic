@@ -28,61 +28,61 @@ if exist data\benchmark.log del data\benchmark.log
 if exist data\engine.log del data\engine.log
 set p=+r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-omg.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+goto start
 
+:benchmark
+echo Benchmarking on %e%
 if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-low.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-low.cfg %p% >> data\engine.log 2>&1
+echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-%e%.cfg %p% > data\engine.log
+%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-%e%.cfg %p% >> data\engine.log 2>&1
+find "MED: " data\engine.log
 find "]quit" data\engine.log >nul
 if not errorlevel 1 goto done
 type data\engine.log >> data\the-big-benchmark.log
 type data\benchmark.log >> data\the-big-benchmark.log
+if not "%e%" == "med" goto nomed
+find "checking for OpenGL 2.0 core features...  not detected" data\engine.log >nul
+if errorlevel 1 goto nomed
+echo OpenGL 2.0 or later required for Normal quality and higher, exiting.
+goto done
+:nomed
+if not "%e%" == "high" goto nohigh
+find "vid_soft 1" data\engine.log >nul
+if errorlevel 1 goto nohigh
+echo Software rendering does not support Ultra and Ultimate quality settings, exiting.
+goto done
+:nohigh
+goto z%e%
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-med.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-med.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+:start
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-normal.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-normal.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+set e=omg
+goto benchmark
+:zomg
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-high.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-high.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+set e=low
+goto benchmark
+:zlow
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultra.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultra.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+set e=med
+goto benchmark
+:zmed
 
-if exist data\benchmark.log del data\benchmark.log
-echo + %xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultimate.cfg %p% > data\engine.log
-%xonotic% %2 %3 %4 %5 %6 %7 %8 %9 +exec effects-ultimate.cfg %p% >> data\engine.log 2>&1
-find "]quit" data\engine.log >nul
-if not errorlevel 1 goto done
-type data\engine.log >> data\the-big-benchmark.log
-type data\benchmark.log >> data\the-big-benchmark.log
+set e=normal
+goto benchmark
+:znormal
+
+set e=high
+goto benchmark
+:zhigh
+
+set e=ultra
+goto benchmark
+:zultra
+
+set e=ultimate
+goto benchmark
+:zultimate
 
 :done
 
