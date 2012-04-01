@@ -204,7 +204,7 @@ reduce_jpeg2_dds()
 	i=$1; shift
 	ia=$1; shift
 	o=$1; shift; shift 
-	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
+	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -213,7 +213,7 @@ reduce_jpeg2_dds_premul()
 	i=$1; shift
 	ia=$1; shift
 	o=$1; shift; shift 
-	convert "$i" "$ia" -compose CopyOpacity -composite "$tmpdir/x.tga" && \
+	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -273,7 +273,7 @@ reduce_rgba_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" "$tmpdir/x.tga" && \
+	convert "$i" -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -281,7 +281,7 @@ reduce_rgba_dds_premul()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" "$tmpdir/x.tga" && \
+	convert "$i" -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -306,7 +306,7 @@ reduce_rgb_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" "$tmpdir/x.tga" && \
+	convert "$i" -type TrueColor "$tmpdir/x.tga" && \
 	"$meprefix"compress-texture "$dds_tool" "$dds_noalpha" "$tmpdir/x.tga" "$o" $1
 }
 
