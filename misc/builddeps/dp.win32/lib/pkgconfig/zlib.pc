@@ -1,0 +1,13 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/tmp/zlib-1.2.6.out/usr/local/lib
+sharedlibdir=/tmp/zlib-1.2.6.out/usr/local/lib
+includedir=/tmp/zlib-1.2.6.out/usr/local/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.6
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

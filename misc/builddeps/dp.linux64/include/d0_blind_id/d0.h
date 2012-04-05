@@ -30,7 +30,7 @@
  * SUCH DAMAGE.
  *
  * $Format:commit %H$
- * $Id: 0f9b41999f2a57f07067272a8b89919394c4b04f $
+ * $Id: 6c55afeb50f24bd316079ae46582e65f8020b19b $
  */
 
 #ifndef __D0_H__
@@ -39,6 +39,7 @@
 #include <unistd.h> // size_t
 
 #define D0_EXPORT __attribute__((__visibility__("default")))
+#define D0_USED __attribute__((used))
 #define D0_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #define D0_BOOL int
 
