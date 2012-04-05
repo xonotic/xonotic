@@ -1,150 +1,34 @@
 devsite_url="http://dev.xonotic.org/"
-pushsite_url="ssh://xonotic@push.git.xonotic.org/"
-httppushsite_url="http://push.git.xonotic.org/login/xonotic/"
-gitsite_url="git://git.xonotic.org/xonotic/"
-httpsite_url="http://git.xonotic.org/xonotic/"
 
-repos_urls="
-.                             |                                                   | master         |
-data/xonotic-data.pk3dir      |                                                   | master         |
-data/xonotic-music.pk3dir     |                                                   | master         |
-data/xonotic-nexcompat.pk3dir |                                                   | master         | no
-darkplaces                    |                                                   | div0-stable    | svn
-netradiant                    |                                                   | master         |
-div0-gittools                 |                                                   | master         | no
-d0_blind_id                   |                                                   | master         |
-data/xonotic-maps.pk3dir      |                                                   | master         |
-mediasource                   |                                                   | master         | no
-fteqcc                        |                                                   | xonotic-stable | noautocrlf
-"
-# todo: in darkplaces, change repobranch to div0-stable
-
-repos=`$ECHO "$repos_urls" | grep . | cut -d '|' -f 1 | tr -d ' '`
-
-base=`git config remote.origin.url`
-case "$base" in
-	*/xonotic.git)
-		base=${base%xonotic.git}
-		;;
-	*)
-		$ECHO "The main repo is not xonotic.git, what have you done?"
-		exit 1
-		;;
-esac
-pushbase=`git config remote.origin.pushurl || true`
-case "$pushbase" in
-	*/xonotic.git)
-		pushbase=${pushbase%xonotic.git}
-		;;
-	'')
-		;;
-	*)
-		$ECHO "The main repo is not xonotic.git, what have you done?"
-		exit 1
-		;;
-esac
-
-repourl()
+allrepos()
 {
-	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
-	if [ -n "$repo_t" ]; then
-		case "$repo_t" in
-			*://*)
-				$ECHO "$repo_t"
-				;;
-			*)
-				$ECHO "$base$repo_t"
-				;;
-		esac
-	else
-		if [ x"$1" = x"." ]; then
-			$ECHO "$base""xonotic.git"
-		else
-			$ECHO "$base${1##*/}.git"
-		fi
-	fi
+	"$@" .                             xonotic.git                  master         ""
+	"$@" data/xonotic-data.pk3dir      xonotic-data.pk3dir.git      master         ""
+	"$@" data/xonotic-music.pk3dir     xonotic-music.pk3dir.git     master         ""
+	"$@" data/xonotic-nexcompat.pk3dir xonotic-nexcompat.pk3dir.git master         "no"
+	"$@" darkplaces                    darkplaces.git               div0-stable    "svn"
+	"$@" netradiant                    netradiant.git               master         ""
+	"$@" div0-gittools                 div0-gittools.git            master         "no"
+	"$@" d0_blind_id                   d0_blind_id.git              master         ""
+	"$@" data/xonotic-maps.pk3dir      xonotic-maps.pk3dir.git      master         ""
+	"$@" mediasource                   mediasource.git              master         "no"
+	"$@" fteqcc                        fteqcc.git                   xonotic-stable "noautocrlf"
 }
 
-repopushurl()
+allmirrors()
 {
-	[ -n "$pushbase" ] || return 0
-	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 2 | tr -d ' '`
-	if [ -n "$repo_t" ]; then
-		case "$repo_t" in
-			*://*)
-				;;
-			*)
-				$ECHO "$pushbase$repo_t"
-				;;
-		esac
-	else
-		if [ x"$1" = x"." ]; then
-			$ECHO "$pushbase""xonotic.git"
-		else
-			$ECHO "$pushbase${1##*/}.git"
-		fi
-	fi
-}
+	"$@" git  ''   git://git.xonotic.org/xonotic/      ''
+	"$@" http ''   http://git.xonotic.org/xonotic/     ''
+	"$@" ssh  ''   ssh://xonotic@git.xonotic.org/      ''
 
-repobranch()
-{
-	repo_t=`$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 3 | tr -d ' '`
-	if [ -n "$repo_t" ]; then
-		$ECHO "$repo_t"
-	else
-		$ECHO "master"
-	fi
-}
+	"$@" git  us   git://us.git.xonotic.org/xonotic/   ''
+	"$@" http us   http://us.git.xonotic.org/xonotic/  ''
 
-repoflags()
-{
-	$ECHO "$repos_urls" | grep "^$1 " | cut -d '|' -f 4 | tr -d ' '
-}
+	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
+	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
 
-listrepos()
-{
-	for d in $repos; do
-		p="${d%dir}"
-		f="`repoflags "$d"`"
-		# if we have .no file, skip
-		if [ -f "$d.no" ]; then
-			msg "Repository $d disabled by a .no file, delete $d.no to enable"
-			continue
-		fi
-		# if .yes file exists, always keep it
-		if [ -f "$d.yes" ]; then
-			msg "Repository $d enabled by a .yes file"
-			$ECHO "$d"
-			continue
-		fi
-		# remove broken clones so they don't mess up stuff
-		if [ x"$d" != x"." ] && [ -d "$d" ] && ! [ -d "$d/.git" ]; then
-			msg "$d exists but has no .git subdir. Probably a broken clone. Deleting."
-			verbose rm -rf "$d"
-			continue
-		fi
-		# if we have the dir, always keep it
-		if [ -d "$d" ]; then
-			msg "Repository $d enabled because it already exists"
-			$ECHO "$d"
-			continue
-		fi
-		# if we have matching pk3, skip
-		if [ x"$p" != x"$d" ] && [ -f "$p" ]; then
-			msg "Repository $d disabled by matching .pk3 file, delete $p or create $d.yes to enable"
-			continue
-		fi
-		# if "no" flag is set, skip
-		case ",$f," in
-			*,no,*)
-				msg "Repository $d disabled by default, create $d.yes to enable"
-				continue
-				;;
-		esac
-		# default: enable
-		msg "Repository $d enabled by default"
-		$ECHO "$d"
-	done
-}
+	"$@" git  nl   git://nl.git.xonotic.org/xonotic/   '*2'
+	"$@" http nl   http://nl.git.xonotic.org/xonotic/  '*2'
 
-repos=`listrepos`
+	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
+}
