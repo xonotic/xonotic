@@ -170,7 +170,7 @@ case "$cmd" in
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
+		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id mapping
