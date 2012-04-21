@@ -63,7 +63,7 @@ install-data-git: all-git
 	$(RM) -rf $(DESTDIR)$(LIBDIR)/data
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/data
 	for p in data/*.pk3; do $(INSTALL) $$p $(DESTDIR)$(LIBDIR)/$$p || exit 1; done
-	for p in data/*.pk3dir; do ( cd $$p; $(ZIP) -r $(DESTDIR)$(LIBDIR)/$${p%dir} * ) || exit 1; done
+	for p in data/*.pk3dir; do ( cd $$p && $(ZIP) -r $(DESTDIR)$(LIBDIR)/$${p%dir} * ) || exit 1; done
 
 .PHONY: install-data-zip-binary
 install-data-zip-binary: all-zip-binary
@@ -76,7 +76,7 @@ install-data-zip-source: all-zip-source
 	$(RM) -rf $(DESTDIR)$(LIBDIR)/data
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)/data
 	for p in data/*.pk3; do $(INSTALL) $$p $(DESTDIR)$(LIBDIR)/$$p || exit 1; done
-	for p in data/xonotic-*-data*.pk3; do cd source; $(ZIP) $(DESTDIR)$(LIBDIR)/$$p progs.dat menu.dat csprogs.dat; done
+	for p in data/xonotic-*-data*.pk3; do cd source && $(ZIP) $(DESTDIR)$(LIBDIR)/$$p progs.dat menu.dat csprogs.dat; done
 
 
 .PHONY: install-engine
