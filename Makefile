@@ -9,6 +9,8 @@ LN ?= ln
 CP ?= cp
 BINARY ?= yes
 SUFFIX ?= $(shell if [ -d .git ]; then echo git; elif [ x"$(BINARY)" = x"yes" ]; then echo zip-binary; else echo zip-source; fi)
+RIJNDAELDETECT_CONFIGURE ?= $(shell if ! [ -f source/d0_blind_id/d0_rijndael.c ]; then echo --disable-rijndael; fi)
+RIJNDAELDETECT_MAKE_DP ?= $(shell if [ -f source/d0_blind_id/d0_rijndael.c ]; then echo DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs; fi)
 
 
 .PHONY: all
@@ -24,11 +26,13 @@ all-zip-binary:
 
 .PHONY: all-zip-source
 all-zip-source:
+	( cd source/d0_blind_id && ./configure --enable-static --disable-shared $(RIJNDAELDETECT_CONFIGURE) )
+	$(MAKE) -C source/d0_blind_id
 	$(MAKE) -C source/fteqcc
 	$(MAKE) -C source/qcsrc FTEQCC=$(CURDIR)/source/fteqcc/fteqcc.bin
-	$(MAKE) -C source/darkplaces sv-release
-	$(MAKE) -C source/darkplaces cl-release
-	$(MAKE) -C source/darkplaces sdl-release
+	$(MAKE) -C source/darkplaces sv-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
+	$(MAKE) -C source/darkplaces cl-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
+	$(MAKE) -C source/darkplaces sdl-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
 
 
 .PHONY: clean
@@ -39,13 +43,15 @@ clean-git:
 	./all clean
 
 .PHONY: clean-zip
-clean-binary:
+clean-zip-binary:
 	@echo Nothing to do
 
 .PHONY: clean-zip
-clean-source:
-	@echo Sorry, this is not implemented yet
-	@false
+clean-zip-source:
+	-$(MAKE) -C source/d0_blind_id distclean
+	$(MAKE) -C source/fteqcc clean
+	$(MAKE) -C source/qcsrc clean
+	$(MAKE) -C source/darkplaces clean
 
 
 .PHONY: install-data
@@ -86,7 +92,7 @@ install-engine-git: all-git
 	$(INSTALL) darkplaces/darkplaces-dedicated $(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 .PHONY: install-engine-zip-binary
-install-engine-zip: all-zip
+install-engine-zip-binary: all-zip-binary
 	$(INSTALL) -d $(LIBDIR)
 	$(INSTALL) xonotic-linux-glx.sh $(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(LIBDIR)/xonotic-linux-sdl.sh
@@ -96,7 +102,7 @@ install-engine-zip: all-zip
 	$(INSTALL) xonotic-$(ARCH)-dedicated $(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 .PHONY: install-engine-zip-source
-install-engine-zip: all-zip
+install-engine-zip-source: all-zip-source
 	$(INSTALL) -d $(LIBDIR)
 	$(INSTALL) xonotic-linux-glx.sh $(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(LIBDIR)/xonotic-linux-sdl.sh
