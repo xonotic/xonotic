@@ -107,8 +107,8 @@ install-engine-zip-source: all-zip-source
 	$(INSTALL) xonotic-linux-glx.sh $(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(LIBDIR)/xonotic-linux-sdl.sh
 	$(INSTALL) xonotic-linux-dedicated.sh $(LIBDIR)/xonotic-linux-dedicated.sh
-	$(INSTALL) source/darkplaces/xonotic-sdl $(LIBDIR)/xonotic-$(ARCH)-sdl
-	$(INSTALL) source/darkplaces/darkplaces-sdl $(LIBDIR)/xonotic-$(ARCH)-glx
+	$(INSTALL) source/darkplaces/darkplaces-sdl $(LIBDIR)/xonotic-$(ARCH)-sdl
+	$(INSTALL) source/darkplaces/darkplaces-glx $(LIBDIR)/xonotic-$(ARCH)-glx
 	$(INSTALL) source/darkplaces/darkplaces-dedicated $(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 
