@@ -34,21 +34,38 @@ use constant OPCODE_E => [qw[
 	AND OR
 	BITAND BITOR
 ]];
+use constant ETYPE_E => [qw[
+	void
+	string
+	float
+	vector
+	entity
+	field
+	function
+	pointer
+]];
+use constant DEF_SAVEGLOBAL => 32768;
+sub typesize($)
+{
+	my ($type) = @_;
+	return 3 if $type eq 'vector';
+	return 1;
+}
 
 sub checkop($)
 {
 	my ($op) = @_;
 	if($op =~ /^IF.*_V$/)
 	{
-		return { a => 'inglobalvec', b => 'immediate', isjump => 'b', isconditional => 1 };
+		return { a => 'inglobalvec', b => 'ipoffset', isjump => 'b', isconditional => 1 };
 	}
 	if($op =~ /^IF/)
 	{
-		return { a => 'inglobal', b => 'immediate', isjump => 'b', isconditional => 1 };
+		return { a => 'inglobal', b => 'ipoffset', isjump => 'b', isconditional => 1 };
 	}
 	if($op eq 'GOTO')
 	{
-		return { a => 'immediate', isjump => 'a', isconditional => 0 };
+		return { a => 'ipoffset', isjump => 'a', isconditional => 0 };
 	}
 	if($op =~ /^ADD_V$|^SUB_V$/)
 	{
@@ -98,7 +115,7 @@ sub checkop($)
 	{
 		return { a => 'inglobalfunc', iscall => 1 };
 	}
-	if($op =~ /^DONE|^RETURN/)
+	if($op =~ /^DONE$|^RETURN$/)
 	{
 		return { a => 'inglobal', isreturn => 1 };
 	}
@@ -113,6 +130,7 @@ use constant TYPES => {
 	float => ['f', 4, id],
 	uchar8 => ['a8', 8, sub { [unpack 'C8', $_[0]] }],
 	global => ['i', 4, sub { { int => $_[0], float => unpack "f", pack "L", $_[0] }; }],
+	deftype => ['v', 2, sub { { type => ETYPE_E->[$_[0] & ~DEF_SAVEGLOBAL], save => !!($_[0] & DEF_SAVEGLOBAL) }; }],
 };
 
 use constant DPROGRAMS_T => [
@@ -141,7 +159,7 @@ use constant DSTATEMENT_T => [
 ];
 
 use constant DDEF_T => [
-	[ushort => 'type'],
+	[deftype => 'type'],
 	[ushort => 'ofs'],
 	[int => 's_name']
 ];
@@ -206,6 +224,57 @@ sub parse_section($$$$$)
 	return @out
 		if wantarray;
 	return $out[0];
+}
+
+sub run_nfa($$$$$$)
+{
+	my ($progs, $ip, $state, $copy_handler, $state_hasher, $instruction_handler) = @_;
+	my %seen = ();
+
+	my $statements = $progs->{statements};
+
+	my $nfa;
+	$nfa = sub
+	{
+		no warnings 'recursion';
+
+		my ($ip, $state) = @_;
+
+		for(;;)
+		{
+			my $statestr = $state_hasher->($state);
+			return
+				if $seen{"$ip:$statestr"}++;
+
+			my $s = $statements->[$ip];
+			my $c = checkop $s->{op};
+
+			$instruction_handler->($ip, $state, $s, $c);
+
+			if($c->{isreturn})
+			{
+				last;
+			}
+			elsif($c->{isjump})
+			{
+				if($c->{isconditional})
+				{
+					$nfa->($ip+1, $copy_handler->($state));
+					$ip += $s->{$c->{isjump}};
+				}
+				else
+				{
+					$ip += $s->{$c->{isjump}};
+				}
+			}
+			else
+			{
+				$ip += 1;
+			}
+		}
+	};
+
+	$nfa->($ip, $copy_handler->($state));
 }
 
 use constant PRE_MARK_STATEMENT => "\e[1m";
@@ -301,7 +370,7 @@ sub disassemble_function($$;$)
 
 	my $operand = sub
 	{
-		my ($type, $operand) = @_;
+		my ($ip, $type, $operand) = @_;
 		if($type eq 'inglobal')
 		{
 			my $name = $getname->($operand);
@@ -327,9 +396,9 @@ sub disassemble_function($$;$)
 			my $name = $getname->($operand);
 			printf OPERAND_FORMAT, "$name()";
 		}
-		elsif($type eq 'immediate')
+		elsif($type eq 'ipoffset')
 		{
-			printf OPERAND_FORMAT, "$operand";
+			printf OPERAND_FORMAT, "@{[$ip + $operand]}" . sprintf ' ($%+d)', $operand;
 		}
 		else
 		{
@@ -337,16 +406,57 @@ sub disassemble_function($$;$)
 		}
 	};
 
-	for my $s($func->{first_statement}..(@{$progs->{statements}}-1))
+	my %statements = ();
+	my %come_from = ();
+	run_nfa $progs, $func->{first_statement}, "", id, id,
+		sub
+		{
+			my ($ip, $state, $s, $c) = @_;
+			++$statements{$ip};
+
+			if(my $j = $c->{isjump})
+			{
+				my $t = $ip + $s->{$j};
+				$come_from{$t}{$ip} = $c->{isconditional};
+			}
+		};
+
+	my $ipprev = undef;
+	for my $ip(sort { $a <=> $b } keys %statements)
 	{
-		my $op = $progs->{statements}[$s]{op};
-		my $st = $progs->{statements}[$s];
+		if($ip == $func->{first_statement})
+		{
+			printf INSTRUCTION_FORMAT, $ip, '', '.ENTRY';
+			print INSTRUCTION_SEPARATOR;
+		}
+		if(defined $ipprev && $ip != $ipprev + 1)
+		{
+			printf INSTRUCTION_FORMAT, $ip, '', '.SKIP';
+			printf OPERAND_FORMAT, $ip - $ipprev - 1;
+			print INSTRUCTION_SEPARATOR;
+		}
+		if(my $cf = $come_from{$ip})
+		{
+			printf INSTRUCTION_FORMAT, $ip, '', '.XREF';
+			my $cnt = 0;
+			for(sort { $a <=> $b } keys %$cf)
+			{
+				print OPERAND_SEPARATOR
+					if $cnt++;
+				printf OPERAND_FORMAT, ($cf->{$_} ? 'c' : 'j') . $_ . sprintf ' ($%+d)', $_ - $ip;
+			}
+			print INSTRUCTION_SEPARATOR;
+		}
+
+		my $op = $progs->{statements}[$ip]{op};
+		my $ipt = $progs->{statements}[$ip];
 		my $opprop = checkop $op;
 
 		print PRE_MARK_STATEMENT
-			if $highlight and $highlight->{$s};
+			if $highlight and $highlight->{$ip};
 
-		printf INSTRUCTION_FORMAT, $s, $highlight->{$s} ? "<!>" : "", $op;
+		my $showip = $opprop->{isjump};
+		printf INSTRUCTION_FORMAT, $showip ? $ip : '', $highlight->{$ip} ? "<!>" : "", $op;
 
 		my $cnt = 0;
 		for my $o(qw(a b c))
@@ -356,70 +466,17 @@ sub disassemble_function($$;$)
 			print OPERAND_SEPARATOR
 				if $cnt++;
 			print PRE_MARK_OPERAND
-				if $highlight and $highlight->{$s} and $highlight->{$s}{$o};
-			$operand->($opprop->{$o}, $st->{$o});
+				if $highlight and $highlight->{$ip} and $highlight->{$ip}{$o};
+			$operand->($ip, $opprop->{$o}, $ipt->{$o});
 			print POST_MARK_OPERAND
-				if $highlight and $highlight->{$s} and $highlight->{$s}{$o};
+				if $highlight and $highlight->{$ip} and $highlight->{$ip}{$o};
 		}
 
 		print POST_MARK_STATEMENT
-			if $highlight and $highlight->{$s};
+			if $highlight and $highlight->{$ip};
 
 		print INSTRUCTION_SEPARATOR;
-
-		last if $progs->{function_byoffset}->($s + 1);
 	}
-}
-
-sub run_nfa($$$$$$)
-{
-	my ($progs, $ip, $state, $copy_handler, $state_hasher, $instruction_handler) = @_;
-	my %seen = ();
-
-	my $statements = $progs->{statements};
-
-	my $nfa;
-	$nfa = sub
-	{
-		no warnings 'recursion';
-
-		my ($ip, $state) = @_;
-
-		for(;;)
-		{
-			my $statestr = $state_hasher->($state);
-			return
-				if $seen{"$ip:$statestr"}++;
-
-			my $s = $statements->[$ip];
-			my $c = checkop $s->{op};
-
-			$instruction_handler->($ip, $state, $s, $c);
-
-			if($c->{isreturn})
-			{
-				last;
-			}
-			elsif($c->{isjump})
-			{
-				if($c->{isconditional})
-				{
-					$nfa->($ip+1, $copy_handler->($state));
-					$ip += $s->{$c->{isjump}};
-				}
-				else
-				{
-					$ip += $s->{$c->{isjump}};
-				}
-			}
-			else
-			{
-				$ip += 1;
-			}
-		}
-	};
-
-	$nfa->($ip, $copy_handler->($state));
 }
 
 sub find_uninitialized_locals($$)
@@ -443,9 +500,13 @@ sub find_uninitialized_locals($$)
 	use constant WATCHME_T => 8;
 	my %watchme = map { $_ => WATCHME_X } ($p .. ($func->{parm_start} + $func->{locals} - 1));
 
-	# TODO mark temp globals as WATCHME_T
+	for($progs->{temps})
+	{
+		$watchme{$_} = WATCHME_T | WATCHME_X
+			if not exists $watchme{$_};
+	}
 
-	run_nfa $progs, $func->{first_statement}, "", sub { $_[0] }, sub { $_[0] },
+	run_nfa $progs, $func->{first_statement}, "", id, id,
 		sub
 		{
 			my ($ip, $state, $s, $c) = @_;
@@ -482,10 +543,7 @@ sub find_uninitialized_locals($$)
 	for(keys %watchme)
 	{
 		delete $watchme{$_}
-			if
-				($watchme{$_} & (WATCHME_T | WATCHME_X)) == 0
-					or
-				($watchme{$_} & (WATCHME_R | WATCHME_W)) != (WATCHME_R | WATCHME_W);
+			if ($watchme{$_} & (WATCHME_R | WATCHME_W | WATCHME_X)) != (WATCHME_R | WATCHME_W | WATCHME_X);
 	}
 
 	return
@@ -517,47 +575,66 @@ sub find_uninitialized_locals($$)
 
 				my $ofs = $s->{$_};
 
+				my $read = sub
+				{
+					my ($ofs) = @_;
+					return
+						if not exists $state->{$ofs};
+					my $valid = $state->{$ofs}{valid};
+					if($valid == 0)
+					{
+						print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
+						++$warned{$ip}{$_};
+					}
+					elsif($valid < 0)
+					{
+						print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
+						++$warned{$ip}{$_};
+					}
+				};
+				my $write = sub
+				{
+					my ($ofs) = @_;
+					$state->{$ofs}{valid} = 1
+						if exists $state->{$ofs};
+				};
+
 				if($type eq 'inglobal' || $type eq 'inglobalfunc')
 				{
 					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
 					{
-						if($state->{$ofs} && !$state->{$ofs}{valid})
-						{
-							print "; Use of uninitialized local $ofs in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
-						}
+						$read->($ofs);
 					}
 				}
 				elsif($type eq 'inglobalvec')
 				{
 					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
 					{
-						if(
-						   $state->{$ofs} && !$state->{$ofs}{valid}
-								||
-						   $state->{$ofs+1} && !$state->{$ofs+1}{valid}
-								||
-						   $state->{$ofs+2} && !$state->{$ofs+2}{valid}
-						)
-						{
-							print "; Use of uninitialized local $ofs in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
-						}
+						$read->($ofs);
+						$read->($ofs+1);
+						$read->($ofs+2);
 					}
 				}
 				elsif($type eq 'outglobal')
 				{
-					$state->{$ofs}{valid} = 1
-						if $state->{$ofs};
+					$write->($ofs);
 				}
 				elsif($type eq 'outglobalvec')
 				{
-					$state->{$ofs}{valid} = 1
-						if $state->{$ofs};
-					$state->{$ofs+1}{valid} = 1
-						if $state->{$ofs+1};
-					$state->{$ofs+2}{valid} = 1
-						if $state->{$ofs+2};
+					$write->($ofs);
+					$write->($ofs+1);
+					$write->($ofs+2);
+				}
+			}
+			if($c->{iscall})
+			{
+				# invalidate temps
+				for(values %$state)
+				{
+					if($_->{flags} & WATCHME_T)
+					{
+						$_->{valid} = -1;
+					}
 				}
 			}
 		};
@@ -618,6 +695,12 @@ sub parse_progs($)
 	
 	print STDERR "Parsing strings...\n";
 	$p{strings} = get_section $fh, $p{header}{ofs_strings}, $p{header}{numstrings};
+	$p{getstring} = sub
+	{
+		my ($startpos) = @_;
+		my $endpos = index $p{strings}, "\0", $startpos;
+		return substr $p{strings}, $startpos, $endpos - $startpos;
+	};
 
 	print STDERR "Parsing statements...\n";
 	$p{statements} = [parse_section $fh, DSTATEMENT_T, $p{header}{ofs_statements}, undef, $p{header}{numstatements}];
@@ -634,13 +717,27 @@ sub parse_progs($)
 	print STDERR "Parsing functions...\n";
 	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
 
-	print STDERR "Providing helpers...\n";
-	$p{getstring} = sub
+	print STDERR "Detecting temps...\n";
+	my %offsets_saved = ();
+	for(@{$p{globaldefs}})
 	{
-		my ($startpos) = @_;
-		my $endpos = index $p{strings}, "\0", $startpos;
-		return substr $p{strings}, $startpos, $endpos - $startpos;
-	};
+		next
+			unless $_->{type}{save};
+		next
+			unless $p{getstring}->($_->{s_name}) eq "";
+		for my $i(0..(typesize($_->{type}{type})-1))
+		{
+			++$offsets_saved{$_->{ofs}+$i};
+		}
+	}
+	my %istemp = ();
+	for(0..(@{$p{globals}}-1))
+	{
+		next
+			if $offsets_saved{$_};
+		$istemp{$_} = 1;
+	}
+	$p{temps} = [keys %istemp];
 
 	print STDERR "Naming...\n";
 
@@ -652,12 +749,16 @@ sub parse_progs($)
 	}
 	for(@{$p{globaldefs}})
 	{
-		next
-			unless $_->{debugname};
-		if(!defined $globaldefs[$_->{ofs}] || length $globaldefs[$_->{ofs}]->{debugname} < length $_->{debugname})
-		{
-			$globaldefs[$_->{ofs}] = $_;
-		}
+		$globaldefs[$_->{ofs}] //= $_
+			if $_->{debugname} ne "";
+	}
+	for(@{$p{globaldefs}})
+	{
+		$globaldefs[$_->{ofs}] //= $_;
+	}
+	for(0..(@{$p{globals}}-1))
+	{
+		$globaldefs[$_] //= { ofs => $_, s_name => undef, debugname => ($istemp{$_} ? "<temp>" : "<nodef>") . "\@$_" }, 
 	}
 	my %globaldefs = ();
 	for(@{$p{globaldefs}})
@@ -675,8 +776,11 @@ sub parse_progs($)
 	$p{globaldef_byoffset} = sub
 	{
 		my ($ofs) = @_;
-		my $def = $globaldefs[$ofs]
-			or return defaultglobal $_[0];
+		if($ofs < @{(DEFAULTGLOBALS)})
+		{
+			return { ofs => $ofs, s_name => undef, debugname => DEFAULTGLOBALS->[$ofs], type => undef };
+		}
+		my $def = $globaldefs[$ofs];
 	};
 
 	# functions
