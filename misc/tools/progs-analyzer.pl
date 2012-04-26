@@ -371,93 +371,45 @@ sub disassemble_function($$;$)
 	}
 }
 
-sub find_uninitialized_locals($$)
+sub run_nfa($$$$$$)
 {
-	my ($progs, $func) = @_;
+	my ($progs, $ip, $state, $copy_handler, $state_hasher, $instruction_handler) = @_;
+	my %seen = ();
 
-	no warnings 'recursion';
+	my $statements = $progs->{statements};
 
-	my %warned = ();
-
-	my %instructions_seen;
-	my $checkinstruction;
-	$checkinstruction = sub
+	my $nfa;
+	$nfa = sub
 	{
-		my ($ip, $watchlist) = @_;
+		no warnings 'recursion';
+
+		my ($ip, $state) = @_;
+
 		for(;;)
 		{
-			my $statestr = join ' ', map { $watchlist->{$_}->{valid}; } sort keys %$watchlist;
+			my $statestr = $state_hasher->($state);
 			return
-				if $instructions_seen{"$ip $statestr"}++;
-			my %s = %{$progs->{statements}[$ip]};
-			my %c = %{checkop $s{op}};
-			for(qw(a b c))
-			{
-				my $x = $s{$_};
-				if(!defined $c{$_})
-				{
-				}
-				elsif($c{$_} eq 'inglobal' || $c{$_} eq 'inglobalfunc')
-				{
-					if($s{op} ne 'OR' && $s{op} ne 'AND') # fteqcc logicops cause this
-					{
-						if($watchlist->{$x} && !$watchlist->{$x}{valid})
-						{
-							print "; Use of uninitialized local $x in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
-						}
-					}
-				}
-				elsif($c{$_} eq 'inglobalvec')
-				{
-					if($s{op} ne 'OR' && $s{op} ne 'AND') # fteqcc logicops cause this
-					{
-						if(
-						   $watchlist->{$x} && !$watchlist->{$x}{valid}
-								||
-						   $watchlist->{$x+1} && !$watchlist->{$x+1}{valid}
-								||
-						   $watchlist->{$x+2} && !$watchlist->{$x+2}{valid}
-						)
-						{
-							print "; Use of uninitialized local $x in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
-						}
-					}
-				}
-				elsif($c{$_} eq 'outglobal')
-				{
-					$watchlist->{$x}{valid} = 1
-						if $watchlist->{$x};
-				}
-				elsif($c{$_} eq 'outglobalvec')
-				{
-					$watchlist->{$x}{valid} = 1
-						if $watchlist->{$x};
-					$watchlist->{$x+1}{valid} = 1
-						if $watchlist->{$x+1};
-					$watchlist->{$x+2}{valid} = 1
-						if $watchlist->{$x+2};
-				}
-				elsif($c{$_} eq 'immediate')
-				{
-					# OK
-				}
-			}
-			if($c{isreturn})
+				if $seen{"$ip:$statestr"}++;
+
+			my $s = $statements->[$ip];
+			my $c = checkop $s->{op};
+
+			$instruction_handler->($ip, $state, $s, $c);
+
+			if($c->{isreturn})
 			{
 				last;
 			}
-			elsif($c{isjump})
+			elsif($c->{isjump})
 			{
-				if($c{isconditional})
+				if($c->{isconditional})
 				{
-					$checkinstruction->($ip+1, { map { $_ => { %{$watchlist->{$_}} } } keys %$watchlist });
-					$ip += $s{$c{isjump}};
+					$nfa->($ip+1, $copy_handler->($state));
+					$ip += $s->{$c->{isjump}};
 				}
 				else
 				{
-					$ip += $s{$c{isjump}};
+					$ip += $s->{$c->{isjump}};
 				}
 			}
 			else
@@ -466,10 +418,16 @@ sub find_uninitialized_locals($$)
 			}
 		}
 	};
-	
+
+	$nfa->($ip, $copy_handler->($state));
+}
+
+sub find_uninitialized_locals($$)
+{
+	my ($progs, $func) = @_;
+
 	return
 		if $func->{first_statement} < 0; # builtin
-
 
 	print STDERR "Checking $func->{debugname}...\n";
 
@@ -484,72 +442,42 @@ sub find_uninitialized_locals($$)
 	use constant WATCHME_X => 4;
 	use constant WATCHME_T => 8;
 	my %watchme = map { $_ => WATCHME_X } ($p .. ($func->{parm_start} + $func->{locals} - 1));
+
 	# TODO mark temp globals as WATCHME_T
 
-	my $fixinitialstate;
-       	$fixinitialstate = sub
-	{
-		my ($ip) = @_;
-		for(;;)
+	run_nfa $progs, $func->{first_statement}, "", sub { $_[0] }, sub { $_[0] },
+		sub
 		{
-			return
-				if $instructions_seen{$ip}++;
-			my %s = %{$progs->{statements}[$ip]};
-			my %c = %{checkop $s{op}};
+			my ($ip, $state, $s, $c) = @_;
 			for(qw(a b c))
 			{
-				if(!defined $c{$_})
+				my $type = $c->{$_};
+				next
+					unless defined $type;
+
+				my $ofs = $s->{$_};
+				if($type eq 'inglobal' || $type eq 'inglobalfunc')
 				{
+					$watchme{$ofs} |= WATCHME_R;
 				}
-				elsif($c{$_} eq 'inglobal' || $c{$_} eq 'inglobalfunc')
+				elsif($type eq 'inglobalvec')
 				{
-					$watchme{$s{$_}} |= WATCHME_R;
+					$watchme{$ofs} |= WATCHME_R;
+					$watchme{$ofs+1} |= WATCHME_R;
+					$watchme{$ofs+2} |= WATCHME_R;
 				}
-				elsif($c{$_} eq 'inglobalvec')
+				elsif($type eq 'outglobal')
 				{
-					$watchme{$s{$_}} |= WATCHME_R;
-					$watchme{$s{$_}+1} |= WATCHME_R;
-					$watchme{$s{$_}+2} |= WATCHME_R;
+					$watchme{$ofs} |= WATCHME_W;
 				}
-				elsif($c{$_} eq 'outglobal')
+				elsif($type eq 'outglobalvec')
 				{
-					$watchme{$s{$_}} |= WATCHME_W;
-				}
-				elsif($c{$_} eq 'outglobalvec')
-				{
-					$watchme{$s{$_}} |= WATCHME_W;
-					$watchme{$s{$_}+1} |= WATCHME_W;
-					$watchme{$s{$_}+2} |= WATCHME_W;
-				}
-				elsif($c{$_} eq 'immediate')
-				{
-					# OK
+					$watchme{$ofs} |= WATCHME_W;
+					$watchme{$ofs+1} |= WATCHME_W;
+					$watchme{$ofs+2} |= WATCHME_W;
 				}
 			}
-			if($c{isreturn})
-			{
-				last;
-			}
-			elsif($c{isjump})
-			{
-				if($c{isconditional})
-				{
-					$fixinitialstate->($ip+1);
-					$ip += $s{$c{isjump}};
-				}
-				else
-				{
-					$ip += $s{$c{isjump}};
-				}
-			}
-			else
-			{
-				$ip += 1;
-			}
-		}
-	};
-	%instructions_seen = ();
-	$fixinitialstate->($func->{first_statement});
+		};
 
 	for(keys %watchme)
 	{
@@ -568,8 +496,72 @@ sub find_uninitialized_locals($$)
 		$watchme{$_} = { flags => $watchme{$_}, valid => 0 };
 	}
 
-	%instructions_seen = ();
-	$checkinstruction->($func->{first_statement}, \%watchme);
+	my %warned = ();
+	run_nfa $progs, $func->{first_statement}, \%watchme,
+		sub {
+			my ($h) = @_;
+			return { map { $_ => { %{$h->{$_}} } } keys %$h };
+		},
+		sub {
+			my ($h) = @_;
+			return join ' ', map { $h->{$_}->{valid}; } sort keys %$h;
+		},
+		sub {
+			my ($ip, $state, $s, $c) = @_;
+			my $op = $s->{op};
+			for(qw(a b c))
+			{
+				my $type = $c->{$_};
+				next
+					unless defined $type;
+
+				my $ofs = $s->{$_};
+
+				if($type eq 'inglobal' || $type eq 'inglobalfunc')
+				{
+					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
+					{
+						if($state->{$ofs} && !$state->{$ofs}{valid})
+						{
+							print "; Use of uninitialized local $ofs in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
+					}
+				}
+				elsif($type eq 'inglobalvec')
+				{
+					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
+					{
+						if(
+						   $state->{$ofs} && !$state->{$ofs}{valid}
+								||
+						   $state->{$ofs+1} && !$state->{$ofs+1}{valid}
+								||
+						   $state->{$ofs+2} && !$state->{$ofs+2}{valid}
+						)
+						{
+							print "; Use of uninitialized local $ofs in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
+					}
+				}
+				elsif($type eq 'outglobal')
+				{
+					$state->{$ofs}{valid} = 1
+						if $state->{$ofs};
+				}
+				elsif($type eq 'outglobalvec')
+				{
+					$state->{$ofs}{valid} = 1
+						if $state->{$ofs};
+					$state->{$ofs+1}{valid} = 1
+						if $state->{$ofs+1};
+					$state->{$ofs+2}{valid} = 1
+						if $state->{$ofs+2};
+				}
+			}
+		};
+	
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
 }
@@ -706,7 +698,7 @@ sub parse_progs($)
 
 	# what do we want to do?
 	my $checkfunc = \&find_uninitialized_locals;
-	for(sort { $a->{debugname} <=> $b->{debugname} } @{$p{functions}})
+	for(sort { $a->{debugname} cmp $b->{debugname} } @{$p{functions}})
 	{
 		$checkfunc->(\%p, $_);
 	}
