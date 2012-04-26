@@ -249,7 +249,11 @@ sub run_nfa($$$$$$)
 			my $s = $statements->[$ip];
 			my $c = checkop $s->{op};
 
-			$instruction_handler->($ip, $state, $s, $c);
+			if($instruction_handler->($ip, $state, $s, $c))
+			{
+				# abort execution
+				last;
+			}
 
 			if($c->{isreturn})
 			{
@@ -275,6 +279,30 @@ sub run_nfa($$$$$$)
 	};
 
 	$nfa->($ip, $copy_handler->($state));
+}
+
+sub get_constant($$)
+{
+	my ($progs, $g) = @_;
+	if($g->{int} == 0)
+	{
+		return undef;
+	}
+	elsif($g->{int} > 0 && $g->{int} < 16777216)
+	{
+		if($g->{int} < length $progs->{strings} && $g->{int} > 0)
+		{
+			return str($progs->{getstring}->($g->{int}));
+		}
+		else
+		{
+			return $g->{int} . "i";
+		}
+	}
+	else
+	{
+		return $g->{float};
+	}
 }
 
 use constant PRE_MARK_STATEMENT => "\e[1m";
@@ -303,22 +331,9 @@ sub disassemble_function($$;$)
 	my $initializer = sub
 	{
 		my ($ofs) = @_;
-		my $g = $progs->{globals}[$ofs]{v};
-		if($g->{int} == 0)
-		{
-		}
-		elsif($g->{int} < 16777216)
-		{
-			print " = $g->{int}%";
-			if($g->{int} < length $progs->{strings} && $g->{int} > 0)
-			{
-				print " " . str($progs->{getstring}->($g->{int}));
-			}
-		}
-		else
-		{
-			print " = $g->{float}!";
-		}
+		my $g = get_constant($progs, $progs->{globals}[$ofs]{v});
+		print " = $g"
+			if defined $g;
 	};
 
 	printf INSTRUCTION_FORMAT, '', '', '.PARM_START';
@@ -418,6 +433,8 @@ sub disassemble_function($$;$)
 				my $t = $ip + $s->{$j};
 				$come_from{$t}{$ip} = $c->{isconditional};
 			}
+
+			return 0;
 		};
 
 	my $ipprev = undef;
@@ -537,6 +554,8 @@ sub find_uninitialized_locals($$)
 					$watchme{$ofs+2} |= WATCHME_W;
 				}
 			}
+
+			return 0;
 		};
 
 	for(keys %watchme)
@@ -666,8 +685,8 @@ sub find_uninitialized_locals($$)
 				# builtin calls may clobber stuff
 				my $func = $s->{a};
 				my $funcid = $progs->{globals}[$func]{v}{int};
-				my $first_statement = $progs->{functions}[$funcid]{first_statement};
-				if($first_statement >= 0)
+				my $funcobj = $progs->{functions}[$funcid];
+				if($funcobj->{first_statement} >= 0)
 				{
 					# invalidate temps
 					for(values %$state)
@@ -678,7 +697,13 @@ sub find_uninitialized_locals($$)
 						}
 					}
 				}
+				elsif($funcobj->{debugname} =~ /(^|:)error$/)
+				{
+					return 1;
+				}
 			}
+
+			return 0;
 		};
 	
 	disassemble_function($progs, $func, \%warned)
@@ -813,16 +838,33 @@ sub parse_progs($)
 	}
 	for(0..(@{$p{globals}}-1))
 	{
-		$globaldefs[$_] //= { ofs => $_, s_name => undef, debugname => ($istemp{$_} ? "<temp>" : $isconst{$_} ? "<const>" : "<nodef>") . "\@$_" }, 
+		$globaldefs[$_] //= {
+			ofs => $_,
+			s_name => undef,
+			debugname => ""
+		};
 	}
 	my %globaldefs = ();
-	for(@{$p{globaldefs}})
+	for(@globaldefs)
 	{
-		$_->{debugname} = "<anon>\@$_->{ofs}"
-			if $_->{debugname} eq "";
+		if($_->{debugname} eq "")
+		{
+			if($istemp{$_->{ofs}})
+			{
+				$_->{debugname} = "<temp>\@$_->{ofs}";
+			}
+			elsif($isconst{$_->{ofs}})
+			{
+				$_->{debugname} = "<" . get_constant(\%p, $p{globals}[$_->{ofs}]{v}) . ">\@$_->{ofs}";
+			}
+			else
+			{
+				$_->{debugname} = "<nodef>\@$_->{ofs}";
+			}
+		}
 		++$globaldefs{$_->{debugname}};
 	}
-	for(@{$p{globaldefs}})
+	for(@globaldefs)
 	{
 		next
 			if $globaldefs{$_->{debugname}} <= 1;
