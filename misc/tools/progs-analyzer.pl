@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Digest::SHA;
 
 sub id()
 {
@@ -226,10 +227,19 @@ sub parse_section($$$$$)
 	return $out[0];
 }
 
+sub nfa_default_state_checker()
+{
+	my %seen;
+	return sub
+	{
+		my ($ip, $state) = @_;
+		return $seen{"$ip $state"}++;
+	};
+}
+
 sub run_nfa($$$$$$)
 {
-	my ($progs, $ip, $state, $copy_handler, $state_hasher, $instruction_handler) = @_;
-	my %seen = ();
+	my ($progs, $ip, $state, $copy_handler, $state_checker, $instruction_handler) = @_;
 
 	my $statements = $progs->{statements};
 
@@ -242,9 +252,8 @@ sub run_nfa($$$$$$)
 
 		for(;;)
 		{
-			my $statestr = $state_hasher->($state);
 			return
-				if $seen{"$ip:$statestr"}++;
+				if $state_checker->($ip, $state);
 
 			my $s = $statements->[$ip];
 			my $c = checkop $s->{op};
@@ -263,8 +272,16 @@ sub run_nfa($$$$$$)
 			{
 				if($c->{isconditional})
 				{
-					$nfa->($ip+1, $copy_handler->($state));
-					$ip += $s->{$c->{isjump}};
+					if(rand 2)
+					{
+						$nfa->($ip+$s->{$c->{isjump}}, $copy_handler->($state));
+						$ip += 1;
+					}
+					else
+					{
+						$nfa->($ip+1, $copy_handler->($state));
+						$ip += $s->{$c->{isjump}};
+					}
 				}
 				else
 				{
@@ -305,10 +322,10 @@ sub get_constant($$)
 	}
 }
 
-use constant PRE_MARK_STATEMENT => "\e[1m";
-use constant POST_MARK_STATEMENT => "\e[m";
-use constant PRE_MARK_OPERAND => "\e[41m";
-use constant POST_MARK_OPERAND => "\e[49m";
+use constant PRE_MARK_STATEMENT => "";
+use constant POST_MARK_STATEMENT => "";
+use constant PRE_MARK_OPERAND => "*** ";
+use constant POST_MARK_OPERAND => " ***";
 
 use constant INSTRUCTION_FORMAT => "%8s %3s | %-12s ";
 use constant OPERAND_FORMAT => "%s";
@@ -422,7 +439,7 @@ sub disassemble_function($$;$)
 
 	my %statements = ();
 	my %come_from = ();
-	run_nfa $progs, $func->{first_statement}, "", id, id,
+	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
 		sub
 		{
 			my ($ip, $state, $s, $c) = @_;
@@ -522,7 +539,7 @@ sub find_uninitialized_locals($$)
 			if not exists $watchme{$_};
 	}
 
-	run_nfa $progs, $func->{first_statement}, "", id, id,
+	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
 		sub
 		{
 			my ($ip, $state, $s, $c) = @_;
@@ -609,14 +626,41 @@ sub find_uninitialized_locals($$)
 	}
 
 	my %warned = ();
+	my %ip_seen = ();
 	run_nfa $progs, $func->{first_statement}, \%watchme,
 		sub {
 			my ($h) = @_;
 			return { map { $_ => { %{$h->{$_}} } } keys %$h };
 		},
 		sub {
-			my ($h) = @_;
-			return join ' ', map { $h->{$_}->{valid}; } sort keys %$h;
+			my ($ip, $state) = @_;
+			my $s = $ip_seen{$ip};
+			if($s)
+			{
+				# if $state is stronger or equal to $s, return 1
+				for(keys %$state)
+				{
+					if($state->{$_}{valid} < $s->{$_})
+					{
+						# The current state is LESS valid than the previously run one. We NEED to run this.
+						# The saved state can safely become the intersection [citation needed].
+						for(keys %$state)
+						{
+							$s->{$_} = $state->{$_}{valid}
+								if $state->{$_}{valid} < $s->{$_};
+						}
+						return 0;
+					}
+				}
+				# if we get here, $state is stronger or equal. No need to try it.
+				return 1;
+			}
+			else
+			{
+				# Never seen this IP yet.
+				$ip_seen{$ip} = { map { ($_ => $state->{$_}{valid}); } keys %$state };
+				return 0;
+			}
 		},
 		sub {
 			my ($ip, $state, $s, $c) = @_;
