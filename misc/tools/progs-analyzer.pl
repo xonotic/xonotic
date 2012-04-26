@@ -333,10 +333,7 @@ sub disassemble_function($$;$)
 	my $p = $func->{parm_start};
 	for(0..($func->{numparms}-1))
 	{
-		if($func->{parm_size}[$_] <= 1)
-		{
-			$override_locals{$p} //= "argv[$_]";
-		}
+		$override_locals{$p} //= "argv[$_]";
 		for my $comp(0..($func->{parm_size}[$_]-1))
 		{
 			$override_locals{$p} //= "argv[$_][$comp]";
@@ -363,9 +360,11 @@ sub disassemble_function($$;$)
 	my $getname = sub
 	{
 		my ($ofs) = @_;
+		$ofs &= 0xFFFF;
 		return $override_locals{$ofs}
 			if exists $override_locals{$ofs};
-		return $progs->{globaldef_byoffset}->($ofs)->{debugname};
+		my $def = $progs->{globaldef_byoffset}->($ofs);
+		return $def->{debugname};
 	};
 
 	my $operand = sub
@@ -498,9 +497,9 @@ sub find_uninitialized_locals($$)
 	use constant WATCHME_W => 2;
 	use constant WATCHME_X => 4;
 	use constant WATCHME_T => 8;
-	my %watchme = map { $_ => WATCHME_X } ($p .. ($func->{parm_start} + $func->{locals} - 1));
+	my %watchme = map { $_ => WATCHME_X } ($func->{parm_start} .. ($func->{parm_start} + $func->{locals} - 1));
 
-	for($progs->{temps})
+	for(keys %{$progs->{temps}})
 	{
 		$watchme{$_} = WATCHME_T | WATCHME_X
 			if not exists $watchme{$_};
@@ -551,7 +550,10 @@ sub find_uninitialized_locals($$)
 
 	for(keys %watchme)
 	{
-		$watchme{$_} = { flags => $watchme{$_}, valid => 0 };
+		$watchme{$_} = {
+			flags => $watchme{$_},
+			valid => ($_ >= $func->{parm_start} && $_ < $p) # preinitialize parameters
+		};
 	}
 
 	my %warned = ();
@@ -628,12 +630,19 @@ sub find_uninitialized_locals($$)
 			}
 			if($c->{iscall})
 			{
-				# invalidate temps
-				for(values %$state)
+				# builtin calls may clobber stuff
+				my $func = $s->{a};
+				my $funcid = $progs->{globals}[$func]{v}{int};
+				my $first_statement = $progs->{functions}[$funcid]{first_statement};
+				if($first_statement >= 0)
 				{
-					if($_->{flags} & WATCHME_T)
+					# invalidate temps
+					for(values %$state)
 					{
-						$_->{valid} = -1;
+						if($_->{flags} & WATCHME_T)
+						{
+							$_->{valid} = -1;
+						}
 					}
 				}
 			}
@@ -721,23 +730,37 @@ sub parse_progs($)
 	my %offsets_saved = ();
 	for(@{$p{globaldefs}})
 	{
+		my $type = $_->{type};
+		my $name = $p{getstring}->($_->{s_name});
 		next
-			unless $_->{type}{save};
-		next
-			unless $p{getstring}->($_->{s_name}) eq "";
+			unless $type->{save} or $name ne "";
 		for my $i(0..(typesize($_->{type}{type})-1))
 		{
 			++$offsets_saved{$_->{ofs}+$i};
 		}
 	}
+	my %offsets_initialized = ();
+	for(0..(@{$p{globals}}-1))
+	{
+		if($p{globals}[$_]{v}{int})
+		{
+			++$offsets_initialized{$_};
+		}
+	}
 	my %istemp = ();
+	my %isconst = ();
 	for(0..(@{$p{globals}}-1))
 	{
 		next
-			if $offsets_saved{$_};
-		$istemp{$_} = 1;
+			if $_ < @{(DEFAULTGLOBALS)};
+		++$isconst{$_}
+			if !$offsets_saved{$_} and $offsets_initialized{$_};
+		++$istemp{$_}
+			if !$offsets_saved{$_} and !$offsets_initialized{$_};
 	}
-	$p{temps} = [keys %istemp];
+	$p{temps} = \%istemp;
+	$p{consts} = \%isconst;
+	# TODO rather detect consts by only reading instructions
 
 	print STDERR "Naming...\n";
 
@@ -758,7 +781,7 @@ sub parse_progs($)
 	}
 	for(0..(@{$p{globals}}-1))
 	{
-		$globaldefs[$_] //= { ofs => $_, s_name => undef, debugname => ($istemp{$_} ? "<temp>" : "<nodef>") . "\@$_" }, 
+		$globaldefs[$_] //= { ofs => $_, s_name => undef, debugname => ($istemp{$_} ? "<temp>" : $isconst{$_} ? "<const>" : "<nodef>") . "\@$_" }, 
 	}
 	my %globaldefs = ();
 	for(@{$p{globaldefs}})
@@ -776,11 +799,13 @@ sub parse_progs($)
 	$p{globaldef_byoffset} = sub
 	{
 		my ($ofs) = @_;
-		if($ofs < @{(DEFAULTGLOBALS)})
+		$ofs &= 0xFFFF;
+		if($ofs >= 0 && $ofs < @{(DEFAULTGLOBALS)})
 		{
 			return { ofs => $ofs, s_name => undef, debugname => DEFAULTGLOBALS->[$ofs], type => undef };
 		}
 		my $def = $globaldefs[$ofs];
+		return $def;
 	};
 
 	# functions
@@ -802,6 +827,7 @@ sub parse_progs($)
 
 	# what do we want to do?
 	my $checkfunc = \&find_uninitialized_locals;
+	#my $checkfunc = \&disassemble_function;
 	for(sort { $a->{debugname} cmp $b->{debugname} } @{$p{functions}})
 	{
 		$checkfunc->(\%p, $_);
