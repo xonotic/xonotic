@@ -686,7 +686,7 @@ sub find_uninitialized_locals($$)
 				my $func = $s->{a};
 				my $funcid = $progs->{globals}[$func]{v}{int};
 				my $funcobj = $progs->{functions}[$funcid];
-				if($funcobj->{first_statement} >= 0)
+				if(!$funcobj || $funcobj->{first_statement} >= 0)
 				{
 					# invalidate temps
 					for(values %$state)
@@ -697,9 +697,11 @@ sub find_uninitialized_locals($$)
 						}
 					}
 				}
-				elsif($funcobj->{debugname} =~ /(^|:)error$/)
+				else # builtin
 				{
-					return 1;
+					my $def = $progs->{globaldef_byoffset}->($func);
+					return 1
+						if $def->{debugname} eq 'error';
 				}
 			}
 
