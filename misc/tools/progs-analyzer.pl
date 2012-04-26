@@ -552,8 +552,41 @@ sub find_uninitialized_locals($$)
 	{
 		$watchme{$_} = {
 			flags => $watchme{$_},
-			valid => ($_ >= $func->{parm_start} && $_ < $p) # preinitialize parameters
+			valid => 0
 		};
+	}
+
+	# mark parameters as initialized
+	for($func->{parm_start} .. ($p-1))
+	{
+		$watchme{$_}{valid} = 1
+			if defined $watchme{$_};
+	}
+	# an initial run of STORE instruction is for receiving extra parameters
+	# (beyond 8). Only possible if the function is declared as having 8 params.
+	# Extra parameters behave otherwise like temps, but are initialized at
+	# startup.
+	for($func->{first_statement} .. (@{$progs->{statements}}-1))
+	{
+		my $s = $progs->{statements}[$_];
+		if($s->{op} eq 'STORE_V')
+		{
+			$watchme{$s->{a}}{valid} = 1
+				if defined $watchme{$s->{a}};
+			$watchme{$s->{a}+1}{valid} = 1
+				if defined $watchme{$s->{a}+1};
+			$watchme{$s->{a}+2}{valid} = 1
+				if defined $watchme{$s->{a}+2};
+		}
+		elsif($s->{op} =~ /^STORE_/)
+		{
+			$watchme{$s->{a}}{valid} = 1
+				if defined $watchme{$s->{a}};
+		}
+		else
+		{
+			last;
+		}
 	}
 
 	my %warned = ();
@@ -760,7 +793,6 @@ sub parse_progs($)
 	}
 	$p{temps} = \%istemp;
 	$p{consts} = \%isconst;
-	# TODO rather detect consts by only reading instructions
 
 	print STDERR "Naming...\n";
 
