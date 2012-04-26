@@ -365,14 +365,14 @@ sub disassemble_function($$;$)
 	my $p = $func->{parm_start};
 	for(0..($func->{numparms}-1))
 	{
-		$override_locals{$p} //= "argv[$_]";
+		$override_locals{$p} //= "argv_$_";
 		for my $comp(0..($func->{parm_size}[$_]-1))
 		{
-			$override_locals{$p} //= "argv[$_][$comp]";
+			$override_locals{$p} //= "argv_$_\[$comp]";
 			++$p;
 		}
 		printf INSTRUCTION_FORMAT, '', '', '.ARG';
-		printf OPERAND_FORMAT, "argv[$_]";
+		printf OPERAND_FORMAT, "argv_$_";
 		print OPERAND_SEPARATOR;
 		printf OPERAND_FORMAT, $func->{parm_size}[$_];
 		print INSTRUCTION_SEPARATOR;
@@ -381,10 +381,10 @@ sub disassemble_function($$;$)
 	{
 		next
 			if exists $override_locals{$_};
-		$override_locals{$_} = "<local>\@$_";
+		$override_locals{$_} = "local_$_";
 
 		printf INSTRUCTION_FORMAT, '', '', '.LOCAL';
-		printf OPERAND_FORMAT, "<local>\@$_";
+		printf OPERAND_FORMAT, "local_$_";
 		$initializer->($_);
 		print INSTRUCTION_SEPARATOR;
 	}
@@ -757,34 +757,34 @@ sub find_uninitialized_locals($$)
 }
 
 use constant DEFAULTGLOBALS => [
-	"<OFS_NULL>",
-	"<OFS_RETURN>",
-	"<OFS_RETURN>[1]",
-	"<OFS_RETURN>[2]",
-	"<OFS_PARM0>",
-	"<OFS_PARM0>[1]",
-	"<OFS_PARM0>[2]",
-	"<OFS_PARM1>",
-	"<OFS_PARM1>[1]",
-	"<OFS_PARM1>[2]",
-	"<OFS_PARM2>",
-	"<OFS_PARM2>[1]",
-	"<OFS_PARM2>[2]",
-	"<OFS_PARM3>",
-	"<OFS_PARM3>[1]",
-	"<OFS_PARM3>[2]",
-	"<OFS_PARM4>",
-	"<OFS_PARM4>[1]",
-	"<OFS_PARM4>[2]",
-	"<OFS_PARM5>",
-	"<OFS_PARM5>[1]",
-	"<OFS_PARM5>[2]",
-	"<OFS_PARM6>",
-	"<OFS_PARM6>[1]",
-	"<OFS_PARM6>[2]",
-	"<OFS_PARM7>",
-	"<OFS_PARM7>[1]",
-	"<OFS_PARM7>[2]"
+	"OFS_NULL",
+	"OFS_RETURN",
+	"OFS_RETURN[1]",
+	"OFS_RETURN[2]",
+	"OFS_PARM0",
+	"OFS_PARM0[1]",
+	"OFS_PARM0[2]",
+	"OFS_PARM1",
+	"OFS_PARM1[1]",
+	"OFS_PARM1[2]",
+	"OFS_PARM2",
+	"OFS_PARM2[1]",
+	"OFS_PARM2[2]",
+	"OFS_PARM3",
+	"OFS_PARM3[1]",
+	"OFS_PARM3[2]",
+	"OFS_PARM4",
+	"OFS_PARM4[1]",
+	"OFS_PARM4[2]",
+	"OFS_PARM5",
+	"OFS_PARM5[1]",
+	"OFS_PARM5[2]",
+	"OFS_PARM6",
+	"OFS_PARM6[1]",
+	"OFS_PARM6[2]",
+	"OFS_PARM7",
+	"OFS_PARM7[1]",
+	"OFS_PARM7[2]"
 ];
 
 sub defaultglobal($)
@@ -871,12 +871,14 @@ sub parse_progs($)
 	my @globaldefs = ();
 	for(@{$p{globaldefs}})
 	{
-		$_->{debugname} = $p{getstring}->($_->{s_name});
+		my $s = $p{getstring}->($_->{s_name});
+		$_->{debugname} //= "_$s"
+			if length $s;
 	}
 	for(@{$p{globaldefs}})
 	{
 		$globaldefs[$_->{ofs}] //= $_
-			if $_->{debugname} ne "";
+			if defined $_->{debugname};
 	}
 	for(@{$p{globaldefs}})
 	{
@@ -887,25 +889,25 @@ sub parse_progs($)
 		$globaldefs[$_] //= {
 			ofs => $_,
 			s_name => undef,
-			debugname => ""
+			debugname => undef
 		};
 	}
 	my %globaldefs = ();
 	for(@globaldefs)
 	{
-		if($_->{debugname} eq "")
+		if(!defined $_->{debugname})
 		{
 			if($istemp{$_->{ofs}})
 			{
-				$_->{debugname} = "<temp>\@$_->{ofs}";
+				$_->{debugname} = "temp_$_->{ofs}";
 			}
 			elsif($isconst{$_->{ofs}})
 			{
-				$_->{debugname} = "<" . get_constant(\%p, $p{globals}[$_->{ofs}]{v}) . ">\@$_->{ofs}";
+				$_->{debugname} = "(" . get_constant(\%p, $p{globals}[$_->{ofs}]{v}) . ")";
 			}
 			else
 			{
-				$_->{debugname} = "<nodef>\@$_->{ofs}";
+				$_->{debugname} = "global_$_->{ofs}";
 			}
 		}
 		++$globaldefs{$_->{debugname}};
@@ -914,6 +916,7 @@ sub parse_progs($)
 	{
 		next
 			if $globaldefs{$_->{debugname}} <= 1;
+		print "Not unique: $_->{debugname} at $_->{ofs}\n";
 		$_->{debugname} .= "\@$_->{ofs}";
 	}
 	$p{globaldef_byoffset} = sub
