@@ -118,7 +118,7 @@ sub checkop($)
 	}
 	if($op =~ /^DONE$|^RETURN$/)
 	{
-		return { a => 'inglobal', isreturn => 1 };
+		return { a => 'inglobalvec', isreturn => 1 };
 	}
 	return { a => 'inglobal', b => 'inglobal', c => 'outglobal' };
 }
@@ -516,6 +516,15 @@ sub find_uninitialized_locals($$)
 {
 	my ($progs, $func) = @_;
 
+#	TODO
+#	21:04:25      divVerent | just wondering how I can best detect "temp value is never used"
+#	21:04:33      divVerent | I know which vars are temps already
+#	21:04:59      divVerent | basically, looks like for each write, I will not just have to track that the new value is valid
+#	21:05:01      divVerent | but also its source
+#	21:05:12      divVerent | on each read, I'll remember that this source statement's value has been used
+#	21:05:21      divVerent | and will compare the list of sources in a step after "execution"
+#	21:05:27      divVerent | to the list of total write statements to the temp
+
 	return
 		if $func->{first_statement} < 0; # builtin
 
@@ -539,6 +548,7 @@ sub find_uninitialized_locals($$)
 			if not exists $watchme{$_};
 	}
 
+	my %write_places = ();
 	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
 		sub
 		{
@@ -563,12 +573,16 @@ sub find_uninitialized_locals($$)
 				elsif($type eq 'outglobal')
 				{
 					$watchme{$ofs} |= WATCHME_W;
+					$write_places{$ip}{$_} = $_
+						if $watchme{$ofs} & WATCHME_X;
 				}
 				elsif($type eq 'outglobalvec')
 				{
 					$watchme{$ofs} |= WATCHME_W;
 					$watchme{$ofs+1} |= WATCHME_W;
 					$watchme{$ofs+2} |= WATCHME_W;
+					$write_places{$ip}{$_} = 1
+						if ($watchme{$ofs} | $watchme{$ofs+1} | $watchme{$ofs+2}) & WATCHME_X;
 				}
 			}
 
@@ -588,14 +602,14 @@ sub find_uninitialized_locals($$)
 	{
 		$watchme{$_} = {
 			flags => $watchme{$_},
-			valid => 0
+			valid => [0, undef, undef]
 		};
 	}
 
 	# mark parameters as initialized
 	for($func->{parm_start} .. ($p-1))
 	{
-		$watchme{$_}{valid} = 1
+		$watchme{$_}{valid} = [1, undef, undef]
 			if defined $watchme{$_};
 	}
 	# an initial run of STORE instruction is for receiving extra parameters
@@ -607,16 +621,16 @@ sub find_uninitialized_locals($$)
 		my $s = $progs->{statements}[$_];
 		if($s->{op} eq 'STORE_V')
 		{
-			$watchme{$s->{a}}{valid} = 1
+			$watchme{$s->{a}}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}};
-			$watchme{$s->{a}+1}{valid} = 1
+			$watchme{$s->{a}+1}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}+1};
-			$watchme{$s->{a}+2}{valid} = 1
+			$watchme{$s->{a}+2}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}+2};
 		}
 		elsif($s->{op} =~ /^STORE_/)
 		{
-			$watchme{$s->{a}}{valid} = 1
+			$watchme{$s->{a}}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}};
 		}
 		else
@@ -634,20 +648,28 @@ sub find_uninitialized_locals($$)
 		},
 		sub {
 			my ($ip, $state) = @_;
+
 			my $s = $ip_seen{$ip};
 			if($s)
 			{
 				# if $state is stronger or equal to $s, return 1
+
+				# FIXME this is wrong now
+				# when merging states, we also must somehow merge initialization sources
+				# to become the union, EVEN for already analyzes future instructions!
+				# maybe can do this by abusing references
+				# and thereby adjusting the value after the fact
+
 				for(keys %$state)
 				{
-					if($state->{$_}{valid} < $s->{$_})
+					if($state->{$_}{valid}[0] < $s->{$_}[0])
 					{
 						# The current state is LESS valid than the previously run one. We NEED to run this.
 						# The saved state can safely become the intersection [citation needed].
 						for(keys %$state)
 						{
 							$s->{$_} = $state->{$_}{valid}
-								if $state->{$_}{valid} < $s->{$_};
+								if $state->{$_}{valid}[0] < $s->{$_}[0];
 						}
 						return 0;
 					}
@@ -665,6 +687,9 @@ sub find_uninitialized_locals($$)
 		sub {
 			my ($ip, $state, $s, $c) = @_;
 			my $op = $s->{op};
+
+			my $return_hack = $c->{isreturn} // 0;
+
 			for(qw(a b c))
 			{
 				my $type = $c->{$_};
@@ -676,42 +701,52 @@ sub find_uninitialized_locals($$)
 				my $read = sub
 				{
 					my ($ofs) = @_;
+					++$return_hack
+						if $return_hack;
 					return
 						if not exists $state->{$ofs};
 					my $valid = $state->{$ofs}{valid};
-					if($valid == 0)
+					if($valid->[0] == 0)
 					{
-						print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
-						++$warned{$ip}{$_};
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						{
+							print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
 					}
-					elsif($valid < 0)
+					elsif($valid->[0] < 0)
 					{
-						print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
-						++$warned{$ip}{$_};
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						{
+							print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
+					}
+					else
+					{
+						# it's VALID
+						if(defined $valid->[1])
+						{
+							delete $write_places{$valid->[1]}{$valid->[2]};
+						}
 					}
 				};
 				my $write = sub
 				{
 					my ($ofs) = @_;
-					$state->{$ofs}{valid} = 1
+					$state->{$ofs}{valid} = [1, $ip, $_]
 						if exists $state->{$ofs};
 				};
 
 				if($type eq 'inglobal' || $type eq 'inglobalfunc')
 				{
-					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
-					{
-						$read->($ofs);
-					}
+					$read->($ofs);
 				}
 				elsif($type eq 'inglobalvec')
 				{
-					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
-					{
-						$read->($ofs);
-						$read->($ofs+1);
-						$read->($ofs+2);
-					}
+					$read->($ofs);
+					$read->($ofs+1);
+					$read->($ofs+2);
 				}
 				elsif($type eq 'outglobal')
 				{
@@ -737,7 +772,7 @@ sub find_uninitialized_locals($$)
 					{
 						if($_->{flags} & WATCHME_T)
 						{
-							$_->{valid} = -1;
+							$_->{valid} = [-1, undef, undef];
 						}
 					}
 				}
@@ -751,6 +786,15 @@ sub find_uninitialized_locals($$)
 
 			return 0;
 		};
+
+#	for my $ip(keys %write_places)
+#	{
+#		for(keys %{$write_places{$ip}})
+#		{
+#			print "; Value is never used in $func->{debugname} at $ip.$_\n";
+#			++$warned{$ip}{$_};
+#		}
+#	}
 	
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
