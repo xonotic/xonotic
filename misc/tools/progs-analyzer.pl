@@ -127,7 +127,7 @@ use constant TYPES => {
 	int => ['V', 4, signed 32],
 	ushort => ['v', 2, id],
 	short => ['v', 2, signed 16],
-	opcode => ['v', 2, sub { OPCODE_E->[$_[0]] or die "Invalid opcode: $_[0]"; }],
+	opcode => ['v', 2, sub { OPCODE_E->[$_[0]] or do { warn "Invalid opcode: $_[0]"; "INVALID#$_[0]"; }; }],
 	float => ['f', 4, id],
 	uchar8 => ['a8', 8, sub { [unpack 'C8', $_[0]] }],
 	global => ['i', 4, sub { { int => $_[0], float => unpack "f", pack "L", $_[0] }; }],
