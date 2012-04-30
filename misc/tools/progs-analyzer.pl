@@ -657,14 +657,14 @@ sub find_uninitialized_locals($$)
 
 				for(keys %$state)
 				{
-					if($state->{$_}{valid}[0] < $s->{$_}[0])
+					if($state->{$_}{valid}[0] < $s->{$_})
 					{
 						# The current state is LESS valid than the previously run one. We NEED to run this.
 						# The saved state can safely become the intersection [citation needed].
 						for(keys %$state)
 						{
-							$s->{$_} = $state->{$_}{valid}
-								if $state->{$_}{valid}[0] < $s->{$_}[0];
+							$s->{$_} = $state->{$_}{valid}[0]
+								if $state->{$_}{valid}[0] < $s->{$_};
 						}
 						return 0;
 					}
@@ -675,7 +675,7 @@ sub find_uninitialized_locals($$)
 			else
 			{
 				# Never seen this IP yet.
-				$ip_seen{$ip} = { map { ($_ => $state->{$_}{valid}); } keys %$state };
+				$ip_seen{$ip} = { map { ($_ => $state->{$_}{valid}[0]); } keys %$state };
 				return 0;
 			}
 		},
