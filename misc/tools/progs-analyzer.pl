@@ -1022,7 +1022,7 @@ sub parse_progs($)
 	{
 		next
 			if $globaldefs{$_->{debugname}} <= 1;
-		print "Not unique: $_->{debugname} at $_->{ofs}\n";
+		#print "Not unique: $_->{debugname} at $_->{ofs}\n";
 		$_->{debugname} .= "\@$_->{ofs}";
 	}
 	$p{globaldef_byoffset} = sub
