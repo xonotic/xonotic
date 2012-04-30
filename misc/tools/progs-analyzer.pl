@@ -269,6 +269,18 @@ sub run_nfa($$$$$$)
 			{
 				last;
 			}
+			elsif($c->{iscall})
+			{
+				my $func = $s->{a};
+				my $funcid = $progs->{globals}[$func]{v}{int};
+				my $funcobj = $progs->{functions}[$funcid];
+				if($funcobj && $funcobj->{first_statement} < 0) # builtin
+				{
+					my $def = $progs->{globaldef_byoffset}->($func);
+					last
+						if $def->{debugname} eq 'error';
+				}
+			}
 			elsif($c->{isjump})
 			{
 				if($c->{isconditional})
@@ -768,12 +780,6 @@ sub find_uninitialized_locals($$)
 							$_->{valid} = [-1, undef, undef];
 						}
 					}
-				}
-				else # builtin
-				{
-					my $def = $progs->{globaldef_byoffset}->($func);
-					return 1
-						if $def->{debugname} eq 'error';
 				}
 			}
 
