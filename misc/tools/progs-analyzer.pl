@@ -249,16 +249,17 @@ sub run_nfa($$$$$$)
 		no warnings 'recursion';
 
 		my ($ip, $state) = @_;
+		my $ret = 0;
 
 		for(;;)
 		{
-			return
+			return $ret
 				if $state_checker->($ip, $state);
 
 			my $s = $statements->[$ip];
 			my $c = checkop $s->{op};
 
-			if($instruction_handler->($ip, $state, $s, $c))
+			if(($ret = $instruction_handler->($ip, $state, $s, $c)))
 			{
 				# abort execution
 				last;
@@ -274,7 +275,10 @@ sub run_nfa($$$$$$)
 				{
 					if(rand 2)
 					{
-						$nfa->($ip+$s->{$c->{isjump}}, $copy_handler->($state));
+						if(($ret = $nfa->($ip+$s->{$c->{isjump}}, $copy_handler->($state))) < 0)
+						{
+							last;
+						}
 						$ip += 1;
 					}
 					else
@@ -293,6 +297,8 @@ sub run_nfa($$$$$$)
 				$ip += 1;
 			}
 		}
+
+		return $ret;
 	};
 
 	$nfa->($ip, $copy_handler->($state));
@@ -516,14 +522,6 @@ sub find_uninitialized_locals($$)
 {
 	my ($progs, $func) = @_;
 
-#	TODO
-#	21:04:25      divVerent | just wondering how I can best detect "temp value is never used"
-#	21:04:33      divVerent | I know which vars are temps already
-#	21:04:59      divVerent | basically, looks like for each write, I will not just have to track that the new value is valid
-#	21:05:01      divVerent | but also its source
-#	21:05:12      divVerent | on each read, I'll remember that this source statement's value has been used
-#	21:05:21      divVerent | and will compare the list of sources in a step after "execution"
-#	21:05:27      divVerent | to the list of total write statements to the temp
 
 	return
 		if $func->{first_statement} < 0; # builtin
@@ -782,7 +780,6 @@ sub find_uninitialized_locals($$)
 			return 0;
 		};
 
-	my %writeplace_seen = ();
 	for my $ip(keys %write_places)
 	{
 		for my $operand(keys %{$write_places{$ip}})
@@ -791,6 +788,7 @@ sub find_uninitialized_locals($$)
 			my %left = map { $_ => 1 } @{$write_places{$ip}{$operand}};
 			my $isread = 0;
 
+			my %writeplace_seen = ();
 			run_nfa $progs, $ip+1, \%left,
 				sub
 				{
