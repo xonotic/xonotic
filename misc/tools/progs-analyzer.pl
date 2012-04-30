@@ -278,8 +278,9 @@ sub run_nfa($$$$$$)
 				{
 					my $def = $progs->{globaldef_byoffset}->($func);
 					last
-						if $def->{debugname} eq 'error';
+						if $def->{debugname} eq '_error';
 				}
+				$ip += 1;
 			}
 			elsif($c->{isjump})
 			{
