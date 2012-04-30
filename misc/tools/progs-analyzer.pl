@@ -573,7 +573,7 @@ sub find_uninitialized_locals($$)
 				elsif($type eq 'outglobal')
 				{
 					$watchme{$ofs} |= WATCHME_W;
-					$write_places{$ip}{$_} = $_
+					$write_places{$ip}{$_} = [$ofs]
 						if $watchme{$ofs} & WATCHME_X;
 				}
 				elsif($type eq 'outglobalvec')
@@ -581,8 +581,9 @@ sub find_uninitialized_locals($$)
 					$watchme{$ofs} |= WATCHME_W;
 					$watchme{$ofs+1} |= WATCHME_W;
 					$watchme{$ofs+2} |= WATCHME_W;
-					$write_places{$ip}{$_} = 1
-						if ($watchme{$ofs} | $watchme{$ofs+1} | $watchme{$ofs+2}) & WATCHME_X;
+					my @l = grep { $watchme{$_} & WATCHME_X } $ofs .. ($ofs+2);
+					$write_places{$ip}{$_} = \@l
+						if @l;
 				}
 			}
 
@@ -653,12 +654,6 @@ sub find_uninitialized_locals($$)
 			if($s)
 			{
 				# if $state is stronger or equal to $s, return 1
-
-				# FIXME this is wrong now
-				# when merging states, we also must somehow merge initialization sources
-				# to become the union, EVEN for already analyzes future instructions!
-				# maybe can do this by abusing references
-				# and thereby adjusting the value after the fact
 
 				for(keys %$state)
 				{
@@ -787,14 +782,76 @@ sub find_uninitialized_locals($$)
 			return 0;
 		};
 
-#	for my $ip(keys %write_places)
-#	{
-#		for(keys %{$write_places{$ip}})
-#		{
-#			print "; Value is never used in $func->{debugname} at $ip.$_\n";
-#			++$warned{$ip}{$_};
-#		}
-#	}
+	my %writeplace_seen = ();
+	for my $ip(keys %write_places)
+	{
+		for my $operand(keys %{$write_places{$ip}})
+		{
+			# TODO verify it
+			my %left = map { $_ => 1 } @{$write_places{$ip}{$operand}};
+			my $isread = 0;
+
+			run_nfa $progs, $ip+1, \%left,
+				sub
+				{
+					return { %{$_[0]} };
+				},
+				sub
+				{
+					my ($ip, $state) = @_;
+					return $writeplace_seen{"$ip " . join " ", sort keys %$state}++;
+				},
+				sub
+				{
+					my ($ip, $state, $s, $c) = @_;
+					for(qw(a b c))
+					{
+						my $type = $c->{$_};
+						next
+							unless defined $type;
+
+						my $ofs = $s->{$_};
+						if($type eq 'inglobal' || $type eq 'inglobalfunc')
+						{
+							if($state->{$ofs})
+							{
+								$isread = 1;
+								return -1; # exit TOTALLY
+							}
+						}
+						elsif($type eq 'inglobalvec')
+						{
+							if($state->{$ofs} || $state->{$ofs+1} || $state->{$ofs+2})
+							{
+								$isread = 1;
+								return -1; # exit TOTALLY
+							}
+						}
+						elsif($type eq 'outglobal')
+						{
+							delete $state->{$ofs};
+							return 1
+								if !%$state;
+						}
+						elsif($type eq 'outglobalvec')
+						{
+							delete $state->{$ofs};
+							delete $state->{$ofs+1};
+							delete $state->{$ofs+2};
+							return 1
+								if !%$state;
+						}
+					}
+					return 0;
+				};
+
+			if(!$isread)
+			{
+				print "; Value is never used in $func->{debugname} at $ip.$operand\n";
+				++$warned{$ip}{$operand};
+			}
+		}
+	}
 	
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
