@@ -605,32 +605,6 @@ sub find_uninitialized_locals($$)
 		$watchme{$_}{valid} = [1, undef, undef]
 			if defined $watchme{$_};
 	}
-	# an initial run of STORE instruction is for receiving extra parameters
-	# (beyond 8). Only possible if the function is declared as having 8 params.
-	# Extra parameters behave otherwise like temps, but are initialized at
-	# startup.
-	for($func->{first_statement} .. (@{$progs->{statements}}-1))
-	{
-		my $s = $progs->{statements}[$_];
-		if($s->{op} eq 'STORE_V')
-		{
-			$watchme{$s->{a}}{valid} = [1, undef, undef]
-				if defined $watchme{$s->{a}};
-			$watchme{$s->{a}+1}{valid} = [1, undef, undef]
-				if defined $watchme{$s->{a}+1};
-			$watchme{$s->{a}+2}{valid} = [1, undef, undef]
-				if defined $watchme{$s->{a}+2};
-		}
-		elsif($s->{op} =~ /^STORE_/)
-		{
-			$watchme{$s->{a}}{valid} = [1, undef, undef]
-				if defined $watchme{$s->{a}};
-		}
-		else
-		{
-			last;
-		}
-	}
 
 	my %warned = ();
 	my %ip_seen = ();
@@ -903,6 +877,7 @@ sub detect_constants($)
 	use constant GLOBALFLAG_N => 16; # named
 	use constant GLOBALFLAG_Q => 32; # unique to function
 	use constant GLOBALFLAG_U => 64; # unused
+	use constant GLOBALFLAG_P => 128; # possibly parameter passing
 	my @globalflags = (GLOBALFLAG_Q | GLOBALFLAG_U) x @{$progs->{globals}};
 
 	for(@{$progs->{functions}})
@@ -922,6 +897,56 @@ sub detect_constants($)
 			for keys %{$_->{globals_read}};
 		$globalflags[$_] |= GLOBALFLAG_W
 			for keys %{$_->{globals_written}};
+		for my $ip($_->{first_statement} .. (@{$progs->{statements}}-1))
+		{
+			my $s = $progs->{statements}[$ip];
+			if($s->{op} eq 'STORE_V')
+			{
+				$globalflags[$s->{a}] |= GLOBALFLAG_P
+					if $s->{b} >= $_->{parm_start} and $s->{b} < $_->{parm_start} + $_->{locals};
+				$globalflags[$s->{a}+1] |= GLOBALFLAG_P
+					if $s->{b}+1 >= $_->{parm_start} and $s->{b}+1 < $_->{parm_start} + $_->{locals};
+				$globalflags[$s->{a}+2] |= GLOBALFLAG_P
+					if $s->{b}+2 >= $_->{parm_start} and $s->{b}+2 < $_->{parm_start} + $_->{locals};
+			}
+			elsif($s->{op} =~ /^STORE_/)
+			{
+				$globalflags[$s->{a}] |= GLOBALFLAG_P
+					if $s->{b} >= $_->{parm_start} and $s->{b} < $_->{parm_start} + $_->{locals};
+			}
+			else
+			{
+				last;
+			}
+		}
+	}
+
+	# parameter passing globals are only ever used in STORE_ instructions
+	for my $s(@{$progs->{statements}})
+	{
+		next
+			if $s->{op} =~ /^STORE_/;
+
+		my $c = checkop $s->{op};
+
+		for(qw(a b c))
+		{
+			my $type = $c->{$_};
+			next
+				unless defined $type;
+
+			my $ofs = $s->{$_};
+			if($type eq 'inglobal' || $type eq 'inglobalfunc' || $type eq 'outglobal')
+			{
+				$globalflags[$ofs] &= ~GLOBALFLAG_P;
+			}
+			if($type eq 'inglobalvec' || $type eq 'outglobalvec')
+			{
+				$globalflags[$ofs] &= ~GLOBALFLAG_P;
+				$globalflags[$ofs+1] &= ~GLOBALFLAG_P;
+				$globalflags[$ofs+2] &= ~GLOBALFLAG_P;
+			}
+		}
 	}
 
 	my %offsets_saved = ();
@@ -991,15 +1016,22 @@ sub detect_constants($)
 			{
 				$globaltypes[$_] = "global";
 			}
-			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == GLOBALFLAG_Q)
+			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == 0)
 			{
-				$globaltypes[$_] = "uniquetemp";
-				$istemp{$_} = 0;
-			}
-			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == 0)
-			{
-				$globaltypes[$_] = "temp";
-				$istemp{$_} = 1;
+				if($globalflags[$_] & GLOBALFLAG_P)
+				{
+					$globaltypes[$_] = "OFS_PARM";
+				}
+				elsif($globalflags[$_] & GLOBALFLAG_Q)
+				{
+					$globaltypes[$_] = "uniquetemp";
+					$istemp{$_} = 0;
+				}
+				else
+				{
+					$globaltypes[$_] = "temp";
+					$istemp{$_} = 1;
+				}
 			}
 			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == GLOBALFLAG_I)
 			{
@@ -1125,7 +1157,6 @@ sub parse_progs($)
 				$s->{$_} &= 0xFFFF;
 			}
 		}
-
 	}
 
 	print STDERR "Parsing globaldefs...\n";
