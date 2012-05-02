@@ -661,7 +661,17 @@ sub find_uninitialized_locals($$)
 			my ($ip, $state, $s, $c) = @_;
 			my $op = $s->{op};
 
+			# QCVM BUG: RETURN always takes vector, there is no float equivalent
 			my $return_hack = $c->{isreturn} // 0;
+
+			if($op eq 'STORE_V')
+			{
+				# COMPILER BUG of QCC: params are always copied using STORE_V
+				if($s->{b} >= 4 && $s->{b} < 28) # parameter range
+				{
+					$return_hack = 1;
+				}
+			}
 
 			for(qw(a b c))
 			{
@@ -681,7 +691,8 @@ sub find_uninitialized_locals($$)
 					my $valid = $state->{$ofs}{valid};
 					if($valid->[0] == 0)
 					{
-						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
 							print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
 							++$warned{$ip}{$_};
@@ -689,7 +700,8 @@ sub find_uninitialized_locals($$)
 					}
 					elsif($valid->[0] < 0)
 					{
-						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
 							print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
 							++$warned{$ip}{$_};
