@@ -954,6 +954,8 @@ sub detect_constants($)
 	{
 		my $type = $_->{type};
 		my $name = $progs->{getstring}->($_->{s_name});
+		$name = ''
+			if $name eq 'IMMEDIATE';
 		if($type->{save})
 		{
 			for my $i(0..(typesize($_->{type}{type})-1))
@@ -1050,6 +1052,8 @@ sub detect_constants($)
 	for(@{$progs->{globaldefs}})
 	{
 		my $s = $progs->{getstring}->($_->{s_name});
+		$s = ''
+			if $s eq 'IMMEDIATE';
 		$_->{debugname} //= "\$" . "$s"
 			if length $s;
 	}
