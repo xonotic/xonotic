@@ -958,7 +958,11 @@ sub detect_constants($)
 			{
 				$globaltypes[$_] = "global";
 			}
-			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == 0)
+			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == GLOBALFLAG_Q)
+			{
+				$globaltypes[$_] = "uniquetemp";
+			}
+			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == 0)
 			{
 				$globaltypes[$_] = "temp";
 				++$istemp{$_};
