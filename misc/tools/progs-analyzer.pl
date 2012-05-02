@@ -273,13 +273,8 @@ sub run_nfa($$$$$$)
 			{
 				my $func = $s->{a};
 				my $funcid = $progs->{globals}[$func]{v}{int};
-				my $funcobj = $progs->{functions}[$funcid];
-				if($funcobj && $funcobj->{first_statement} < 0) # builtin
-				{
-					my $def = $progs->{globaldef_byoffset}->($func);
-					last
-						if $def->{debugname} eq '$error';
-				}
+				last
+					if $progs->{error_func}{$funcid};
 				$ip += 1;
 			}
 			elsif($c->{isjump})
@@ -455,25 +450,11 @@ sub disassemble_function($$;$)
 		}
 	};
 
-	my %statements = ();
-	my %come_from = ();
-	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
-		sub
-		{
-			my ($ip, $state, $s, $c) = @_;
-			++$statements{$ip};
-
-			if(my $j = $c->{isjump})
-			{
-				my $t = $ip + $s->{$j};
-				$come_from{$t}{$ip} = $c->{isconditional};
-			}
-
-			return 0;
-		};
+	my $statements = $func->{statements};
+	my $come_from = $func->{come_from};
 
 	my $ipprev = undef;
-	for my $ip(sort { $a <=> $b } keys %statements)
+	for my $ip(sort { $a <=> $b } keys %$statements)
 	{
 		if($ip == $func->{first_statement})
 		{
@@ -486,7 +467,7 @@ sub disassemble_function($$;$)
 			printf OPERAND_FORMAT, $ip - $ipprev - 1;
 			print INSTRUCTION_SEPARATOR;
 		}
-		if(my $cf = $come_from{$ip})
+		if(my $cf = $come_from->{$ip})
 		{
 			printf INSTRUCTION_FORMAT, $ip, '', '.XREF';
 			my $cnt = 0;
@@ -558,47 +539,24 @@ sub find_uninitialized_locals($$)
 			if not exists $watchme{$_};
 	}
 
+	$watchme{$_} |= WATCHME_R
+		for keys %{$func->{globals_read}};
+	$watchme{$_} |= WATCHME_W
+		for keys %{$func->{globals_written}};
+
 	my %write_places = ();
-	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
-		sub
+	for my $ofs(keys %{$func->{globals_written}})
+	{
+		next
+			unless exists $watchme{$ofs} and $watchme{$ofs} & WATCHME_X;
+		for my $ip(keys %{$func->{globals_written}{$ofs}})
 		{
-			my ($ip, $state, $s, $c) = @_;
-			for(qw(a b c))
+			for my $op(keys %{$func->{globals_written}{$ofs}{$ip}})
 			{
-				my $type = $c->{$_};
-				next
-					unless defined $type;
-
-				my $ofs = $s->{$_};
-				if($type eq 'inglobal' || $type eq 'inglobalfunc')
-				{
-					$watchme{$ofs} |= WATCHME_R;
-				}
-				elsif($type eq 'inglobalvec')
-				{
-					$watchme{$ofs} |= WATCHME_R;
-					$watchme{$ofs+1} |= WATCHME_R;
-					$watchme{$ofs+2} |= WATCHME_R;
-				}
-				elsif($type eq 'outglobal')
-				{
-					$watchme{$ofs} |= WATCHME_W;
-					$write_places{$ip}{$_} = [$ofs]
-						if $watchme{$ofs} & WATCHME_X;
-				}
-				elsif($type eq 'outglobalvec')
-				{
-					$watchme{$ofs} |= WATCHME_W;
-					$watchme{$ofs+1} |= WATCHME_W;
-					$watchme{$ofs+2} |= WATCHME_W;
-					my @l = grep { $watchme{$_} & WATCHME_X } $ofs .. ($ofs+2);
-					$write_places{$ip}{$_} = \@l
-						if @l;
-				}
+				push @{$write_places{$ip}{$op}}, $ofs;
 			}
-
-			return 0;
-		};
+		}
+	}
 
 	for(keys %watchme)
 	{
@@ -902,102 +860,42 @@ sub defaultglobal($)
 	return { ofs => $ofs, s_name => undef, debugname => "<undefined>\@$ofs", type => undef };
 }
 
-sub parse_progs($)
+sub detect_constants($)
 {
-	my ($fh) = @_;
+	my ($progs) = @_;
+	use constant GLOBALFLAG_R => 1; # read
+	use constant GLOBALFLAG_W => 2; # written
+	use constant GLOBALFLAG_S => 4; # saved
+	use constant GLOBALFLAG_I => 8; # initialized
+	use constant GLOBALFLAG_N => 16; # named
+	use constant GLOBALFLAG_Q => 32; # unique to function
+	use constant GLOBALFLAG_U => 64; # unused
+	my @globalflags = (GLOBALFLAG_Q | GLOBALFLAG_U) x @{$progs->{globals}};
 
-	my %p = ();
-
-	print STDERR "Parsing header...\n";
-	$p{header} = parse_section $fh, DPROGRAMS_T, 0, undef, 1;
-	
-	print STDERR "Parsing strings...\n";
-	$p{strings} = get_section $fh, $p{header}{ofs_strings}, $p{header}{numstrings};
-	$p{getstring} = sub
+	for(@{$progs->{functions}})
 	{
-		my ($startpos) = @_;
-		my $endpos = index $p{strings}, "\0", $startpos;
-		return substr $p{strings}, $startpos, $endpos - $startpos;
-	};
-
-	print STDERR "Parsing statements...\n";
-	$p{statements} = [parse_section $fh, DSTATEMENT_T, $p{header}{ofs_statements}, undef, $p{header}{numstatements}];
-
-	print STDERR "Parsing globaldefs...\n";
-	$p{globaldefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_globaldefs}, undef, $p{header}{numglobaldefs}];
-
-	print STDERR "Parsing fielddefs...\n";
-	$p{fielddefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_fielddefs}, undef, $p{header}{numfielddefs}];
-
-	print STDERR "Parsing globals...\n";
-	$p{globals} = [parse_section $fh, DGLOBAL_T, $p{header}{ofs_globals}, undef, $p{header}{numglobals}];
-
-	print STDERR "Parsing functions...\n";
-	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
-
-	print STDERR "Detecting constants and temps...\n";
-	use constant GLOBALFLAG_R => 1;
-	use constant GLOBALFLAG_W => 2;
-	use constant GLOBALFLAG_S => 4;
-	use constant GLOBALFLAG_I => 8;
-	use constant GLOBALFLAG_N => 16;
-	my @globalflags = (0) x @{$p{globals}};
-	for my $s(@{$p{statements}})
-	{
-		my $c = checkop $s->{op};
-
-		for(qw(a b c))
+		for(keys %{$_->{globals_used}})
 		{
-			my $type = $c->{$_};
-			next
-				unless defined $type;
-
-			my $ofs = $s->{$_};
-
-			my $read = sub
+			if($globalflags[$_] & GLOBALFLAG_Q)
 			{
-				my ($ofs) = @_;
-				$globalflags[$ofs] |= GLOBALFLAG_R;
-			};
-			my $write = sub
-			{
-				my ($ofs) = @_;
-				$globalflags[$ofs] |= GLOBALFLAG_W;
-			};
-
-			if($type eq 'inglobal' || $type eq 'inglobalfunc')
-			{
-				$s->{$_} = $ofs = ($ofs & 0xFFFF);
-				$read->($ofs);
+				$globalflags[$_] &= ~GLOBALFLAG_Q;
 			}
-			elsif($type eq 'inglobalvec')
+			else
 			{
-				$s->{$_} = $ofs = ($ofs & 0xFFFF);
-				$read->($ofs);
-				$read->($ofs+1);
-				$read->($ofs+2);
-			}
-			elsif($type eq 'outglobal')
-			{
-				$s->{$_} = $ofs = ($ofs & 0xFFFF);
-				$write->($ofs);
-			}
-			elsif($type eq 'outglobalvec')
-			{
-				$s->{$_} = $ofs = ($ofs & 0xFFFF);
-				$write->($ofs);
-				$write->($ofs+1);
-				$write->($ofs+2);
+				$globalflags[$_] &= ~GLOBALFLAG_U;
 			}
 		}
-
+		$globalflags[$_] |= GLOBALFLAG_R
+			for keys %{$_->{globals_read}};
+		$globalflags[$_] |= GLOBALFLAG_W
+			for keys %{$_->{globals_written}};
 	}
 
 	my %offsets_saved = ();
-	for(@{$p{globaldefs}})
+	for(@{$progs->{globaldefs}})
 	{
 		my $type = $_->{type};
-		my $name = $p{getstring}->($_->{s_name});
+		my $name = $progs->{getstring}->($_->{s_name});
 		if($type->{save})
 		{
 			for my $i(0..(typesize($_->{type}{type})-1))
@@ -1014,18 +912,18 @@ sub parse_progs($)
 		}
 	}
 	my %offsets_initialized = ();
-	for(0..(@{$p{globals}}-1))
+	for(0..(@{$progs->{globals}}-1))
 	{
-		if($p{globals}[$_]{v}{int})
+		if($progs->{globals}[$_]{v}{int})
 		{
 			$globalflags[$_] |= GLOBALFLAG_I;
 		}
 	}
 
-	my @globaltypes = (undef) x @{$p{globals}};
+	my @globaltypes = (undef) x @{$progs->{globals}};
 
 	my %istemp = ();
-	for(0..(@{$p{globals}}-1))
+	for(0..(@{$progs->{globals}}-1))
 	{
 		next
 			if $_ < @{(DEFAULTGLOBALS)};
@@ -1075,27 +973,26 @@ sub parse_progs($)
 			}
 		}
 	}
-	$p{temps} = \%istemp;
+	$progs->{temps} = \%istemp;
 
-	print STDERR "Naming...\n";
 	# globaldefs
-	my @globaldefs = (undef) x @{$p{globaldefs}};
-	for(@{$p{globaldefs}})
+	my @globaldefs = (undef) x @{$progs->{globaldefs}};
+	for(@{$progs->{globaldefs}})
 	{
-		my $s = $p{getstring}->($_->{s_name});
+		my $s = $progs->{getstring}->($_->{s_name});
 		$_->{debugname} //= "\$" . "$s"
 			if length $s;
 	}
-	for(@{$p{globaldefs}})
+	for(@{$progs->{globaldefs}})
 	{
 		$globaldefs[$_->{ofs}] //= $_
 			if defined $_->{debugname};
 	}
-	for(@{$p{globaldefs}})
+	for(@{$progs->{globaldefs}})
 	{
 		$globaldefs[$_->{ofs}] //= $_;
 	}
-	for(0..(@{$p{globals}}-1))
+	for(0..(@{$progs->{globals}}-1))
 	{
 		$globaldefs[$_] //= {
 			ofs => $_,
@@ -1103,44 +1000,125 @@ sub parse_progs($)
 			debugname => undef
 		};
 	}
-	my %globaldefs = ();
 	for(0..(@{(DEFAULTGLOBALS)}-1))
 	{
 		$globaldefs[$_] = { ofs => $_, s_name => undef, debugname => DEFAULTGLOBALS->[$_], type => undef };
 		$globaltypes[$_] = 'defglobal';
 	}
+	my %globaldefs_namecount = ();
 	for(@globaldefs)
 	{
+		$_->{globaltype} = $globaltypes[$_->{ofs}];
 		if(defined $_->{debugname})
 		{
 			# already has debugname
 		}
-		elsif($globaltypes[$_->{ofs}] eq 'const')
+		elsif($_->{globaltype} eq 'const')
 		{
-			$_->{debugname} = get_constant(\%p, $p{globals}[$_->{ofs}]{v});
+			$_->{debugname} = get_constant($progs, $progs->{globals}[$_->{ofs}]{v});
 		}
 		else
 		{
-			$_->{debugname} = "$globaltypes[$_->{ofs}]_$_->{ofs}";
+			$_->{debugname} = "$_->{globaltype}_$_->{ofs}";
 		}
-		++$globaldefs{$_->{debugname}};
+		++$globaldefs_namecount{$_->{debugname}};
 	}
 	for(@globaldefs)
 	{
 		next
-			if $globaldefs{$_->{debugname}} <= 1;
+			if $globaldefs_namecount{$_->{debugname}} <= 1;
 		#print "Not unique: $_->{debugname} at $_->{ofs}\n";
 		$_->{debugname} .= "\@$_->{ofs}";
 	}
-	$p{globaldef_byoffset} = sub
+	$progs->{globaldef_byoffset} = sub
 	{
 		my ($ofs) = @_;
 		my $def = $globaldefs[$ofs];
 		return $def;
 	};
+}
 
-	# functions
-	my %functions = ();
+sub parse_progs($)
+{
+	my ($fh) = @_;
+
+	my %p = ();
+
+	print STDERR "Parsing header...\n";
+	$p{header} = parse_section $fh, DPROGRAMS_T, 0, undef, 1;
+	
+	print STDERR "Parsing strings...\n";
+	$p{strings} = get_section $fh, $p{header}{ofs_strings}, $p{header}{numstrings};
+	$p{getstring} = sub
+	{
+		my ($startpos) = @_;
+		my $endpos = index $p{strings}, "\0", $startpos;
+		return substr $p{strings}, $startpos, $endpos - $startpos;
+	};
+
+	print STDERR "Parsing statements...\n";
+	$p{statements} = [parse_section $fh, DSTATEMENT_T, $p{header}{ofs_statements}, undef, $p{header}{numstatements}];
+
+	print STDERR "Fixing statements...\n";
+	for my $s(@{$p{statements}})
+	{
+		my $c = checkop $s->{op};
+
+		for(qw(a b c))
+		{
+			my $type = $c->{$_};
+			next
+				unless defined $type;
+
+			if($type eq 'inglobal' || $type eq 'inglobalfunc')
+			{
+				$s->{$_} &= 0xFFFF;
+			}
+			elsif($type eq 'inglobalvec')
+			{
+				$s->{$_} &= 0xFFFF;
+			}
+			elsif($type eq 'outglobal')
+			{
+				$s->{$_} &= 0xFFFF;
+			}
+			elsif($type eq 'outglobalvec')
+			{
+				$s->{$_} &= 0xFFFF;
+			}
+		}
+
+	}
+
+	print STDERR "Parsing globaldefs...\n";
+	$p{globaldefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_globaldefs}, undef, $p{header}{numglobaldefs}];
+
+	print STDERR "Parsing fielddefs...\n";
+	$p{fielddefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_fielddefs}, undef, $p{header}{numfielddefs}];
+
+	print STDERR "Parsing globals...\n";
+	$p{globals} = [parse_section $fh, DGLOBAL_T, $p{header}{ofs_globals}, undef, $p{header}{numglobals}];
+
+	print STDERR "Parsing functions...\n";
+	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
+
+	print STDERR "Looking for error()...\n";
+	$p{error_func} = {};
+	for(@{$p{globaldefs}})
+	{
+		next
+			if $p{getstring}($_->{s_name}) ne 'error';
+		my $v = $p{globals}[$_->{ofs}]{v}{int};
+		next
+			if $v <= 0 || $v >= @{$p{functions}};
+		my $first = $p{functions}[$v]{first_statement};
+		next
+			if $first >= 0;
+		print STDERR "Detected error() at offset $_->{ofs} (builtin #@{[-$first]})\n";
+		$p{error_func}{$_->{ofs}} = 1;
+	}
+
+	print STDERR "Scanning functions...\n";
 	for(@{$p{functions}})
 	{
 		my $file = $p{getstring}->($_->{s_file});
@@ -1148,13 +1126,86 @@ sub parse_progs($)
 		$name = "$file:$name"
 			if length $file;
 		$_->{debugname} = $name;
-		$functions{$_->{first_statement}} = $_;
+
+		next
+			if $_->{first_statement} < 0;
+
+		my %statements = ();
+		my %come_from = ();
+		my %go_to = ();
+		my %globals_read = ();
+		my %globals_written = ();
+		my %globals_used = ();
+
+		run_nfa \%p, $_->{first_statement}, "", id, nfa_default_state_checker,
+			sub
+			{
+				my ($ip, $state, $s, $c) = @_;
+				++$statements{$ip};
+
+				if(my $j = $c->{isjump})
+				{
+					my $t = $ip + $s->{$j};
+					$come_from{$t}{$ip} = $c->{isconditional};
+					$go_to{$ip}{$t} = $c->{isconditional};
+				}
+
+				for my $o(qw(a b c))
+				{
+					my $type = $c->{$o}
+						or next;
+					my $ofs = $s->{$o};
+
+					my $read = sub
+					{
+						my ($ofs) = @_;
+						$globals_read{$ofs}{$ip}{$o} = 1;
+						$globals_used{$ofs} = 1;
+					};
+					my $write = sub
+					{
+						my ($ofs) = @_;
+						$globals_written{$ofs}{$ip}{$o} = 1;
+						$globals_used{$ofs} = 1;
+					};
+
+					if($type eq 'inglobal' || $type eq 'inglobalfunc')
+					{
+						$read->($ofs);
+					}
+					elsif($type eq 'inglobalvec')
+					{
+						$read->($ofs);
+						$read->($ofs+1);
+						$read->($ofs+2);
+					}
+					elsif($type eq 'outglobal')
+					{
+						$write->($ofs);
+					}
+					elsif($type eq 'outglobalvec')
+					{
+						$write->($ofs);
+						$write->($ofs+1);
+						$write->($ofs+2);
+					}
+				}
+
+				return 0;
+			};
+
+		$_->{statements} = \%statements;
+		$_->{come_from} = \%come_from;
+		$_->{go_to} = \%go_to;
+		$_->{globals_read} = \%globals_read;
+		$_->{globals_written} = \%globals_written;
+		$_->{globals_used} = \%globals_used;
+
+		# using this info, we could now identify basic blocks
 	}
-	$p{function_byoffset} = sub
-	{
-		my ($ofs) = @_;
-		return $functions{$ofs};
-	};
+
+	print STDERR "Detecting constants and temps, and naming...\n";
+	detect_constants \%p;
 
 	# what do we want to do?
 	my $checkfunc = \&find_uninitialized_locals;
