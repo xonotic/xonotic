@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Digest::SHA;
+use Carp;
 
 sub id()
 {
@@ -186,7 +187,7 @@ sub get_section($$$)
 	seek $fh, $start, 0
 		or die "seek: $!";
 	$len == read $fh, my $buf, $len
-		or die "short read";
+		or die "short read from $start length $len (malformed progs header)";
 	return $buf;
 }
 
@@ -214,7 +215,7 @@ sub parse_section($$$$$)
 	my @out = map
 	{
 		$itemlen == read $fh, my $buf, $itemlen
-			or die "short read";
+			or die "short read from $start length $cnt * $itemlen $(malformed progs header)";
 		my %h = ();
 		@h{@packnames} = unpack $packspec, $buf;
 		$h{$_->[1]} = TYPES->{$_->[0]}->[2]->($h{$_->[1]})
@@ -897,6 +898,8 @@ sub detect_constants($)
 			for keys %{$_->{globals_read}};
 		$globalflags[$_] |= GLOBALFLAG_W
 			for keys %{$_->{globals_written}};
+		next
+			if $_->{first_statement} < 0;
 		for my $ip($_->{first_statement} .. (@{$progs->{statements}}-1))
 		{
 			my $s = $progs->{statements}[$ip];
@@ -955,7 +958,9 @@ sub detect_constants($)
 		my $type = $_->{type};
 		my $name = $progs->{getstring}->($_->{s_name});
 		$name = ''
-			if $name eq 'IMMEDIATE';
+			if $name eq 'IMMEDIATE' or $name =~ /^\./;
+		$_->{debugname} = $name
+			if $name ne '';
 		if($type->{save})
 		{
 			for my $i(0..(typesize($_->{type}{type})-1))
@@ -963,7 +968,7 @@ sub detect_constants($)
 				$globalflags[$_->{ofs}] |= GLOBALFLAG_S;
 			}
 		}
-		if($name ne "")
+		if($name ne '')
 		{
 			for my $i(0..(typesize($_->{type}{type})-1))
 			{
@@ -1051,14 +1056,6 @@ sub detect_constants($)
 	my @globaldefs = (undef) x @{$progs->{globaldefs}};
 	for(@{$progs->{globaldefs}})
 	{
-		my $s = $progs->{getstring}->($_->{s_name});
-		$s = ''
-			if $s eq 'IMMEDIATE';
-		$_->{debugname} //= "\$" . "$s"
-			if length $s;
-	}
-	for(@{$progs->{globaldefs}})
-	{
 		$globaldefs[$_->{ofs}] //= $_
 			if defined $_->{debugname};
 	}
@@ -1100,7 +1097,7 @@ sub detect_constants($)
 	for(@globaldefs)
 	{
 		next
-			if $globaldefs_namecount{$_->{debugname}} <= 1;
+			if $globaldefs_namecount{$_->{debugname}} <= 1 && !$ENV{FORCE_OFFSETS};
 		#print "Not unique: $_->{debugname} at $_->{ofs}\n";
 		$_->{debugname} .= "\@$_->{ofs}";
 	}
@@ -1130,12 +1127,76 @@ sub parse_progs($)
 		return substr $p{strings}, $startpos, $endpos - $startpos;
 	};
 
+	print STDERR "Parsing globals...\n";
+	$p{globals} = [parse_section $fh, DGLOBAL_T, $p{header}{ofs_globals}, undef, $p{header}{numglobals}];
+
+	print STDERR "Parsing globaldefs...\n";
+	$p{globaldefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_globaldefs}, undef, $p{header}{numglobaldefs}];
+
+	print STDERR "Range checking globaldefs...\n";
+	for(0 .. (@{$p{globaldefs}}-1))
+	{
+		my $g = $p{globaldefs}[$_];
+		die "Out of range name in globaldef $_"
+			if $g->{s_name} < 0 || $g->{s_name} >= length $p{strings};
+		my $name = $p{getstring}->($g->{s_name});
+		die "Out of range ofs in globaldef $_ (name: \"$name\")"
+			if $g->{ofs} >= $p{globals};
+	}
+
+	print STDERR "Parsing fielddefs...\n";
+	$p{fielddefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_fielddefs}, undef, $p{header}{numfielddefs}];
+
+	print STDERR "Range checking fielddefs...\n";
+	for(0 .. (@{$p{fielddefs}}-1))
+	{
+		my $g = $p{fielddefs}[$_];
+		die "Out of range name in fielddef $_"
+			if $g->{s_name} < 0 || $g->{s_name} >= length $p{strings};
+		my $name = $p{getstring}->($g->{s_name});
+		die "Out of range ofs in globaldef $_ (name: \"$name\")"
+			if $g->{ofs} >= $p{header}{entityfields};
+	}
+
 	print STDERR "Parsing statements...\n";
 	$p{statements} = [parse_section $fh, DSTATEMENT_T, $p{header}{ofs_statements}, undef, $p{header}{numstatements}];
 
-	print STDERR "Fixing statements...\n";
-	for my $s(@{$p{statements}})
+	print STDERR "Parsing functions...\n";
+	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
+
+	print STDERR "Range checking functions...\n";
+	for(0 .. (@{$p{functions}} - 1))
 	{
+		my $f = $p{functions}[$_];
+		die "Out of range name in function $_"
+			if $f->{s_name} < 0 || $f->{s_name} >= length $p{strings};
+		my $name = $p{getstring}->($f->{s_name});
+		die "Out of range file in function $_"
+			if $f->{s_file} < 0 || $f->{s_file} >= length $p{strings};
+		my $file = $p{getstring}->($f->{s_file});
+		die "Out of range first_statement in function $_ (name: \"$name\", file: \"$file\")"
+			if $f->{first_statement} >= @{$p{statements}};
+		die "Out of range parm_start in function $_ (name: \"$name\", file: \"$file\")"
+			if $f->{parm_start} < 0 || $f->{parm_start} >= @{$p{globals}};
+		die "Out of range locals in function $_ (name: \"$name\", file: \"$file\")"
+			if $f->{locals} < 0 || $f->{parm_start} + $f->{locals} >= @{$p{globals}};
+		die "Out of range numparms in function $_ (name: \"$name\", file: \"$file\")"
+			if $f->{numparms} < 0 || $f->{numparms} > 8;
+		my $totalparms = 0;
+		for(0..($f->{numparms}-1))
+		{
+			die "Out of range parm_size[$_] in function $_ (name: \"$name\", file: \"$file\")"
+				unless { 0 => 1, 1 => 1, 3 => 1 }->{$f->{parm_size}[$_]};
+			$totalparms += $f->{parm_size}[$_];
+		}
+		die "Out of range parms in function $_ (name: \"$name\", file: \"$file\")"
+			if $f->{locals} < 0 || $f->{parm_start} + $totalparms >= @{$p{globals}};
+	}
+
+	print STDERR "Range checking statements...\n";
+	for my $ip(0 .. (@{$p{statements}}-1))
+	{
+		my $s = $p{statements}[$ip];
 		my $c = checkop $s->{op};
 
 		for(qw(a b c))
@@ -1147,33 +1208,34 @@ sub parse_progs($)
 			if($type eq 'inglobal' || $type eq 'inglobalfunc')
 			{
 				$s->{$_} &= 0xFFFF;
+				die "Out of range global offset in statement $ip - cannot continue"
+					if $s->{$_} >= @{$p{globals}};
 			}
 			elsif($type eq 'inglobalvec')
 			{
 				$s->{$_} &= 0xFFFF;
+				die "Out of range global offset in statement $ip - cannot continue"
+					if $s->{$_} >= @{$p{globals}}-2;
 			}
 			elsif($type eq 'outglobal')
 			{
 				$s->{$_} &= 0xFFFF;
+				die "Out of range global offset in statement $ip - cannot continue"
+					if $s->{$_} >= @{$p{globals}};
 			}
 			elsif($type eq 'outglobalvec')
 			{
 				$s->{$_} &= 0xFFFF;
+				die "Out of range global offset in statement $ip - cannot continue"
+					if $s->{$_} >= @{$p{globals}}-2;
+			}
+			elsif($type eq 'ipoffset')
+			{
+				die "Out of range GOTO/IF/IFNOT in statement $ip - cannot continue"
+					if $ip + $s->{$_} < 0 || $ip + $s->{$_} >= @{$p{statements}};
 			}
 		}
 	}
-
-	print STDERR "Parsing globaldefs...\n";
-	$p{globaldefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_globaldefs}, undef, $p{header}{numglobaldefs}];
-
-	print STDERR "Parsing fielddefs...\n";
-	$p{fielddefs} = [parse_section $fh, DDEF_T, $p{header}{ofs_fielddefs}, undef, $p{header}{numfielddefs}];
-
-	print STDERR "Parsing globals...\n";
-	$p{globals} = [parse_section $fh, DGLOBAL_T, $p{header}{ofs_globals}, undef, $p{header}{numglobals}];
-
-	print STDERR "Parsing functions...\n";
-	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
 
 	print STDERR "Looking for error()...\n";
 	$p{error_func} = {};
@@ -1210,62 +1272,65 @@ sub parse_progs($)
 		my %globals_written = ();
 		my %globals_used = ();
 
-		run_nfa \%p, $_->{first_statement}, "", id, nfa_default_state_checker,
-			sub
-			{
-				my ($ip, $state, $s, $c) = @_;
-				++$statements{$ip};
-
-				if(my $j = $c->{isjump})
+		if($_->{first_statement} >= 0)
+		{
+			run_nfa \%p, $_->{first_statement}, "", id, nfa_default_state_checker,
+				sub
 				{
-					my $t = $ip + $s->{$j};
-					$come_from{$t}{$ip} = $c->{isconditional};
-					$go_to{$ip}{$t} = $c->{isconditional};
-				}
+					my ($ip, $state, $s, $c) = @_;
+					++$statements{$ip};
 
-				for my $o(qw(a b c))
-				{
-					my $type = $c->{$o}
-						or next;
-					my $ofs = $s->{$o};
+					if(my $j = $c->{isjump})
+					{
+						my $t = $ip + $s->{$j};
+						$come_from{$t}{$ip} = $c->{isconditional};
+						$go_to{$ip}{$t} = $c->{isconditional};
+					}
 
-					my $read = sub
+					for my $o(qw(a b c))
 					{
-						my ($ofs) = @_;
-						$globals_read{$ofs}{$ip}{$o} = 1;
-						$globals_used{$ofs} = 1;
-					};
-					my $write = sub
-					{
-						my ($ofs) = @_;
-						$globals_written{$ofs}{$ip}{$o} = 1;
-						$globals_used{$ofs} = 1;
-					};
+						my $type = $c->{$o}
+							or next;
+						my $ofs = $s->{$o};
 
-					if($type eq 'inglobal' || $type eq 'inglobalfunc')
-					{
-						$read->($ofs);
-					}
-					elsif($type eq 'inglobalvec')
-					{
-						$read->($ofs);
-						$read->($ofs+1);
-						$read->($ofs+2);
-					}
-					elsif($type eq 'outglobal')
-					{
-						$write->($ofs);
-					}
-					elsif($type eq 'outglobalvec')
-					{
-						$write->($ofs);
-						$write->($ofs+1);
-						$write->($ofs+2);
-					}
-				}
+						my $read = sub
+						{
+							my ($ofs) = @_;
+							$globals_read{$ofs}{$ip}{$o} = 1;
+							$globals_used{$ofs} = 1;
+						};
+						my $write = sub
+						{
+							my ($ofs) = @_;
+							$globals_written{$ofs}{$ip}{$o} = 1;
+							$globals_used{$ofs} = 1;
+						};
 
-				return 0;
-			};
+						if($type eq 'inglobal' || $type eq 'inglobalfunc')
+						{
+							$read->($ofs);
+						}
+						elsif($type eq 'inglobalvec')
+						{
+							$read->($ofs);
+							$read->($ofs+1);
+							$read->($ofs+2);
+						}
+						elsif($type eq 'outglobal')
+						{
+							$write->($ofs);
+						}
+						elsif($type eq 'outglobalvec')
+						{
+							$write->($ofs);
+							$write->($ofs+1);
+							$write->($ofs+2);
+						}
+					}
+
+					return 0;
+				};
+		}
 
 		$_->{statements} = \%statements;
 		$_->{come_from} = \%come_from;
@@ -1282,7 +1347,10 @@ sub parse_progs($)
 
 	# what do we want to do?
 	my $checkfunc = \&find_uninitialized_locals;
-	#my $checkfunc = \&disassemble_function;
+	if($ENV{DISASSEMBLE})
+	{
+		$checkfunc = \&disassemble_function;
+	}
 	for(sort { $a->{debugname} cmp $b->{debugname} } @{$p{functions}})
 	{
 		$checkfunc->(\%p, $_);
