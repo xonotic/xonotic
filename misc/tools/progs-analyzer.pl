@@ -491,7 +491,7 @@ sub disassemble_function($$;$)
 				for(@$_)
 				{
 					print PRE_MARK_STATEMENT;
-					printf INSTRUCTION_FORMAT, '', '', '.WARN';
+					printf INSTRUCTION_FORMAT, '', '<!>', '.WARN';
 					printf OPERAND_FORMAT, "$_ (in $func->{debugname})";
 					print INSTRUCTION_SEPARATOR;
 				}
@@ -502,7 +502,7 @@ sub disassemble_function($$;$)
 			if $highlight and $highlight->{$ip};
 
 		my $showip = $opprop->{isjump};
-		printf INSTRUCTION_FORMAT, $showip ? $ip : '', $highlight->{$ip} ? "<!>" : "", $op;
+		printf INSTRUCTION_FORMAT, $showip ? $ip : '', $highlight->{$ip} ? '<!>' : '', $op;
 
 		my $cnt = 0;
 		for my $o(qw(a b c))
