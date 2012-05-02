@@ -360,6 +360,14 @@ sub disassemble_function($$;$)
 
 	print "$func->{debugname}:\n";
 
+	if($func->{first_statement} < 0) # builtin
+	{
+		printf INSTRUCTION_FORMAT, '', '', '.BUILTIN';
+		printf OPERAND_FORMAT, -$func->{first_statement};
+		print INSTRUCTION_SEPARATOR;
+		return;
+	}
+
 	my $initializer = sub
 	{
 		my ($ofs) = @_;
@@ -529,7 +537,6 @@ sub disassemble_function($$;$)
 sub find_uninitialized_locals($$)
 {
 	my ($progs, $func) = @_;
-
 
 	return
 		if $func->{first_statement} < 0; # builtin
@@ -1053,7 +1060,7 @@ sub detect_constants($)
 	$progs->{temps} = \%istemp;
 
 	# globaldefs
-	my @globaldefs = (undef) x @{$progs->{globaldefs}};
+	my @globaldefs = (undef) x @{$progs->{globals}};
 	for(@{$progs->{globaldefs}})
 	{
 		$globaldefs[$_->{ofs}] //= $_
@@ -1344,6 +1351,13 @@ sub parse_progs($)
 
 	print STDERR "Detecting constants and temps, and naming...\n";
 	detect_constants \%p;
+
+	if($ENV{DUMP})
+	{
+		use Data::Dumper;
+		print Dumper \%p;
+		return;
+	}
 
 	# what do we want to do?
 	my $checkfunc = \&find_uninitialized_locals;
