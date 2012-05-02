@@ -303,9 +303,9 @@ sub get_constant($$)
 	my ($progs, $g) = @_;
 	if($g->{int} == 0)
 	{
-		return undef;
+		return 0;
 	}
-	elsif($g->{int} > 0 && $g->{int} < 16777216)
+	elsif($g->{int} > 0 && $g->{int} < 8388608)
 	{
 		if($g->{int} < length $progs->{strings} && $g->{int} > 0)
 		{
@@ -392,7 +392,6 @@ sub disassemble_function($$;$)
 	my $getname = sub
 	{
 		my ($ofs) = @_;
-		$ofs &= 0xFFFF;
 		return $override_locals{$ofs}
 			if exists $override_locals{$ofs};
 		my $def = $progs->{globaldef_byoffset}->($ofs);
@@ -745,7 +744,7 @@ sub find_uninitialized_locals($$)
 				{
 					my $def = $progs->{globaldef_byoffset}->($func);
 					return 1
-						if $def->{debugname} eq 'error';
+						if $def->{debugname} eq '$error';
 				}
 			}
 
@@ -830,17 +829,82 @@ sub parse_progs($)
 	print STDERR "Parsing functions...\n";
 	$p{functions} = [parse_section $fh, DFUNCTION_T, $p{header}{ofs_functions}, undef, $p{header}{numfunctions}];
 
-	print STDERR "Detecting temps...\n";
+	print STDERR "Detecting constants and temps...\n";
+	use constant GLOBALFLAG_R => 1;
+	use constant GLOBALFLAG_W => 2;
+	use constant GLOBALFLAG_S => 4;
+	use constant GLOBALFLAG_I => 8;
+	use constant GLOBALFLAG_N => 16;
+	my @globalflags = (0) x @{$p{globals}};
+	for my $s(@{$p{statements}})
+	{
+		my $c = checkop $s->{op};
+
+		for(qw(a b c))
+		{
+			my $type = $c->{$_};
+			next
+				unless defined $type;
+
+			my $ofs = $s->{$_};
+
+			my $read = sub
+			{
+				my ($ofs) = @_;
+				$globalflags[$ofs] |= GLOBALFLAG_R;
+			};
+			my $write = sub
+			{
+				my ($ofs) = @_;
+				$globalflags[$ofs] |= GLOBALFLAG_W;
+			};
+
+			if($type eq 'inglobal' || $type eq 'inglobalfunc')
+			{
+				$s->{$_} = $ofs = ($ofs & 0xFFFF);
+				$read->($ofs);
+			}
+			elsif($type eq 'inglobalvec')
+			{
+				$s->{$_} = $ofs = ($ofs & 0xFFFF);
+				$read->($ofs);
+				$read->($ofs+1);
+				$read->($ofs+2);
+			}
+			elsif($type eq 'outglobal')
+			{
+				$s->{$_} = $ofs = ($ofs & 0xFFFF);
+				$write->($ofs);
+			}
+			elsif($type eq 'outglobalvec')
+			{
+				$s->{$_} = $ofs = ($ofs & 0xFFFF);
+				$write->($ofs);
+				$write->($ofs+1);
+				$write->($ofs+2);
+			}
+		}
+
+	}
+
 	my %offsets_saved = ();
 	for(@{$p{globaldefs}})
 	{
 		my $type = $_->{type};
 		my $name = $p{getstring}->($_->{s_name});
-		next
-			unless $type->{save} or $name ne "";
-		for my $i(0..(typesize($_->{type}{type})-1))
+		if($type->{save})
 		{
-			++$offsets_saved{$_->{ofs}+$i};
+			for my $i(0..(typesize($_->{type}{type})-1))
+			{
+				$globalflags[$_->{ofs}] |= GLOBALFLAG_S;
+			}
+		}
+		if($name ne "")
+		{
+			for my $i(0..(typesize($_->{type}{type})-1))
+			{
+				$globalflags[$_->{ofs}] |= GLOBALFLAG_N;
+			}
 		}
 	}
 	my %offsets_initialized = ();
@@ -848,31 +912,72 @@ sub parse_progs($)
 	{
 		if($p{globals}[$_]{v}{int})
 		{
-			++$offsets_initialized{$_};
+			$globalflags[$_] |= GLOBALFLAG_I;
 		}
 	}
+
+	my @globaltypes = (undef) x @{$p{globals}};
+
 	my %istemp = ();
-	my %isconst = ();
 	for(0..(@{$p{globals}}-1))
 	{
 		next
 			if $_ < @{(DEFAULTGLOBALS)};
-		++$isconst{$_}
-			if !$offsets_saved{$_} and $offsets_initialized{$_};
-		++$istemp{$_}
-			if !$offsets_saved{$_} and !$offsets_initialized{$_};
+		if(($globalflags[$_] & (GLOBALFLAG_R | GLOBALFLAG_W)) == 0)
+		{
+			$globaltypes[$_] = "unused";
+		}
+		elsif(($globalflags[$_] & (GLOBALFLAG_R | GLOBALFLAG_W)) == GLOBALFLAG_R)
+		{
+			# so it is ro
+			if(($globalflags[$_] & GLOBALFLAG_N) == GLOBALFLAG_N)
+			{
+				$globaltypes[$_] = "read_only";
+			}
+			elsif(($globalflags[$_] & GLOBALFLAG_S) == 0)
+			{
+				$globaltypes[$_] = "const";
+			}
+			else
+			{
+				$globaltypes[$_] = "read_only";
+			}
+		}
+		elsif(($globalflags[$_] & (GLOBALFLAG_R | GLOBALFLAG_W)) == GLOBALFLAG_W)
+		{
+			$globaltypes[$_] = "write_only";
+		}
+		else
+		{
+			# now we know it is rw
+			if(($globalflags[$_] & GLOBALFLAG_N) == GLOBALFLAG_N)
+			{
+				$globaltypes[$_] = "global";
+			}
+			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == 0)
+			{
+				$globaltypes[$_] = "temp";
+				++$istemp{$_};
+			}
+			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == GLOBALFLAG_I)
+			{
+				$globaltypes[$_] = "not_saved";
+			}
+			else
+			{
+				$globaltypes[$_] = "global";
+			}
+		}
 	}
 	$p{temps} = \%istemp;
-	$p{consts} = \%isconst;
 
 	print STDERR "Naming...\n";
-
 	# globaldefs
-	my @globaldefs = ();
+	my @globaldefs = (undef) x @{$p{globaldefs}};
 	for(@{$p{globaldefs}})
 	{
 		my $s = $p{getstring}->($_->{s_name});
-		$_->{debugname} //= "_$s"
+		$_->{debugname} //= "\$" . "$s"
 			if length $s;
 	}
 	for(@{$p{globaldefs}})
@@ -893,22 +998,24 @@ sub parse_progs($)
 		};
 	}
 	my %globaldefs = ();
+	for(0..(@{(DEFAULTGLOBALS)}-1))
+	{
+		$globaldefs[$_] = { ofs => $_, s_name => undef, debugname => DEFAULTGLOBALS->[$_], type => undef };
+		$globaltypes[$_] = 'defglobal';
+	}
 	for(@globaldefs)
 	{
-		if(!defined $_->{debugname})
+		if(defined $_->{debugname})
 		{
-			if($istemp{$_->{ofs}})
-			{
-				$_->{debugname} = "temp_$_->{ofs}";
-			}
-			elsif($isconst{$_->{ofs}})
-			{
-				$_->{debugname} = "(" . get_constant(\%p, $p{globals}[$_->{ofs}]{v}) . ")";
-			}
-			else
-			{
-				$_->{debugname} = "global_$_->{ofs}";
-			}
+			# already has debugname
+		}
+		elsif($globaltypes[$_->{ofs}] eq 'const')
+		{
+			$_->{debugname} = get_constant(\%p, $p{globals}[$_->{ofs}]{v});
+		}
+		else
+		{
+			$_->{debugname} = "$globaltypes[$_->{ofs}]_$_->{ofs}";
 		}
 		++$globaldefs{$_->{debugname}};
 	}
@@ -916,17 +1023,12 @@ sub parse_progs($)
 	{
 		next
 			if $globaldefs{$_->{debugname}} <= 1;
-		print "Not unique: $_->{debugname} at $_->{ofs}\n";
+		#print "Not unique: $_->{debugname} at $_->{ofs}\n";
 		$_->{debugname} .= "\@$_->{ofs}";
 	}
 	$p{globaldef_byoffset} = sub
 	{
 		my ($ofs) = @_;
-		$ofs &= 0xFFFF;
-		if($ofs >= 0 && $ofs < @{(DEFAULTGLOBALS)})
-		{
-			return { ofs => $ofs, s_name => undef, debugname => DEFAULTGLOBALS->[$ofs], type => undef };
-		}
 		my $def = $globaldefs[$ofs];
 		return $def;
 	};
