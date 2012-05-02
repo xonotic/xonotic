@@ -484,6 +484,20 @@ sub disassemble_function($$;$)
 		my $ipt = $progs->{statements}[$ip];
 		my $opprop = checkop $op;
 
+		if($highlight and $highlight->{$ip})
+		{
+			for(values %{$highlight->{$ip}})
+			{
+				for(@$_)
+				{
+					print PRE_MARK_STATEMENT;
+					printf INSTRUCTION_FORMAT, '', '', '.WARN';
+					printf OPERAND_FORMAT, "$_ (in $func->{debugname})";
+					print INSTRUCTION_SEPARATOR;
+				}
+			}
+		}
+
 		print PRE_MARK_STATEMENT
 			if $highlight and $highlight->{$ip};
 
@@ -694,8 +708,7 @@ sub find_uninitialized_locals($$)
 						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
 						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
-							print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
+							push @{$warned{$ip}{$_}}, "Use of uninitialized value";
 						}
 					}
 					elsif($valid->[0] < 0)
@@ -703,8 +716,7 @@ sub find_uninitialized_locals($$)
 						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
 						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
-							print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
-							++$warned{$ip}{$_};
+							push @{$warned{$ip}{$_}}, "Use of temporary across CALL";
 						}
 					}
 					else
@@ -831,8 +843,7 @@ sub find_uninitialized_locals($$)
 
 			if(!$isread)
 			{
-				print "; Value is never used in $func->{debugname} at $ip.$operand\n";
-				++$warned{$ip}{$operand};
+				push @{$warned{$ip}{$operand}}, "Value is never used";
 			}
 		}
 	}
