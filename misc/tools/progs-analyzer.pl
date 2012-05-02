@@ -118,7 +118,7 @@ sub checkop($)
 	}
 	if($op =~ /^DONE$|^RETURN$/)
 	{
-		return { a => 'inglobal', isreturn => 1 };
+		return { a => 'inglobalvec', isreturn => 1 };
 	}
 	return { a => 'inglobal', b => 'inglobal', c => 'outglobal' };
 }
@@ -127,7 +127,7 @@ use constant TYPES => {
 	int => ['V', 4, signed 32],
 	ushort => ['v', 2, id],
 	short => ['v', 2, signed 16],
-	opcode => ['v', 2, sub { OPCODE_E->[$_[0]] or die "Invalid opcode: $_[0]"; }],
+	opcode => ['v', 2, sub { OPCODE_E->[$_[0]] or do { warn "Invalid opcode: $_[0]"; "INVALID#$_[0]"; }; }],
 	float => ['f', 4, id],
 	uchar8 => ['a8', 8, sub { [unpack 'C8', $_[0]] }],
 	global => ['i', 4, sub { { int => $_[0], float => unpack "f", pack "L", $_[0] }; }],
@@ -249,16 +249,17 @@ sub run_nfa($$$$$$)
 		no warnings 'recursion';
 
 		my ($ip, $state) = @_;
+		my $ret = 0;
 
 		for(;;)
 		{
-			return
+			return $ret
 				if $state_checker->($ip, $state);
 
 			my $s = $statements->[$ip];
 			my $c = checkop $s->{op};
 
-			if($instruction_handler->($ip, $state, $s, $c))
+			if(($ret = $instruction_handler->($ip, $state, $s, $c)))
 			{
 				# abort execution
 				last;
@@ -268,13 +269,29 @@ sub run_nfa($$$$$$)
 			{
 				last;
 			}
+			elsif($c->{iscall})
+			{
+				my $func = $s->{a};
+				my $funcid = $progs->{globals}[$func]{v}{int};
+				my $funcobj = $progs->{functions}[$funcid];
+				if($funcobj && $funcobj->{first_statement} < 0) # builtin
+				{
+					my $def = $progs->{globaldef_byoffset}->($func);
+					last
+						if $def->{debugname} eq '$error';
+				}
+				$ip += 1;
+			}
 			elsif($c->{isjump})
 			{
 				if($c->{isconditional})
 				{
 					if(rand 2)
 					{
-						$nfa->($ip+$s->{$c->{isjump}}, $copy_handler->($state));
+						if(($ret = $nfa->($ip+$s->{$c->{isjump}}, $copy_handler->($state))) < 0)
+						{
+							last;
+						}
 						$ip += 1;
 					}
 					else
@@ -293,6 +310,8 @@ sub run_nfa($$$$$$)
 				$ip += 1;
 			}
 		}
+
+		return $ret;
 	};
 
 	$nfa->($ip, $copy_handler->($state));
@@ -515,6 +534,7 @@ sub find_uninitialized_locals($$)
 {
 	my ($progs, $func) = @_;
 
+
 	return
 		if $func->{first_statement} < 0; # builtin
 
@@ -538,6 +558,7 @@ sub find_uninitialized_locals($$)
 			if not exists $watchme{$_};
 	}
 
+	my %write_places = ();
 	run_nfa $progs, $func->{first_statement}, "", id, nfa_default_state_checker,
 		sub
 		{
@@ -562,12 +583,17 @@ sub find_uninitialized_locals($$)
 				elsif($type eq 'outglobal')
 				{
 					$watchme{$ofs} |= WATCHME_W;
+					$write_places{$ip}{$_} = [$ofs]
+						if $watchme{$ofs} & WATCHME_X;
 				}
 				elsif($type eq 'outglobalvec')
 				{
 					$watchme{$ofs} |= WATCHME_W;
 					$watchme{$ofs+1} |= WATCHME_W;
 					$watchme{$ofs+2} |= WATCHME_W;
+					my @l = grep { $watchme{$_} & WATCHME_X } $ofs .. ($ofs+2);
+					$write_places{$ip}{$_} = \@l
+						if @l;
 				}
 			}
 
@@ -587,14 +613,14 @@ sub find_uninitialized_locals($$)
 	{
 		$watchme{$_} = {
 			flags => $watchme{$_},
-			valid => 0
+			valid => [0, undef, undef]
 		};
 	}
 
 	# mark parameters as initialized
 	for($func->{parm_start} .. ($p-1))
 	{
-		$watchme{$_}{valid} = 1
+		$watchme{$_}{valid} = [1, undef, undef]
 			if defined $watchme{$_};
 	}
 	# an initial run of STORE instruction is for receiving extra parameters
@@ -606,16 +632,16 @@ sub find_uninitialized_locals($$)
 		my $s = $progs->{statements}[$_];
 		if($s->{op} eq 'STORE_V')
 		{
-			$watchme{$s->{a}}{valid} = 1
+			$watchme{$s->{a}}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}};
-			$watchme{$s->{a}+1}{valid} = 1
+			$watchme{$s->{a}+1}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}+1};
-			$watchme{$s->{a}+2}{valid} = 1
+			$watchme{$s->{a}+2}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}+2};
 		}
 		elsif($s->{op} =~ /^STORE_/)
 		{
-			$watchme{$s->{a}}{valid} = 1
+			$watchme{$s->{a}}{valid} = [1, undef, undef]
 				if defined $watchme{$s->{a}};
 		}
 		else
@@ -633,20 +659,22 @@ sub find_uninitialized_locals($$)
 		},
 		sub {
 			my ($ip, $state) = @_;
+
 			my $s = $ip_seen{$ip};
 			if($s)
 			{
 				# if $state is stronger or equal to $s, return 1
+
 				for(keys %$state)
 				{
-					if($state->{$_}{valid} < $s->{$_})
+					if($state->{$_}{valid}[0] < $s->{$_})
 					{
 						# The current state is LESS valid than the previously run one. We NEED to run this.
 						# The saved state can safely become the intersection [citation needed].
 						for(keys %$state)
 						{
-							$s->{$_} = $state->{$_}{valid}
-								if $state->{$_}{valid} < $s->{$_};
+							$s->{$_} = $state->{$_}{valid}[0]
+								if $state->{$_}{valid}[0] < $s->{$_};
 						}
 						return 0;
 					}
@@ -657,13 +685,16 @@ sub find_uninitialized_locals($$)
 			else
 			{
 				# Never seen this IP yet.
-				$ip_seen{$ip} = { map { ($_ => $state->{$_}{valid}); } keys %$state };
+				$ip_seen{$ip} = { map { ($_ => $state->{$_}{valid}[0]); } keys %$state };
 				return 0;
 			}
 		},
 		sub {
 			my ($ip, $state, $s, $c) = @_;
 			my $op = $s->{op};
+
+			my $return_hack = $c->{isreturn} // 0;
+
 			for(qw(a b c))
 			{
 				my $type = $c->{$_};
@@ -675,42 +706,52 @@ sub find_uninitialized_locals($$)
 				my $read = sub
 				{
 					my ($ofs) = @_;
+					++$return_hack
+						if $return_hack;
 					return
 						if not exists $state->{$ofs};
 					my $valid = $state->{$ofs}{valid};
-					if($valid == 0)
+					if($valid->[0] == 0)
 					{
-						print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
-						++$warned{$ip}{$_};
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						{
+							print "; Use of uninitialized value $ofs in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
 					}
-					elsif($valid < 0)
+					elsif($valid->[0] < 0)
 					{
-						print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
-						++$warned{$ip}{$_};
+						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b')) # fteqcc logicops cause this
+						{
+							print "; Use of temporary $ofs across CALL in $func->{debugname} at $ip.$_\n";
+							++$warned{$ip}{$_};
+						}
+					}
+					else
+					{
+						# it's VALID
+						if(defined $valid->[1])
+						{
+							delete $write_places{$valid->[1]}{$valid->[2]};
+						}
 					}
 				};
 				my $write = sub
 				{
 					my ($ofs) = @_;
-					$state->{$ofs}{valid} = 1
+					$state->{$ofs}{valid} = [1, $ip, $_]
 						if exists $state->{$ofs};
 				};
 
 				if($type eq 'inglobal' || $type eq 'inglobalfunc')
 				{
-					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
-					{
-						$read->($ofs);
-					}
+					$read->($ofs);
 				}
 				elsif($type eq 'inglobalvec')
 				{
-					if($op ne 'OR' && $op ne 'AND') # fteqcc logicops cause this
-					{
-						$read->($ofs);
-						$read->($ofs+1);
-						$read->($ofs+2);
-					}
+					$read->($ofs);
+					$read->($ofs+1);
+					$read->($ofs+2);
 				}
 				elsif($type eq 'outglobal')
 				{
@@ -736,20 +777,85 @@ sub find_uninitialized_locals($$)
 					{
 						if($_->{flags} & WATCHME_T)
 						{
-							$_->{valid} = -1;
+							$_->{valid} = [-1, undef, undef];
 						}
 					}
-				}
-				else # builtin
-				{
-					my $def = $progs->{globaldef_byoffset}->($func);
-					return 1
-						if $def->{debugname} eq '$error';
 				}
 			}
 
 			return 0;
 		};
+
+	for my $ip(keys %write_places)
+	{
+		for my $operand(keys %{$write_places{$ip}})
+		{
+			# TODO verify it
+			my %left = map { $_ => 1 } @{$write_places{$ip}{$operand}};
+			my $isread = 0;
+
+			my %writeplace_seen = ();
+			run_nfa $progs, $ip+1, \%left,
+				sub
+				{
+					return { %{$_[0]} };
+				},
+				sub
+				{
+					my ($ip, $state) = @_;
+					return $writeplace_seen{"$ip " . join " ", sort keys %$state}++;
+				},
+				sub
+				{
+					my ($ip, $state, $s, $c) = @_;
+					for(qw(a b c))
+					{
+						my $type = $c->{$_};
+						next
+							unless defined $type;
+
+						my $ofs = $s->{$_};
+						if($type eq 'inglobal' || $type eq 'inglobalfunc')
+						{
+							if($state->{$ofs})
+							{
+								$isread = 1;
+								return -1; # exit TOTALLY
+							}
+						}
+						elsif($type eq 'inglobalvec')
+						{
+							if($state->{$ofs} || $state->{$ofs+1} || $state->{$ofs+2})
+							{
+								$isread = 1;
+								return -1; # exit TOTALLY
+							}
+						}
+						elsif($type eq 'outglobal')
+						{
+							delete $state->{$ofs};
+							return 1
+								if !%$state;
+						}
+						elsif($type eq 'outglobalvec')
+						{
+							delete $state->{$ofs};
+							delete $state->{$ofs+1};
+							delete $state->{$ofs+2};
+							return 1
+								if !%$state;
+						}
+					}
+					return 0;
+				};
+
+			if(!$isread)
+			{
+				print "; Value is never used in $func->{debugname} at $ip.$operand\n";
+				++$warned{$ip}{$operand};
+			}
+		}
+	}
 	
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
