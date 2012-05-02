@@ -121,6 +121,10 @@ sub checkop($)
 	{
 		return { a => 'inglobalvec', isreturn => 1 };
 	}
+	if($op eq 'STATE')
+	{
+		return { a => 'inglobal', b => 'inglobalfunc' };
+	}
 	return { a => 'inglobal', b => 'inglobal', c => 'outglobal' };
 }
 
