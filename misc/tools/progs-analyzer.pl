@@ -535,8 +535,18 @@ sub find_uninitialized_locals($$)
 
 	for(keys %{$progs->{temps}})
 	{
-		$watchme{$_} = WATCHME_T | WATCHME_X
-			if not exists $watchme{$_};
+		next
+			if exists $watchme{$_};
+		if($progs->{temps}{$_})
+		{
+			# shared temp
+			$watchme{$_} = WATCHME_T | WATCHME_X
+		}
+		else
+		{
+			# unique temp
+			$watchme{$_} = WATCHME_X
+		}
 	}
 
 	$watchme{$_} |= WATCHME_R
@@ -876,13 +886,13 @@ sub detect_constants($)
 	{
 		for(keys %{$_->{globals_used}})
 		{
-			if($globalflags[$_] & GLOBALFLAG_Q)
-			{
-				$globalflags[$_] &= ~GLOBALFLAG_Q;
-			}
-			else
+			if($globalflags[$_] & GLOBALFLAG_U)
 			{
 				$globalflags[$_] &= ~GLOBALFLAG_U;
+			}
+			elsif($globalflags[$_] & GLOBALFLAG_Q)
+			{
+				$globalflags[$_] &= ~GLOBALFLAG_Q;
 			}
 		}
 		$globalflags[$_] |= GLOBALFLAG_R
@@ -961,11 +971,12 @@ sub detect_constants($)
 			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == GLOBALFLAG_Q)
 			{
 				$globaltypes[$_] = "uniquetemp";
+				$istemp{$_} = 0;
 			}
 			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I | GLOBALFLAG_Q)) == 0)
 			{
 				$globaltypes[$_] = "temp";
-				++$istemp{$_};
+				$istemp{$_} = 1;
 			}
 			elsif(($globalflags[$_] & (GLOBALFLAG_S | GLOBALFLAG_I)) == GLOBALFLAG_I)
 			{
