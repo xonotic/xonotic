@@ -155,7 +155,7 @@ case "$action" in
 				)
 			)
 			if [ -n "$out" ]; then
-				b=${REFNAME#refs/remotes/[^/]*/}
+				b=${REFNAME#refs/remotes/[!/]*/}
 				case "$b" in
 					*/*)
 						n=${b%%/*}
