@@ -39,9 +39,9 @@ to_rss()
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-	<title>Merge conflicts for $name</title>
+	<title>XonCW: $name</title>
 	<link>http://git.xonotic.org/</link>
-	<description>...</description>
+	<description>Xonotic Conflict Watch for branches by $name</description>
 	<ttl>3600</ttl>
 	<atom:link href="http://de.git.xonotic.org/conflicts/$filename" rel="self" type="application/rss+xml" />
 	<lastBuildDate>$datetime</lastBuildDate>
@@ -85,6 +85,15 @@ EOF
 if [ -z "$outdir" ]; then
 	set --
 fi
+
+case "$repodir" in
+	'')
+		repo=`git config remote.origin.url | cut -d / -f 4-`
+		;;
+	*)
+		repo=$repodir # FIXME
+		;;
+esac
 
 case "$action" in
 	--init)
@@ -141,7 +150,7 @@ case "$action" in
 						n=divVerent
 						;;
 				esac
-				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$HASH" "$b" "$repodir"
+				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$HASH" "$b" "$repo"
 				echo >&2 " CONFLICT"
 			else
 				echo >&2 " ok"
