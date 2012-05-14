@@ -158,8 +158,7 @@ case "$action" in
 				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant-split-up-the-q3map2-commit) continue ;;
 				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant-split-up-the-q3map2-commit-goal) continue ;;
 				xonotic/fteqcc.git:refs/remotes/origin/wip) continue ;;
-				xonotic/darkplaces:refs/remotes/origin/master) continue ;;
-				xonotic/darkplaces:refs/remotes/origin/dp-mqc-render) continue ;;
+				xonotic/darkplaces.git:refs/remotes/origin/dp-mqc-render) continue ;;
 			esac
 
 			if [ x"$masterhash" = x"$masterhash2" ]; then
