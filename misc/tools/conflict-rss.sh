@@ -28,7 +28,7 @@ to_rss()
 		repo=" in $repo"
 	fi
 
-	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.xml
+	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.rss
 	outfilename="$outdir/$filename"
 	datetime=`date --rfc-2822`
 	branch=`echo "$branch" | escape_html`
@@ -63,6 +63,11 @@ EOF
 EOF
 }
 
+clear_rss()
+{
+	sed -i -e '/<item>/,$d' "$1"
+}
+
 finish_rss()
 {
 	cat <<EOF >>"$1"
@@ -77,8 +82,11 @@ fi
 
 case "$action" in
 	--init)
-		rm -rf "$outdir"
 		mkdir -p "$outdir"
+		for f in "$outdir"/*; do
+			[ -f "$f" ] || continue
+			clear_rss "$f"
+		done
 		;;
 	--finish)
 		for f in "$outdir"/*; do
