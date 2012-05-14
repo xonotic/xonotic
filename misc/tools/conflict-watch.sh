@@ -22,19 +22,28 @@ to_rss()
 	name=$2
 	masterhash=$3
 	masterbranch=$4
-	hash=$5
-	branch=$6
-	repo=$7
+	masterhash2=$5
+	masterbranch2=$6
+	hash=$7
+	branch=$8
+	repo=$9
 
 	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.rss
 	outfilename="$outdir/$filename"
 	masterbranch=`echo -n "$masterbranch" | escape_html`
+	masterbranch2=`echo -n "$masterbranch2" | escape_html`
 	branch=`echo -n "$branch" | escape_html`
 	repo=`echo -n "$repo" | escape_html`
 	if [ -n "$repo" ]; then
 		repotxt=" in $repo"
 	else
 		repotxt=
+	fi
+
+	if [ x"$masterhash" = x"$masterhash2" ]; then
+		against="$masterbranch at $masterhash"
+	else
+		against="$masterbranch at $masterhash or $masterbranch2 at $masterhash2"
 	fi
 
 	if ! [ -f "$outfilename" ]; then
@@ -57,7 +66,7 @@ EOF
 		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$branch</link>
 		<guid isPermaLink="false">http://nl.git.xonotic.org/xoncw/$filename#$hash</guid>
 		<description><![CDATA[
-		Conflicts of $branch at $hash against $masterbranch at $masterhash:
+		Conflicts of $branch at $hash against $against:
 EOF
  
 	echo -n "<pre>" >>"$outfilename"
@@ -132,6 +141,17 @@ case "$action" in
 			)
 		)
 		masterbranch=${masterbranch#refs/heads/}
+
+		masterhash2=$(
+			(
+				if [ -n "$repodir" ]; then
+					cd "$repodir"
+				fi
+				git rev-parse master
+			)
+		)
+		masterbranch2=master
+
 		(
 		 	if [ -n "$repodir" ]; then
 				cd "$repodir"
@@ -157,8 +177,24 @@ case "$action" in
 					if out=`git merge --no-commit -- "$REFNAME" 2>&1`; then
 						good=true
 					else
-						good=false
-						echo "$out"
+						if [ x"$masterbranch2" != x"$masterbranch" ]; then
+							git reset --hard "$masterhash2" >/dev/null 2>&1
+							if out2=`git merge --no-commit -- "$REFNAME" 2>&1`; then
+								good=true
+							else
+								good=false
+								l=`echo "$out" | wc -l`
+								l2=`echo "$out2" | wc -l`
+								if [ $l -gt $l2 ]; then
+									echo "$out2"
+								else
+									echo "$out"
+								fi
+							fi
+						else
+							good=false
+							echo "$out"
+						fi
 					fi
 					git reset --hard "$masterhash" >/dev/null 2>&1
 				)
@@ -173,7 +209,7 @@ case "$action" in
 						n=divVerent
 						;;
 				esac
-				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$masterbranch" "$HASH" "$b" "$repo"
+				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$masterbranch" "$masterhash2" "$masterbranch2" "$HASH" "$b" "$repo"
 				echo >&2 " CONFLICT"
 			else
 				echo >&2 " ok"
