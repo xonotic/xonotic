@@ -139,6 +139,14 @@ case "$action" in
 			branches
 		) | while read -r HASH TYPE REFNAME; do
 			echo >&2 -n "$repo $REFNAME..."
+			case "$repo:$REFNAME" in
+				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant) continue ;;
+				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant-original) continue ;;
+				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant-split-up-the-q3map2-commit) continue ;;
+				xonotic/netradiant.git:refs/remotes/origin/divVerent/zeroradiant-split-up-the-q3map2-commit-goal) continue ;;
+				xonotic/fteqcc.git:refs/remotes/origin/wip) continue ;;
+				xonotic/darkplaces:refs/remotes/origin/master) continue ;;
+			esac
 			out=$(
 				(
 					if [ -n "$repodir" ]; then
