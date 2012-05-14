@@ -22,29 +22,22 @@ to_rss()
 	name=$2
 	masterhash=$3
 	masterbranch=$4
-	masterhash2=$5
-	masterbranch2=$6
-	hash=$7
-	branch=$8
-	repo=$9
+	hash=$5
+	branch=$6
+	repo=$7
 
 	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.rss
 	outfilename="$outdir/$filename"
 	masterbranch=`echo -n "$masterbranch" | escape_html`
-	masterbranch2=`echo -n "$masterbranch2" | escape_html`
 	branch=`echo -n "$branch" | escape_html`
 	repo=`echo -n "$repo" | escape_html`
+
 	if [ -n "$repo" ]; then
 		repotxt=" in $repo"
 	else
 		repotxt=
 	fi
-
-	if [ x"$masterhash" = x"$masterhash2" ]; then
-		against="$masterbranch at $masterhash"
-	else
-		against="$masterbranch at $masterhash or $masterbranch2 at $masterhash2"
-	fi
+	against="$masterbranch at $masterhash"
 
 	if ! [ -f "$outfilename" ]; then
 		datetime=`date --rfc-2822`
@@ -168,33 +161,43 @@ case "$action" in
 				xonotic/darkplaces:refs/remotes/origin/master) continue ;;
 				xonotic/darkplaces:refs/remotes/origin/dp-mqc-render) continue ;;
 			esac
+
+			if [ x"$masterhash" = x"$masterhash2" ]; then
+				thismasterhash=$masterhash
+				thismasterbranch=$masterbranch
+			else
+				l=$(
+					if [ -n "$repodir" ]; then
+						cd "$repodir"
+					fi
+					git rev-list "$masterhash".."$REFNAME" | wc -l
+				)
+				l2=$(
+					if [ -n "$repodir" ]; then
+						cd "$repodir"
+					fi
+					git rev-list "$masterhash2".."$REFNAME" | wc -l
+				)
+				if [ $l -gt $l2 ]; then
+					thismasterhash=$masterhash2
+					thismasterbranch=$masterbranch2
+				else
+					thismasterhash=$masterhash
+					thismasterbranch=$masterbranch
+				fi
+			fi
+				
 			out=$(
 				(
 					if [ -n "$repodir" ]; then
 						cd "$repodir"
 					fi
-					git reset --hard "$masterhash" >/dev/null 2>&1
+					git reset --hard "$thismasterhash" >/dev/null 2>&1
 					if out=`git merge --no-commit -- "$REFNAME" 2>&1`; then
 						good=true
 					else
-						if [ x"$masterbranch2" != x"$masterbranch" ]; then
-							git reset --hard "$masterhash2" >/dev/null 2>&1
-							if out2=`git merge --no-commit -- "$REFNAME" 2>&1`; then
-								good=true
-							else
-								good=false
-								l=`echo "$out" | wc -l`
-								l2=`echo "$out2" | wc -l`
-								if [ $l -gt $l2 ]; then
-									echo "$out2"
-								else
-									echo "$out"
-								fi
-							fi
-						else
-							good=false
-							echo "$out"
-						fi
+						good=false
+						echo "$out"
 					fi
 					git reset --hard "$masterhash" >/dev/null 2>&1
 				)
@@ -209,7 +212,7 @@ case "$action" in
 						n=divVerent
 						;;
 				esac
-				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$masterbranch" "$masterhash2" "$masterbranch2" "$HASH" "$b" "$repo"
+				echo "$out" | to_rss "$outdir" "$n" "$thismasterhash" "$thismasterbranch" "$HASH" "$b" "$repo"
 				echo >&2 " CONFLICT"
 			else
 				echo >&2 " ok"
