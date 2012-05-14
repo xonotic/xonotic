@@ -86,14 +86,14 @@ if [ -z "$outdir" ]; then
 	set --
 fi
 
-case "$repodir" in
-	'')
-		repo=`git config remote.origin.url | cut -d / -f 4-`
-		;;
-	*)
-		repo=$repodir # FIXME
-		;;
-esac
+repo=$(
+	(
+		if [ -n "$repodir" ]; then
+			cd "$repodir"
+		fi
+		git config remote.origin.url | cut -d / -f 4-
+	)
+)
 
 case "$action" in
 	--init)
