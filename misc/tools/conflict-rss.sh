@@ -50,7 +50,7 @@ EOF
 	cat >>"$outfilename" <<EOF
 	<item>
 		<title>$branch$repo ($hash)</title>
-		<link>http://git.xonotic.org/?p=xonotic/netradiant.git;a=shortlog;h=refs/heads/$name/$branch</link>
+		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$name/$branch</link>
 		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash-$masterhash</guid>
 		<description><![CDATA[
 EOF
@@ -69,7 +69,7 @@ clear_rss()
 {
 	datetime=`date --rfc-2822`
 	sed -i -e '/<lastBuildDate>/,$d' "$1"
-	cat <<EOF >"$1"
+	cat <<EOF >>"$1"
 	<lastBuildDate>$datetime</lastBuildDate>
 EOF
 }
@@ -124,7 +124,7 @@ case "$action" in
 			fi
 			branches
 		) | while read -r HASH TYPE REFNAME; do
-			echo >&2 -n "$repodir $REFNAME..."
+			echo >&2 -n "$repo $REFNAME..."
 			out=$(
 				(
 					if [ -n "$repodir" ]; then
