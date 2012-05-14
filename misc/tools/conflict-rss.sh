@@ -21,17 +21,21 @@ to_rss()
 	outdir=$1
 	name=$2
 	masterhash=$3
-	hash=$4
-	branch=$5
-	repo=$6
-	if [ -n "$repo" ]; then
-		repo=" in $repo"
-	fi
+	masterbranch=$4
+	hash=$5
+	branch=$6
+	repo=$7
 
 	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.rss
 	outfilename="$outdir/$filename"
+	masterbranch=`echo -n "$masterbranch" | escape_html`
 	branch=`echo -n "$branch" | escape_html`
 	repo=`echo -n "$repo" | escape_html`
+	if [ -n "$repo" ]; then
+		repotxt=" in $repo"
+	else
+		repotxt=
+	fi
 
 	if ! [ -f "$outfilename" ]; then
 		datetime=`date --rfc-2822`
@@ -49,10 +53,11 @@ EOF
 	fi
 	cat >>"$outfilename" <<EOF
 	<item>
-		<title>$branch$repo ($hash)</title>
+		<title>$branch$repotxt</title>
 		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$name/$branch</link>
-		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash-$masterhash</guid>
+		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash</guid>
 		<description><![CDATA[
+		Conflicts of $branch at $hash against $masterbranch at $masterhash:
 EOF
  
 	echo -n "<pre>" >>"$outfilename"
@@ -118,6 +123,15 @@ case "$action" in
 				git rev-parse HEAD
 			)
 		)
+		masterbranch=$(
+			(
+				if [ -n "$repodir" ]; then
+					cd "$repodir"
+				fi
+				git symbolic-ref HEAD
+			)
+		)
+		masterbranch=${masterbranch#refs/heads/}
 		(
 		 	if [ -n "$repodir" ]; then
 				cd "$repodir"
@@ -150,7 +164,7 @@ case "$action" in
 						n=divVerent
 						;;
 				esac
-				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$HASH" "$b" "$repo"
+				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$masterbranch" "$HASH" "$b" "$repo"
 				echo >&2 " CONFLICT"
 			else
 				echo >&2 " ok"
