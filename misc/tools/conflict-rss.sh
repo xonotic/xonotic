@@ -30,11 +30,11 @@ to_rss()
 
 	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.rss
 	outfilename="$outdir/$filename"
-	datetime=`date --rfc-2822`
-	branch=`echo "$branch" | escape_html`
-	repo=`echo "$repo" | escape_html`
+	branch=`echo -n "$branch" | escape_html`
+	repo=`echo -n "$repo" | escape_html`
 
 	if ! [ -f "$outfilename" ]; then
+		datetime=`date --rfc-2822`
 		cat >"$outfilename" <<EOF
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -42,9 +42,9 @@ to_rss()
 	<title>Merge conflicts for $name</title>
 	<link>http://git.xonotic.org/</link>
 	<description>...</description>
-	<lastBuildDate>$datetime</lastBuildDate>
 	<ttl>3600</ttl>
 	<atom:link href="http://de.git.xonotic.org/conflicts/$filename" rel="self" type="application/rss+xml" />
+	<lastBuildDate>$datetime</lastBuildDate>
 EOF
 	fi
 	cat >>"$outfilename" <<EOF
@@ -54,8 +54,10 @@ EOF
 		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash-$masterhash</guid>
 		<description><![CDATA[
 EOF
-
+ 
+	echo -n "<pre>" >>"$outfilename"
 	escape_html >>"$outfilename"
+	echo "</pre>" >>"$outfilename"
 
 	cat >>"$outfilename" <<EOF
 		]]></description>
@@ -65,7 +67,11 @@ EOF
 
 clear_rss()
 {
-	sed -i -e '/<item>/,$d' "$1"
+	datetime=`date --rfc-2822`
+	sed -i -e '/<lastBuildDate>/,$d' "$1"
+	cat <<EOF >"$1"
+	<lastBuildDate>$datetime</lastBuildDate>
+EOF
 }
 
 finish_rss()
