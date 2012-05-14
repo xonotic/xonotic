@@ -46,7 +46,7 @@ to_rss()
 	<title>XonCW: $name</title>
 	<link>http://git.xonotic.org/</link>
 	<description>Xonotic Conflict Watch for branches by $name</description>
-	<ttl>3600</ttl>
+	<ttl>10800</ttl>
 	<atom:link href="http://nl.git.xonotic.org/xoncw/$filename" rel="self" type="application/rss+xml" />
 	<lastBuildDate>$datetime</lastBuildDate>
 EOF
