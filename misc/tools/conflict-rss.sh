@@ -20,35 +20,44 @@ to_rss()
 {
 	outdir=$1
 	name=$2
-	hash=$3
-	branch=$4
+	masterhash=$3
+	hash=$4
+	branch=$5
+	repo=$6
+	if [ -n "$repo" ]; then
+		repo=" in $repo"
+	fi
 
-	filename=$outdir/`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.xml
+	filename=`echo -n "$name" | tr -c 'A-Za-z0-9' '_'`.xml
+	outfilename="$outdir/$filename"
 	datetime=`date --rfc-2822`
 	branch=`echo "$branch" | escape_html`
+	repo=`echo "$repo" | escape_html`
 
-	if ! [ -f "$filename" ]; then
-		cat >"$filename" <<EOF
+	if ! [ -f "$outfilename" ]; then
+		cat >"$outfilename" <<EOF
 <?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
 	<title>Merge conflicts for $name</title>
-	<link>...</link>
+	<link>http://git.xonotic.org/</link>
 	<description>...</description>
 	<lastBuildDate>$datetime</lastBuildDate>
 	<ttl>3600</ttl>
+	<atom:link href="http://de.git.xonotic.org/conflicts/$filename" rel="self" type="application/rss+xml" />
 EOF
 	fi
-	cat >>"$filename" <<EOF
+	cat >>"$outfilename" <<EOF
 	<item>
-		<title>$branch ($hash)</title>
-		<link>...</link>
+		<title>$branch$repo ($hash)</title>
+		<link>http://git.xonotic.org/?p=xonotic/netradiant.git;a=shortlog;h=refs/heads/$name/$branch</link>
+		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash-$masterhash</guid>
 		<description><![CDATA[
 EOF
 
-	escape_html >>"$filename"
+	escape_html >>"$outfilename"
 
-	cat >>"$filename" <<EOF
+	cat >>"$outfilename" <<EOF
 		]]></description>
 	</item>
 EOF
@@ -78,6 +87,14 @@ case "$action" in
 		done
 		;;
 	--add)
+		masterhash=$(
+			(
+				if [ -n "$repodir" ]; then
+					cd "$repodir"
+				fi
+				git rev-parse HEAD
+			)
+		)
 		(
 		 	if [ -n "$repodir" ]; then
 				cd "$repodir"
@@ -85,32 +102,32 @@ case "$action" in
 			branches
 		) | while read -r HASH TYPE REFNAME; do
 			echo >&2 -n "$repodir $REFNAME..."
-			out=$( (
-				if [ -n "$repodir" ]; then
-					cd "$repodir"
-				fi
-				git reset --hard >/dev/null 2>&1
-				if out=`git merge --no-commit -- "$REFNAME" 2>&1`; then
-					good=true
-				else
-					good=false
-					echo "$out"
-				fi
-				git reset --hard >/dev/null 2>&1
-			) )
+			out=$(
+				(
+					if [ -n "$repodir" ]; then
+						cd "$repodir"
+					fi
+					git reset --hard "$masterhash" >/dev/null 2>&1
+					if out=`git merge --no-commit -- "$REFNAME" 2>&1`; then
+						good=true
+					else
+						good=false
+						echo "$out"
+					fi
+					git reset --hard "$masterhash" >/dev/null 2>&1
+				)
+			)
 			if [ -n "$out" ]; then
-				n=${REFNAME#refs/remotes/[^/]*/}
-				case "$n" in
+				b=${REFNAME#refs/remotes/[^/]*/}
+				case "$b" in
 					*/*)
-						b=${n#*/}
-						n=${n%%/*}
+						n=${b%%/*}
 						;;
 					*)
-						b="/$n"
 						n=divVerent
 						;;
 				esac
-				echo "$out" | to_rss "$outdir" "$n" "$HASH" "$b"
+				echo "$out" | to_rss "$outdir" "$n" "$masterhash" "$HASH" "$b" "$repodir"
 				echo >&2 " CONFLICT"
 			else
 				echo >&2 " ok"
