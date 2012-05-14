@@ -47,7 +47,7 @@ to_rss()
 	<link>http://git.xonotic.org/</link>
 	<description>Xonotic Conflict Watch for branches by $name</description>
 	<ttl>3600</ttl>
-	<atom:link href="http://de.git.xonotic.org/conflicts/$filename" rel="self" type="application/rss+xml" />
+	<atom:link href="http://nl.git.xonotic.org/xoncw/$filename" rel="self" type="application/rss+xml" />
 	<lastBuildDate>$datetime</lastBuildDate>
 EOF
 	fi
@@ -55,7 +55,7 @@ EOF
 	<item>
 		<title>$branch$repotxt</title>
 		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$branch</link>
-		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash</guid>
+		<guid isPermaLink="false">http://nl.git.xonotic.org/xoncw/$filename#$hash</guid>
 		<description><![CDATA[
 		Conflicts of $branch at $hash against $masterbranch at $masterhash:
 EOF
