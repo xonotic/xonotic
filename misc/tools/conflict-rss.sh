@@ -54,7 +54,7 @@ EOF
 	cat >>"$outfilename" <<EOF
 	<item>
 		<title>$branch$repotxt</title>
-		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$name/$branch</link>
+		<link>http://git.xonotic.org/?p=$repo;a=shortlog;h=refs/heads/$branch</link>
 		<guid isPermaLink="false">http://de.git.xonotic.org/conflicts/$filename#$hash</guid>
 		<description><![CDATA[
 		Conflicts of $branch at $hash against $masterbranch at $masterhash:
