@@ -170,7 +170,7 @@ case "$cmd" in
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
+		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data fteqcc source source/darkplaces source/fteqcc source/d0_blind_id mapping
@@ -293,14 +293,14 @@ case "$cmd" in
 	release-engine-linux32)
 		release_common
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -march=i686 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
+			'STRIP=: CC="gcc -m32 -march=i686 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib DP_GMP_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		release_common
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib' \
+			'STRIP=: CC="gcc -m64 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib DP_GMP_STATIC_LIBDIR=.deps/lib' \
 			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
@@ -557,6 +557,7 @@ case "$cmd" in
 		fi
 		# build the archives
 		verbose mkzip Xonotic-$stamp-enginesource.zip \
+			Xonotic/Makefile \
 			Xonotic/source/darkplaces/ \
 			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-engine.zip
