@@ -741,6 +741,13 @@ sub find_uninitialized_locals($$)
 					$write->($ofs+1);
 					$write->($ofs+2);
 				}
+				elsif($type eq 'ipoffset')
+				{
+					push @{$warned{$ip}{$_}}, "Endless loop"
+						if $ofs == 0;
+					push @{$warned{$ip}{$_}}, "No-operation jump"
+						if $ofs == 1;
+				}
 			}
 			if($c->{iscall})
 			{
