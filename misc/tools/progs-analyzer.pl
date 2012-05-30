@@ -501,7 +501,7 @@ sub disassemble_function($$;$)
 		{
 			for(values %{$highlight->{$ip}})
 			{
-				for(@$_)
+				for(sort keys %$_)
 				{
 					print PRE_MARK_STATEMENT;
 					printf INSTRUCTION_FORMAT, '', '<!>', '.WARN';
@@ -694,7 +694,7 @@ sub find_uninitialized_locals($$)
 						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
 						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
-							push @{$warned{$ip}{$_}}, "Use of uninitialized value";
+							++$warned{$ip}{$_}{"Use of uninitialized value"};
 						}
 					}
 					elsif($valid->[0] < 0)
@@ -702,7 +702,7 @@ sub find_uninitialized_locals($$)
 						# COMPILER BUG of FTEQCC: AND and OR may take uninitialized as second argument (logicops)
 						if($return_hack <= 2 and ($op ne 'OR' && $op ne 'AND' || $_ ne 'b'))
 						{
-							push @{$warned{$ip}{$_}}, "Use of temporary across CALL";
+							++$warned{$ip}{$_}{"Use of temporary across CALL"};
 						}
 					}
 					else
@@ -743,9 +743,9 @@ sub find_uninitialized_locals($$)
 				}
 				elsif($type eq 'ipoffset')
 				{
-					push @{$warned{$ip}{$_}}, "Endless loop"
+					++$warned{$ip}{$_}{"Endless loop"}
 						if $ofs == 0;
-					push @{$warned{$ip}{$_}}, "No-operation jump"
+					++$warned{$ip}{$_}{"No-operation jump"}
 						if $ofs == 1;
 				}
 			}
@@ -836,7 +836,7 @@ sub find_uninitialized_locals($$)
 
 			if(!$isread)
 			{
-				push @{$warned{$ip}{$operand}}, "Value is never used";
+				++$warned{$ip}{$operand}{"Value is never used"};
 			}
 		}
 	}
@@ -1192,23 +1192,26 @@ sub parse_progs($)
 		die "Out of range file in function $_"
 			if $f->{s_file} < 0 || $f->{s_file} >= length $p{strings};
 		my $file = $p{getstring}->($f->{s_file});
-		die "Out of range first_statement in function $_ (name: \"$name\", file: \"$file\")"
+		die "Out of range first_statement in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
 			if $f->{first_statement} >= @{$p{statements}};
-		die "Out of range parm_start in function $_ (name: \"$name\", file: \"$file\")"
+		die "Out of range parm_start in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
 			if $f->{parm_start} < 0 || $f->{parm_start} >= @{$p{globals}};
-		die "Out of range locals in function $_ (name: \"$name\", file: \"$file\")"
+		die "Out of range locals in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
 			if $f->{locals} < 0 || $f->{parm_start} + $f->{locals} >= @{$p{globals}};
-		die "Out of range numparms in function $_ (name: \"$name\", file: \"$file\")"
-			if $f->{numparms} < 0 || $f->{numparms} > 8;
-		my $totalparms = 0;
-		for(0..($f->{numparms}-1))
+		if($f->{first_statement} >= 0)
 		{
-			die "Out of range parm_size[$_] in function $_ (name: \"$name\", file: \"$file\")"
-				unless { 0 => 1, 1 => 1, 3 => 1 }->{$f->{parm_size}[$_]};
-			$totalparms += $f->{parm_size}[$_];
+			die "Out of range numparms $f->{numparms} in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+				if $f->{numparms} < 0 || $f->{numparms} > 8;
+			my $totalparms = 0;
+			for(0..($f->{numparms}-1))
+			{
+				die "Out of range parm_size[$_] in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+					unless { 0 => 1, 1 => 1, 3 => 1 }->{$f->{parm_size}[$_]};
+				$totalparms += $f->{parm_size}[$_];
+			}
+			die "Out of range parms in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+				if $f->{locals} < 0 || $f->{parm_start} + $totalparms >= @{$p{globals}};
 		}
-		die "Out of range parms in function $_ (name: \"$name\", file: \"$file\")"
-			if $f->{locals} < 0 || $f->{parm_start} + $totalparms >= @{$p{globals}};
 	}
 
 	print STDERR "Range checking statements...\n";
