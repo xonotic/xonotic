@@ -53,12 +53,13 @@ testrepoflag()
 
 mirrorspeed()
 {
+	# first result is to be ignored, but we use it to check status
+	git ls-remote "$1" refs/heads/master >/dev/null 2>&1 || return 1
+	# if we can't time, we only check availability
 	if ! { time -p true; } >/dev/null 2>&1; then
 		echo 0
 		return
 	fi
-	# first result is to be ignored, but we use it to check status
-	git ls-remote "$1" refs/heads/master >/dev/null 2>&1 || return 1
 	# now actually time it
 	(
 		set +x
