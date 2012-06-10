@@ -104,7 +104,13 @@ bestmirror()
 	bestcount=
 	bestmirror_benchmark()
 	{
-		if [ -z "$2" ]; then
+		bmb_curloc=$1
+		bmb_proto=$2
+		bmb_loc=$3
+		bmb_url=$4
+		bmb_fudge=$5
+
+		if [ -z "$bmb_loc" ]; then
 			# empty location is not allowed
 			return
 		fi
@@ -112,7 +118,7 @@ bestmirror()
 			*"  "*)
 				# no protocol requested? all match
 				;;
-			*" $1 "*)
+			*" $bmb_proto "*)
 				;;
 			*)
 				return
@@ -121,9 +127,18 @@ bestmirror()
 
 		# prefer location match
 		case " $newlocation " in
-			*" $2 "*)
+			*" $bmb_loc "*)
+				# bmb_curloc is true in first run, false in second
+				# so first run gets all matching locations
+				# so second run gets all non-matching locations
+				if ! $bmb_curloc; then
+					return
+				fi
 				;;
 			*)
+				if $bmb_curloc; then
+					return
+				fi
 				case " $newlocation " in
 					*" $bestlocation "*)
 						# worse
@@ -134,7 +149,7 @@ bestmirror()
 		esac
 
 		case " $newlocation " in
-			*" $2 "*)
+			*" $bmb_loc "*)
 				# see below
 				;;
 			*)
@@ -146,20 +161,20 @@ bestmirror()
 				esac
 				;;
 		esac
-		msg "Testing speed of $3..."
+		msg "Testing speed of $bmb_url..."
 
 		# only working mirrors
-		if ! thistime=`mirrorspeed "$3$testrepo"`; then
+		if ! thistime=`mirrorspeed "$bmb_url$testrepo"`; then
 			msg "-> FAILED"
 			return
 		fi
-		thistime=$(($thistime $4))
+		thistime=$(($thistime $bmb_fudge))
 		msg "-> $thistime"
 
 		# anything is better than nothing
 		if [ -z "$besttime" ]; then
-			besturl=$3
-			bestlocation=$2
+			besturl=$bmb_url
+			bestlocation=$bmb_loc
 			besttime=$thistime
 			bestcount=1
 			return
@@ -167,15 +182,15 @@ bestmirror()
 
 		# prefer location match
 		case " $newlocation " in
-			*" $2 "*)
+			*" $bmb_loc "*)
 				case " $newlocation " in
 					*" $bestlocation "*)
 						# equality
 						;;
 					*)
 						# better
-						besturl=$3
-						bestlocation=$2
+						besturl=$bmb_url
+						bestlocation=$bmb_loc
 						besttime=$thistime
 						bestcount=1
 						return
@@ -191,7 +206,8 @@ bestmirror()
 		if [ $thistime -gt $besttime ]; then
 			return
 		elif [ $thistime -lt $besttime ]; then
-			besturl=$3
+			besturl=$bmb_url
+			bestlocation=$bmb_loc
 			besttime=$thistime
 			bestcount=1
 			return
@@ -199,10 +215,12 @@ bestmirror()
 		# both location and time match. Random decision.
 		bestcount=$(($bestcount + 1))
 		if [ $((($RANDOM + 0) % $bestcount)) -eq 0 ]; then
-			besturl=$3
+			besturl=$bmb_url
+			bestlocation=$bmb_loc
 		fi
 	}
-	allmirrors bestmirror_benchmark
+	allmirrors bestmirror_benchmark true
+	allmirrors bestmirror_benchmark false
 	echo "$besturl"
 }
 
