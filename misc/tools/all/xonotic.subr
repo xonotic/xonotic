@@ -244,11 +244,17 @@ case "$cmd" in
 			client=-sdl
 		fi
 		case "$1" in
-			sdl|glx|agl|dedicated)
+			dedicated)
+				client=-$1
+				shift
+				;;
+			sdl|glx|agl)
+				USE_RLWRAP=no
 				client=-$1
 				shift
 				;;
 			wgl)
+				USE_RLWRAP=no
 				client=
 				shift
 				;;
@@ -276,10 +282,15 @@ case "$cmd" in
 
 		if [ x"$USE_GDB" = x"yes" ]; then
 			set -- gdb --args "$@"
-		elif [ x"$USE_GDB" = x"core" ] && which gdb >/dev/null 2>&1; then
+			USE_RLWRAP=no
+		elif [ x"$USE_GDB" = x"core" ]; then
 			set -- gdb --batch -x savecore.gdb --args "$@"
+			USE_RLWRAP=no
 		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
+		fi
+		if [ x"$USE_RLWRAP" != x"no" ] && which rlwrap >/dev/null 2>&1; then
+			set -- rlwrap -A -g '^quit' -q "\"" -r -S ']' -w 100 "$@"
 		fi
 		rm -f xonotic.core
 		"$@" || true
