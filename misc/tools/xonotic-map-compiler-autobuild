@@ -361,6 +361,10 @@ case "$1" in
 		runmakeindex
 		;;
 	download)
+		if ! which unzip >/dev/null 2>&1; then
+			echo "Cannot find unzip, bailing out"
+			exit 1
+		fi
 		if ! cd data/xonotic-maps.pk3dir >/dev/null 2>&1; then
 			echo "data/xonotic-maps.pk3dir does not exist, not downloading"
 			exit 0
