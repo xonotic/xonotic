@@ -75,7 +75,7 @@ sub get_player_count
 	my $pj = $store{plugin_joinsparts};
 	
 	my $ip = $store{"playerip_byid_$id"};
-	my ($cn) = $pj->{geo}->LookUp($ip) if ($pj->{irc_show_country} && $ip ne 'bot');
+	my ($cn) = $pj->{geo}->LookUp($ip) if ($pj->{irc_show_country} && $ip && $ip ne 'bot');
 	
 	if ($pj->{irc_announce_parts} && defined $store{"playernick_byid_$id"} && $store{"playerip_byid_$id"} ne 'bot') {
 		out irc => 0, "PRIVMSG $config{irc_channel} :\00304- part\017: " . $store{"playernick_byid_$id"} . "\017" . 
