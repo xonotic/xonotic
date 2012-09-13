@@ -18,13 +18,43 @@ my %chanpos = (
 	pitch_wheel_change => 2
 );
 
+my %isclean = (
+	set_tempo => sub { 1; },
+	note_off => sub { 1; },
+	note_on => sub { 1; },
+	control_change => sub { $_[3] == 64; },
+);
+
+sub abstime(@)
+{
+	my $t = 0;
+	return map { [$_->[0], $t += $_->[1], @{$_}[2..(@$_-1)]]; } @_;
+}
+
+sub reltime(@)
+{
+	my $t = 0;
+	return map { my $tsave = $t; $t = $_->[1]; [$_->[0], $t - $tsave, @{$_}[2..(@$_-1)]]; } @_;
+}
+
+sub clean(@)
+{
+	return reltime grep { ($isclean{$_->[0]} // sub { 0; })->(@$_) } abstime @_;
+}
+
 while(<STDIN>)
 {
 	chomp;
 	my @arg = split /\s+/, $_;
 	my $cmd = shift @arg;
 	print "Executing: $cmd @arg\n";
-	if($cmd eq 'ticks')
+	if($cmd eq 'clean')
+	{
+		my $tracks = $opus->tracks_r();
+		$tracks->[$_]->events_r([clean($tracks->[$_]->events())])
+			for 0..@$tracks-1;
+	}
+	elsif($cmd eq 'ticks')
 	{
 		if(@arg)
 		{
@@ -44,8 +74,8 @@ while(<STDIN>)
 		my $tracks = $opus->tracks_r();
 		if(@arg)
 		{
-			my %taken = (0 => 1);
-			my @t = ($tracks->[0]);
+			my %taken = ();
+			my @t = ();
 			my $force = 0;
 			for(@arg)
 			{
@@ -61,7 +91,7 @@ while(<STDIN>)
 		}
 		else
 		{
-			for(1..@$tracks-1)
+			for(0..@$tracks-1)
 			{
 				print "Track $_:";
 				my $name = undef;
@@ -69,8 +99,10 @@ while(<STDIN>)
 				my $notes = 0;
 				my %notehash = ();
 				my $t = 0;
+				my $events = 0;
 				for($tracks->[$_]->events())
 				{
+					++$events;
 					$_->[0] = 'note_off' if $_->[0] eq 'note_on' and $_->[4] == 0;
 					$t += $_->[1];
 					my $p = $chanpos{$_->[0]};
@@ -96,6 +128,7 @@ while(<STDIN>)
 				}
 				print " $name" if defined $name;
 				print " (channel $channels)" if $channels ne "";
+				print " ($events events)" if $events;
 				print " ($notes notes)" if $notes;
 				print " (notes @stuck stuck)" if @stuck;
 				print "\n";
@@ -108,7 +141,7 @@ while(<STDIN>)
 	}
 	else
 	{
-		print "Unknown command, allowed commands: ticks, tricks, tracks, save\n";
+		print "Unknown command, allowed commands: ticks, tracks, clean, save\n";
 	}
 	print "Done with: $cmd @arg\n";
 }
