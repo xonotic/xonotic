@@ -90,7 +90,7 @@ sub botconfig_read($)
 	while(<$fh>)
 	{
 		chomp;
-		s/\s*#.*//;
+		s/\s*\/\/.*//;
 		next if /^$/;
 		if(s/^\t\t//)
 		{
