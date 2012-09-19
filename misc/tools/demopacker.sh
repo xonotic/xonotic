@@ -9,7 +9,7 @@ demobase=${demo##*/}
 
 cp "$demo" data/"$demobase"
 
-strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window -demo "$demobase"
+strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window "$@" -demo "$demobase"
 
 allfiles()
 {
@@ -78,7 +78,7 @@ cd output
 find . -type f -print0 | xargs -0 ../misc/tools/cached-converter.sh
 cd ..
 mv data/"$demobase" output/
-echo "-xonotic -nohome -readonly -forceqmenu +bind ESC quit -demo $demobase" > output/darkplaces.opt
+echo "-xonotic -nohome -readonly -forceqmenu +bind ESC quit $* -demo $demobase" > output/darkplaces.opt
 rm output.pk3
 ( cd output && zip -9r ../output.pk3 . )
 cp "$xonotic" output.exe
