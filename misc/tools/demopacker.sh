@@ -37,9 +37,10 @@ while [ -n "$allfiles" ]; do
 		[ -f "$f" ] || continue
 		fn=${f#*/*/}
 		case "$f" in
-			*/csprogs.dat)
-				# spam, skip it
-				;;
+# BUG: DP cannot read the csprogs.dat from the demo in readonly mode, so we have to keep this one for now
+#			*/csprogs.dat)
+#				# spam, skip it
+#				;;
 			*/unifont-*.ttf)
 				# spam, skip it
 				;;
@@ -78,7 +79,7 @@ cd output
 find . -type f -print0 | xargs -0 ../misc/tools/cached-converter.sh
 cd ..
 mv data/"$demobase" output/
-echo "-xonotic -nohome -readonly -forceqmenu +bind ESC quit $* -demo $demobase" > output/darkplaces.opt
+echo "-xonotic -nohome -readonly -forceqmenu +bind ESCAPE quit $* -demo $demobase" > output/darkplaces.opt
 rm output.pk3
 ( cd output && zip -9r ../output.pk3 . )
 cp "$xonotic" output.exe
