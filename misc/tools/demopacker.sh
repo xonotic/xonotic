@@ -80,7 +80,7 @@ cd ..
 mv data/"$demobase" output/
 echo "-xonotic -nohome -readonly -forceqmenu +bind ESCAPE quit $* -demo $demobase" > output/darkplaces.opt
 rm output.pk3
-( cd output && zip -9r ../output.pk3 . )
+( cd output && 7za a -tzip -mx=9 ../output.pk3 . )
 cp "$xonotic" output.exe
 $strip --strip-unneeded output.exe
 cat output.pk3 >> output.exe
