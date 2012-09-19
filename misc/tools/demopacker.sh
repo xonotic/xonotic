@@ -37,10 +37,9 @@ while [ -n "$allfiles" ]; do
 		[ -f "$f" ] || continue
 		fn=${f#*/*/}
 		case "$f" in
-# BUG: DP cannot read the csprogs.dat from the demo in readonly mode, so we have to keep this one for now
-#			*/csprogs.dat)
-#				# spam, skip it
-#				;;
+			*/csprogs.dat)
+				# spam, skip it
+				;;
 			*/unifont-*.ttf)
 				# spam, skip it
 				;;
