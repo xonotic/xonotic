@@ -25,6 +25,8 @@ my $timeoffset_postdone = 2;
 my $timeoffset_preintermission = 2;
 my $timeoffset_postintermission = 2;
 my $time_forgetfulness = 1.5;
+my %lists = ();
+my %listindexes = ();
 
 my ($config, @midilist) = @ARGV;
 
@@ -88,7 +90,7 @@ sub botconfig_read($)
 	while(<$fh>)
 	{
 		chomp;
-		s/\s*#.*//;
+		s/\s*\/\/.*//;
 		next if /^$/;
 		if(s/^\t\t//)
 		{
@@ -207,6 +209,11 @@ sub botconfig_read($)
 		{
 			$time_forgetfulness = $1;
 		}
+		elsif(/^list (.*?) (.*)/)
+		{
+			$lists{$1} = [split / /, $2];
+			$listindexes{$1} = 0;
+		}
 		else
 		{
 			print "unknown command: $_\n";
@@ -298,6 +305,19 @@ sub busybot_cmd_bot_test($$$@)
 	return 1;
 }
 
+sub buildstring(@)
+{
+	return
+		join " ",
+		map
+		{
+			$_ =~ /^\@(.*)$/
+				? do { $lists{$1}[$listindexes{$1}++ % @{$lists{$1}}]; }
+				: $_
+		}
+		@_;
+}
+
 sub busybot_cmd_bot_execute($$@)
 {
 	my ($bot, $time, @commands) = @_;
@@ -340,7 +360,7 @@ sub busybot_cmd_bot_execute($$@)
 		}
 		elsif($_->[0] eq 'cmd')
 		{
-			$commands .= sprintf "sv_cmd bot_cmd %d %s\n", $bot->{id}, join " ", @{$_}[1..@$_-1];
+			$commands .= sprintf "sv_cmd bot_cmd %d %s\n", $bot->{id}, buildstring @{$_}[1..@$_-1];
 		}
 		elsif($_->[0] eq 'aim_random')
 		{
@@ -354,7 +374,7 @@ sub busybot_cmd_bot_execute($$@)
 		}
 		elsif($_->[0] eq 'raw')
 		{
-			$commands .= sprintf "%s\n", join " ", @{$_}[1..@$_-1];
+			$commands .= sprintf "%s\n", buildstring @{$_}[1..@$_-1];
 		}
 	}
 
@@ -1050,6 +1070,7 @@ my @preallocate = ();
 $noalloc = 0;
 for(;;)
 {
+	%listindexes = ();
 	$commands = "";
 	eval
 	{
