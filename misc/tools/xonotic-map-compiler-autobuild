@@ -204,6 +204,9 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "maps/$M.irc" || true
 	fi
+	if [ -n "$BUILD_ONE" ]; then
+		exit
+	fi
 }
 
 screenshotthemap()
@@ -254,6 +257,9 @@ screenshotthemap()
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
 		$IRCSPAM < "$M-$blobhash/$M.ircss" || true
+	fi
+	if [ -n "$BUILD_ONE" ]; then
+		exit
 	fi
 }
 
