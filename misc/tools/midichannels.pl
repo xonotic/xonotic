@@ -54,6 +54,10 @@ while(<STDIN>)
 		$tracks->[$_]->events_r([clean($tracks->[$_]->events())])
 			for 0..@$tracks-1;
 	}
+	elsif($cmd eq 'dump')
+	{
+		print $opus->dump({ dump_tracks => 1 });
+	}
 	elsif($cmd eq 'ticks')
 	{
 		if(@arg)

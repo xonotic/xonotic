@@ -14,6 +14,7 @@ use constant SYS_TICRATE => 0.033333;
 
 use constant MIDI_FIRST_NONCHANNEL => 17;
 use constant MIDI_DRUMS_CHANNEL => 10;
+use constant TEXT_EVENT_CHANNEL => -1;
 
 die "Usage: $0 filename.conf midifile1 transpose1 midifile2 transpose2 ..."
 	unless @ARGV > 1 and @ARGV % 2;
@@ -163,14 +164,14 @@ sub botconfig_read($)
 				$super = $currentbot->{percussion}->{$1};
 				$currentbot->{percussion}->{$1} = $appendref = [];
 			}
-			elsif(/^vocals$/)
+			elsif(/^text (.*)$/)
 			{
-				$super = $currentbot->{vocals};
-				$currentbot->{vocals} = $appendref = [];
+				$super = $currentbot->{text}->{$1};
+				$currentbot->{text}->{$1} = $appendref = [];
 			}
 			else
 			{
-				print "unknown command: $_\n";
+				print STDERR "unknown command: $_\n";
 			}
 		}
 		elsif(/^bot (.*)/)
@@ -216,7 +217,7 @@ sub botconfig_read($)
 		}
 		else
 		{
-			print "unknown command: $_\n";
+			print STDERR "unknown command: $_\n";
 		}
 	}
 
@@ -401,6 +402,8 @@ sub busybot_note_off_bot($$$$)
 {
 	my ($bot, $time, $channel, $note) = @_;
 	#print STDERR "note off $bot:$time:$channel:$note\n";
+	return 1
+		if not $bot->{busy};
 	my ($busychannel, $busynote, $cmds) = @{$bot->{busy}};
 	return 1
 		if not defined $cmds; # note off cannot fail
@@ -425,16 +428,19 @@ sub busybot_get_cmds_bot($$$)
 {
 	my ($bot, $channel, $note) = @_;
 	my ($k0, $k1, $cmds, $cmds_off) = (undef, undef, undef, undef);
-	if($channel <= 0)
+	if($channel == TEXT_EVENT_CHANNEL)
 	{
 		# vocals
-		$cmds = $bot->{vocals};
+		$note =~ /^([^:]*):(.*)$/;
+		my $name = $1;
+		my $data = $2;
+		$cmds = $bot->{text}->{$name};
 		if(defined $cmds)
 		{
-			$cmds = [ map { [ map { $_ eq '%s' ? $note : $_ } @$_ ] } @$cmds ];
+			$cmds = [ map { [ map { $_ eq '%s' ? $data : $_ } @$_ ] } @$cmds ];
 		}
-		$k0 = "vocals";
-		$k1 = $channel;
+		$k0 = "text";
+		$k1 = $name;
 	}
 	elsif($channel == 10)
 	{
@@ -457,6 +463,7 @@ sub busybot_get_cmds_bot($$$)
 sub busybot_note_on_bot($$$$$$$)
 {
 	my ($bot, $time, $channel, $program, $note, $init, $force) = @_;
+
 	return -1 # I won't play on this channel
 		if defined $bot->{channels} and not $bot->{channels}->{$channel};
 	return -1 # I won't play this program
@@ -491,7 +498,7 @@ sub busybot_note_on_bot($$$$$$$)
 			if not busybot_cmd_bot_test $bot, $time + $notetime, $force, @$cmds; 
 		busybot_cmd_bot_execute $bot, $time + $notetime, @$cmds; 
 	}
-	if(defined $cmds and defined $cmds_off)
+	if(defined $cmds_off)
 	{
 		$bot->{busy} = [$channel, $note, $cmds_off];
 	}
@@ -528,11 +535,6 @@ sub busybot_note_off($$$)
 	my ($time, $channel, $note) = @_;
 
 #	print STDERR "note off $time:$channel:$note\n";
-
-	return 0
-		if $channel <= 0;
-	return 0
-		if $channel == 10;
 
 	if(my $bot = $notechannelbots{$channel}{$note})
 	{
@@ -589,6 +591,7 @@ sub busybot_note_on($$$$)
 
 	if($notechannelbots{$channel}{$note})
 	{
+		print STDERR "THIS SHOULD NEVER HAPPEN\n";
 		busybot_note_off $time, $channel, $note;
 	}
 
@@ -792,6 +795,8 @@ sub ConvertMIDI($$)
 			my ($command, $delta, @data) = @$_;
 			$command = 'note_off' if $command eq 'note_on' and $data[2] == 0;
 			$tick += $delta;
+			next
+				if $command eq 'text_event' && $data[0] !~ /:/;
 			push @allmidievents, [$command, $tick, $sequence++, $track, @data];
 		}
 	}
@@ -814,9 +819,17 @@ sub ConvertMIDI($$)
 			}
 			else
 			{
-				push @allmidievents, ['note_on', $tick * $scale + $shift, $sequence++, -1, -1, $file];
-				push @allmidievents, ['note_off', $tick * $scale + $shift, $sequence++, -1, -1, $file];
+				push @allmidievents, ['text_event', $tick * $scale + $shift, $sequence++, -1, "vocals:$file"];
 			}
+		}
+	}
+
+	# HACK for broken rosegarden export: put patch changes first by clearing their sequence number
+	for(@allmidievents)
+	{
+		if($_->[0] eq 'patch_change')
+		{
+			$_->[2] = -1;
 		}
 	}
 
@@ -824,7 +837,7 @@ sub ConvertMIDI($$)
 	@allmidievents = sort { $a->[1] <=> $b->[1] or $a->[2] <=> $b->[2] } @allmidievents;
 
 	# find the first interesting event
-	my $shift = [grep { $_->[0] eq 'note_on' } @allmidievents]->[0][1];
+	my $shift = [grep { $_->[0] eq 'note_on' || $_->[0] eq 'text_event' } @allmidievents]->[0][1];
 	die "No notes!"
 		unless defined $shift;
 
@@ -873,6 +886,16 @@ sub ConvertMIDI($$)
 		$midinotes{$chan}{$ev->[5]} = 0;
 	};
 
+	my $text_event = sub
+	{
+		my ($ev) = @_;
+
+		my $chan = TEXT_EVENT_CHANNEL;
+
+		busybot_note_on($t, TEXT_EVENT_CHANNEL, -1, $ev->[4]);
+		busybot_note_off($t, TEXT_EVENT_CHANNEL, $ev->[4]);
+	};
+
 	my $patch_change = sub
 	{
 		my ($ev) = @_;
@@ -914,6 +937,10 @@ sub ConvertMIDI($$)
 		{
 			$note_off->($_);
 		}
+		elsif($_->[0] eq 'text_event')
+		{
+			$text_event->($_);
+		}
 		elsif($_->[0] eq 'patch_change')
 		{
 			$patch_change->($_);
@@ -940,7 +967,7 @@ sub ConvertMIDI($$)
 		my $good = 0;
 		for my $channel(sort keys %notes_seen)
 		{
-			next if $channel == 10 or $channel < 0;
+			next if $channel == 10;
 			for my $program(sort keys %{$notes_seen{$channel}})
 			{
 				for my $note(sort keys %{$notes_seen{$channel}{$program}})
@@ -1046,7 +1073,7 @@ sub Deallocate()
 		print STDERR "$counthash{$cn} bots of $cn have played:\n";
 		for my $type(sort keys %{$notehash{$cn}})
 		{
-			for my $note(sort { $a <=> $b } keys %{$notehash{$cn}{$type}})
+			for my $note(sort keys %{$notehash{$cn}{$type}})
 			{
 				my $cnt = $notehash{$cn}{$type}{$note};
 				print STDERR "  $type $note ($cnt times)\n";
@@ -1086,7 +1113,6 @@ for(;;)
 		my @preallocate_new = map { $_->{classname} } @busybots_allocated;
 		if(@preallocate_new == @preallocate)
 		{
-			print "sv_cmd bot_cmd reset\n";
 			print "sv_cmd bot_cmd setbots @{[scalar @preallocate_new]}\n";
 			print "$precommands$commands";
 			exit 0;
