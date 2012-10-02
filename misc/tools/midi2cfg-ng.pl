@@ -377,6 +377,10 @@ sub busybot_cmd_bot_execute($$@)
 		{
 			$commands .= sprintf "%s\n", buildstring @{$_}[1..@$_-1];
 		}
+		else
+		{
+			warn "Invalid command: @$_";
+		}
 	}
 
 	return 1;

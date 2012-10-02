@@ -1,7 +1,6 @@
 #!/bin/sh
 
 xonotic=$1; shift
-strip=$1; shift
 demo=$1; shift
 # rest: command line options to use
 
@@ -9,7 +8,7 @@ demobase=${demo##*/}
 
 cp "$demo" data/"$demobase"
 
-strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window "$@" -demo "$demobase"
+USE_RLWRAP=no strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window "$@" -demo "$demobase"
 
 allfiles()
 {
@@ -66,8 +65,8 @@ done
 
 export do_jpeg=true
 export dp_jpeg_if_not_dds=false
-export jpeg_qual_rgb=80
-export jpeg_qual_a=95
+export jpeg_qual_rgb=70
+export jpeg_qual_a=90
 export do_dds=false
 export do_ogg=true
 export ogg_ogg=true
@@ -82,5 +81,4 @@ echo "-xonotic -nohome -readonly -forceqmenu +bind ESCAPE quit $* -demo $demobas
 rm output.pk3
 ( cd output && 7za a -tzip -mx=9 ../output.pk3 . )
 cp "$xonotic" output.exe
-$strip --strip-unneeded output.exe
 cat output.pk3 >> output.exe
