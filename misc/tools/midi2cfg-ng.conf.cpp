@@ -1549,11 +1549,9 @@ bot vocals
 #ifdef INDICATORS
 		cmd cc usetarget indicator_vocals
 #endif
-		cmd sound %s
-		buttons left
-		time 0.06666
-		buttons right
-		time 0.13333
+		cmd sound 10 %s
+		buttons crouch
+		time 0.05
 		buttons 
 
 bot common
