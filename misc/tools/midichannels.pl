@@ -5,7 +5,7 @@ use warnings;
 use MIDI;
 use MIDI::Opus;
 
-my ($filename) = @ARGV;
+my ($filename, @others) = @ARGV;
 my $opus = MIDI::Opus->new({from_file => $filename});
 
 my %chanpos = (
@@ -40,6 +40,20 @@ sub reltime(@)
 sub clean(@)
 {
 	return reltime grep { ($isclean{$_->[0]} // sub { 0; })->(@$_) } abstime @_;
+}
+
+for(@others)
+{
+	my $opus2 = MIDI::Opus->new({from_file => $_});
+	if($opus2->ticks() != $opus->ticks())
+	{
+		my $tickfactor = $opus->ticks() / $opus2->ticks();
+		for($opus2->tracks())
+		{
+			$_->events(reltime map { $_->[1] = int($_->[1] * $tickfactor + 0.5); $_; } abstime $_->events());
+		}
+	}
+	$opus->tracks($opus->tracks(), $opus2->tracks());
 }
 
 while(<STDIN>)
