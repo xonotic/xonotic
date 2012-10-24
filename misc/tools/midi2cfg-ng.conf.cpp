@@ -1,7 +1,7 @@
 #define USE_CHEATS
 #undef FAST
 #define BOW
-#undef INDICATORS
+#define INDICATORS
 
 #ifdef FAST
 timeoffset_preinit 0
@@ -1549,7 +1549,7 @@ bot vocals
 #ifdef INDICATORS
 		cmd cc usetarget indicator_vocals
 #endif
-		cmd sound 10 %s
+		cmd sound -10 %s
 		buttons crouch
 		time 0.05
 		buttons 
