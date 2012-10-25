@@ -112,8 +112,8 @@ while(<STDIN>)
 	elsif($cmd eq 'program')
 	{
 		my $tracks = $opus->tracks_r();
-		my ($channel, $program) = @arg;
-		for(0..@$tracks-1)
+		my ($track, $channel, $program) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
 		{
 			my @events = ();
 			my $added = 0;
@@ -123,7 +123,7 @@ while(<STDIN>)
 				if(defined $p)
 				{
 					my $c = $_->[$p] + 1;
-					if($c == $channel)
+					if($channel eq '*' || $c == $channel)
 					{
 						next
 							if $_->[0] eq 'patch_change';
@@ -163,11 +163,11 @@ while(<STDIN>)
 			}
 		}
 	}
-	elsif($cmd eq 'percussion')
+	elsif($cmd eq 'channel')
 	{
 		my $tracks = $opus->tracks_r();
-		my %map = @arg;
-		for(0..@$tracks-1)
+		my ($track, %chanmap) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
 		{
 			my @events = ();
 			for(abstime $tracks->[$_]->events())
@@ -176,7 +176,30 @@ while(<STDIN>)
 				if(defined $p)
 				{
 					my $c = $_->[$p] + 1;
-					if($c == 10)
+					$c = $chanmap{$c} // $chanmap{'*'} // $c;
+					next
+						if $c == 0; # kill by setting channel to 0
+					$_->[$p] = $c - 1;
+				}
+				push @events, $_;
+			}
+			$tracks->[$_]->events_r([reltime @events]);
+		}
+	}
+	elsif($cmd eq 'percussion')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, %map) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
 					{
 						if($_->[0] eq 'note_on' || $_->[0] eq 'note_off')
 						{
@@ -277,9 +300,10 @@ while(<STDIN>)
 		print "  dump\n";
 		print "  ticks [value]\n";
 		print "  retrack\n";
-		print "  program <channel> <program (1-based)>\n";
+		print "  program <track|*> <channel|*> <program (1-based)>\n";
 		print "  transpose <track|*> <channel|*> <delta>\n";
-		print "  percussion <from> <to> [<from> <to> ...]\n";
+		print "  channel <track|*> <channel|*> <channel> [<channel> <channel> ...]\n";
+		print "  percussion <track|*> <channel|*> <from> <to> [<from> <to> ...]\n";
 		print "  tracks [trackno] [trackno] ...\n";
 	}
 	print "Done with: $cmd @arg\n";
