@@ -5,7 +5,7 @@ use warnings;
 use MIDI;
 use MIDI::Opus;
 
-my ($filename) = @ARGV;
+my ($filename, @others) = @ARGV;
 my $opus = MIDI::Opus->new({from_file => $filename});
 
 my %chanpos = (
@@ -42,6 +42,20 @@ sub clean(@)
 	return reltime grep { ($isclean{$_->[0]} // sub { 0; })->(@$_) } abstime @_;
 }
 
+for(@others)
+{
+	my $opus2 = MIDI::Opus->new({from_file => $_});
+	if($opus2->ticks() != $opus->ticks())
+	{
+		my $tickfactor = $opus->ticks() / $opus2->ticks();
+		for($opus2->tracks())
+		{
+			$_->events(reltime map { $_->[1] = int($_->[1] * $tickfactor + 0.5); $_; } abstime $_->events());
+		}
+	}
+	$opus->tracks($opus->tracks(), $opus2->tracks());
+}
+
 while(<STDIN>)
 {
 	chomp;
@@ -72,6 +86,138 @@ while(<STDIN>)
 	elsif($cmd eq 'tricks')
 	{
 		print "haha, very funny\n";
+	}
+	elsif($cmd eq 'retrack')
+	{
+		my $tracks = $opus->tracks_r();
+		my @newtracks = ();
+		for(0..@$tracks-1)
+		{
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					push @{$newtracks[$c]}, $_;
+				}
+				else
+				{
+					push @{$newtracks[0]}, $_;
+				}
+			}
+		}
+		$opus->tracks_r([map { ($_ && @$_) ? MIDI::Track->new({ events => [reltime @$_] }) : () } @newtracks]);
+	}
+	elsif($cmd eq 'program')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, $program) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			my $added = 0;
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
+					{
+						next
+							if $_->[0] eq 'patch_change';
+						if(!$added)
+						{
+							push @events, ['patch_change', $_->[1], $c-1, $program-1]
+								if $program;
+							$added = 1;
+						}
+					}
+				}
+				push @events, $_;
+			}
+			$tracks->[$_]->events_r([reltime @events]);
+		}
+	}
+	elsif($cmd eq 'transpose')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, $delta) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			for($tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
+					{
+						if($_->[0] eq 'note_on' || $_->[0] eq 'note_off')
+						{
+							$_->[3] += $delta;
+						}
+					}
+				}
+			}
+		}
+	}
+	elsif($cmd eq 'channel')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, %chanmap) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					$c = $chanmap{$c} // $chanmap{'*'} // $c;
+					next
+						if $c == 0; # kill by setting channel to 0
+					$_->[$p] = $c - 1;
+				}
+				push @events, $_;
+			}
+			$tracks->[$_]->events_r([reltime @events]);
+		}
+	}
+	elsif($cmd eq 'percussion')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, %map) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
+					{
+						if($_->[0] eq 'note_on' || $_->[0] eq 'note_off')
+						{
+							if(length $map{$_->[3]})
+							{
+								$_->[3] = $map{$_->[3]};
+							}
+							elsif(exists $map{$_->[3]})
+							{
+								next;
+							}
+						}
+					}
+				}
+				push @events, $_;
+			}
+			$tracks->[$_]->events_r([reltime @events]);
+		}
 	}
 	elsif($cmd eq 'tracks')
 	{
@@ -113,14 +259,18 @@ while(<STDIN>)
 					if(defined $p)
 					{
 						my $c = $_->[$p] + 1;
-						++$channels{$c};
+						$channels{$c} //= {};
+						if($_->[0] eq 'patch_change')
+						{
+							++$channels{$c}{$_->[3]};
+						}
 					}
 					++$notes if $_->[0] eq 'note_on';
 					$notehash{$_->[2]}{$_->[3]} = $t if $_->[0] eq 'note_on';
 					$notehash{$_->[2]}{$_->[3]} = undef if $_->[0] eq 'note_off';
 					$name = $_->[2] if $_->[0] eq 'track_name';
 				}
-				my $channels = join " ", sort keys %channels;
+				my $channels = join " ", map { sprintf "%s(%s)", $_, join ",", sort { $a <=> $b } keys %{$channels{$_}} } sort { $a <=> $b } keys %channels;
 				my @stuck = ();
 				while(my ($k1, $v1) = each %notehash)
 				{
@@ -145,7 +295,16 @@ while(<STDIN>)
 	}
 	else
 	{
-		print "Unknown command, allowed commands: ticks, tracks, clean, save\n";
+		print "Unknown command, allowed commands:\n";
+		print "  clean\n";
+		print "  dump\n";
+		print "  ticks [value]\n";
+		print "  retrack\n";
+		print "  program <track|*> <channel|*> <program (1-based)>\n";
+		print "  transpose <track|*> <channel|*> <delta>\n";
+		print "  channel <track|*> <channel|*> <channel> [<channel> <channel> ...]\n";
+		print "  percussion <track|*> <channel|*> <from> <to> [<from> <to> ...]\n";
+		print "  tracks [trackno] [trackno] ...\n";
 	}
 	print "Done with: $cmd @arg\n";
 }

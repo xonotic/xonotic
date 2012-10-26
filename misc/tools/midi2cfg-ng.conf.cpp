@@ -1,3 +1,19 @@
+#define USE_CHEATS
+#undef FAST
+#define BOW
+#define INDICATORS
+
+#ifdef FAST
+timeoffset_preinit 0
+timeoffset_postinit 0
+timeoffset_predone 0
+timeoffset_postdone 0
+timeoffset_preintermission 0
+timeoffset_postintermission 0
+list WAIT_SELECTWEAPON 0.2
+list WAIT_RELOAD 0.5
+list WAIT_AIMTARGET 0.1
+#else
 timeoffset_preinit 2
 timeoffset_postinit 2
 timeoffset_predone 2
@@ -7,6 +23,7 @@ timeoffset_postintermission 2
 list WAIT_SELECTWEAPON 0.5
 list WAIT_RELOAD 0.5
 list WAIT_AIMTARGET 1
+#endif
 
 time_forgetfulness 3
 
@@ -511,6 +528,172 @@ bot tuba
 		cmd barrier
 		cmd selectweapon 15
 		cmd wait @WAIT_SELECTWEAPON
+#ifdef INDICATORS
+	note on -18
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -17
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -16
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -13
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -12
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note off -12
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -11
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -10
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -9
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -8
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -7
+		time 0
+		cmd cc usetarget indicator_tuba0
+		super
+	note on -6
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on -5
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on -4
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on -3
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on -2
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on -1
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 0
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 1
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 2
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 3
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 4
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 5
+		time 0
+		cmd cc usetarget indicator_tuba1
+		super
+	note on 6
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 7
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 8
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 9
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 10
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 11
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 12
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 13
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 14
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 15
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 16
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 17
+		time 0
+		cmd cc usetarget indicator_tuba2
+		super
+	note on 18
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+	note on 19
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+	note on 21
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+	note on 22
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+	note on 23
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+	note on 24
+		time 0
+		cmd cc usetarget indicator_tuba3
+		super
+#endif
 
 bot accordeon
 	include notebot
@@ -523,6 +706,172 @@ bot accordeon
 		cmd wait @WAIT_SELECTWEAPON
 		cmd impulse 20
 		cmd wait @WAIT_RELOAD
+#ifdef INDICATORS
+	note on -18
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -17
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -16
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -13
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -12
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note off -12
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -11
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -10
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -9
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -8
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -7
+		time 0
+		cmd cc usetarget indicator_accordeon0
+		super
+	note on -6
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on -5
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on -4
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on -3
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on -2
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on -1
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 0
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 1
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 2
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 3
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 4
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 5
+		time 0
+		cmd cc usetarget indicator_accordeon1
+		super
+	note on 6
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 7
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 8
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 9
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 10
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 11
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 12
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 13
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 14
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 15
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 16
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 17
+		time 0
+		cmd cc usetarget indicator_accordeon2
+		super
+	note on 18
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+	note on 19
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+	note on 21
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+	note on 22
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+	note on 23
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+	note on 24
+		time 0
+		cmd cc usetarget indicator_accordeon3
+		super
+#endif
 
 bot kleinbottle
 	include notebot
@@ -537,6 +886,172 @@ bot kleinbottle
 		cmd wait @WAIT_RELOAD
 		cmd impulse 20
 		cmd wait @WAIT_RELOAD
+#ifdef INDICATORS
+	note on -18
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -17
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -16
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -13
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -12
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note off -12
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -11
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -10
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -9
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -8
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -7
+		time 0
+		cmd cc usetarget indicator_kleinbottle0
+		super
+	note on -6
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on -5
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on -4
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on -3
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on -2
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on -1
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 0
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 1
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 2
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 3
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 4
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 5
+		time 0
+		cmd cc usetarget indicator_kleinbottle1
+		super
+	note on 6
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 7
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 8
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 9
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 10
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 11
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 12
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 13
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 14
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 15
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 16
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 17
+		time 0
+		cmd cc usetarget indicator_kleinbottle2
+		super
+	note on 18
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+	note on 19
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+	note on 21
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+	note on 22
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+	note on 23
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+	note on 24
+		time 0
+		cmd cc usetarget indicator_kleinbottle3
+		super
+#endif
 
 bot tuba_red
 	include tuba
@@ -591,6 +1106,9 @@ bot laser
 		raw settemp g_balance_laser_primary_refire 0.3
 	percussion 38 // 038_Snare_1-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_laser1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -617,6 +1135,9 @@ bot shotgun
 		cmd debug_assert_canfire 0
 		buttons
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_shotgun2
+#endif
 		busy 1.1
 	percussion 73 // 073_Guiro_1_Short-0.wav
 		percussion 74
@@ -635,6 +1156,9 @@ bot uzi
 		raw settemp g_casings 0
 	percussion 27 // 027_High_Q-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_uzi1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -667,6 +1191,9 @@ bot electro
 		raw settemp g_balance_electro_primary_refire 0.2
 	percussion 49 // 049_Cymbal_Crash_1-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_electro1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -689,6 +1216,9 @@ bot crylink
 		raw settemp g_balance_crylink_secondary_refire 0.2
 	percussion 34 // 034_Metronome_Bell-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_crylink1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -698,6 +1228,9 @@ bot crylink
 		busy 0.3
 	percussion 45 // 045_Tom_Mid_2-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_crylink2
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack2
 		time 0.05
@@ -735,6 +1268,9 @@ bot nex
 		raw settemp g_balance_nex_primary_refire 1.25
 	percussion 52 // 052_Cymbal_Chinese-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_nex1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -754,6 +1290,9 @@ bot minstanex
 		raw settemp g_balance_minstanex_refire 1
 	percussion 55 // 055_Cymbal_Splash-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_minstanex1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -773,6 +1312,9 @@ bot hagar
 		raw settemp g_balance_hagar_primary_refire 0.2
 	percussion 35 // 035_Kick_1-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_hagar1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -800,6 +1342,9 @@ bot rocket
 		raw settemp g_balance_rocketlauncher_refire 1.1
 	percussion 25 // 025_Snare_Roll-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_rocketlauncher1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack2
 		time 0.05
@@ -821,6 +1366,9 @@ bot hook
 		raw settemp g_balance_hook_secondary_refire 0.9
 	percussion 62 // 062_Conga_High_1_Mute-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_hook1
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack1
 		time 0.05
@@ -832,6 +1380,9 @@ bot hook
 		percussion 62
 	percussion 84 // 084_Belltree-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_hook2
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack2
 		time 0.05
@@ -856,6 +1407,9 @@ bot seeker
 		raw settemp g_balance_seeker_tag_refire 0.2
 	percussion 41 // 041_Tom_Low_2-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_seeker2
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack2
 		time 0.05
@@ -897,6 +1451,9 @@ bot rifle
 //		busy 1.2
 	percussion 58 // 058_Vibra-Slap-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_rifle2
+#endif
 		cmd debug_assert_canfire 1
 		buttons attack2
 		time 0.05
@@ -914,6 +1471,9 @@ bot jetpack
 		raw settemp g_jetpack_attenuation 0.5
 	percussion 42 // 042_Hi-Hat_Closed-0.wav
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_jetpack
+#endif
 		buttons hook
 		time 0.05
 		buttons
@@ -938,6 +1498,9 @@ bot jumper
 		time -0.5
 		buttons
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_jump
+#endif
 		busy 0.1
 
 bot metaljumper
@@ -952,6 +1515,9 @@ bot metaljumper
 		time -0.5
 		buttons
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_metaljump
+#endif
 		busy 0.1
 	percussion 66 // 066_Timbale_Low-0.wav
 		percussion 65
@@ -964,6 +1530,9 @@ bot switcher
 		cmd barrier
 	percussion 29 // not in freepats
 		time 0
+#ifdef INDICATORS
+		cmd cc usetarget indicator_switch
+#endif
 		cmd impulse 10
 		time 0.05
 		busy 0.3
@@ -977,11 +1546,12 @@ bot vocals
 		cmd barrier
 	text vocals
 		time 0
-		cmd sound %s
-		buttons left
-		time 0.06666
-		buttons right
-		time 0.13333
+#ifdef INDICATORS
+		cmd cc usetarget indicator_vocals
+#endif
+		cmd sound -10 %s
+		buttons crouch
+		time 0.05
 		buttons 
 
 bot common
@@ -989,12 +1559,14 @@ bot common
 		cmd resetaim
 		cmd aim 270 0
 		cmd wait 1
+#ifdef BOW
 		barrier
 		buttons crouch
 		cmd wait 3
 		buttons
 		cmd wait 1
 		barrier
+#endif
 		buttons use
 		cmd cc kill
 		cmd wait 900
@@ -1007,8 +1579,11 @@ bot instance_tuba_red
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1017,8 +1592,11 @@ bot instance_tuba_blue
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1027,8 +1605,11 @@ bot instance_accordeon_red
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1037,8 +1618,11 @@ bot instance_accordeon_blue
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1047,8 +1631,11 @@ bot instance_kleinbottle_red
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1057,8 +1644,11 @@ bot instance_kleinbottle_blue
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_tuba
-		// cmd movetotarget @places_tuba
+#else
+		cmd movetotarget @places_tuba
+#endif
 		cmd barrier
 		super
 
@@ -1067,8 +1657,11 @@ bot instance_laser
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1077,8 +1670,11 @@ bot instance_shotgun
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1087,8 +1683,11 @@ bot instance_uzi
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1097,8 +1696,11 @@ bot instance_electro
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1107,8 +1709,11 @@ bot instance_crylink
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1117,8 +1722,11 @@ bot instance_nex
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1127,8 +1735,11 @@ bot instance_minstanex
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1137,8 +1748,11 @@ bot instance_hagar
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1147,8 +1761,11 @@ bot instance_rocket
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1157,8 +1774,11 @@ bot instance_hook
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1167,8 +1787,11 @@ bot instance_seeker
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1177,8 +1800,11 @@ bot instance_rifle
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1187,8 +1813,11 @@ bot instance_jetpack
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_nosteps
-		// cmd movetotarget @places_nosteps
+#else
+		cmd movetotarget @places_nosteps
+#endif
 		cmd barrier
 		super
 
@@ -1197,8 +1826,11 @@ bot instance_jumper
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1207,8 +1839,11 @@ bot instance_metaljumper
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_metalsteps
-		// cmd movetotarget @places_metalsteps
+#else
+		cmd movetotarget @places_metalsteps
+#endif
 		cmd barrier
 		super
 
@@ -1217,8 +1852,11 @@ bot instance_switcher
 	include common
 	count 16
 	init
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_percussion
-		// cmd movetotarget @places_percussion
+#else
+		cmd movetotarget @places_percussion
+#endif
 		cmd barrier
 		super
 
@@ -1228,10 +1866,12 @@ bot instance_vocals
 	count 1
 	init
 		cmd cc playermodel models/player/suiseiseki.zym
+#ifdef USE_CHEATS
 		cmd cc teleporttotarget @places_vocals
-		// cmd movetotarget @places_vocals
+#else
+		cmd movetotarget @places_vocals
+#endif
 		cmd barrier
 		super
 
 // TODO jumping?
-
