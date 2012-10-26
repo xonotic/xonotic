@@ -23,8 +23,8 @@ allmirrors()
 	"$@" http ''   http://git.xonotic.org/xonotic/     ''
 	"$@" ssh  ''   ssh://xonotic@git.xonotic.org/      ''
 
-	"$@" git  us   git://us.git.xonotic.org/xonotic/   ''
-	"$@" http us   http://us.git.xonotic.org/xonotic/  ''
+	"$@" git  us   git://us.git.xonotic.org/xonotic/   '*2/3'
+	"$@" http us   http://us.git.xonotic.org/xonotic/  '*2/3'
 
 	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
 	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
