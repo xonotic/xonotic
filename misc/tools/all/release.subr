@@ -324,7 +324,7 @@ case "$cmd" in
 		;;
 	release-qc)
 		release_common
-		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source FTEQCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
+		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source QCC="$d0/Xonotic/fteqcc/fteqcc.linux32" XON_BUILDSYSTEM=1 clean all
 		verbose rm -f Xonotic/source/qcsrc/*/fteqcc.log
 		;;
 	release-buildpk3-transform-raw)
