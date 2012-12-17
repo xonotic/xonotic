@@ -13,6 +13,7 @@ allrepos()
 	"$@" data/xonotic-maps.pk3dir      xonotic-maps.pk3dir.git      master         ""
 	"$@" mediasource                   mediasource.git              master         "no"
 	"$@" fteqcc                        fteqcc.git                   xonotic-stable "noautocrlf"
+	"$@" gmqcc                         gmqcc.git                    master         ""
 	"$@" xonstat                       xonstat.git                  master         "no"
 	"$@" xonstatdb                     xonstatdb.git                master         "no"
 }
