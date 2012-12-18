@@ -898,7 +898,7 @@ sub detect_constants($)
 	use constant GLOBALFLAG_U => 64; # unused
 	use constant GLOBALFLAG_P => 128; # possibly parameter passing
 	use constant GLOBALFLAG_D => 256; # has a def
-	my @globalflags = (GLOBALFLAG_Q | GLOBALFLAG_U) x @{$progs->{globals}};
+	my @globalflags = (GLOBALFLAG_Q | GLOBALFLAG_U) x (@{$progs->{globals}} + 2);
 
 	for(@{$progs->{functions}})
 	{
@@ -1181,7 +1181,7 @@ sub parse_progs($)
 		die "Out of range name in globaldef $_"
 			if $g->{s_name} < 0 || $g->{s_name} >= length $p{strings};
 		my $name = $p{getstring}->($g->{s_name});
-		die "Out of range ofs in globaldef $_ (name: \"$name\")"
+		die "Out of range ofs $g->{ofs} in globaldef $_ (name: \"$name\")"
 			if $g->{ofs} >= $p{globals};
 	}
 
@@ -1195,7 +1195,7 @@ sub parse_progs($)
 		die "Out of range name in fielddef $_"
 			if $g->{s_name} < 0 || $g->{s_name} >= length $p{strings};
 		my $name = $p{getstring}->($g->{s_name});
-		die "Out of range ofs in globaldef $_ (name: \"$name\")"
+		die "Out of range ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
 			if $g->{ofs} >= $p{header}{entityfields};
 	}
 
@@ -1249,6 +1249,7 @@ sub parse_progs($)
 			next
 				unless defined $type;
 
+				use Data::Dumper; warn Dumper $s;
 			if($type eq 'inglobal' || $type eq 'inglobalfunc')
 			{
 				$s->{$_} &= 0xFFFF;
@@ -1258,8 +1259,18 @@ sub parse_progs($)
 			elsif($type eq 'inglobalvec')
 			{
 				$s->{$_} &= 0xFFFF;
-				die "Out of range global offset in statement $ip - cannot continue"
-					if $s->{$_} >= @{$p{globals}}-2;
+				if($c->{isreturn})
+				{
+					die "Out of range global offset in statement $ip - cannot continue"
+						if $s->{$_} >= @{$p{globals}};
+					print "Potentially out of range global offset in statement $ip - may crash engines"
+						if $s->{$_} >= @{$p{globals}}-2;
+				}
+				else
+				{
+					die "Out of range global offset in statement $ip - cannot continue"
+						if $s->{$_} >= @{$p{globals}}-2;
+				}
 			}
 			elsif($type eq 'outglobal')
 			{
