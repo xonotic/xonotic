@@ -897,6 +897,7 @@ sub detect_constants($)
 	use constant GLOBALFLAG_Q => 32; # unique to function
 	use constant GLOBALFLAG_U => 64; # unused
 	use constant GLOBALFLAG_P => 128; # possibly parameter passing
+	use constant GLOBALFLAG_D => 256; # has a def
 	my @globalflags = (GLOBALFLAG_Q | GLOBALFLAG_U) x @{$progs->{globals}};
 
 	for(@{$progs->{functions}})
@@ -979,21 +980,42 @@ sub detect_constants($)
 			if $name eq 'IMMEDIATE' or $name =~ /^\./;
 		$_->{debugname} = $name
 			if $name ne '';
+		$globalflags[$_->{ofs}] |= GLOBALFLAG_D;
 		if($type->{save})
 		{
-			for my $i(0..(typesize($_->{type}{type})-1))
-			{
-				$globalflags[$_->{ofs}] |= GLOBALFLAG_S;
-			}
+			$globalflags[$_->{ofs}] |= GLOBALFLAG_S;
 		}
-		if($name ne '')
+		if(defined $_->{debugname})
 		{
-			for my $i(0..(typesize($_->{type}{type})-1))
-			{
-				$globalflags[$_->{ofs}] |= GLOBALFLAG_N;
-			}
+			$globalflags[$_->{ofs}] |= GLOBALFLAG_N;
 		}
 	}
+	# fix up vectors
+	my @extradefs = ();
+	for(@{$progs->{globaldefs}})
+	{
+		my $type = $_->{type};
+		for my $i(1..(typesize($type->{type})-1))
+		{
+			# add missing def
+			if(!($globalflags[$_->{ofs}+$i] & GLOBALFLAG_D))
+			{
+				print "Missing globaldef for $_->{debugname}[$i] at $_->{ofs}\n";
+				push @extradefs, {
+					type => {
+						saved => 0,
+						type => 'float'
+					},
+					ofs => $_->{ofs} + $i,
+					debugname => defined $_->{debugname} ? $_->{debugname} . "[$i]" : undef
+				};
+			}
+			# "saved" and "named" states hit adjacent globals too
+			$globalflags[$_->{ofs}+$i] |= $globalflags[$_->{ofs}] & (GLOBALFLAG_S | GLOBALFLAG_N | GLOBALFLAG_D);
+		}
+	}
+	push @{$progs->{globaldefs}}, @extradefs;
+
 	my %offsets_initialized = ();
 	for(0..(@{$progs->{globals}}-1))
 	{
@@ -1086,7 +1108,8 @@ sub detect_constants($)
 		$globaldefs[$_] //= {
 			ofs => $_,
 			s_name => undef,
-			debugname => undef
+			debugname => undef,
+			type => undef
 		};
 	}
 	for(0..(@{(DEFAULTGLOBALS)}-1))
