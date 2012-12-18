@@ -1000,7 +1000,7 @@ sub detect_constants($)
 			# add missing def
 			if(!($globalflags[$_->{ofs}+$i] & GLOBALFLAG_D))
 			{
-				print "Missing globaldef for $_->{debugname}[$i] at $_->{ofs}\n";
+				print "Missing globaldef for a component@{[defined $_->{debugname} ? ' of ' . $_->{debugname} : '']} at $_->{ofs}+$i\n";
 				push @extradefs, {
 					type => {
 						saved => 0,
