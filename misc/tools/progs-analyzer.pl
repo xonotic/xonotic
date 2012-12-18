@@ -1249,7 +1249,6 @@ sub parse_progs($)
 			next
 				unless defined $type;
 
-				use Data::Dumper; warn Dumper $s;
 			if($type eq 'inglobal' || $type eq 'inglobalfunc')
 			{
 				$s->{$_} &= 0xFFFF;
