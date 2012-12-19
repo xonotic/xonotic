@@ -253,15 +253,15 @@ case "$cmd" in
 		release_common
 		suffix=$1
 		makeflags=$2
-		fteqcc_maketargets=$3
-		fteqcc_files=$4
-		gmqcc_maketargets=$5
-		gmqcc_files=$6
+		gmqcc_maketargets=$3
+		gmqcc_files=$4
+		fteqcc_maketargets=$5
+		fteqcc_files=$6
 		darkplaces_maketargets=$7
 		darkplaces_files=$8
 		host=xonotic-build-$suffix
-		verbose "$SELF" release-compile-run "$host" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/source/fteqcc" "$d0/misc/builddeps/dp.$suffix" "$fteqcc_files"
 		verbose "$SELF" release-compile-run "$host" /tmp/gmqcc.build."$suffix" "$gmqcc_maketargets" "$makeflags" "Xonotic/source/gmqcc" "$d0/misc/builddeps/dp.$suffix" "$gmqcc_files"
+		verbose "$SELF" release-compile-run "$host" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/source/fteqcc" "$d0/misc/builddeps/dp.$suffix" "$fteqcc_files"
 		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/dp.$suffix" "$darkplaces_files"
 		;;
 	release-engine-win32)
