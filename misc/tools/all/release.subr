@@ -605,6 +605,9 @@ case "$cmd" in
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/data/xonotic-$pk3stamp-maps-mapping.pk3
+		verbose mkzip gmqcc-$stamp.zip \
+			Xonotic/gmqcc \
+			Xonotic/source/gmqcc
 		;;
 	release)
 		release_common
