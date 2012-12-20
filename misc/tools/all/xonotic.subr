@@ -207,7 +207,11 @@ case "$cmd" in
 			if $cleanqcc; then
 				verbose make $MAKEFLAGS clean
 			fi
-			verbose make $MAKEFLAGS
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				verbose make $MAKEFLAGS gmqcc.exe
+			else
+				verbose make $MAKEFLAGS gmqcc
+			fi
 
 			verbose cd "$d0/data/xonotic-data.pk3dir"
 			if $cleanqc; then
