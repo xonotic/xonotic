@@ -134,7 +134,7 @@ case "$cmd" in
 				#   - xonotic-build-linux64 (with gcc on x86_64)
 				#   - xonotic-build-win32 (with i586-mingw32msvc-g++)
 				#   - xonotic-build-win64 (with amd64-mingw32msvc-g++
-				#     and x86_64-w64-mingw32-g++)
+				#     and amd64-mingw32msvc-g++)
 				#   - xonotic-build-osx (with Xcode and SDL.framework)
 				# - AMD Compressonator installed in WINE
 				# - ResEdit installed in WINE
@@ -275,7 +275,7 @@ case "$cmd" in
 	release-engine-win64)
 		release_common
 		verbose "$SELF" release-compile win64 \
-			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="x86_64-w64-mingw32-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DSUPPORTIPV6" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
+			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="amd64-mingw32msvc-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DSUPPORTIPV6" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
 			gmqcc.exe 'gmqcc.exe:Xonotic/gmqcc/gmqcc-x64.exe' \
 			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
