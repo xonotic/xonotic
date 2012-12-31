@@ -127,6 +127,10 @@ sub checkop($)
 	{
 		return { a => 'inglobal', b => 'inglobalfunc' };
 	}
+	if($op =~ /^INVALID#/)
+	{
+		return { isinvalid => 1 };
+	}
 	return { a => 'inglobal', b => 'inglobal', c => 'outglobal' };
 }
 
@@ -675,6 +679,10 @@ sub find_uninitialized_locals($$)
 				}
 			}
 
+			if($c->{isinvalid})
+			{
+				++$warned{$ip}{''}{"Invalid opcode"};
+			}
 			for(qw(a b c))
 			{
 				my $type = $c->{$_};
