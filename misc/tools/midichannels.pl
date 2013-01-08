@@ -250,6 +250,8 @@ while(<STDIN>)
 				my %notehash = ();
 				my $t = 0;
 				my $events = 0;
+				my $min = undef;
+				my $max = undef;
 				for($tracks->[$_]->events())
 				{
 					++$events;
@@ -269,6 +271,11 @@ while(<STDIN>)
 					$notehash{$_->[2]}{$_->[3]} = $t if $_->[0] eq 'note_on';
 					$notehash{$_->[2]}{$_->[3]} = undef if $_->[0] eq 'note_off';
 					$name = $_->[2] if $_->[0] eq 'track_name';
+					if($_->[0] eq 'note_on')
+					{
+						$min = $_->[3] if !defined $min || $_->[3] < $min;
+						$max = $_->[3] if !defined $max || $_->[3] > $max;
+					}
 				}
 				my $channels = join " ", map { sprintf "%s(%s)", $_, join ",", sort { $a <=> $b } keys %{$channels{$_}} } sort { $a <=> $b } keys %channels;
 				my @stuck = ();
@@ -283,7 +290,7 @@ while(<STDIN>)
 				print " $name" if defined $name;
 				print " (channel $channels)" if $channels ne "";
 				print " ($events events)" if $events;
-				print " ($notes notes)" if $notes;
+				print " ($notes notes [$min-$max])" if $notes;
 				print " (notes @stuck stuck)" if @stuck;
 				print "\n";
 			}
