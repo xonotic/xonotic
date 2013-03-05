@@ -137,28 +137,8 @@ itemstring:
     131072 = Empathy
 
 death type:
-   either a weapon ID ORed with weapon death flags, or one of:
-     10000 = fallen to death
-     10001 = telefragged
-     10002 = drowned
-     10003 = killed by a trap / fallen into the void
-     10004 = lava
-     10005 = slime
-     10006 = console kill
-     10007 = (MinstaGib) out of ammo
-     10008 = swamp
-     10009 = team change
-     10010 = auto team change
-     10011 = camping protection
-	 10012 = player became too fast (should never happen)
-	 10013 = health rot
-	 10014 = mirror damage
-	 10015 = g_touchexplode
-	 10100 = turret
-	10150 = spiderbot miniguns
-	10151 = spiderbot rocket
-	10152 = spiderbot, cushed by
-	10300 = custom deathmessage
+   either a weapon ID ORed with weapon death flags, or one of
+   the notifications in common/deathtypes.qh in the form of a string.
 
    weapon death flags are:
        256 = secondary fire
