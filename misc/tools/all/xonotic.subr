@@ -86,19 +86,19 @@ case "$cmd" in
 			for X in $1; do
 				case "$X" in
 					sdl)
-						TARGETS="$TARGETS sdl-debug"
+						TARGETS="$TARGETS sdl-$debug"
 						;;
 					agl)
-						TARGETS="$TARGETS cl-debug"
+						TARGETS="$TARGETS cl-$debug"
 						if $snowleopardhack; then
 							export CC="$CC -arch i386"
 						fi
 						;;
 					glx|wgl)
-						TARGETS="$TARGETS cl-debug"
+						TARGETS="$TARGETS cl-$debug"
 						;;
 					dedicated)
-						TARGETS="$TARGETS sv-debug"
+						TARGETS="$TARGETS sv-$debug"
 						;;
 					*)
 						BAD_TARGETS="$BAD_TARGETS $X"
