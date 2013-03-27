@@ -202,6 +202,7 @@ case "$cmd" in
 			done
 			# TODO possibly include other tools?
 		}
+		./all each git rev-parse HEAD > Xonotic/misc/git-revisions.txt
 		;;
 	release-compile-run)
 		release_common
