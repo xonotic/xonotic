@@ -192,7 +192,7 @@ case "$cmd" in
 			verbose sh autogen.sh
 		)
 		rm -f Xonotic/key_15.d0pk
-		{
+		(
 			verbose cd Xonotic/mapping
 			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120301.tar.bz2
 			verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120301-win32-7z.exe
@@ -201,7 +201,7 @@ case "$cmd" in
 				rm -f "$X"
 			done
 			# TODO possibly include other tools?
-		}
+		)
 		./all each git rev-parse HEAD > Xonotic/misc/git-revisions.txt
 		;;
 	release-compile-run)
