@@ -620,10 +620,11 @@ case "$cmd" in
 						o=`( cd "$d0" && git config xonotic.all.mirrorselection 2>/dev/null || true )`
 						( cd "$d0" && git config xonotic.all.mirrorselection try_same )
 						if ! verbose git pull; then
-							fix_upstream_rebase_mergefail || true
-							check_mergeconflict "$d"
-							$ECHO "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
-							read -r DUMMY
+							if fix_upstream_rebase_mergefail; then
+								check_mergeconflict "$d"
+								$ECHO "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
+								read -r DUMMY
+							fi
 						else
 							( cd "$d0" && git config xonotic.all.mirrorselection "$o" )
 							fix_upstream_rebase_mergeok || true
