@@ -202,37 +202,21 @@ case "$cmd" in
 			verbose make $MAKEFLAGS
 		fi
 
-		if [ x"$USE_FTEQCC" = x"yes" ]; then
-			verbose cd "$d0/fteqcc"
-			if $cleanqcc; then
-				verbose make $MAKEFLAGS clean
-			fi
-			verbose make $MAKEFLAGS
-
-			verbose cd "$d0/data/xonotic-data.pk3dir"
-			if $cleanqc; then
-				verbose make QCC="../../../../fteqcc/fteqcc.bin" FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
-				#verbose make QCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS clean
-			fi
-			verbose make QCC="../../../../fteqcc/fteqcc.bin" FTEQCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
-			#verbose make QCC="../../../../fteqcc/fteqcc.bin" "$@" $MAKEFLAGS
-		else
-			verbose cd "$d0/gmqcc"
-			if $cleanqcc; then
-				verbose make $MAKEFLAGS clean
-			fi
-			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				verbose make $MAKEFLAGS gmqcc.exe
-			else
-				verbose make $MAKEFLAGS gmqcc
-			fi
-
-			verbose cd "$d0/data/xonotic-data.pk3dir"
-			if $cleanqc; then
-				verbose make QCC="../../../../gmqcc/qmqcc" "$@" $MAKEFLAGS clean
-			fi
-			verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+		verbose cd "$d0/gmqcc"
+		if $cleanqcc; then
+			verbose make $MAKEFLAGS clean
 		fi
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose make $MAKEFLAGS gmqcc.exe
+		else
+			verbose make $MAKEFLAGS gmqcc
+		fi
+
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		if $cleanqc; then
+			verbose make QCC="../../../../gmqcc/qmqcc" "$@" $MAKEFLAGS clean
+		fi
+		verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
 		# 4 levels up: data, xonotic-data, qcsrc, server
 
 		verbose cd "$d0/darkplaces"

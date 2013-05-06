@@ -173,7 +173,7 @@ case "$cmd" in
 		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
-			verbose mkdir data gmqcc fteqcc source source/darkplaces source/fteqcc source/gmqcc source/d0_blind_id mapping
+			verbose mkdir data gmqcc source source/darkplaces source/gmqcc source/d0_blind_id mapping
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32 bin32 || true
 			verbose mv bin32/SDL.dll . || true
@@ -183,7 +183,6 @@ case "$cmd" in
 			verbose rm -rf misc/pki
 		)
 		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces" .
-		release_git_extract_dir "fteqcc" "Xonotic/source/fteqcc" .
 		release_git_extract_dir "gmqcc" "Xonotic/source/gmqcc" .
 		release_git_extract_dir "data/xonotic-data.pk3dir" "Xonotic/source" qcsrc Makefile
 		release_git_extract_dir "d0_blind_id" "Xonotic/source/d0_blind_id" .
@@ -256,13 +255,10 @@ case "$cmd" in
 		makeflags=$2
 		gmqcc_maketargets=$3
 		gmqcc_files=$4
-		fteqcc_maketargets=$5
-		fteqcc_files=$6
-		darkplaces_maketargets=$7
-		darkplaces_files=$8
+		darkplaces_maketargets=$5
+		darkplaces_files=$6
 		host=xonotic-build-$suffix
 		verbose "$SELF" release-compile-run "$host" /tmp/gmqcc.build."$suffix" "$gmqcc_maketargets" "$makeflags" "Xonotic/source/gmqcc" "$d0/misc/builddeps/dp.$suffix" "$gmqcc_files"
-		verbose "$SELF" release-compile-run "$host" /tmp/fteqcc.build."$suffix" "$fteqcc_maketargets" "$makeflags" "Xonotic/source/fteqcc" "$d0/misc/builddeps/dp.$suffix" "$fteqcc_files"
 		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/dp.$suffix" "$darkplaces_files"
 		;;
 	release-engine-win32)
@@ -270,7 +266,6 @@ case "$cmd" in
 		verbose "$SELF" release-compile win32 \
 			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="i586-mingw32msvc-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN32RELEASE=1 D3D=1' \
 			gmqcc.exe 'gmqcc.exe:Xonotic/gmqcc/gmqcc.exe' \
-			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
@@ -278,7 +273,6 @@ case "$cmd" in
 		verbose "$SELF" release-compile win64 \
 			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="amd64-mingw32msvc-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I.deps/include -L.deps/lib -DSUPPORTIPV6" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG=".deps/bin/sdl-config" LIB_JPEG= CFLAGS_LIBJPEG= WIN64RELEASE=1 D3D=1' \
 			gmqcc.exe 'gmqcc.exe:Xonotic/gmqcc/gmqcc-x64.exe' \
-			win 'fteqcc.exe:Xonotic/fteqcc/fteqcc.exe' \
 			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
 		;;
 	release-engine-osx)
@@ -287,7 +281,6 @@ case "$cmd" in
 		verbose "$SELF" release-compile osx \
 			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I.deps/include -L.deps/lib -fno-reorder-blocks -DSUPPORTIPV6"' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.osx' \
-			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
@@ -295,7 +288,6 @@ case "$cmd" in
 		verbose "$SELF" release-compile linux32 \
 			'STRIP=: CC="gcc -m32 -march=i686 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib DP_GMP_STATIC_LIBDIR=.deps/lib' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.linux32' \
-			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
@@ -303,7 +295,6 @@ case "$cmd" in
 		verbose "$SELF" release-compile linux64 \
 			'STRIP=: CC="gcc -m64 -g1 -I.deps/include -L.deps/lib -DSUPPORTIPV6" DP_MODPLUG_STATIC_LIBDIR=.deps/lib LIB_JPEG=.deps/lib/libjpeg.a DP_CRYPTO_STATIC_LIBDIR=.deps/lib DP_GMP_STATIC_LIBDIR=.deps/lib' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.linux64' \
-			all 'fteqcc.bin:Xonotic/fteqcc/fteqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
@@ -327,7 +318,6 @@ case "$cmd" in
 	release-qc)
 		release_common
 		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source QCC="$d0/Xonotic/gmqcc/gmqcc.linux64" XON_BUILDSYSTEM=1 clean all
-		verbose rm -f Xonotic/source/qcsrc/*/fteqcc.log
 		;;
 	release-buildpk3-transform-raw)
 		release_common
@@ -573,12 +563,10 @@ case "$cmd" in
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
 		verbose mkzip Xonotic-$stamp-common.zip \
 			Xonotic/source/d0_blind_id/ \
-			Xonotic/source/fteqcc/ \
 			Xonotic/source/gmqcc/ \
 			Xonotic/source/qcsrc/ \
 			Xonotic/Docs \
 			Xonotic/misc \
-			Xonotic/fteqcc \
 			Xonotic/gmqcc \
 			Xonotic/server \
 			Xonotic/key_0.d0pk \
@@ -587,7 +575,6 @@ case "$cmd" in
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
 		verbose mkzip Xonotic-$stamp-source.zip \
 			Xonotic/source/d0_blind_id/ \
-			Xonotic/source/fteqcc/ \
 			Xonotic/source/gmqcc/ \
 			Xonotic/source/qcsrc/ \
 			Xonotic/misc/logos

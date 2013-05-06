@@ -20,7 +20,7 @@ for r in \
 	/home/rpolzer/Games/Xonotic/d0_blind_id \
 	/home/rpolzer/Games/Xonotic/data/xonotic-maps.pk3dir \
 	/home/rpolzer/Games/Xonotic/mediasource \
-	/home/rpolzer/Games/Xonotic/fteqcc
+	/home/rpolzer/Games/Xonotic/gmqcc
 do
 	cd "$r"
 	git tag -u D276946B -m"version $VER" xonotic-v"$VER"

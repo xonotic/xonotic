@@ -58,7 +58,7 @@ fi
 excludes=
 if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 	excludes="$excludes --exclude=/*.exe"
-	excludes="$excludes --exclude=/fteqcc/*.exe"
+	excludes="$excludes --exclude=/gmqcc/*.exe"
 	excludes="$excludes --exclude=/bin32"
 	excludes="$excludes --exclude=/*.dll"
 	excludes="$excludes --exclude=/bin64"
@@ -66,23 +66,23 @@ if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 	case `uname`:`uname -m` in
 		Darwin:*)
 			excludes="$excludes --exclude=/xonotic-linux*"
-			excludes="$excludes --exclude=/fteqcc/fteqcc.linux*"
+			excludes="$excludes --exclude=/gmqcc/gmqcc.linux*"
 			;;
 		Linux:x86_64)
 			excludes="$excludes --exclude=/Xonotic*.app"
 			excludes="$excludes --exclude=/xonotic-osx-*"
-			excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
+			excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
 			if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
 				excludes="$excludes --exclude=/xonotic-linux32-*"
-				excludes="$excludes --exclude=/fteqcc/fteqcc.linux32"
+				excludes="$excludes --exclude=/gmqcc/gmqcc.linux32"
 			fi
 			;;
 		Linux:i?86)
 			excludes="$excludes --exclude=/Xonotic*.app"
 			excludes="$excludes --exclude=/xonotic-osx-*"
-			excludes="$excludes --exclude=/fteqcc/fteqcc.osx"
+			excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
 			excludes="$excludes --exclude=/xonotic-linux64-*"
-			excludes="$excludes --exclude=/fteqcc/fteqcc.linux64"
+			excludes="$excludes --exclude=/gmqcc/gmqcc.linux64"
 			;;
 		*)
 			echo >&2 "WARNING: Could not detect architecture - downloading all architectures"
