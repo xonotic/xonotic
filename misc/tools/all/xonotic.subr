@@ -214,7 +214,7 @@ case "$cmd" in
 
 		verbose cd "$d0/data/xonotic-data.pk3dir"
 		if $cleanqc; then
-			verbose make QCC="../../../../gmqcc/qmqcc" "$@" $MAKEFLAGS clean
+			verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
 		fi
 		verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
 		# 4 levels up: data, xonotic-data, qcsrc, server
