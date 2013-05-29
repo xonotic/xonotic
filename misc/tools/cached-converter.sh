@@ -7,6 +7,12 @@ set -e
 : ${do_jpeg_if_not_dds:=false}
 : ${jpeg_qual_rgb:=95}
 : ${jpeg_qual_a:=99}
+: ${do_webp:=false}
+: ${do_webp_if_not_dds:=false}
+: ${webp_flags_lq:=-lossless -q 100}
+: ${webp_flags_hq:=-lossless -q 100}
+: ${webp_flags_alq:=-lossless -q 100 -q_alpha 100}
+: ${webp_flags_ahq:=-lossless -q 100 -q_alpha 100}
 : ${do_dds:=true}
 : ${dds_tool:=compressonator-dxtc}
 : ${do_ogg:=false}
@@ -239,6 +245,16 @@ reduce_jpeg2_jpeg2()
 	fi
 }
 
+reduce_jpeg2_webp()
+{
+	i=$1; shift
+	ia=$1; shift
+	o=$1; shift; shift
+	# this one MUST run
+	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
+	cwebp $1 "$tmpdir/x.tga" -o "$o"
+}
+
 reduce_jpeg_jpeg()
 {
 	i=$1; shift; shift
@@ -321,6 +337,13 @@ reduce_rgb_jpeg()
 	fi
 }
 
+reduce_rgba_webp()
+{
+	i=$1; shift; shift
+	o=$1; shift; shift
+	cwebp $1 "$i" -o "$o"
+}
+
 has_alpha()
 {
 	i=$1; shift; shift
@@ -344,8 +367,10 @@ for F in "$@"; do
 	keep=false
 	jqual_rgb=$jpeg_qual_rgb
 	jqual_a=$jpeg_qual_a
+	webp_mode=lq
 
 	will_jpeg=$do_jpeg
+	will_webp=$do_webp
 	will_dds=$do_dds
 	will_ogg=$do_ogg
 	if ! $ogg_ogg; then
@@ -388,12 +413,15 @@ for F in "$@"; do
 		case "$f" in
 			./maps/*/lm_[0-9][0-9][0-9][13579]) # deluxemap
 				jqual_rgb=$jqual_a
+				webp_mode=hq
 				;;
 			./maps/*/lm_[0-9][0-9][0-9][02468]) # lightmap
 				jqual_rgb=$jqual_a
+				webp_mode=hq
 				;;
 			*_norm) # normalmap
 				jqual_rgb=$jqual_a
+				webp_mode=hq
 				;;
 		esac
 	fi
@@ -412,13 +440,20 @@ for F in "$@"; do
 			will_jpeg=true
 		fi
 	fi
+	if $do_webp_if_not_dds; then
+		if $will_dds; then
+			will_webp=false
+		else
+			will_webp=true
+		fi
+	fi
 	selfprofile startconvert
 	case "$F" in
 		*_alpha.jpg)
 			# handle in *.jpg case
 
 			# they always got converted, I assume
-			if $will_dds || $will_jpeg; then
+			if $will_dds || $will_jpeg || $will_webp; then
 				conv=true
 			fi
 			keep=$will_jpeg
@@ -427,20 +462,28 @@ for F in "$@"; do
 			if [ -f "${f}_alpha.jpg" ]; then
 				cached "$will_dds"  reduce_jpeg2_dds$pm "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_jpeg2_jpeg2  "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
-			else                                   
+				eval wflags=\$webp_flags_${webp_mode}a
+				cached "$will_webp" reduce_jpeg2_webp   "$F" "${f}_alpha.jpg" "${f}.webp"    ""               "$wflags"
+			else
 				cached "$will_dds"  reduce_rgb_dds      "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_jpeg_jpeg    "$F" ""               "$F"           ""               "$jqual_rgb"
+				eval wflags=\$webp_flags_${webp_mode}
+				cached "$will_webp" reduce_rgba_webp    "$F" ""               "${f}.webp"    ""               "$wflags"
 			fi
 			;;
-		*.png|*.tga)
+		*.png|*.tga|*.webp)
 			cached true has_alpha "$F" "" "$F.hasalpha" ""
 			conv=false
 			if [ -s "$F.hasalpha" ]; then
 				cached "$will_dds"  reduce_rgba_dds$pm  "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_rgba_jpeg2   "$F" ""               "${f}.jpg"     "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
-			else                                                             
+				eval wflags=\$webp_flags_${webp_mode}a
+				cached "$will_webp" reduce_rgba_webp    "$F" ""               "${f}.webp"    ""               "$wflags"
+			else
 				cached "$will_dds"  reduce_rgb_dds      "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_rgb_jpeg     "$F" ""               "${f}.jpg"     ""               "$jqual_rgb"
+				eval wflags=\$webp_flags_${webp_mode}
+				cached "$will_webp" reduce_rgba_webp    "$F" ""               "${f}.webp"    ""               "$wflags"
 			fi
 			rm -f "$F.hasalpha"
 			;;
