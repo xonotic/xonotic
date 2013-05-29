@@ -251,8 +251,8 @@ reduce_jpeg2_webp()
 	ia=$1; shift
 	o=$1; shift; shift
 	# this one MUST run
-	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
-	cwebp $1 "$tmpdir/x.tga" -o "$o"
+	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.png" && \
+	cwebp $1 "$tmpdir/x.png" -o "$o"
 }
 
 reduce_jpeg_jpeg()
@@ -341,7 +341,8 @@ reduce_rgba_webp()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	cwebp $1 "$i" -o "$o"
+	convert "$i" "$tmpdir/x.png" && \
+	cwebp $1 "$tmpdir/x.png" -o "$o"
 }
 
 has_alpha()
