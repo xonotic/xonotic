@@ -597,7 +597,7 @@ case "$cmd" in
 			Xonotic/data/xonotic-$pk3stamp-maps.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-nexcompat.pk3
-		verbose mv Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
+		verbose cp Xonotic-$stamp-common.zip Xonotic-$stamp-low.zip
 		verbose mkzip0 Xonotic-$stamp-low.zip \
 			Xonotic/data/xonotic-$pk3stamp-data-low.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-maps-low.pk3 \
