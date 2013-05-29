@@ -462,13 +462,13 @@ for F in "$@"; do
 			if [ -f "${f}_alpha.jpg" ]; then
 				cached "$will_dds"  reduce_jpeg2_dds$pm "$F" "${f}_alpha.jpg" "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_jpeg2_jpeg2  "$F" "${f}_alpha.jpg" "$F"           "${f}_alpha.jpg" "$jqual_rgb" "$jqual_a"
-				eval wflags=\$webp_flags_${webp_mode}a
-				cached "$will_webp" reduce_jpeg2_webp   "$F" "${f}_alpha.jpg" "${f}.webp"    ""               "$wflags"
+				#eval wflags=\$webp_flags_${webp_mode}a
+				#cached "$will_webp" reduce_jpeg2_webp   "$F" "${f}_alpha.jpg" "${f}.webp"    ""               "$wflags"
 			else
 				cached "$will_dds"  reduce_rgb_dds      "$F" ""               "dds/${f}.dds" ""               "$dds_flags"
 				cached "$will_jpeg" reduce_jpeg_jpeg    "$F" ""               "$F"           ""               "$jqual_rgb"
-				eval wflags=\$webp_flags_${webp_mode}
-				cached "$will_webp" reduce_rgba_webp    "$F" ""               "${f}.webp"    ""               "$wflags"
+				#eval wflags=\$webp_flags_${webp_mode}
+				#cached "$will_webp" reduce_rgba_webp    "$F" ""               "${f}.webp"    ""               "$wflags"
 			fi
 			;;
 		*.png|*.tga|*.webp)
