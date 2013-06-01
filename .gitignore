@@ -9,3 +9,5 @@
 *.yes
 *.no
 /data.old/
+/xonstat/
+/xonstatdb/
