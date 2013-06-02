@@ -963,7 +963,7 @@ case "$cmd" in
 	grep)
 		for d in $repos; do
 			if verbose cd "$d0/$d"; then
-					git grep -I "$@" || true
+				git grep -I "$@" || true
 				cd "$d0"
 			fi
 		done
