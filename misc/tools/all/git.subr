@@ -960,6 +960,14 @@ case "$cmd" in
 		$ECHO "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
 		handled=false
 		;;
+	grep)
+		for d in $repos; do
+			if verbose cd "$d0/$d"; then
+					git grep -I "$@" || true
+				cd "$d0"
+			fi
+		done
+		;;
 	*)
 		handled=false
 		;;
