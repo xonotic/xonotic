@@ -122,6 +122,14 @@ case "$cmd" in
 			fi
 		fi
 
+		# workaround ARM issue in DP's makefile.inc
+		case `uname -m` in
+			x86_64|*86)
+				;;
+			*)
+				MAKEFLAGS="$MAKEFLAGS CFLAGS_SSE= CFLAGS_SSE2="
+				;;
+		esac
 		
 		if ! verbose $CC misc/tools/conftest.c -o conftest; then
 			msg ""
