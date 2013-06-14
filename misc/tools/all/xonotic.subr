@@ -3,6 +3,15 @@ case "$cmd" in
 	update-maps)
 		misc/tools/xonotic-map-compiler-autobuild download
 		;;
+	compile-map)
+		if [ ! -f "netradiant/install/q3map2.x86" ] ; then
+			msg "q3map2 needed! Building netradiant..."
+			cd netradiant
+			make
+			cd ../
+		fi
+		misc/tools/xonotic-map-compiler_from_all ./data/xonotic-maps.pk3dir/maps/$1
+		;;
 	compile)
 		cleand0=false
 		cleandp=false
