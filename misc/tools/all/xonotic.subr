@@ -4,19 +4,24 @@ case "$cmd" in
 		misc/tools/xonotic-map-compiler-autobuild download
 		;;
 	compile-map)
-		mapfile="data/xonotic-maps.pk3dir/maps/$1.map"
+		if [ -n "$1" ] ; then
+			msg "Usage: ./all compile-map mapname1 mapname2 mapname3"
+			msg "For example: ./all compile-map dance xoylent"
+		fi
 		if [ ! -f "netradiant/install/q3map2.x86" ] ; then
 			msg "q3map2 needed! Building netradiant..."
 			cd netradiant
 			make
 			cd ../
 		fi
-		if [ ! -f "$mapfile" ] ; then
-			msg "ERROR, $mapfile not found!"
-			exit 2
-		else
-			time misc/tools/xonotic-map-compiler_from_all $mapfile
-		fi
+		for mapfile in $@ ; do
+				mapfile="data/xonotic-maps.pk3dir/maps/$1.map"
+			if [ ! -f "$mapfile" ] ; then
+				msg "ERROR, $mapfile not found!"
+			else
+				time misc/tools/xonotic-map-compiler_from_all $mapfile
+			fi
+		done
 		;;
 	compile)
 		cleand0=false
