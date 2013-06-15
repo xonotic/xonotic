@@ -344,6 +344,7 @@ case "$cmd" in
 		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|agl|dedicated]"
 		$ECHO "  $SELF update-maps"
 		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;
 	*)
