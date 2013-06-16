@@ -4,7 +4,7 @@ case "$cmd" in
 		misc/tools/xonotic-map-compiler-autobuild download
 		;;
 	compile-map)
-		if [ -n "$1" ] ; then
+		if [ $# -eq 0 ] ; then
 			msg "Usage: ./all compile-map mapname1 mapname2 mapname3"
 			msg "For example: ./all compile-map dance xoylent"
 		fi
