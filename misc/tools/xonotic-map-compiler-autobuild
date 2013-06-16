@@ -177,11 +177,11 @@ buildthemap()
 	t0=`date +%s`
 	(
 		cd ../..
-		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-data.pk3dir/maps/$M" $build_override > "$M.log" 2>&1
+		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-data.pk3dir/maps/$M" $build_override > "data/xonotic-data.pk3dir/maps/$M.log" 2>&1
 	)
 	status=$?
 	if ! [ -f "maps/$M.bsp" ]; then
-		echo >>"$M.log" "ERROR: No BSP file"
+		echo >>"maps/$M.log" "ERROR: No BSP file"
 	fi
 	t1=`date +%s`
 	dt=$(($t1 - $t0))
