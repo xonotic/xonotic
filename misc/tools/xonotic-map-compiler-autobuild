@@ -177,7 +177,7 @@ buildthemap()
 	t0=`date +%s`
 	(
 		cd ../..
-		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-maps/maps/$M" $build_override > "data/xonotic-maps/maps/$M.log" 2>&1
+		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-maps.pk3dir/maps/$M" $build_override > "data/xonotic-maps.pk3dir/maps/$M.log" 2>&1
 	)
 	status=$?
 	if ! [ -f "maps/$M.bsp" ]; then
