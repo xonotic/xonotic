@@ -19,7 +19,7 @@ case "$cmd" in
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				time misc/tools/xonotic-map-compiler $mapfile
+				time misc/tools/xonotic-map-compiler $mapfile `grep "^-" $mapfile.options`
 			fi
 		done
 		;;
