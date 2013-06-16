@@ -176,14 +176,8 @@ buildthemap()
 	fi
 	t0=`date +%s`
 	(
-		cd maps
-		sz=`grep '^size ' "$M.mapinfo" 2>/dev/null || true`
-		if [ -n "$sz" ]; then
-			minimap_override="-minimap + -minmax ${sz#size }"
-		else
-			minimap_override=
-		fi
-		../../../misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override $build_override > "$M.log" 2>&1
+		cd ../..
+		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-data.pk3dir/maps/$M" $build_override > "$M.log" 2>&1
 	)
 	status=$?
 	if ! [ -f "maps/$M.bsp" ]; then

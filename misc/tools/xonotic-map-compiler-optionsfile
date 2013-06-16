@@ -1,0 +1,12 @@
+#!/bin/sh
+
+M=${1%.map}
+shift
+
+sz=`grep '^size ' "$M.mapinfo" 2>/dev/null || true`
+if [ -n "$sz" ]; then
+	minimap_override="-minimap + -minmax ${sz#size }"
+else
+	minimap_override=
+fi
+misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
