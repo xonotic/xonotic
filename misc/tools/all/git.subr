@@ -958,7 +958,16 @@ case "$cmd" in
 		$ECHO "  $SELF keygen"
 		$ECHO "  $SELF push|commit [-s]"
 		$ECHO "  $SELF update|pull [-N] [-s | -h [-p] | -g [-p]] [-l de|nl|default]"
+		$ECHO "  $SELF grep \"<regex>\""
 		handled=false
+		;;
+	grep)
+		for d in $repos; do
+			if verbose cd "$d0/$d"; then
+				git grep -In "$@" || true
+				cd "$d0"
+			fi
+		done
 		;;
 	*)
 		handled=false
