@@ -18,4 +18,7 @@ tstart=`date +%s`
 misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
 
 tend=`date +%s`
-let tdelta=$tend-$tstart
+let tdelta=$tend-$tstart # compute time
+
+cd ~/.xonotic-map-compiler-autobuild/
+echo $tdelta > ${M:30} # save time in ~/.xonotic-map-compiler-autobuild/mapname
