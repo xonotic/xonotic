@@ -10,15 +10,15 @@ else
 	minimap_override=
 fi
 
-mkdir -p ~/.xonotic-map-compiler-autobuild/ # to store map compile times
-
+mkdir -p ~/.xonotic-map-compiler-autobuild/ # to store map compile times in
 tstart=`date +%s`
 
+lasttime=`cat ~/.xonotic-map-compiler-autobuild/${M:30} 2>/dev/null` # oppress warnings if file doesn't exist
+echo "Done in approximately $(($lasttime/60)) minutes."
 
 misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
 
 tend=`date +%s`
 let tdelta=$tend-$tstart # compute time
 
-cd ~/.xonotic-map-compiler-autobuild/
-echo $tdelta > ${M:30} # save time in ~/.xonotic-map-compiler-autobuild/mapname
+echo $tdelta > ~/.xonotic-map-compiler-autobuild/${M:30} # save time in ~/.xonotic-map-compiler-autobuild/mapname
