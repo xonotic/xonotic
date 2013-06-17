@@ -13,7 +13,7 @@ fi
 mkdir -p ~/.xonotic-map-compiler-autobuild/ # to store map compile times in
 tstart=`date +%s`
 
-if [ -f "~/.xonotic-map-compiler-autobuild/${M:30}" ] ; then
+if [ -f ~/.xonotic-map-compiler-autobuild/${M:30} ] ; then
 	lasttime=`cat ~/.xonotic-map-compiler-autobuild/${M:30} 2>/dev/null` # oppress warnings if file doesn't exist
 	echo "Done in approximately $(($lasttime/60)) minutes."
 fi
