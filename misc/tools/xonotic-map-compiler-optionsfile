@@ -16,9 +16,10 @@ tstart=`date +%s`
 lasttime=`cat ~/.xonotic-map-compiler-autobuild/${M:30} 2>/dev/null` # oppress warnings if file doesn't exist
 echo "Done in approximately $(($lasttime/60)) minutes."
 
-misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
+misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@" || mapfail=true
 
 tend=`date +%s`
 let tdelta=$tend-$tstart # compute time
-
-echo $tdelta > ~/.xonotic-map-compiler-autobuild/${M:30} # save time in ~/.xonotic-map-compiler-autobuild/mapname
+if  [[ ! ${mapfail} ]] ; then
+	echo $tdelta > ~/.xonotic-map-compiler-autobuild/${M:30} # save time in ~/.xonotic-map-compiler-autobuild/mapname
+fi
