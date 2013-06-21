@@ -2,7 +2,6 @@
 
 M=${1%.map}
 shift
-m=${M:30}
 
 sz=`grep '^size ' "$M.mapinfo" 2>/dev/null || true`
 if [ -n "$sz" ]; then
@@ -14,15 +13,18 @@ fi
 mkdir -p ~/.xonotic-map-compiler-autobuild/ # to store map compile times in
 tstart=`date +%s`
 
-if [ -f ~/.xonotic-map-compiler-autobuild/${m##*/} ] ; then # ${m##*/} : cut $m at "/", get latest field
-	lasttime=`cat ~/.xonotic-map-compiler-autobuild/${m##*/} 2>/dev/null` # oppress warnings if file doesn't exist
-	echo "Done in approximately $(($lasttime/60)) minutes."
+lasttime=`cat ~/.xonotic-map-compiler-autobuild/"${M##*/}".buildtime 2>/dev/null || true`
+if [ -n "$lasttime" ] ; then
+	echo "Done in approximately $((($lasttime+59)/60)) minutes."
 fi
 
-misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@" || mapfail=true
+misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
+status=$?
 
 tend=`date +%s`
-let tdelta=$tend-$tstart # compute time
-if  [[ ! ${mapfail} ]] ; then
-	echo $tdelta > ~/.xonotic-map-compiler-autobuild/${m##*/} # save time in ~/.xonotic-map-compiler-autobuild/mapname
+tdelta=$(($tend - $tstart)) # compute time
+if [ $status -eq 0 ] ; then
+	echo "$tdelta" > ~/.xonotic-map-compiler-autobuild/"${M##*/}".buildtime # save time in ~/.xonotic-map-compiler-autobuild/mapname
 fi
+
+exit $status
