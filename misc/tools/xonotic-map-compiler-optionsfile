@@ -16,6 +16,9 @@ tstart=`date +%s`
 lasttime=`cat ~/.xonotic-map-compiler-autobuild/"${M##*/}".buildtime 2>/dev/null || true`
 if [ -n "$lasttime" ] ; then
 	echo "Done in approximately $((($lasttime+59)/60)) minutes."
+	if [ -n "$IRCSPAM" ]; then
+		echo "Done in approximately $((($lasttime+59)/60)) minutes." | $IRCSPAM || true
+	fi
 fi
 
 misc/tools/xonotic-map-compiler "$M" `grep ^- "$M.map.options" | cut -d '#' -f 1` $minimap_override "$@"
