@@ -106,10 +106,6 @@ while(@ARGV)
 	{
 		$options->{minimap} = undef;
 	}
-	elsif($_ eq '-noshaderlist')
-	{
-		$options->{noshaderlist} = 1;
-	}
 	elsif($_ eq '-bsp_timeout')
 	{
 		$options->{bsp_timeout} = shift @ARGV;
@@ -222,16 +218,24 @@ sub q3map2(@)
 	}
 }
 
-(my $mapdir = getcwd()) =~ s!/[^/]*(?:$)!!;
-$mapdir = "/" if $mapdir eq "";
-symlink "$mapdir", "$linkdir/data";
-
 my ($prescale, $postscale) = ($options->{scalefactor} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
 $prescale = 1 if not defined $prescale;
 $postscale = 1 if not defined $postscale;
 
+my $origcwd = getcwd();
 for my $m(@{$options->{maps}})
 {
+	chdir $origcwd
+		or die "chdir $origcwd: $!";
+	if($m =~ s!(.*)/!!)
+	{
+		my $predir = $1;
+		chdir $predir
+			or die "chdir $predir: $!";
+	}
+	symlink getcwd() . "/..", "$linkdir/data"
+		or die "symlink $linkdir/data: $!";
+
 	$m =~ s/\.(?:map|bsp)$//;
 
 	if($prescale != 1)
@@ -239,88 +243,61 @@ for my $m(@{$options->{maps}})
 		unshift @{$options->{bsp}}, "-keeplights";
 	}
 
-	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "$mapdir/scripts/*.shader";
-
-	my $restore_shaderlist = sub { };
-	if(!$options->{noshaderlist})
-	{
-		local $ENV{mapdir} = $mapdir;
-		system 'cd $mapdir; make -C ../scripts shaderlist.txt';
-
-		$restore_shaderlist = sub
-		{
-			local $ENV{mapdir} = $mapdir;
-			system 'cd $mapdir; git checkout ../scripts/shaderlist.txt';
-		};
-	}
-
 	local $SIG{INT} = sub
 	{
 		print "SIGINT caught, cleaning up...\n";
-		$restore_shaderlist->();
 		exit 0;
 	};
 
-	eval
+	unlink <$m/lm_*>; # delete old external lightmaps
+	q3map2 '-bsp', @{$options->{bsp}},   "$m.map"
+		or die "-bsp: $?";
+	if($prescale != 1)
 	{
-		unlink <$m/lm_*>; # delete old external lightmaps
-		q3map2 '-bsp', @{$options->{bsp}},   "$m.map"
-			or die "-bsp: $?";
-		if($prescale != 1)
-		{
-			q3map2 '-scale', @{$options->{scale}}, $prescale, "$m.bsp"
-				or die "-scale: $?";
-			rename "${m}_s.bsp", "$m.bsp"
-				or die "rename ${m}_s.bsp $m.bsp: $!";
-		}
-		my @o = @{$options->{order}};
-		push @o, qw/light vis/;
-		my %o = ();
-
-		for(@o)
-		{
-			next if $o{$_}++;
-			if($_ eq 'light')
-			{
-				if(defined $options->{light})
-				{
-					q3map2 '-light',        @{$options->{light}}, "$m.map"
-						or die "-light: $?";
-				}
-			}
-			if($_ eq 'vis')
-			{
-				if(defined $options->{vis})
-				{
-					q3map2 '-vis',          @{$options->{vis}},   "$m.map"
-						or die "-vis: $?";
-				}
-			}
-		}
-
-		if($postscale != 1)
-		{
-			q3map2 '-scale', @{$options->{scale}}, $postscale, "$m.bsp"
-				or die "-scale: $?";
-			rename "${m}_s.bsp", "$m.bsp"
-				or die "rename ${m}_s.bsp $m.bsp: $!";
-		}
-
-		if(defined $options->{minimap})
-		{
-			q3map2 '-minimap',      @{$options->{minimap}}, "$m.map"
-				or die "-minimap: $?";
-		}
-
-		unlink "$m.srf";
-		unlink "$m.prt";
-
-		$restore_shaderlist->();
-		1;
+		q3map2 '-scale', @{$options->{scale}}, $prescale, "$m.bsp"
+			or die "-scale: $?";
+		rename "${m}_s.bsp", "$m.bsp"
+			or die "rename ${m}_s.bsp $m.bsp: $!";
 	}
-	or do
+	my @o = @{$options->{order}};
+	push @o, qw/light vis/;
+	my %o = ();
+
+	for(@o)
 	{
-		$restore_shaderlist->();
-		die $@;
-	};
+		next if $o{$_}++;
+		if($_ eq 'light')
+		{
+			if(defined $options->{light})
+			{
+				q3map2 '-light',        @{$options->{light}}, "$m.map"
+					or die "-light: $?";
+			}
+		}
+		if($_ eq 'vis')
+		{
+			if(defined $options->{vis})
+			{
+				q3map2 '-vis',          @{$options->{vis}},   "$m.map"
+					or die "-vis: $?";
+			}
+		}
+	}
+
+	if($postscale != 1)
+	{
+		q3map2 '-scale', @{$options->{scale}}, $postscale, "$m.bsp"
+			or die "-scale: $?";
+		rename "${m}_s.bsp", "$m.bsp"
+			or die "rename ${m}_s.bsp $m.bsp: $!";
+	}
+
+	if(defined $options->{minimap})
+	{
+		q3map2 '-minimap',      @{$options->{minimap}}, "$m.map"
+			or die "-minimap: $?";
+	}
+
+	unlink "$m.srf";
+	unlink "$m.prt";
 }
