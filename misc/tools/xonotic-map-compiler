@@ -239,73 +239,19 @@ for my $m(@{$options->{maps}})
 		unshift @{$options->{bsp}}, "-keeplights";
 	}
 
-	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "../scripts/*.shader";
+	my %shaders = map { m!/([^/.]*)\.shader(?:$)! ? ($1 => 1) : () } glob "$mapdir/scripts/*.shader";
 
 	my $restore_shaderlist = sub { };
 	if(!$options->{noshaderlist})
 	{
-		my $previous_shaderlist = undef;
-		my $shaderlist = "";
-		if(open my $fh, "<", "$XONOTICDIR/data/scripts/shaderlist.txt")
-		{
-			while(<$fh>)
-			{
-				$shaderlist .= $_;
-			}
-
-			# we may have to restore the file on exit
-			$previous_shaderlist = $shaderlist
-				if "$XONOTICDIR/data" eq $mapdir;
-		}
-		else
-		{
-			# possibly extract the shader list from a pk3?
-			local $ENV{N} = $XONOTICDIR;
-			$shaderlist = `cd "\$N" && for X in "\$N"/data/data*.pk3; do Y=\$X; done; unzip -p "\$Y" scripts/shaderlist.txt`;
-		}
-
-		my $shaderlist_new = "";
-		for(split /\r?\n|\r/, $shaderlist)
-		{
-			delete $shaders{$_};
-			$shaderlist_new .= "$_\n";
-		}
-		if(%shaders)
-		{
-			for(sort keys %shaders)
-			{
-				$shaderlist_new .= "$_\n";
-			}
-		}
-		else
-		{
-			$shaderlist_new = undef;
-		}
+		local $ENV{mapdir} = $mapdir;
+		system 'cd $mapdir; make -C ../scripts shaderlist.txt';
 
 		$restore_shaderlist = sub
 		{
-			if(defined $shaderlist_new)
-			{
-				if(defined $previous_shaderlist)
-				{
-					open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
-					print $fh $previous_shaderlist;
-					close $fh;
-				}
-				else
-				{
-					unlink "$mapdir/scripts/shaderlist.txt";
-				}
-			}
+			local $ENV{mapdir} = $mapdir;
+			system 'cd $mapdir; git checkout ../scripts/shaderlist.txt';
 		};
-
-		if(defined $shaderlist_new)
-		{
-			mkdir "$mapdir/scripts";
-			open my $fh, ">", "$mapdir/scripts/shaderlist.txt";
-			print $fh $shaderlist_new;
-			close $fh;
-		}
 	}
 
 	local $SIG{INT} = sub
