@@ -13,11 +13,19 @@ case "$cmd" in
 			make -C netradiant install/q3map2.x86
 		fi
 		for mapfile in "$@"; do
+			mapname=$mapfile
 			mapfile="data/xonotic-maps.pk3dir/maps/$mapfile.map"
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
+				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile" // map is compiled now
+				cd data/xonotic-maps.pk3dir
+				mapblobhash=`git rev-parse --revs-only "HEAD:maps/$mapname.map.options" || true`-`git rev-parse --revs-only "HEAD:maps/$mapname.map" || true`
+				mapnamezip=${mapname##*/}
+				echo "Compressing to .pk3..."
+				zip -9r "$mapnamezip-$mapblobhash.pk3"  "maps/$mapname.bsp" "maps/$mapname/"  "gfx/${mapnamezip}_mini.tga"
+				mv -f "$mapnamezip-$mapblobhash.pk3" ../
+				verbose "$SELF" update-maps
 			fi
 		done
 		;;
