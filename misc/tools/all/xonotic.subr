@@ -18,7 +18,7 @@ case "$cmd" in
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile" |& tee data/xonotic-maps.pk3dir/$mapname.log
+				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile" 2>&1 | tee data/xonotic-maps.pk3dir/$mapname.log
 				cd data/xonotic-maps.pk3dir
 				mapblobhash=`git rev-parse --revs-only "HEAD:maps/$mapname.map.options" || true`-`git rev-parse --revs-only "HEAD:maps/$mapname.map" || true`
 				mapnamezip=${mapname##*/}
