@@ -200,13 +200,13 @@ case "$cmd" in
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared CFLAGS_CRYPTO=-I../../../misc/builddeps/dp.linux32/include LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
 								;;
 							*86)
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared CFLAGS_CRYPTO=-I../../../misc/builddeps/dp.linux32/include LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
 								;;
 							*)
 								compiled0=true
