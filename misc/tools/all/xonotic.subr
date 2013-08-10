@@ -12,12 +12,12 @@ case "$cmd" in
 			msg "q3map2 needed! Building netradiant..."
 			make -C netradiant install/q3map2
 		fi
-		for mapfile in "$@"; do
-			mapfile="data/xonotic-maps.pk3dir/maps/$mapfile.map"
+		for mapname in "$@"; do
+			mapfile="data/xonotic-maps.pk3dir/maps/$mapname.map"
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
+				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile" |& tee data/xonotic-maps.pk3dir/maps/$mapname.log
 			fi
 		done
 		;;
