@@ -145,9 +145,6 @@ case "$cmd" in
 			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
 		fi
 
-		# ODE is optional
-		MAKEFLAGS="$MAKEFLAGS LIB_ODE= CFLAGS_ODE=-DUSEODE"
-
 		# workaround ARM issue in DP's makefile.inc
 		case `uname -m` in
 			x86_64|*86)
@@ -200,13 +197,15 @@ case "$cmd" in
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared CFLAGS_CRYPTO=-I../../../../misc/builddeps/dp.linux32/include LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
+								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
 								;;
 							*86)
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared CFLAGS_CRYPTO=-I../../../../misc/builddeps/dp.linux32/include LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
+								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
 								;;
 							*)
 								compiled0=true
