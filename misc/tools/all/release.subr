@@ -279,21 +279,21 @@ case "$cmd" in
 		release_common
 		# gcc on OSX is buggy, needs -fno-reorder-blocks for a release build to succeed
 		verbose "$SELF" release-compile osx \
-			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I../../../.deps/include -L../../../.deps/lib -fno-reorder-blocks -DSUPPORTIPV6" DP_LINK_ZLIB=shared DP_LINK_JPEG=shared DP_LINK_ODE=dlopen DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
+			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I../../../.deps/include -L../../../.deps/lib -fno-reorder-blocks -DSUPPORTIPV6" DP_LINK_ZLIB=shared DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.osx' \
 			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux32)
 		release_common
 		verbose "$SELF" release-compile linux32 \
-			'STRIP=: CC="gcc -m32 -march=i686 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" LIB_JPEG=../../../.deps/lib/libjpeg.a LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_ZLIB=shared DP_LINK_JPEG=shared DP_LINK_ODE=dlopen DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
+			'STRIP=: CC="gcc -m32 -march=i686 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" LIB_JPEG=../../../.deps/lib/libjpeg.a LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_ZLIB=shared DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.linux32' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux32-glx darkplaces-sdl:Xonotic/xonotic-linux32-sdl darkplaces-dedicated:Xonotic/xonotic-linux32-dedicated'
 		;;
 	release-engine-linux64)
 		release_common
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" LIB_JPEG=../../../.deps/lib/libjpeg.a LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_ZLIB=shared DP_LINK_JPEG=shared DP_LINK_ODE=dlopen DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
+			'STRIP=: CC="gcc -m64 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" LIB_JPEG=../../../.deps/lib/libjpeg.a LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_ZLIB=shared DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
 			gmqcc 'gmqcc:Xonotic/gmqcc/gmqcc.linux64' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
