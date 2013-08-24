@@ -1,3 +1,12 @@
+unshallow=
+depth="--depth 1"
+unshallow()
+{
+	msg "Now allowing shallow clones."
+	unshallow="--unshallow"
+	depth=
+}
+
 initrepo_()
 {
 	if [ x"$3" != x"." ]; then
@@ -24,8 +33,14 @@ initrepo()
 		exit 1
 	fi
 	msg "Found main repo = $base"
+	case "$base" in
+		ssh://*)
+			unshallow
+			;;
+	esac
 	if [ -n "$pushbase" ]; then
 		msg "Found push repo = $pushbase"
+		unshallow
 	fi
 }
 matchrepoflag()
@@ -364,7 +379,7 @@ fix_upstream_rebase()
 		if [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_me )) ] || [ $(( $r_lc_same * 2 )) -gt $(( $r_lc_other )) ]; then
 			if yesno "Probable upstream rebase detected, automatically fix?" 'git log --oneline --graph --date-order --left-right "$r_other"..."$r_me"'; then
 				git reset --hard "$r_me"
-				git pull --rebase
+				git pull $unshallow --rebase
 				return 1
 			fi
 		fi
@@ -563,6 +578,8 @@ case "$cmd" in
 				newlocation=$2
 				need_bestmirror=true
 				shift
+			elif [ x"$1" = x"--unshallow" ]; then
+				unshallow
 			else
 				break
 			fi
@@ -619,7 +636,7 @@ case "$cmd" in
 					if git config branch.$r.remote >/dev/null 2>&1; then
 						o=`( cd "$d0" && git config xonotic.all.mirrorselection 2>/dev/null || true )`
 						( cd "$d0" && git config xonotic.all.mirrorselection try_same )
-						if ! verbose git pull; then
+						if ! verbose git pull $unshallow; then
 							if fix_upstream_rebase_mergefail; then
 								check_mergeconflict "$d"
 								$ECHO "Pulling failed. Press ENTER to continue, or Ctrl-C to abort."
@@ -648,7 +665,7 @@ case "$cmd" in
 				fi
 				o=`git config xonotic.all.mirrorselection 2>/dev/null || true`
 				git config xonotic.all.mirrorselection try_same
-				verbose git clone "$url" "$d0/$d"
+				verbose git clone $depth "$url" "$d0/$d"
 				git config xonotic.all.mirrorselection "$o"
 				enter "$d0/$d" verbose
 				fix_git_config "$url" "$pushurl"
@@ -750,7 +767,7 @@ case "$cmd" in
 							b=$srcbranch
 						else
 							b=$branch
-							verbose git fetch origin || true
+							verbose git fetch $unshallow origin || true
 						fi
 						verbose git checkout -b "$askbranch" "$b"
 						verbose git config "branch.$askbranch.remote" "$remote"
@@ -892,7 +909,7 @@ case "$cmd" in
 				fi
 				if $gotomaster; then
 					if $fetchupstream; then
-						verbose git fetch origin
+						verbose git fetch $unshallow origin
 						verbose git remote prune origin
 					fi
 					verbose git checkout -f "$branch"
@@ -907,7 +924,7 @@ case "$cmd" in
 						for t in `git tag -l "xonotic-v"*`; do
 							verbose git tag -d "$t"
 						done
-						verbose git fetch "$rem"
+						verbose git fetch $unshallow "$rem"
 						verbose git remote prune "$rem"
 					fi
 					if ! git rev-parse "$upstream" >/dev/null 2>&1; then
