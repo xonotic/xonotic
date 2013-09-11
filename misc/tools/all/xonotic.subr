@@ -8,9 +8,9 @@ case "$cmd" in
 			msg "Usage: ./all compile-map-pk3 mapname1 mapname2 mapname3"
 			msg "For example: ./all compile-map-pk3 dance xoylent"
 		fi
-		if ! [ -f "netradiant/install/q3map2.x86" ] ; then
-			msg "q3map2 needed! Building..."
-			make -C netradiant install/q3map2.x86
+		if ! [ -f "netradiant/install/q3map2" ] ; then
+			msg "q3map2 needed! Building netradiant..."
+			make -C netradiant install/q3map2
 		fi
 		for mapfile in "$@"; do
 			mapname=$mapfile
@@ -142,8 +142,13 @@ case "$cmd" in
 				MAKEFLAGS=-j$ncpus
 			fi
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw LIB_JPEG= CFLAGS_LIBJPEG="
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
 			fi
+		fi
+
+		# win32: don't rely on jpeg includes
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
 		fi
 
 		# workaround ARM issue in DP's makefile.inc
@@ -198,13 +203,23 @@ case "$cmd" in
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/ DP_GMP_STATIC_LIBDIR=../misc/builddeps/dp.linux64/lib/"
+								# FIXME(whoeverwantsto) get rid of this -I flag, as we just can't do this (the directory has other stuff, e.g. jpeg, inside).
+								# FIXME(whoeverwantsto) maybe use the cp commands from above again, and load via dlopen again? Needs evaluation of whether they work.
+								export CC="$CC -I../../../../misc/builddeps/dp.linux64/include"
+								export CC="$CC -L../../../../misc/builddeps/dp.linux64/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/dp.linux64/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
 								;;
 							*86)
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
 								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								MAKEFLAGS="$MAKEFLAGS DP_CRYPTO_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_CRYPTO_RIJNDAEL_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/ DP_GMP_STATIC_LIBDIR=../misc/builddeps/dp.linux32/lib/"
+								# FIXME(whoeverwantsto) get rid of this -I flag, as we just can't do this (the directory has other stuff, e.g. jpeg, inside).
+								# FIXME(whoeverwantsto) maybe use the cp commands from above again, and load via dlopen again? Needs evaluation of whether they work.
+								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
+								export CC="$CC -L../../../../misc/builddeps/dp.linux32/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/dp.linux32/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
 								;;
 							*)
 								compiled0=true
