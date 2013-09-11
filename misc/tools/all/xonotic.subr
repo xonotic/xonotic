@@ -24,6 +24,9 @@ case "$cmd" in
 				msg "Compressing to .pk3..."
 				zip -9r "$mapnamezip.pk3"  "maps/$mapname.bsp" "maps/$mapname/"  "gfx/${mapnamezip}_mini.tga" "$mapname.log" `git diff --name-only --diff-filter=ACMRTUXB origin/master...HEAD`
 				mv $mapnamezip.pk3 ../../
+				cd ../../
+				echo
+				echo .pk3 saved to `pwd`/$mapnamezip.pk3
 			fi
 		done
 		;;
