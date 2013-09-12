@@ -194,26 +194,24 @@ case "$cmd" in
 					Linux)
 						case `uname -m` in
 							x86_64)
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								# FIXME(whoeverwantsto) get rid of this -I flag, as we just can't do this (the directory has other stuff, e.g. jpeg, inside).
-								# FIXME(whoeverwantsto) maybe use the cp commands from above again, and load via dlopen again? Needs evaluation of whether they work.
-								export CC="$CC -I../../../../misc/builddeps/dp.linux64/include"
-								export CC="$CC -L../../../../misc/builddeps/dp.linux64/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/dp.linux64/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
+								# No cp commands, we want to use static linking instead.
+								export CC="$CC -I../../../../misc/builddeps/linux64/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/linux64/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/linux64/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/linux64/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux64/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_rijndael.a"
 								;;
 							*86)
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								# FIXME(whoeverwantsto) get rid of this -I flag, as we just can't do this (the directory has other stuff, e.g. jpeg, inside).
-								# FIXME(whoeverwantsto) maybe use the cp commands from above again, and load via dlopen again? Needs evaluation of whether they work.
-								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
-								export CC="$CC -L../../../../misc/builddeps/dp.linux32/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/dp.linux32/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
+								# No cp commands, we want to use static linking instead.
+								export CC="$CC -I../../../../misc/builddeps/linux32/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/linux32/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/linux32/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/linux32/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
 								;;
 							*)
 								compiled0=true
