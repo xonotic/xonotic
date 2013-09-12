@@ -175,11 +175,13 @@ buildthemap()
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM || true
 	fi
 	t0=`date +%s`
+	set +e
 	(
 		cd ../..
 		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-maps.pk3dir/maps/$M" $build_override > "data/xonotic-maps.pk3dir/maps/$M.log" 2>&1
 	)
 	status=$?
+	set -e
 	if ! [ -f "maps/$M.bsp" ]; then
 		echo >>"maps/$M.log" "ERROR: No BSP file"
 	fi
