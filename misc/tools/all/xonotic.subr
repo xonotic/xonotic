@@ -10,7 +10,7 @@ case "$cmd" in
 		fi
 		if ! [ -f "netradiant/install/q3map2" ] ; then
 			msg "q3map2 needed! Building netradiant..."
-			make -C netradiant install/q3map2
+			make -C netradiant BUILD=native install/q3map2
 		fi
 		for mapfile in "$@"; do
 			mapfile="data/xonotic-maps.pk3dir/maps/$mapfile.map"
