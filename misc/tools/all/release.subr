@@ -258,8 +258,8 @@ case "$cmd" in
 		darkplaces_maketargets=$5
 		darkplaces_files=$6
 		host=xonotic-build-$suffix
-		verbose "$SELF" release-compile-run "$host" /tmp/gmqcc.build."$suffix" "$gmqcc_maketargets" "$makeflags" "Xonotic/source/gmqcc" "$d0/misc/builddeps/dp.$suffix" "$gmqcc_files"
-		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/dp.$suffix" "$darkplaces_files"
+		verbose "$SELF" release-compile-run "$host" /tmp/gmqcc.build."$suffix" "$gmqcc_maketargets" "$makeflags" "Xonotic/source/gmqcc" "$d0/misc/builddeps/$suffix" "$gmqcc_files"
+		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/$suffix" "$darkplaces_files"
 		;;
 	release-engine-win32)
 		release_common
