@@ -212,7 +212,7 @@ screenshotthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
-	if lwp-request -m HEAD "$url$M-$blobhash/"; then
+	if lwp-request -m HEAD "$url$M-$blobhash/$M-000000.jpg"; then
 		continue
 	fi
 
