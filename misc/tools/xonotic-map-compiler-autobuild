@@ -174,9 +174,45 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM || true
 	fi
+
 	t0=`date +%s`
+
+	# It's sad that we must enforce this rule by code.
+	if grep -- '-nosRGB' "maps/$map.map.options" >/dev/null; then
+		is_nosrgb=true
+	else
+		is_nosrgb=false
+	fi
+	allow_build=true
+	case "$map" in
+		afterslime|dance|drain|glowplant|leave_em_behind|newtonian-nightmare|nexballarena|oilrig|red-planet|runningmanctf|runningman|space-elevator|stormkeep|techassault|xoylent)
+			if ! $is_nosrgb; then
+				if [ -n "$IRCSPAM" ]; then
+					echo "CONGRATULATIONS: map $map does not use -nosRGB any more. Please remove the map name from the list in xonotic-map-compiler-autobuild once this is merged to master." | $IRCSPAM || true
+				fi
+			fi
+			;;
+		*)
+			if $is_nosrgb; then
+				case "$REFNAME" in
+					master|refs/heads/master|origin/master|refs/remotes/origin/master)
+						if [ -n "$IRCSPAM" ]; then
+							echo "4ERROR: map $map uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+						fi
+						allow_build=false
+						;;
+					*)
+						if [ -n "$IRCSPAM" ]; then
+							echo "4WARNING: map $map uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+						fi
+						;;
+				esac
+			fi
+			;;
+	esac
+
 	set +e
-	(
+	$allow_build && (
 		cd ../..
 		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-maps.pk3dir/maps/$M" $build_override > "data/xonotic-maps.pk3dir/maps/$M.log" 2>&1
 	)
