@@ -189,7 +189,7 @@ buildthemap()
 			if ! $is_nosrgb; then
 				if [ -n "$IRCSPAM" ]; then
 					echo "CONGRATULATIONS: map $map does not use -nosRGB any more. Please remove the map name from the list in xonotic-map-compiler-autobuild once this is merged to master." | $IRCSPAM || true
-				Fi
+				fi
 			fi
 			;;
 		*)
