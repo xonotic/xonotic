@@ -184,11 +184,15 @@ buildthemap()
 		is_nosrgb=false
 	fi
 	allow_build=true
-	case "$map" in
+	case "$M" in
 		afterslime|dance|drain|glowplant|leave_em_behind|newtonian-nightmare|nexballarena|oilrig|red-planet|runningmanctf|runningman|space-elevator|stormkeep|techassault|xoylent)
-			if ! $is_nosrgb; then
+			if $is_nosrgb; then
 				if [ -n "$IRCSPAM" ]; then
-					echo "CONGRATULATIONS: map $map does not use -nosRGB any more. Please remove the map name from the list in xonotic-map-compiler-autobuild once this is merged to master." | $IRCSPAM || true
+					echo "8NOTE: map $M still uses -nosRGB. This should eventually get fixed." | $IRCSPAM || true
+				fi
+			else
+				if [ -n "$IRCSPAM" ]; then
+					echo "9CONGRATULATIONS: map $M does not use -nosRGB any more. Please remove the map name from the list in xonotic-map-compiler-autobuild once this is merged to master." | $IRCSPAM || true
 				fi
 			fi
 			;;
@@ -197,13 +201,13 @@ buildthemap()
 				case "$REFNAME" in
 					master|refs/heads/master|origin/master|refs/remotes/origin/master)
 						if [ -n "$IRCSPAM" ]; then
-							echo "4ERROR: map $map uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+							echo "4ERROR: map $M uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
 						fi
 						allow_build=false
 						;;
 					*)
 						if [ -n "$IRCSPAM" ]; then
-							echo "4WARNING: map $map uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+							echo "4WARNING: map $M uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
 						fi
 						;;
 				esac
