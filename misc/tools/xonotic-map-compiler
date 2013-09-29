@@ -31,7 +31,7 @@ use File::Temp;
 	our $MINIMAPFLAGS = '';
 
 	# Default order of commands
-	our $ORDER = 'vis,light';
+	our $ORDER = 'vis,scale,light';
 
 # end of user changable part
 
@@ -232,9 +232,15 @@ sub q3map2(@)
 	}
 }
 
-my ($prescale, $postscale) = ($options->{scalefactor} =~ /^([0-9.]+)(?::([0-9.]+))?$/);
-$prescale = 1 if not defined $prescale;
-$postscale = 1 if not defined $postscale;
+if ($options->{scalefactor} =~ /^([0-9.]+):([0-9.]+)$/)
+{
+	die "Two-scale isn't supported"
+		if $1 != 1 and $2 != 1;
+	$options->{scalefactor} = $1
+		if $2 == 1;
+	$options->{scalefactor} = $2
+		if $1 == 1;
+}
 
 my $origcwd = getcwd();
 for my $m(@{$options->{maps}})
@@ -252,10 +258,8 @@ for my $m(@{$options->{maps}})
 
 	$m =~ s/\.(?:map|bsp)$//;
 
-	if($prescale != 1)
-	{
-		unshift @{$options->{bsp}}, "-keeplights";
-	}
+	# never hurts, may help with rtlights
+	unshift @{$options->{bsp}}, "-keeplights";
 
 	local $SIG{INT} = sub
 	{
@@ -266,15 +270,8 @@ for my $m(@{$options->{maps}})
 	unlink <$m/lm_*>; # delete old external lightmaps
 	q3map2 '-bsp', @{$options->{bsp}},   "$m.map"
 		or die "-bsp: $?";
-	if($prescale != 1)
-	{
-		q3map2 '-scale', @{$options->{scale}}, $prescale, "$m.bsp"
-			or die "-scale: $?";
-		rename "${m}_s.bsp", "$m.bsp"
-			or die "rename ${m}_s.bsp $m.bsp: $!";
-	}
 	my @o = @{$options->{order}};
-	push @o, qw/light vis/;
+	push @o, qw/vis scale light/;
 	my %o = ();
 
 	for(@o)
@@ -296,14 +293,16 @@ for my $m(@{$options->{maps}})
 					or die "-vis: $?";
 			}
 		}
-	}
-
-	if($postscale != 1)
-	{
-		q3map2 '-scale', @{$options->{scale}}, $postscale, "$m.bsp"
-			or die "-scale: $?";
-		rename "${m}_s.bsp", "$m.bsp"
-			or die "rename ${m}_s.bsp $m.bsp: $!";
+		if($_ eq 'scale')
+		{
+			if ($options->{scalefactor} != 1)
+			{
+				q3map2 '-scale', @{$options->{scale}}, $options->{scalefactor}, "$m.bsp"
+					or die "-scale: $?";
+				rename "${m}_s.bsp", "$m.bsp"
+					or die "rename ${m}_s.bsp $m.bsp: $!";
+			}
+		}
 	}
 
 	if(defined $options->{minimap})
