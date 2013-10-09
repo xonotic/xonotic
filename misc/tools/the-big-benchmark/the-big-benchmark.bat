@@ -26,7 +26,7 @@ goto postarg
 if exist data\the-big-benchmark.log del data\the-big-benchmark.log
 if exist data\benchmark.log del data\benchmark.log
 if exist data\engine.log del data\engine.log
-set p=+cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
+set p=+vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
 goto start
 
@@ -46,6 +46,12 @@ if errorlevel 1 goto nomed
 echo OpenGL 2.0 or later required for Normal quality and higher, exiting.
 goto done
 :nomed
+if not "%e%" == "med" goto nomed2
+find "Using GL1.3 rendering path" data\engine.log >nul
+if errorlevel 1 goto nomed
+echo OpenGL 2.0 rendering disabled, exiting.
+goto done
+:nomed2
 if not "%e%" == "high" goto nohigh
 find "vid_soft 1" data\engine.log >nul
 if errorlevel 1 goto nohigh
