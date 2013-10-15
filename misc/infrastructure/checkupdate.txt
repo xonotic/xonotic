@@ -1,0 +1,39 @@
+# Current released version.
+V 0.7.0
+
+# Download URL.
+D http://dl.xonotic.org/xonotic-0.7.0.zip
+
+# When releasing, create this string by:
+# date -u +%Y%m%d%H%M%S -d'now + 3 months'
+C 20131013223900
+
+# Website URL.
+U http://www.xonotic.org/
+
+# List of startswith tests for banned servers, separated by space.
+# Possible items:
+#   IPv4 address:
+#     a.b.c.d:
+#   IPv4 subnet:
+#     a.b.c.
+#     a.b.
+#   IPv6 address:
+#     [a:b:c:d:e:f:g:h]:
+#   IPv6 subnet:
+#     [a:b:c:d:
+#     [a:b:c:
+# B 8.8.8.8:
+
+# Emergency packs. Specify as:
+# E http://packurl/pack.pk3 file-in-pack.txt
+
+# Recommended servers. 
+# FIXME please list by keys, not IP.
+R 64.237.42.69:26000
+R 74.91.112.86:26000
+
+# Promoted servers. Always show up as recommended, even if "slow".
+# FIXME please list by keys, not IP.
+P 64.237.42.69:26000
+P 74.91.112.86:26000
