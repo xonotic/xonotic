@@ -528,7 +528,6 @@ case "$cmd" in
 		;;
 	release-pack)
 		release_common
-		verbose "$SELF" release-buildpk3s data/font-nimbussansl.pk3dir  raw ''
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
 		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    webp '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' webp '-high'
@@ -576,7 +575,6 @@ case "$cmd" in
 				Xonotic/gmqcc \
 				Xonotic/server \
 				Xonotic/key_0.d0pk \
-				Xonotic/data/font-nimbussansl-$pk3stamp.pk3 \
 				Xonotic/data/font-xolonium-$pk3stamp.pk3
 			verbose cp Xonotic-$stamp-enginesource$suffix.zip Xonotic-$stamp-source$suffix.zip
 			verbose mkzip Xonotic-$stamp-source$suffix.zip \
