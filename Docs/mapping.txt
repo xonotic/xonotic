@@ -8,10 +8,8 @@ there's much more available.
 
 Table of Contents
 -----------------
-I        Map Lists & Scripts
+I        Map Settings
          (get your map listed and working)
-  i.     mapinfo
-  ii.    mapname.cfg
 
 II       Map Image
 
@@ -31,23 +29,13 @@ Appendix B - Helpful extras
 
 Appendix C - Advanced Darkplaces shaders
 
-========================
-=I. Map Lists & Scripts=
-========================
+=================
+=I. Map Settings=
+=================
 
-There now is just a single script/cfg file available to you, containing all map
-specific settings:
+All map specific settings goes in a single file:
 
 mapname.mapinfo
-
-The mapinfo is actually required - however, the game is so nice that it
-automatically generates a draft of it for you.
-
-------------------
--The mapinfo file-
-------------------
-
-*cue even more scary music*
 
 The mapinfo file is basically what gets your map listed in the menu, and sets
 up the options needed to change to it. If no mapinfo file exists, the menu
