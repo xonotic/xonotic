@@ -19,11 +19,9 @@ III      Domination
 
 IV       CTF
 
-V        Rune Match
+V        Race/CTS
 
-VI       Race/CTS
-
-VII      Nexball
+VI       Nexball
 
 Appendix A - Advanced mapinfo
 
@@ -60,7 +58,7 @@ As an example, let's say I make a map called "wazat1.bsp". As long as I'm
 fantasizing, I might as well say this map is so well done I'm actually willing
 to release it for friends, neighbors, fellow forum visitors and other people
 who like me to judge me by. Let's also assume that I want domination,
-deathmatch/team deathmatch and runematch to all be playable on my map.
+deathmatch/team deathmatch to all be playable on my map.
 
 This is very easy. First, I start the game and exit it again so the game writes
 data/data/wazat1.mapinfo for me. The file may look like:
@@ -74,17 +72,15 @@ data/data/wazat1.mapinfo for me. The file may look like:
 	cdtrack 5
     gametype dm // defaults: timelimit=20 pointlimit=30 leadlimit=0
     gametype dom // defaults: timelimit=20 pointlimit=200 teams=2 leadlimit=0
-    gametype rune // defaults: timelimit=20 pointlimit=200 leadlimit=0
     gametype lms // defaults: timelimit=20 lives=9 leadlimit=0
     gametype arena // defaults: timelimit=20 pointlimit=10 leadlimit=0
 
 As I see, the menu autodetected that my map may be suitable for deathmatch,
-domination, runematch, last man standing and arena. But I want the map to be
-played in domination, deathmatch, team deathmatch, runematch only, and I also
-want different timelimits/fraglimits, so I will change the "gametype" lines to:
+domination, last man standing and arena. But I want the map to be played in
+domination, deathmatch, team deathmatch only, and I also want different
+timelimits/fraglimits, so I will change the "gametype" lines to:
 
     gametype dom pointlimit=100 timelimit=15
-    gametype rune pointlimit=1000 timelimit=25
     gametype dm pointlimit=40 timelimit=15
     gametype tdm pointlimit=50 timelimit=0 teams=2
 
@@ -113,7 +109,6 @@ Deathmatch      | gametype dm [timelimit=...] [pointlimit=...] [leadlimit=...]  
 Team Deathmatch | gametype tdm [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams
 Domination      | gametype dom [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams, only if map has no dom_team ents
 CTF             | gametype ctf [timelimit=...] [caplimit=...] [leadlimit=...]                                              |
-Runematch       | gametype rune [timelimit=...] [pointlimit=...] [leadlimit=...]                                           |
 LMS             | gametype lms [timelimit=...] [lives=...] [leadlimit=...]                                                 |
 Arena           | gametype arena [timelimit=...] [pointlinit=...] [leadlimit=...]                                          |
 Key Hunt        | gametype kh [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 | 2, 3, or 4 teams
@@ -298,27 +293,9 @@ detect it for supporting CTF. To force the map to get re-detected after you add
 such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
 add the "gametype ctf" line.
 
-==============
-=V. Runematch=
-==============
-
-Runematch needs only one type of entity to work: rune spawn points. You will
-need at least one for each rune (5 minimum at the time of this writing), though
-you should probably have more than that in the map. Just give the points a
-classname and origin.
-
-Rune Spawnpoints
-----------------
-classname  runematch_spawn_point
-
-If your map contains the required entities for Runematch, the menu will automatically
-detect it for supporting Runematch. To force the map to get re-detected after you add
-such entities, delete the data/data/mapname.mapinfo file - or simply edit it to
-add the "gametype rune" line.
-
-==============
-=VI. Race/CTS=
-==============
+=============
+=V. Race/CTS=
+=============
 
 Making a race map is not hard: you need some special spawnpoints, and some checkpoints.
 
