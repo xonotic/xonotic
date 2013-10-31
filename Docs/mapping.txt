@@ -121,9 +121,9 @@ Assault         | gametype as [timelimit=...]                                   
 Onslaught       | gametype ons [timelimit=...]                                                                             | never uses points
 Race            | gametype rc [timelimit=...] [qualifying_timelimit=...] [laplimit=...] [teamlaplimit=...] [leadlimit=...] | g_race_teams: teamlaplimit is used instead of laplimit
 CTS             | gametype cts [timelimit=...] [skill=...]                                                                 | never uses points
-CA              | gametype ca [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
+CA              | gametype ca [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 | 2, 3, or 4 teams
 Nexball         | gametype nb [timelimit=...] [pointlimit=...] [leadlimit=...]                                             |
-Freeze Tag      | gametype ft [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 |
+Freeze Tag      | gametype ft [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 | 2, 3, or 4 teams
 Keepaway        | gametype ka [timelimit=...] [pointlimit=...]                                                             |
 
 
