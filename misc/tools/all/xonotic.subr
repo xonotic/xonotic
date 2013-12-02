@@ -333,7 +333,7 @@ case "$cmd" in
 			set -- catchsegv "$@"
 		fi
 		if [ x"$USE_RLWRAP" != x"no" ] && which rlwrap >/dev/null 2>&1; then
-			set -- rlwrap -A -g '^quit' -q "\"" -r -S ']' -w 100 "$@"
+			set -- rlwrap -A -g '^quit' -q "\"" -S ']' -w 100 "$@"
 		fi
 		rm -f xonotic.core
 		"$@" || true
