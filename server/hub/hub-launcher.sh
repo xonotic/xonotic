@@ -7,8 +7,6 @@ alias stopxonotic='killall darkplaces-dedicated -s SIGKILL'
 
 alias start-xon-all='xon-ctf-mh && xon-ctf-wa && xon-ka-mh && xon-ka-wa && xon-priv-1 && xon-priv-2 && xon-tourney &&xon-votable'
 alias start-xon-bitmissile='xon-ctf-mh && xon-ctf-wa && xon-priv-1'
-alias start-xon-godzilla='xon-ctf-mh && xon-votable && xon-priv-1 && xon-tourney'
-alias start-xon-srv02='xon-ctf-wa && xon-priv-1'
 
 alias xon-ctf-mh='$XON_DIR && screen -dmS xon-ctf-mh $XON_COMMON sv-dedicated.cfg -sessionid ctf-mh +set \_dedimode \"ctf\" +set \_dedimutator \"minstahook\" +set \_dedidescription \"CTF Instagib+Hook\"'
 alias xon-ctf-wa='$XON_DIR && screen -dmS xon-ctf-wa $XON_COMMON sv-dedicated.cfg -sessionid ctf-wa +set \_dedimode \"ctf\" +set \_dedimutator \"weaponarena\" +set \_dedidescription \"CTF Weaponarena\"'
