@@ -56,7 +56,7 @@ mirrorspeed()
 	# first result is to be ignored, but we use it to check status
 	git ls-remote "$1" refs/heads/master >/dev/null 2>&1 || return 1
 	# if we can't time, we only check availability
-	if ! { time -p sh -c 'true'; } >/dev/null 2>&1; then
+	if [ -z "$time" ]; then
 		echo 0
 		return
 	fi
@@ -64,7 +64,7 @@ mirrorspeed()
 	(
 		set +x
 		export REPO=$1 # so that the sh -c subshell can use it
-		{ time -p sh -c 'git ls-remote "$REPO" refs/heads/master >/dev/null 2>&1'; } 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,' | grep . || echo 0
+		{ $time sh -c 'git ls-remote "$REPO" refs/heads/master >/dev/null 2>&1'; } 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,' | grep . || echo 0
 			# unit: clock ticks (depends on what "time" returns
 	)
 }
