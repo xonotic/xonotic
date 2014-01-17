@@ -28,11 +28,12 @@ U http://www.xonotic.org/
 # Emergency packs. Specify as:
 # E http://packurl/pack.pk3 file-in-pack.txt
 
-# Recommended servers. 
-# FIXME please list by keys, not IP.
-R 64.237.42.69:26000
+# Recommended servers.
+# P <key or IP here>
+R 8yb+8E4UyruJl8bHgf0Z/hHYQ98i8tMSSwbFZM7C0yA=
+R Ws/yvWENfrsab3HIR6oCsW7GvjuT8SYKC0f5iXVEswo=
+R AaQzHJT+/f6XHfZ4Zabz2KR7dXwQsoKJ1XYICRNo7to=
 R 74.91.112.86:26000
 
 # Promoted servers. Always show up as recommended, even if "slow".
-# FIXME please list by keys, not IP.
-P 8yb+8E4UyruJl8bHgf0Z/hHYQ98i8tMSSwbFZM7C0yA=
+# P <key or IP here>
