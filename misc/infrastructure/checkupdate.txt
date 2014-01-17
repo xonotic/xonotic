@@ -33,6 +33,9 @@ U http://www.xonotic.org/
 R 8yb+8E4UyruJl8bHgf0Z/hHYQ98i8tMSSwbFZM7C0yA=
 R Ws/yvWENfrsab3HIR6oCsW7GvjuT8SYKC0f5iXVEswo=
 R AaQzHJT+/f6XHfZ4Zabz2KR7dXwQsoKJ1XYICRNo7to=
+R UQmpkXkHoHwxLDnpN9RefNFsWyT8rh5vnk9SBm0z8/0=
+R Q8WVFydNurVBXCzvqI+WVu1drhbcKL6CRGwpY4E4M6g=
+R NNCc4COD691etf99X9ZtcLrvqJ5seo+qOoyWao/t/Fo=
 R 74.91.112.86:26000
 
 # Promoted servers. Always show up as recommended, even if "slow".
