@@ -35,8 +35,7 @@ allmirrors()
 	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
 }
 
-if ! { time -p sh -c 'true'; } >/dev/null 2>&1; then
-	time=
-else
+time=
+if { time -p sh -c 'true'; } >/dev/null 2>&1; then
 	time="time -p"
 fi
