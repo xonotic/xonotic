@@ -35,7 +35,10 @@ allmirrors()
 	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
 }
 
-time=
-if { time -p sh -c 'true'; } 2>&1 >/dev/null | grep '^user ' >/dev/null; then
-	time="time -p"
+time="time -p"
+if { $time sh -c 'true'; } 2>&1 >/dev/null | grep '^user ' >/dev/null; then
+	msg "Timing via the time utility works."
+else
+	time=
+	msg "Timing not supported."
 fi
