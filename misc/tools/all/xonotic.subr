@@ -17,7 +17,7 @@ case "$cmd" in
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				verbose $time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
+				verbose measure_time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
 			fi
 		done
 		;;
@@ -336,7 +336,7 @@ case "$cmd" in
 			set -- rlwrap -A -g '^quit' -q "\"" -s 10000 -S ']' -w 100 "$@"
 		fi
 		rm -f xonotic.core
-		verbose $time "$@" || true
+		verbose measure_time "$@" || true
 		if [ -f xonotic.core ]; then
 			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
 				gdb "$binary" xonotic.core
