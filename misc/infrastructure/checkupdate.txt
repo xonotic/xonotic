@@ -44,3 +44,4 @@ R r29WNw5YU6fE+ukMXJtyioXZkgbTjgNou/OQLAbPGuI=
 
 # Promoted servers. Always show up as recommended, even if "slow".
 # P <key or IP here>
+P P53x9uwIDVsztgRkFBJwflFw8vAFQBsVmT9UuL1fs9A=
