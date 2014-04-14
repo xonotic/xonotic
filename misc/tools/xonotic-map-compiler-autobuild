@@ -292,6 +292,9 @@ screenshotthemap()
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
+		# It takes about 5 minutes for the server to update.
+		sleep 360  # Cut it one more minute of slack.
+
 		$IRCSPAM < "$M-$blobhash/$M.ircss" || true
 	fi
 	if [ -n "$BUILD_ONE" ]; then
