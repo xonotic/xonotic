@@ -384,6 +384,7 @@ for F in "$@"; do
 		*_bump) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
 		./models/sprites/*) will_dds=false ;;
+		./models/*) ;;
 		./textures/*) ;;
 		./models/*) ;;
 		./particles/*) ;;
