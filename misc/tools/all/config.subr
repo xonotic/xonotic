@@ -33,6 +33,9 @@ allmirrors()
 	"$@" http nl   http://nl.git.xonotic.org/xonotic/  '*2'
 
 	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
+
+	"$@" http lab  https://gitlab.com/xonotic/         ''
+	"$@" ssh  lab  ssh://git@gitlab.com/xonotic/       ''
 }
 
 have_time=true
