@@ -19,23 +19,25 @@ allrepos()
 
 allmirrors()
 {
+	# Legacy git URLs.
 	"$@" git  ''   git://git.xonotic.org/xonotic/      ''
 	"$@" http ''   http://git.xonotic.org/xonotic/     ''
 	"$@" ssh  ''   ssh://xonotic@git.xonotic.org/      ''
+	"$@" git  ''   git://nl.git.xonotic.org/xonotic/   ''
+	"$@" http ''   http://nl.git.xonotic.org/xonotic/  ''
+	"$@" git  ''   git://us.git.xonotic.org/xonotic/   ''
+	"$@" http ''   http://us.git.xonotic.org/xonotic/  ''
 
-	"$@" git  us   git://us.git.xonotic.org/xonotic/   '*2/3'
-	"$@" http us   http://us.git.xonotic.org/xonotic/  '*2/3'
+	# Gitlab host (divVerent).
+	"$@" http lab  https://gitlab.com/xonotic/         ''
+	"$@" ssh  lab  ssh://git@gitlab.com/xonotic/       ''
 
+	# German host (divVerent).
 	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
 	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
 
-	"$@" git  nl   git://nl.git.xonotic.org/xonotic/   '*2'
-	"$@" http nl   http://nl.git.xonotic.org/xonotic/  '*2'
-
+	# Pushing destination (authoritative server; merlijn).
 	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
-
-	"$@" http lab  https://gitlab.com/xonotic/         ''
-	"$@" ssh  lab  ssh://git@gitlab.com/xonotic/       ''
 }
 
 have_time=true
