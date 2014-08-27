@@ -207,8 +207,9 @@ case "$cmd" in
 		release_common
 		binary=$1
 		basename=${binary##*/}
-		verbose wget http://beta.xonotic.org/autobuild-bin/$rev/$binary
-		# TODO eventually do this on travis too.
+		rev=`( cd "$d0/darkplaces" && git rev-parse HEAD )`
+		verbose wget "http://beta.xonotic.org/autobuild-bin/$rev/$basename"
+		# TODO eventually do the rebranding on travis too.
 		case "$binary" in
 			Xonotic/xonotic*.exe)
 				verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "${f##*:}"
