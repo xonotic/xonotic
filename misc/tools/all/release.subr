@@ -212,7 +212,7 @@ case "$cmd" in
 		# TODO eventually do the rebranding on travis too.
 		case "$binary" in
 			Xonotic/xonotic*.exe)
-				verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "${f##*:}"
+				verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "$binary"
 				;;
 		esac
 		;;
