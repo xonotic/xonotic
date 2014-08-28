@@ -473,8 +473,8 @@ case "$cmd" in
 	release-pack)
 		release_common
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    webp '-high'
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' webp '-high'
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    normal '-high'
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw '' low '-low'
 		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                   normaldds ''
 		;;
