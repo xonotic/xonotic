@@ -14,7 +14,7 @@ set -e
 : ${webp_flags_alq:=-lossless -q 100 -q_alpha 100}
 : ${webp_flags_ahq:=-lossless -q 100 -q_alpha 100}
 : ${do_dds:=true}
-: ${dds_tool:=compressonator-dxtc}
+: ${dds_tool:=s2tc}
 : ${do_ogg:=false}
 : ${ogg_ogg:=true}
 : ${ogg_qual:=2}
