@@ -648,13 +648,10 @@ case "$cmd" in
 				fi
 				o=`git config xonotic.all.mirrorselection 2>/dev/null || true`
 				git config xonotic.all.mirrorselection try_same
-				verbose git clone "$url" "$d0/$d"
+				verbose git clone --branch "$branch" "$url" "$d0/$d"
 				git config xonotic.all.mirrorselection "$o"
 				enter "$d0/$d" verbose
 				fix_git_config "$url" "$pushurl"
-				if [ "$branch" != "master" ]; then
-					verbose git checkout --track -b "$branch" origin/"$branch"
-				fi
 				cd "$d0"
 			fi
 		}
