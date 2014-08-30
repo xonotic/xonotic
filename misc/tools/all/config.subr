@@ -1,4 +1,5 @@
 devsite_url="http://dev.xonotic.org/"
+gitsite_url="http://gitlab.com/groups/xonotic/"
 
 allrepos()
 {
@@ -29,15 +30,15 @@ allmirrors()
 	"$@" http ''   http://us.git.xonotic.org/xonotic/  ''
 
 	# Gitlab host (divVerent).
-	"$@" http lab  https://gitlab.com/xonotic/         ''
-	"$@" ssh  lab  ssh://git@gitlab.com/xonotic/       ''
+	# Disabled because of https://gitlab.com/gitlab-com/support-forum/issues/15
+	"$@" http ''   https://gitlab.com/xonotic/         ''
 
 	# German host (divVerent).
 	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
 	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
 
 	# Pushing destination (authoritative server; merlijn).
-	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
+	"$@" ssh  push ssh://git@gitlab.com/xonotic/       ''
 }
 
 have_time=true
