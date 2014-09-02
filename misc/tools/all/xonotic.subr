@@ -74,14 +74,14 @@ case "$cmd" in
 					;;
 			esac
 		done
-		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			TARGETS="sv-$debug cl-$debug"
-		elif [ x"`uname`" = x"Darwin" ]; then
+
+		if [ x"`uname`" = x"Darwin" ]; then
 			TARGETS="sv-$debug sdl-$debug"
-			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
+			export CC="$CC -fno-reorder-blocks"
 		else
 			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
+
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
 			# if we give the command make the arg "", it will surely fail (invalid filename),
 			# so better handle it as an empty client option
@@ -95,9 +95,6 @@ case "$cmd" in
 				case "$X" in
 					sdl)
 						TARGETS="$TARGETS sdl-$debug"
-						if [ -n "$WE_HATE_OUR_USERS" ]; then
-							export PATH="$PATH:$d0/misc/builddeps/win32/sdl/bin"
-						fi
 						;;
 					glx|wgl)
 						TARGETS="$TARGETS cl-$debug"
@@ -117,6 +114,7 @@ case "$cmd" in
 				BAD_TARGETS=
 			fi
 		fi
+
 		if [ -z "$MAKEFLAGS" ]; then
 			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
 			if [ $ncpus -gt 1 ]; then
@@ -127,9 +125,18 @@ case "$cmd" in
 			fi
 		fi
 
-		# win32: don't rely on jpeg includes
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			# win32: use SDL2
+			MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win32/sdl/bin/sdl2-config"
+
+			# win32: don't rely on jpeg includes
 			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
+		fi
+
+		if [ x"`uname`" = x"Darwin" ]; then
+			# osx: use SDL2
+			f=$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks
+			MAKEFLAGS="$MAKEFLAGS SDLCONFIG_MACOSXCFLAGS=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXLIBS=-F$f SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=SDL2 SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=Cocoa SDLCONFIG_MACOSXLIBS+=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXSTATICLIBS=-F$f SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=SDL2 SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=Cocoa SDLCONFIG_MACOSXSTATICLIBS+=-I$f/SDL2.framework/Headers"
 		fi
 
 		# workaround ARM issue in DP's makefile.inc
