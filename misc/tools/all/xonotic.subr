@@ -28,7 +28,6 @@ case "$cmd" in
 		cleanqc=false
 		compiled0=false
 		debug=debug
-		snowleopardhack=false
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
@@ -78,16 +77,7 @@ case "$cmd" in
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			TARGETS="sv-$debug cl-$debug"
 		elif [ x"`uname`" = x"Darwin" ]; then
-			case "`uname -r`" in
-				?.*)
-					TARGETS="sv-$debug cl-$debug sdl-$debug"
-					;;
-				*)
-					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
-					snowleopardhack=true
-					TARGETS="sv-$debug sdl-$debug"
-					;;
-			esac
+			TARGETS="sv-$debug sdl-$debug"
 			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
 		else
 			TARGETS="sv-$debug cl-$debug sdl-$debug"
@@ -107,12 +97,6 @@ case "$cmd" in
 						TARGETS="$TARGETS sdl-$debug"
 						if [ -n "$WE_HATE_OUR_USERS" ]; then
 							export PATH="$PATH:$d0/misc/builddeps/win32/sdl/bin"
-						fi
-						;;
-					agl)
-						TARGETS="$TARGETS cl-$debug"
-						if $snowleopardhack; then
-							export CC="$CC -arch i386"
 						fi
 						;;
 					glx|wgl)
@@ -294,7 +278,7 @@ case "$cmd" in
 				client=-$1
 				shift
 				;;
-			sdl|glx|agl)
+			sdl|glx)
 				USE_RLWRAP=no
 				client=-$1
 				shift
@@ -355,9 +339,9 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|agl|dedicated]"
+		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
 		$ECHO "  $SELF update-maps"
-		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		$ECHO "  $SELF run [sdl|glx|wgl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;
