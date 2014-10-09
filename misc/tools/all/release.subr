@@ -252,11 +252,13 @@ case "$cmd" in
 	release-engine)
 		release_common
 		# TODO report failures here.
-		verbose "$SELF" release-engine-linux32 || true
-		verbose "$SELF" release-engine-linux64 || true
-		verbose "$SELF" release-engine-win32 || true
-		verbose "$SELF" release-engine-win64 || true
-		verbose "$SELF" release-engine-osx || true
+		good=false
+		verbose "$SELF" release-engine-linux32 && good=true
+		verbose "$SELF" release-engine-linux64 && good=true
+		verbose "$SELF" release-engine-win32 && good=true
+		verbose "$SELF" release-engine-win64 && good=true
+		verbose "$SELF" release-engine-osx && good=true
+		$good
 		;;
 	release-maps)
 		release_common
