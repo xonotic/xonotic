@@ -214,6 +214,9 @@ case "$cmd" in
 			Xonotic/xonotic*.exe)
 				verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "$binary"
 				;;
+			Xonotic/*osx*|Xonotic/*linux*)
+				chmod +x "$binary"
+				;;
 		esac
 		;;
 	release-engine-win32)
