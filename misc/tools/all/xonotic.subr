@@ -45,6 +45,10 @@ case "$cmd" in
 					cleanqc=true
 					shift
 					;;
+				-qc)
+					cleanqc=true
+					shift
+					;;
 				-r|-p)
 					case "$1" in
 						-p)
@@ -346,7 +350,7 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
 		$ECHO "  $SELF update-maps"
 		$ECHO "  $SELF run [sdl|glx|wgl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
