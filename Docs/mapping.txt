@@ -85,7 +85,7 @@ the right game modes and with the right description in the menu.
 
 Also, note the "has weapons" line. If this line is not there (which happens if
 the map contains no weapon entities other than the Nex), the map will run in
-MinstaGib only and not be shown in the menu normally. So if you look for your
+InstaGib only and not be shown in the menu normally. So if you look for your
 map and don't find it, add "has weapons" to the mapinfo file, and make sure you
 have weapon entities placed.
 

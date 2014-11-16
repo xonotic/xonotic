@@ -147,7 +147,7 @@ Xonotic supports several different game modes and some smaller changes called mu
 
 	*Capture The Flag (CTF) is a team match in which you have two teams, two bases, and two flags.  You have to get into the enemy base, grab their flag, and bring it back to your own flag to score.  Scoring gives the most points, normal fragging and returning the flag gives some points.  The team with the most points wins. 
 
-	*Minstagib is an improved instagib.  You can pick up lives, so you can survive two shots, and you can pick up an item to become almost invisible.  This is were the minstanex got its name from.
+	*In Instagib you can pick up lives, so you can survive two shots, and you can pick up an item to become almost invisible.
 
 	*Runematch places five runes into the map in addition to the normal items.  A rune gives you a bonus but also a curse - but you only get points for fragging if you carry a rune, so make sure you have one.  You also get points for fragging a rune carrier, and for just holding a rune (but fragging is the quicker way to gain points).  The player with the most points wins.
 
