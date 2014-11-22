@@ -308,7 +308,12 @@ case "$cmd" in
 				exit 1
 			fi
 		fi
-		set -- "darkplaces/darkplaces$client" -xonotic "$@"
+		if [ x"$USE_VALGRIND" = x"yes" ]; then
+			$ECHO "Warning: valgrind run takes a long time and only echos to terminal currently, forcing windowed mode."
+			set -- "darkplaces/darkplaces$client" -xonotic -window "$@"
+		else
+			set -- "darkplaces/darkplaces$client" -xonotic "$@"
+		fi
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
@@ -327,6 +332,11 @@ case "$cmd" in
 		elif [ x"$USE_GDB" = x"core" ]; then
 			set -- gdb --batch -x savecore.gdb --args "$@"
 			USE_RLWRAP=no
+		elif [ x"$USE_VALGRIND" = x"yes" ]; then
+			VALGRIND_OPTS="--tool=memcheck --gen-suppressions=all --suppressions=darkplaces/valgrind_dp.supp"
+			$ECHO "Valgrind running with options '$VALGRIND_OPTS'"
+			set -- valgrind $VALGRIND_OPTS "$@"
+			USE_RLWRAP=no
 		elif which catchsegv >/dev/null 2>&1; then
 			set -- catchsegv "$@"
 		fi
@@ -334,7 +344,12 @@ case "$cmd" in
 			set -- rlwrap -A -g '^quit' -q "\"" -s 10000 -S ']' -w 100 "$@"
 		fi
 		rm -f xonotic.core
-		verbose measure_time "$@" || true
+		if [ -n "$DONT_RUN" ]; then
+			$ECHO "Commandline we would run:"
+			$ECHO "$@"
+		else
+			verbose measure_time "$@" || true
+		fi
 		if [ -f xonotic.core ]; then
 			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
 				gdb "$binary" xonotic.core
