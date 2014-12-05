@@ -209,7 +209,8 @@ case "$cmd" in
 		basename=${binary##*/}
 		rev=`( cd "$d0/darkplaces" && git rev-parse HEAD )`
 		verbose wget -O "$binary" "http://beta.xonotic.org/autobuild-bin/$rev/$basename"
-		[ -s "$binary" ]
+		[ -s "$binary" ] || rm -f "$binary"
+		[ -f "$binary" ]
 		# TODO eventually do the rebranding on travis too.
 		case "$binary" in
 			Xonotic/xonotic*.exe)
@@ -222,32 +223,42 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		release_common
-		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-sdl.exe || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || true
+		good=true
+		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-sdl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
+		$good
 		;;
 	release-engine-win64)
 		release_common
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64.exe || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-sdl.exe || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-dedicated.exe || true
+		good=true
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x64.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-sdl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-dedicated.exe || good=false
+		$good
 		;;
 	release-engine-osx)
 		release_common
-		verbose "$SELF" release-getbinary Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || true
+		good=true
+		verbose "$SELF" release-getbinary Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || good=false
+		$good
 		;;
 	release-engine-linux32)
 		release_common
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-glx || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-sdl || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-dedicated || true
+		good=true
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-glx || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-sdl || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-dedicated || good=false
+		$good
 		;;
 	release-engine-linux64)
 		release_common
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-sdl || true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || true
+		good=true
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-sdl || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
+		$good
 		;;
 	release-engine)
 		release_common
