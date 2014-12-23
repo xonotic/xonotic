@@ -10,14 +10,14 @@ case "$cmd" in
 		fi
 		if ! [ -f "netradiant/install/q3map2" ] ; then
 			msg "q3map2 needed! Building netradiant..."
-			make -C netradiant install/q3map2
+			make -C netradiant BUILD=native install/q3map2
 		fi
 		for mapfile in "$@"; do
 			mapfile="data/xonotic-maps.pk3dir/maps/$mapfile.map"
 			if [ ! -f "$mapfile" ] ; then
 				msg "ERROR, $mapfile not found!"
 			else
-				time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
+				verbose measure_time misc/tools/xonotic-map-compiler-optionsfile "$mapfile"
 			fi
 		done
 		;;
@@ -28,7 +28,6 @@ case "$cmd" in
 		cleanqc=false
 		compiled0=false
 		debug=debug
-		snowleopardhack=false
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
@@ -43,6 +42,10 @@ case "$cmd" in
 					cleand0=true
 					cleandp=true
 					cleanqcc=true
+					cleanqc=true
+					shift
+					;;
+				-qc)
 					cleanqc=true
 					shift
 					;;
@@ -75,23 +78,14 @@ case "$cmd" in
 					;;
 			esac
 		done
-		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			TARGETS="sv-$debug cl-$debug"
-		elif [ x"`uname`" = x"Darwin" ]; then
-			case "`uname -r`" in
-				?.*)
-					TARGETS="sv-$debug cl-$debug sdl-$debug"
-					;;
-				*)
-					# AGL cannot be compiled on systems with a kernel > 10.x (Snow Leopard)
-					snowleopardhack=true
-					TARGETS="sv-$debug sdl-$debug"
-					;;
-			esac
-			export CC="$CC -fno-reorder-blocks -I$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL.framework/Headers -F$PWD/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
+
+		if [ x"`uname`" = x"Darwin" ]; then
+			TARGETS="sv-$debug sdl-$debug"
+			export CC="$CC -fno-reorder-blocks"
 		else
 			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
+
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
 			# if we give the command make the arg "", it will surely fail (invalid filename),
 			# so better handle it as an empty client option
@@ -105,12 +99,6 @@ case "$cmd" in
 				case "$X" in
 					sdl)
 						TARGETS="$TARGETS sdl-$debug"
-						;;
-					agl)
-						TARGETS="$TARGETS cl-$debug"
-						if $snowleopardhack; then
-							export CC="$CC -arch i386"
-						fi
 						;;
 					glx|wgl)
 						TARGETS="$TARGETS cl-$debug"
@@ -130,6 +118,7 @@ case "$cmd" in
 				BAD_TARGETS=
 			fi
 		fi
+
 		if [ -z "$MAKEFLAGS" ]; then
 			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
 			if [ $ncpus -gt 1 ]; then
@@ -140,9 +129,18 @@ case "$cmd" in
 			fi
 		fi
 
-		# win32: don't rely on jpeg includes
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			# win32: use SDL2
+			MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win32/sdl/bin/sdl2-config"
+
+			# win32: don't rely on jpeg includes
 			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
+		fi
+
+		if [ x"`uname`" = x"Darwin" ]; then
+			# osx: use SDL2
+			f=$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks
+			MAKEFLAGS="$MAKEFLAGS SDLCONFIG_MACOSXCFLAGS=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXLIBS=-F$f SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=SDL2 SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=Cocoa SDLCONFIG_MACOSXLIBS+=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXSTATICLIBS=-F$f SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=SDL2 SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=Cocoa SDLCONFIG_MACOSXSTATICLIBS+=-I$f/SDL2.framework/Headers"
 		fi
 
 		# workaround ARM issue in DP's makefile.inc
@@ -194,18 +192,24 @@ case "$cmd" in
 					Linux)
 						case `uname -m` in
 							x86_64)
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_blind_id".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libd0_rijndael".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux64/lib/libgmp".* .libs/
-								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux64/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux64/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux64/lib/libd0_rijndael.a"
+								# No cp commands, we want to use static linking instead.
+								export CC="$CC -I../../../../misc/builddeps/linux64/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/linux64/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/linux64/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/linux64/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux64/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_rijndael.a"
 								;;
 							*86)
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_blind_id".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libd0_rijndael".* .libs/
-								#verbose cp "$d0/misc/builddeps/dp.linux32/lib/libgmp".* .libs/
-								export CC="$CC -I../../../../misc/builddeps/dp.linux32/include"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/dp.linux32/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/dp.linux32/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/dp.linux32/lib/libd0_rijndael.a"
+								# No cp commands, we want to use static linking instead.
+								export CC="$CC -I../../../../misc/builddeps/linux32/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/linux32/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/linux32/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/linux32/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
 								;;
 							*)
 								compiled0=true
@@ -285,7 +289,7 @@ case "$cmd" in
 				client=-$1
 				shift
 				;;
-			sdl|glx|agl)
+			sdl|glx)
 				USE_RLWRAP=no
 				client=-$1
 				shift
@@ -327,10 +331,10 @@ case "$cmd" in
 			set -- catchsegv "$@"
 		fi
 		if [ x"$USE_RLWRAP" != x"no" ] && which rlwrap >/dev/null 2>&1; then
-			set -- rlwrap -A -g '^quit' -q "\"" -r -S ']' -w 100 "$@"
+			set -- rlwrap -A -g '^quit' -q "\"" -s 10000 -S ']' -w 100 "$@"
 		fi
 		rm -f xonotic.core
-		"$@" || true
+		verbose measure_time "$@" || true
 		if [ -f xonotic.core ]; then
 			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
 				gdb "$binary" xonotic.core
@@ -346,9 +350,9 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-r|-p] [-0] [sdl|glx|wgl|agl|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
 		$ECHO "  $SELF update-maps"
-		$ECHO "  $SELF run [sdl|glx|wgl|agl|dedicated] options..."
+		$ECHO "  $SELF run [sdl|glx|wgl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;

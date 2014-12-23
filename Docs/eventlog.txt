@@ -124,18 +124,6 @@ itemstring:
         13 = Heavy Laser Assault Cannon
         14 = T.A.G. Seeker
 
-   runes/curses are stored as a bit mask with the following values:
-         1 = Strength
-         2 = Defense
-         4 = Regeneration
-         8 = Speed
-        16 = Vampire
-      8192 = Weakness
-     16384 = Vulnerability
-     32768 = Venom
-     65536 = Slow
-    131072 = Empathy
-
 death type:
    either a weapon ID ORed with weapon death flags, or one of
    the notifications in common/deathtypes.qh in the form of a string.

@@ -61,7 +61,7 @@ rm -f data/benchmark.log
 rm -f data/engine.log
 
 # for next version of benchmark: remove +cl_playerdetailreduction 0 and add +showfps 1
-p="+cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
+p="+vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
 
 for e in omg low med normal high ultra ultimate; do
 	echo "Benchmarking on $e"
@@ -77,6 +77,12 @@ for e in omg low med normal high ultra ultimate; do
 	if [ x"$e" = x"med" ]; then
 		if grep 'checking for OpenGL 2\.0 core features\.\.\.  not detected' data/engine.log; then
 			echo "OpenGL 2.0 or later required for Normal quality and higher, exiting."
+			break
+		fi
+	fi
+	if [ x"$e" = x"med" ]; then
+		if grep 'Using GL1.3 rendering path' data/engine.log; then
+			echo "OpenGL 2.0 rendering disabled, exiting."
 			break
 		fi
 	fi

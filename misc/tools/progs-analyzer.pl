@@ -1227,12 +1227,12 @@ sub parse_progs($)
 		my $file = $p{getstring}->($f->{s_file});
 		die "Out of range first_statement in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
 			if $f->{first_statement} >= @{$p{statements}};
-		die "Out of range parm_start in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
-			if $f->{parm_start} < 0 || $f->{parm_start} >= @{$p{globals}};
-		die "Out of range locals in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
-			if $f->{locals} < 0 || $f->{parm_start} + $f->{locals} >= @{$p{globals}};
 		if($f->{first_statement} >= 0)
 		{
+			die "Out of range parm_start in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+				if $f->{parm_start} < 0 || $f->{parm_start} >= @{$p{globals}};
+			die "Out of range locals in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+				if $f->{locals} < 0 || $f->{parm_start} + $f->{locals} > @{$p{globals}};
 			die "Out of range numparms $f->{numparms} in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
 				if $f->{numparms} < 0 || $f->{numparms} > 8;
 			my $totalparms = 0;
@@ -1243,7 +1243,9 @@ sub parse_progs($)
 				$totalparms += $f->{parm_size}[$_];
 			}
 			die "Out of range parms in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
-				if $f->{locals} < 0 || $f->{parm_start} + $totalparms >= @{$p{globals}};
+				if $f->{parm_start} + $totalparms > @{$p{globals}};
+			die "More parms than locals in function $_ (name: \"$name\", file: \"$file\", first statement: $f->{first_statement})"
+				if $totalparms > $f->{locals};
 		}
 	}
 

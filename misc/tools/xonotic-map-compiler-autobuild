@@ -7,7 +7,7 @@ url_http=http://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
 build_cachedir="$HOME/xonotic-map-compiler.cache/"
 screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
-build_override="-bsp_timeout 5400 -vis_timeout 3600 -light_timeout 14400 -minimap_timeout 900 -scale_timeout 900"
+build_override="-bsp_timeout 3600 -vis_timeout 10800 -light_timeout 18000 -minimap_timeout 900 -scale_timeout 900 -timeout_stealing 0.8"
 screenshot_override="9 900 5 +g_ctf 1"
 
 getthemap_fail=false
@@ -174,12 +174,54 @@ buildthemap()
 	if [ -n "$IRCSPAM" ]; then
 		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM || true
 	fi
+
 	t0=`date +%s`
-	(
+
+	# It's sad that we must enforce this rule by code.
+	if grep -- '-nosRGB' "maps/$M.map.options" >/dev/null; then
+		is_nosrgb=true
+	else
+		is_nosrgb=false
+	fi
+	allow_build=true
+	case "$M" in
+		afterslime|dance|drain|glowplant|leave_em_behind|newtonian-nightmare|nexballarena|oilrig|red-planet|runningmanctf|runningman|space-elevator|stormkeep|techassault|xoylent)
+			if $is_nosrgb; then
+				if [ -n "$IRCSPAM" ]; then
+					echo "8NOTE: map $M still uses -nosRGB. This should eventually get fixed." | $IRCSPAM || true
+				fi
+			else
+				if [ -n "$IRCSPAM" ]; then
+					echo "9CONGRATULATIONS: map $M does not use -nosRGB any more. Please remove the map name from the list in xonotic-map-compiler-autobuild once this is merged to master." | $IRCSPAM || true
+				fi
+			fi
+			;;
+		*)
+			if $is_nosrgb; then
+				case "$REFNAME" in
+					master|refs/heads/master|origin/master|refs/remotes/origin/master)
+						if [ -n "$IRCSPAM" ]; then
+							echo "4ERROR: map $M uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+						fi
+						allow_build=false
+						;;
+					*)
+						if [ -n "$IRCSPAM" ]; then
+							echo "4WARNING: map $M uses -nosRGB. This is not acceptable in master. Please fix." | $IRCSPAM || true
+						fi
+						;;
+				esac
+			fi
+			;;
+	esac
+
+	set +e
+	$allow_build && (
 		cd ../..
 		misc/tools/xonotic-map-compiler-optionsfile "data/xonotic-maps.pk3dir/maps/$M" $build_override > "data/xonotic-maps.pk3dir/maps/$M.log" 2>&1
 	)
 	status=$?
+	set -e
 	if ! [ -f "maps/$M.bsp" ]; then
 		echo >>"maps/$M.log" "ERROR: No BSP file"
 	fi
@@ -210,7 +252,7 @@ screenshotthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
-	if lwp-request -m HEAD "$url$M-$blobhash/"; then
+	if lwp-request -m HEAD "$url$M-$blobhash/$M-000000.jpg"; then
 		continue
 	fi
 
@@ -250,6 +292,9 @@ screenshotthemap()
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
+		# It takes about 5 minutes for the server to update.
+		sleep 360  # Cut it one more minute of slack.
+
 		$IRCSPAM < "$M-$blobhash/$M.ircss" || true
 	fi
 	if [ -n "$BUILD_ONE" ]; then

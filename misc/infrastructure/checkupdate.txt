@@ -1,0 +1,47 @@
+# Current released version.
+V 0.7.0
+
+# Download URL.
+D http://dl.xonotic.org/xonotic-0.7.0.zip
+
+# When releasing, create this string by:
+# date -u +%Y%m%d%H%M%S -d'now + 3 months'
+C 20131013223900
+
+# Website URL.
+U http://www.xonotic.org/
+
+# List of startswith tests for banned servers, separated by space.
+# Possible items:
+#   IPv4 address:
+#     a.b.c.d:
+#   IPv4 subnet:
+#     a.b.c.
+#     a.b.
+#   IPv6 address:
+#     [a:b:c:d:e:f:g:h]:
+#   IPv6 subnet:
+#     [a:b:c:d:
+#     [a:b:c:
+# B 8.8.8.8:
+
+# Emergency packs. Specify as:
+# E http://packurl/pack.pk3 file-in-pack.txt
+
+# Recommended servers.
+# P <key or IP here>
+R 8yb+8E4UyruJl8bHgf0Z/hHYQ98i8tMSSwbFZM7C0yA=
+R Ws/yvWENfrsab3HIR6oCsW7GvjuT8SYKC0f5iXVEswo=
+R AaQzHJT+/f6XHfZ4Zabz2KR7dXwQsoKJ1XYICRNo7to=
+R UQmpkXkHoHwxLDnpN9RefNFsWyT8rh5vnk9SBm0z8/0=
+R Q8WVFydNurVBXCzvqI+WVu1drhbcKL6CRGwpY4E4M6g=
+R NNCc4COD691etf99X9ZtcLrvqJ5seo+qOoyWao/t/Fo=
+R J9JepdOZjvCBXYfz8fj3civ4PulKF4/asnK9u5ZojYg=
+R kljWd72jWwuvquX1bk4x3hOaj+1dxWAFeSaLAMyVuL4=
+R fpd0YafKdywMMxHR5xAwyK4Xn/POe67n52a1wKNS3dY=
+R 6QtAVwbWcJFYZDvSeuZHEaaJE4JoTzmNni/LPZUSOKE=
+R r29WNw5YU6fE+ukMXJtyioXZkgbTjgNou/OQLAbPGuI=
+
+# Promoted servers. Always show up as recommended, even if "slow".
+# P <key or IP here>
+P P53x9uwIDVsztgRkFBJwflFw8vAFQBsVmT9UuL1fs9A=

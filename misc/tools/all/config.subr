@@ -1,4 +1,5 @@
 devsite_url="http://dev.xonotic.org/"
+gitsite_url="http://gitlab.com/groups/xonotic/"
 
 allrepos()
 {
@@ -15,22 +16,44 @@ allrepos()
 	"$@" gmqcc                         gmqcc.git                    master         ""
 	"$@" xonstat                       xonstat.git                  master         "no"
 	"$@" xonstatdb                     xonstatdb.git                master         "no"
+	"$@" wiki                          xonotic.wiki.git             master         "no"
 }
 
 allmirrors()
 {
+	# Legacy git URLs.
 	"$@" git  ''   git://git.xonotic.org/xonotic/      ''
 	"$@" http ''   http://git.xonotic.org/xonotic/     ''
 	"$@" ssh  ''   ssh://xonotic@git.xonotic.org/      ''
+	"$@" git  ''   git://nl.git.xonotic.org/xonotic/   ''
+	"$@" http ''   http://nl.git.xonotic.org/xonotic/  ''
+	"$@" git  ''   git://us.git.xonotic.org/xonotic/   ''
+	"$@" http ''   http://us.git.xonotic.org/xonotic/  ''
 
-	"$@" git  us   git://us.git.xonotic.org/xonotic/   '*2/3'
-	"$@" http us   http://us.git.xonotic.org/xonotic/  '*2/3'
+	# Gitlab host (divVerent).
+	# Disabled because of https://gitlab.com/gitlab-com/support-forum/issues/15
+	"$@" http ''   https://gitlab.com/xonotic/         ''
 
+	# German host (divVerent).
 	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
 	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
 
-	"$@" git  nl   git://nl.git.xonotic.org/xonotic/   '*2'
-	"$@" http nl   http://nl.git.xonotic.org/xonotic/  '*2'
-
-	"$@" ssh  push ssh://xonotic@push.git.xonotic.org/ ''
+	# Pushing destination (authoritative server; merlijn).
+	"$@" ssh  push ssh://git@gitlab.com/xonotic/       ''
 }
+
+have_time=true
+measure_time()
+{
+	if $have_time; then
+		time -p "$@"
+	else
+		"$@"
+	fi
+}
+if { measure_time sh -c 'true'; } 2>&1 >/dev/null | grep '^user ' >/dev/null; then
+	msg "Timing via the time utility works."
+else
+	have_time=false
+	msg "Timing not supported."
+fi

@@ -1,1 +1,0 @@
-This is the TESTING key, and will NOT be accepted by official Xonotic releases.
