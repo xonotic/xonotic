@@ -207,8 +207,9 @@ case "$cmd" in
 		release_common
 		binary=$1
 		basename=${binary##*/}
+		dpname=darkplaces-${basename#xonotic-}
 		rev=`( cd "$d0/darkplaces" && git rev-parse HEAD )`
-		verbose wget -O "$binary" "http://beta.xonotic.org/autobuild-bin/$rev/$basename"
+		verbose wget -O "$binary" "http://beta.xonotic.org/autobuild-bin/$rev/$dpname"
 		[ -s "$binary" ] || rm -f "$binary"
 		[ -f "$binary" ]
 		# TODO eventually do the rebranding on travis too.
@@ -225,7 +226,7 @@ case "$cmd" in
 		release_common
 		good=true
 		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-sdl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-wgl.exe || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		$good
 		;;
@@ -233,7 +234,7 @@ case "$cmd" in
 		release_common
 		good=true
 		verbose "$SELF" release-getbinary Xonotic/xonotic-x64.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-sdl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-wgl.exe || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-dedicated.exe || good=false
 		$good
 		;;
@@ -247,16 +248,16 @@ case "$cmd" in
 	release-engine-linux32)
 		release_common
 		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-glx || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-sdl || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-glx || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-dedicated || good=false
 		$good
 		;;
 	release-engine-linux64)
 		release_common
 		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-sdl || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || good=false
 		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
 		$good
 		;;
