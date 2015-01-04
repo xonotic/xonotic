@@ -207,7 +207,7 @@ case "$cmd" in
 		release_common
 		binary=$1
 		basename=${binary##*/}
-		dpname=darkplaces-${basename#xonotic-}
+		dpname=darkplaces${basename#xonotic}
 		rev=`( cd "$d0/darkplaces" && git rev-parse HEAD )`
 		verbose wget -O "$binary" "http://beta.xonotic.org/autobuild-bin/$rev/$dpname"
 		[ -s "$binary" ] || rm -f "$binary"
