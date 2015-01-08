@@ -225,17 +225,17 @@ case "$cmd" in
 	release-engine-win32)
 		release_common
 		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-wgl.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x86.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x86-wgl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
 		$good
 		;;
 	release-engine-win64)
 		release_common
 		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-wgl.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x64-dedicated.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-wgl.exe || good=false
+		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		$good
 		;;
 	release-engine-osx)
