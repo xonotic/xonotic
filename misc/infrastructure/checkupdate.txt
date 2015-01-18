@@ -27,6 +27,7 @@ U http://www.xonotic.org/
 
 # Emergency packs. Specify as:
 # E http://packurl/pack.pk3 file-in-pack.txt
+E http://dl.xonotic.org/zzzz-xonotic-0.8hotfix_chatbubble.pk3 scripts/chatbubble_hotfix.shader
 
 # Recommended servers.
 # R <key or IP here>
