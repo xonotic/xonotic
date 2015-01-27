@@ -88,17 +88,17 @@ set excludes=%excludes% --exclude=/gmqcc/gmqcc.osx
 if "%ProgramFiles(x86)%" == "" goto bit32
 :bit64
 	if not "%XONOTIC_INCLUDE_32BIT%" == "" goto endbit
-	set excludes=%excludes% --exclude=/xonotic.exe
-	set excludes=%excludes% --exclude=/xonotic-sdl.exe
-	set excludes=%excludes% --exclude=/xonotic-dedicated.exe
+	set excludes=%excludes% --exclude=/xonotic-x86.exe
+	set excludes=%excludes% --exclude=/xonotic-x86-wgl.exe
+	set excludes=%excludes% --exclude=/xonotic-x86-dedicated.exe
 	set excludes=%excludes% --exclude=/gmqcc/gmqcc.exe
 	set excludes=%excludes% --exclude=/bin32
 	set excludes=%excludes% --exclude=/*.dll
 	goto endbit
 :bit32
-	set excludes=%excludes% --exclude=/xonotic-x64.exe
-	set excludes=%excludes% --exclude=/xonotic-x64-sdl.exe
-	set excludes=%excludes% --exclude=/xonotic-x64-dedicated.exe
+	set excludes=%excludes% --exclude=/xonotic.exe
+	set excludes=%excludes% --exclude=/xonotic-wgl.exe
+	set excludes=%excludes% --exclude=/xonotic-dedicated.exe
 	set excludes=%excludes% --exclude=/gmqcc/gmqcc-x64.exe
 	set excludes=%excludes% --exclude=/bin64
 	goto endbit
