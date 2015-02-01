@@ -356,6 +356,15 @@ case "$cmd" in
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;
+	serverbench)
+		# TODO(rpolzer): Why does :anticheat: output differ? Total game time differs? Why?
+		verbose "$SELF" run "$@" -noconfig -nohome +exec serverbench.cfg |\
+			tee /dev/stderr |\
+			grep '^:' |\
+			grep -v '^:gamestart:' |\
+			grep -v '^:anticheat:' |\
+			md5sum
+		;;
 	*)
 		handled=false
 		;;
