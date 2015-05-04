@@ -1,22 +1,66 @@
-Xolonium Font
-Copyright (C) 2011-2014 Severin Meyer <sev.ch@web.de>
+Xolonium-Regular 3.0
+Xolonium-Bold    3.0
+Copyright 2011-2015 Severin Meyer <sev.ch@web.de>
 
-This font is free software. You can use, modify and/or redistribute it
-under the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 2 of the license, or any later version.
 
-As a special exception, if you create a document which uses this font,
-and embed this font or unaltered portions of this font into the document,
-this font does not by itself cause the resulting document to be covered by
-the GNU General Public License. This exception does not however invalidate
-any other reasons why the document might be covered by the GNU General
-Public License. If you modify this font, you may extend this exception
-to your version of the font, but you are not obligated to do so. If you
-do not wish to do so, delete this exception statement from your version.
+Source
 
-This font is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+	Find the latest version and all sourcefiles at
+	<openfontlibrary.org/font/xolonium>
 
-You should have received a copy of the GNU General Public License
-along with this font. If not, see <http://www.gnu.org/licenses/>.
+
+Credits
+
+	Xolonium is created with FontForge <fontforge.org> and
+	Inkscape <inkscape.org>, and originated as a custom font
+	for the open-source game Xonotic <xonotic.org>. With
+	many thanks to the Xonotic community for your support.
+
+
+Informal License Summary
+
+	Xolonium is released under the GNU General Public License,
+	which gives you the freedom to share and modify the font,
+	as long as you pass on the same freedoms that you received.
+
+	Usage of the font is not restricted by the license. You are
+	free to use the font for any design work, without conditions.
+
+	In addition to the license I grant an Embedding Exception,
+	which ensures that you also can embed the font into your work,
+	without your work being affected by the license of the font.
+
+	Only when you share or modify the font itself, or create a
+	derivative font, you have to respect the terms of the license.
+	When possible, please accompany any of the font files with
+	this README and the LICENSE file.
+
+
+GNU General Public License
+
+	This font is free software. You can redistribute and/or
+	modify it under the terms of the GNU General Public
+	License as published by the Free Software Foundation,
+	either version 2 of the license, or any later version.
+
+	This font is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty
+	of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	See the GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this font. If not, see <http://www.gnu.org/licenses/>.
+
+
+Embedding Exception
+
+	If you embed this font or portions of this font into
+	another work, this font does not by itself cause the
+	resulting compound work to be covered by the GNU General
+	Public License, unless the compound work is a font.
+
+	This exception does not however invalidate any other
+	reasons why the compound work might be covered by the
+	GNU General Public License. If you modify this font,
+	you may extend this exception to your version of the
+	font, but you are not obligated to do so.
