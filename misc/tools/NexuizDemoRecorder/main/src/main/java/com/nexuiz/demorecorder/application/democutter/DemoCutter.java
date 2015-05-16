@@ -95,34 +95,38 @@ public class DemoCutter {
 					}
 					lastSvcTime = svctime;
 					
+					if (demoStarted < 1 && svctime > (startTime - 50)) {
+						injectBuffer = "slowmo " + ffwSpeedSecondStage;
+						demoStarted = 1;
+					}
+					if (demoStarted < 2 && svctime > (startTime - 5)) {
+						injectBuffer = "slowmo 1;" + injectBeforeCap;
+						demoStarted = 2;
+					}
+					if (demoStarted < 3 && svctime > startTime) {
+						injectBuffer = "cl_capturevideo 1";
+						demoStarted = 3;
+					}
+					if (!endIsReached && svctime > endTime) {
+						injectBuffer = "cl_capturevideo 0";
+						endIsReached = true;
+					}
+					if (endIsReached && !finalInjectionDone && svctime > (endTime + 1)) {
+						injectBuffer = injectAfterCap;
+						finalInjectionDone = true;
+					}
+					if (finalInjectionDone && !disconnectIssued && svctime > (endTime + 2)) {
+						injectBuffer = "disconnect";
+						disconnectIssued = true;
+					}
+					// ensure injectAtStart runs exactly once, before everything else
 					if (firstLoop) {
-						injectBuffer = "\011\n" + injectAtStart + ";slowmo " + ffwSpeedFirstStage + "\n\000";
+						injectBuffer = injectAtStart + ";slowmo " + ffwSpeedFirstStage + ";" + injectBuffer;
 						firstLoop = false;
-					} else {
-						if (demoStarted < 1 && svctime > (startTime - 50)) {
-							injectBuffer = "\011\nslowmo " + ffwSpeedSecondStage + "\n\000";
-							demoStarted = 1;
-						}
-						if (demoStarted < 2 && svctime > (startTime - 5)) {
-							injectBuffer = "\011\nslowmo 1;" + injectBeforeCap +"\n\000";
-							demoStarted = 2;
-						}
-						if (demoStarted < 3 && svctime > startTime) {
-							injectBuffer = "\011\ncl_capturevideo 1\n\000";
-							demoStarted = 3;
-						}
-						if (!endIsReached && svctime > endTime) {
-							injectBuffer = "\011\ncl_capturevideo 0\n\000";
-							endIsReached = true;
-						}
-						if (endIsReached && !finalInjectionDone && svctime > (endTime + 1)) {
-							injectBuffer = "\011\n" + injectAfterCap + "\n\000";
-							finalInjectionDone = true;
-						}
-						if (finalInjectionDone && !disconnectIssued && svctime > (endTime + 2)) {
-							injectBuffer = "\011\ndisconnect\n\000";
-							disconnectIssued = true;
-						}
+					}
+					// add Buffer head and tail
+					if (injectAtStart.length() > 0) {
+						injectBuffer = "\011\n" + checkInjectString(injectBuffer) + "\n\000";
 					}
 				}
 
