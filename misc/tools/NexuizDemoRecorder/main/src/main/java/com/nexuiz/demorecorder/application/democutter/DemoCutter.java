@@ -63,7 +63,6 @@ public class DemoCutter {
 		boolean endIsReached = false;
 		boolean finalInjectionDone = false;
 		boolean disconnectIssued = false;
-		int svcLoops = 0;
 		float firstSvcTime = -1;
 		float lastSvcTime = -1;
 		
@@ -125,7 +124,6 @@ public class DemoCutter {
 							disconnectIssued = true;
 						}
 					}
-					svcLoops++;
 				}
 
 				byte[] injectBufferAsBytes = null;
