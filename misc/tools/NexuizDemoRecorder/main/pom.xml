@@ -4,7 +4,7 @@
 	<groupId>NexuizDemoRecorder</groupId>
 	<artifactId>NexuizDemoRecorder</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3</version>
+	<version>0.3.1</version>
 	<name>NexuizDemoRecorder</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
