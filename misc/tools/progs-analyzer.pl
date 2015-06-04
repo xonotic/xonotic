@@ -927,8 +927,8 @@ sub find_uninitialized_locals($$)
 			if($c->{isreturn})
 			{
 				if ($$state >= 0) {
-					++$warned{$$state}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake (write is here)"};
-					++$warned{$ip}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake (return is here)"};
+					++$warned{$$state}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake [write is here]"};
+					++$warned{$ip}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake [return is here]"};
 				}
 			}
 
