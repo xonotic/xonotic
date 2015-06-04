@@ -356,8 +356,8 @@ sub get_constant($$$)
 		if $type eq 'vector';
 	return "entity $g->{int}"
 		if $type eq 'entity';
-	return ".$progs->{entityfieldnames}[$g->{int}]"
-		if $type eq 'field' and defined $progs->{entityfieldnames}[$g->{int}];
+	return ".$progs->{entityfieldnames}[$g->{int}][0]"
+		if $type eq 'field' and defined $progs->{entityfieldnames}[$g->{int}][0];
 	return "$g->{int}i"
 		if $type eq 'int';
 
@@ -883,7 +883,59 @@ sub find_uninitialized_locals($$)
 			}
 		}
 	}
-	
+
+	my %solid_seen = ();
+	run_nfa $progs, $func->{first_statement}, do { my $state = -1; \$state; },
+		sub
+		{
+			my $state = ${$_[0]};
+			return \$state;
+		},
+		sub
+		{
+			my ($ip, $state) = @_;
+			return $solid_seen{"$ip $$state"}++;
+		},
+		sub
+		{
+			my ($ip, $state, $s, $c) = @_;
+
+			if($s->{op} eq 'ADDRESS')
+			{
+				my $field_ptr_ofs = $s->{b};
+				my $def = $progs->{globaldef_byoffset}->($field_ptr_ofs);
+				use Data::Dumper;
+				if (($def->{globaltype} eq 'read_only' || $def->{globaltype} eq 'const') &&
+						grep { $_ eq 'solid' } @{$progs->{entityfieldnames}[$progs->{globals}[$field_ptr_ofs]{v}{int}]})
+				{
+					# Taking address of 'solid' for subsequent write!
+					# TODO check if this address is then actually used in STOREP.
+					$$state = $ip;
+				}
+			}
+
+			if($c->{iscall})
+			{
+				# TODO check if the entity passed is actually the one on which solid was set.
+				my $func = $s->{a};
+				my $funcid = $progs->{globals}[$func]{v}{int};
+				if ($progs->{builtins}{setmodel}{$funcid} || $progs->{builtins}{setsize}{$funcid})
+				{
+					# All is clean.
+					$$state = -1;
+				}
+			}
+
+			if($c->{isreturn})
+			{
+				if ($$state >= 0) {
+					++$warned{$$state}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake"};
+				}
+			}
+
+			return 0;
+		};
+
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
 }
@@ -1265,9 +1317,7 @@ sub parse_progs($$)
 		my $name = $p{getstring}->($g->{s_name});
 		die "Out of range ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
 			if $g->{ofs} >= $p{header}{entityfields};
-		#warn "Duplicate fielddef for ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
-		#	if exists $p{entityfieldnames}[$g->{ofs}];
-		$p{entityfieldnames}[$g->{ofs}] = $name;
+		push @{$p{entityfieldnames}[$g->{ofs}]}, $name;
 	}
 
 	print STDERR "Parsing statements...\n";
