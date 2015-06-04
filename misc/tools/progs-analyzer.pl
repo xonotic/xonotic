@@ -296,9 +296,8 @@ sub run_nfa($$$$$$)
 			elsif($c->{iscall})
 			{
 				my $func = $s->{a};
-				my $funcid = $progs->{globals}[$func]{v}{int};
 				last
-					if $progs->{builtins}{error}{$funcid};
+					if $progs->{builtins}{error}{$func};
 				$ip += 1;
 			}
 			elsif($c->{isjump})
@@ -918,8 +917,7 @@ sub find_uninitialized_locals($$)
 			{
 				# TODO check if the entity passed is actually the one on which solid was set.
 				my $func = $s->{a};
-				my $funcid = $progs->{globals}[$func]{v}{int};
-				if ($progs->{builtins}{setmodel}{$funcid} || $progs->{builtins}{setsize}{$funcid})
+				if ($progs->{builtins}{setmodel}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
 				{
 					# All is clean.
 					$$state = -1;
@@ -929,7 +927,8 @@ sub find_uninitialized_locals($$)
 			if($c->{isreturn})
 			{
 				if ($$state >= 0) {
-					++$warned{$$state}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake"};
+					++$warned{$$state}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake (write is here)"};
+					++$warned{$ip}{''}{"Changing .solid without setmodel/setsize breaks area grid linking in Quake (return is here)"};
 				}
 			}
 
@@ -1414,8 +1413,8 @@ sub parse_progs($$)
 		}
 	}
 
-	print STDERR "Looking for error(), setmodel(), setsize()...\n";
-	$p{builtins} = { error => {}, setmodel => {}, setsize => {} };
+	print STDERR "Looking for error(), setmodel(), setorigin(), setsize()...\n";
+	$p{builtins} = { error => {}, setmodel => {}, setorigin => {}, setsize => {} };
 	for(@{$p{globaldefs}})
 	{
 		my $name = $p{getstring}($_->{s_name});
