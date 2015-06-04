@@ -191,6 +191,19 @@ use constant DFUNCTION_T => [
 	[uchar8 => 'parm_size'],
 ];
 
+use constant LNOHEADER_T => [
+	[int => 'lnotype'],
+	[int => 'version'],
+	[int => 'numglobaldefs'],
+	[int => 'numglobals'],
+	[int => 'numfielddefs'],
+	[int => 'numstatements'],
+];
+
+use constant LNO_T => [
+	[int => 'v'],
+];
+
 sub get_section($$$)
 {
 	my ($fh, $start, $len) = @_;
@@ -364,6 +377,20 @@ sub str($)
 	return "\"$str\"";
 }
 
+sub debugpos($$$) {
+	my ($progs, $func, $ip) = @_;
+	my $s = $func->{debugname};
+	if ($progs->{cno}) {
+		my $column = $progs->{cno}[$ip]{v};
+		$s =~ s/:/:$column:/;
+	}
+	if ($progs->{lno}) {
+		my $line = $progs->{lno}[$ip]{v};
+		$s =~ s/:/:$line:/;
+	}
+	return $s;
+}
+
 sub disassemble_function($$;$)
 {
 	my ($progs, $func, $highlight) = @_;
@@ -511,7 +538,8 @@ sub disassemble_function($$;$)
 				{
 					print PRE_MARK_STATEMENT;
 					printf INSTRUCTION_FORMAT, '', '<!>', '.WARN';
-					printf OPERAND_FORMAT, "$_ (in $func->{debugname})";
+					my $pos = debugpos $progs, $func, $ip;
+					printf OPERAND_FORMAT, "$_ (in $pos)";
 					print INSTRUCTION_SEPARATOR;
 				}
 			}
@@ -1160,15 +1188,40 @@ sub detect_constants($)
 	};
 }
 
-sub parse_progs($)
+sub parse_progs($$)
 {
-	my ($fh) = @_;
+	my ($fh, $lnofh) = @_;
 
 	my %p = ();
 
 	print STDERR "Parsing header...\n";
 	$p{header} = parse_section $fh, DPROGRAMS_T, 0, undef, 1;
 	
+	if (defined $lnofh) {
+		print STDERR "Parsing LNO...\n";
+		my $lnoheader = parse_section $lnofh, LNOHEADER_T, 0, undef, 1;
+		eval {
+			die "Not a LNOF"
+				if $lnoheader->{lnotype} != unpack 'V', 'LNOF';
+			die "Not version 1"
+				if $lnoheader->{version} != 1;
+			die "Not same count of globaldefs"
+				if $lnoheader->{numglobaldefs} != $p{header}{numglobaldefs};
+			die "Not same count of globals"
+				if $lnoheader->{numglobals} != $p{header}{numglobals};
+			die "Not same count of fielddefs"
+				if $lnoheader->{numfielddefs} != $p{header}{numfielddefs};
+			die "Not same count of statements"
+				if $lnoheader->{numstatements} != $p{header}{numstatements};
+			$p{lno} = [parse_section $lnofh, LNO_T, 24, undef, $lnoheader->{numstatements}];
+			eval {
+				$p{lno} = [parse_section $lnofh, LNO_T, 24, undef, $lnoheader->{numstatements} * 2];
+				$p{cno} = [splice $p{lno}, $lnoheader->{numstatements}];
+				print STDERR "Cool, this LNO even has column number info!\n";
+			};
+		} or warn "Skipping LNO: $@";
+	}
+
 	print STDERR "Parsing strings...\n";
 	$p{strings} = get_section $fh, $p{header}{ofs_strings}, $p{header}{numstrings};
 	$p{getstring} = sub
@@ -1430,5 +1483,15 @@ sub parse_progs($)
 	}
 }
 
-open my $fh, '<', $ARGV[0];
-parse_progs $fh;
+for my $progs (@ARGV) {
+	my $lno = "$progs.lno";
+	$lno =~ s/\.dat\.lno$/.lno/;
+
+	open my $fh, '<', $progs
+		or die "$progs: $!";
+
+	open my $lnofh, '<', $lno
+		or warn "$lno: $!";
+
+	parse_progs $fh, $lnofh;
+}
