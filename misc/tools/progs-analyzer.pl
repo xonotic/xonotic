@@ -298,7 +298,7 @@ sub run_nfa($$$$$$)
 				my $func = $s->{a};
 				my $funcid = $progs->{globals}[$func]{v}{int};
 				last
-					if $progs->{error_func}{$funcid};
+					if $progs->{builtins}{error}{$funcid};
 				$ip += 1;
 			}
 			elsif($c->{isjump})
@@ -1364,20 +1364,21 @@ sub parse_progs($$)
 		}
 	}
 
-	print STDERR "Looking for error()...\n";
-	$p{error_func} = {};
+	print STDERR "Looking for error(), setmodel(), setsize()...\n";
+	$p{builtins} = { error => {}, setmodel => {}, setsize => {} };
 	for(@{$p{globaldefs}})
 	{
+		my $name = $p{getstring}($_->{s_name});
 		next
-			if $p{getstring}($_->{s_name}) ne 'error';
+			if not exists $p{builtins}{$name};
 		my $v = $p{globals}[$_->{ofs}]{v}{int};
 		next
 			if $v <= 0 || $v >= @{$p{functions}};
 		my $first = $p{functions}[$v]{first_statement};
 		next
 			if $first >= 0;
-		print STDERR "Detected error() at offset $_->{ofs} (builtin #@{[-$first]})\n";
-		$p{error_func}{$_->{ofs}} = 1;
+		print STDERR "Detected $name() at offset $_->{ofs} (builtin #@{[-$first]})\n";
+		$p{builtins}{$name}{$_->{ofs}} = 1;
 	}
 
 	print STDERR "Scanning functions...\n";
