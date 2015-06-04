@@ -336,28 +336,32 @@ sub run_nfa($$$$$$)
 	$nfa->($ip, $copy_handler->($state));
 }
 
-sub get_constant($$)
+sub get_constant($$$)
 {
-	my ($progs, $g) = @_;
-	if($g->{int} == 0)
-	{
-		return 0;
+	my ($progs, $g, $type) = @_;
+
+	if (!defined $type) {
+		$type = 'float';
+		$type = 'int'
+			if $g->{int} > 0 && $g->{int} < 8388608;
+		$type = 'string'
+			if $g->{int} > 0 && $g->{int} < length $progs->{strings};
 	}
-	elsif($g->{int} > 0 && $g->{int} < 8388608)
-	{
-		if($g->{int} < length $progs->{strings} && $g->{int} > 0)
-		{
-			return str($progs->{getstring}->($g->{int}));
-		}
-		else
-		{
-			return $g->{int} . "i";
-		}
-	}
-	else
-	{
-		return $g->{float};
-	}
+
+	return str($progs->{getstring}->($g->{int}))
+		if $type eq 'string';
+	return $g->{float}
+		if $type eq 'float';
+	return "'$g->{float} _ _'"
+		if $type eq 'vector';
+	return "entity $g->{int}"
+		if $type eq 'entity';
+	return ".$progs->{entityfieldnames}[$g->{int}]"
+		if $type eq 'field' and defined $progs->{entityfieldnames}[$g->{int}];
+	return "$g->{int}i"
+		if $type eq 'int';
+
+	return "$type($g->{int})";
 }
 
 use constant PRE_MARK_STATEMENT => "";
@@ -408,7 +412,8 @@ sub disassemble_function($$;$)
 	my $initializer = sub
 	{
 		my ($ofs) = @_;
-		my $g = get_constant($progs, $progs->{globals}[$ofs]{v});
+		# TODO: Can we know its type?
+		my $g = get_constant($progs, $progs->{globals}[$ofs]{v}, undef);
 		print " = $g"
 			if defined $g;
 	};
@@ -1015,7 +1020,7 @@ sub detect_constants($)
 		my $type = $_->{type};
 		my $name = $progs->{getstring}->($_->{s_name});
 		$name = ''
-			if $name eq 'IMMEDIATE' or $name =~ /^\./;
+			if $name eq 'IMMEDIATE'; # for fteqcc I had: or $name =~ /^\./;
 		$_->{debugname} = $name
 			if $name ne '';
 		$globalflags[$_->{ofs}] |= GLOBALFLAG_D;
@@ -1165,7 +1170,7 @@ sub detect_constants($)
 		}
 		elsif($_->{globaltype} eq 'const')
 		{
-			$_->{debugname} = get_constant($progs, $progs->{globals}[$_->{ofs}]{v});
+			$_->{debugname} = get_constant($progs, $progs->{globals}[$_->{ofs}]{v}, $_->{type}{type});
 		}
 		else
 		{
@@ -1260,6 +1265,9 @@ sub parse_progs($$)
 		my $name = $p{getstring}->($g->{s_name});
 		die "Out of range ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
 			if $g->{ofs} >= $p{header}{entityfields};
+		#warn "Duplicate fielddef for ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
+		#	if exists $p{entityfieldnames}[$g->{ofs}];
+		$p{entityfieldnames}[$g->{ofs}] = $name;
 	}
 
 	print STDERR "Parsing statements...\n";
