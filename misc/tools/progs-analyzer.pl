@@ -917,7 +917,7 @@ sub find_uninitialized_locals($$)
 			{
 				# TODO check if the entity passed is actually the one on which solid was set.
 				my $func = $s->{a};
-				if ($progs->{builtins}{setmodel}{$func} || $pogs->{builtins}{setmodelindex}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
+				if ($progs->{builtins}{setmodel}{$func} || $progs->{builtins}{setmodelindex}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
 				{
 					# All is clean.
 					$$state = -1;
