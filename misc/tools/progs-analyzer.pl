@@ -917,7 +917,7 @@ sub find_uninitialized_locals($$)
 			{
 				# TODO check if the entity passed is actually the one on which solid was set.
 				my $func = $s->{a};
-				if ($progs->{builtins}{setmodel}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
+				if ($progs->{builtins}{setmodel}{$func} || $pogs->{builtins}{setmodelindex}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
 				{
 					# All is clean.
 					$$state = -1;
@@ -927,8 +927,8 @@ sub find_uninitialized_locals($$)
 			if($c->{isreturn})
 			{
 				if ($$state >= 0) {
-					++$warned{$$state}{''}{"Changing .solid without setmodel/setorigin/setsize breaks area grid linking in Quake [write is here]"};
-					++$warned{$ip}{''}{"Changing .solid without setmodel/setorigin/setsize breaks area grid linking in Quake [return is here]"};
+					++$warned{$$state}{''}{"Changing .solid without setmodel/setmodelindex/setorigin/setsize breaks area grid linking in Quake [write is here]"};
+					++$warned{$ip}{''}{"Changing .solid without setmodel/setmodelindex/setorigin/setsize breaks area grid linking in Quake [return is here]"};
 				}
 			}
 
@@ -1413,8 +1413,8 @@ sub parse_progs($$)
 		}
 	}
 
-	print STDERR "Looking for error(), setmodel(), setorigin(), setsize()...\n";
-	$p{builtins} = { error => {}, setmodel => {}, setorigin => {}, setsize => {} };
+	print STDERR "Looking for error(), setmodel(), setmodelindex(), setorigin(), setsize()...\n";
+	$p{builtins} = { error => {}, setmodel => {}, setmodelindex => {}, setorigin => {}, setsize => {} };
 	for(@{$p{globaldefs}})
 	{
 		my $name = $p{getstring}($_->{s_name});
