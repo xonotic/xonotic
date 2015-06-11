@@ -191,6 +191,19 @@ use constant DFUNCTION_T => [
 	[uchar8 => 'parm_size'],
 ];
 
+use constant LNOHEADER_T => [
+	[int => 'lnotype'],
+	[int => 'version'],
+	[int => 'numglobaldefs'],
+	[int => 'numglobals'],
+	[int => 'numfielddefs'],
+	[int => 'numstatements'],
+];
+
+use constant LNO_T => [
+	[int => 'v'],
+];
+
 sub get_section($$$)
 {
 	my ($fh, $start, $len) = @_;
@@ -283,9 +296,8 @@ sub run_nfa($$$$$$)
 			elsif($c->{iscall})
 			{
 				my $func = $s->{a};
-				my $funcid = $progs->{globals}[$func]{v}{int};
 				last
-					if $progs->{error_func}{$funcid};
+					if $progs->{builtins}{error}{$func};
 				$ip += 1;
 			}
 			elsif($c->{isjump})
@@ -323,28 +335,32 @@ sub run_nfa($$$$$$)
 	$nfa->($ip, $copy_handler->($state));
 }
 
-sub get_constant($$)
+sub get_constant($$$)
 {
-	my ($progs, $g) = @_;
-	if($g->{int} == 0)
-	{
-		return 0;
+	my ($progs, $g, $type) = @_;
+
+	if (!defined $type) {
+		$type = 'float';
+		$type = 'int'
+			if $g->{int} > 0 && $g->{int} < 8388608;
+		$type = 'string'
+			if $g->{int} > 0 && $g->{int} < length $progs->{strings};
 	}
-	elsif($g->{int} > 0 && $g->{int} < 8388608)
-	{
-		if($g->{int} < length $progs->{strings} && $g->{int} > 0)
-		{
-			return str($progs->{getstring}->($g->{int}));
-		}
-		else
-		{
-			return $g->{int} . "i";
-		}
-	}
-	else
-	{
-		return $g->{float};
-	}
+
+	return str($progs->{getstring}->($g->{int}))
+		if $type eq 'string';
+	return $g->{float}
+		if $type eq 'float';
+	return "'$g->{float} _ _'"
+		if $type eq 'vector';
+	return "entity $g->{int}"
+		if $type eq 'entity';
+	return ".$progs->{entityfieldnames}[$g->{int}][0]"
+		if $type eq 'field' and defined $progs->{entityfieldnames}[$g->{int}][0];
+	return "$g->{int}i"
+		if $type eq 'int';
+
+	return "$type($g->{int})";
 }
 
 use constant PRE_MARK_STATEMENT => "";
@@ -364,6 +380,20 @@ sub str($)
 	return "\"$str\"";
 }
 
+sub debugpos($$$) {
+	my ($progs, $func, $ip) = @_;
+	my $s = $func->{debugname};
+	if ($progs->{cno}) {
+		my $column = $progs->{cno}[$ip]{v};
+		$s =~ s/:/:$column:/;
+	}
+	if ($progs->{lno}) {
+		my $line = $progs->{lno}[$ip]{v};
+		$s =~ s/:/:$line:/;
+	}
+	return $s;
+}
+
 sub disassemble_function($$;$)
 {
 	my ($progs, $func, $highlight) = @_;
@@ -381,7 +411,8 @@ sub disassemble_function($$;$)
 	my $initializer = sub
 	{
 		my ($ofs) = @_;
-		my $g = get_constant($progs, $progs->{globals}[$ofs]{v});
+		# TODO: Can we know its type?
+		my $g = get_constant($progs, $progs->{globals}[$ofs]{v}, undef);
 		print " = $g"
 			if defined $g;
 	};
@@ -511,7 +542,8 @@ sub disassemble_function($$;$)
 				{
 					print PRE_MARK_STATEMENT;
 					printf INSTRUCTION_FORMAT, '', '<!>', '.WARN';
-					printf OPERAND_FORMAT, "$_ (in $func->{debugname})";
+					my $pos = debugpos $progs, $func, $ip;
+					printf OPERAND_FORMAT, "$_ (in $pos)";
 					print INSTRUCTION_SEPARATOR;
 				}
 			}
@@ -850,7 +882,59 @@ sub find_uninitialized_locals($$)
 			}
 		}
 	}
-	
+
+	my %solid_seen = ();
+	run_nfa $progs, $func->{first_statement}, do { my $state = -1; \$state; },
+		sub
+		{
+			my $state = ${$_[0]};
+			return \$state;
+		},
+		sub
+		{
+			my ($ip, $state) = @_;
+			return $solid_seen{"$ip $$state"}++;
+		},
+		sub
+		{
+			my ($ip, $state, $s, $c) = @_;
+
+			if($s->{op} eq 'ADDRESS')
+			{
+				my $field_ptr_ofs = $s->{b};
+				my $def = $progs->{globaldef_byoffset}->($field_ptr_ofs);
+				use Data::Dumper;
+				if (($def->{globaltype} eq 'read_only' || $def->{globaltype} eq 'const') &&
+						grep { $_ eq 'solid' } @{$progs->{entityfieldnames}[$progs->{globals}[$field_ptr_ofs]{v}{int}]})
+				{
+					# Taking address of 'solid' for subsequent write!
+					# TODO check if this address is then actually used in STOREP.
+					$$state = $ip;
+				}
+			}
+
+			if($c->{iscall})
+			{
+				# TODO check if the entity passed is actually the one on which solid was set.
+				my $func = $s->{a};
+				if ($progs->{builtins}{setmodel}{$func} || $progs->{builtins}{setmodelindex}{$func} || $progs->{builtins}{setorigin}{$func} || $progs->{builtins}{setsize}{$func})
+				{
+					# All is clean.
+					$$state = -1;
+				}
+			}
+
+			if($c->{isreturn})
+			{
+				if ($$state >= 0) {
+					++$warned{$$state}{''}{"Changing .solid without setmodel/setmodelindex/setorigin/setsize breaks area grid linking in Quake [write is here]"};
+					++$warned{$ip}{''}{"Changing .solid without setmodel/setmodelindex/setorigin/setsize breaks area grid linking in Quake [return is here]"};
+				}
+			}
+
+			return 0;
+		};
+
 	disassemble_function($progs, $func, \%warned)
 		if keys %warned;
 }
@@ -987,7 +1071,7 @@ sub detect_constants($)
 		my $type = $_->{type};
 		my $name = $progs->{getstring}->($_->{s_name});
 		$name = ''
-			if $name eq 'IMMEDIATE' or $name =~ /^\./;
+			if $name eq 'IMMEDIATE'; # for fteqcc I had: or $name =~ /^\./;
 		$_->{debugname} = $name
 			if $name ne '';
 		$globalflags[$_->{ofs}] |= GLOBALFLAG_D;
@@ -1137,7 +1221,7 @@ sub detect_constants($)
 		}
 		elsif($_->{globaltype} eq 'const')
 		{
-			$_->{debugname} = get_constant($progs, $progs->{globals}[$_->{ofs}]{v});
+			$_->{debugname} = get_constant($progs, $progs->{globals}[$_->{ofs}]{v}, $_->{type}{type});
 		}
 		else
 		{
@@ -1160,15 +1244,40 @@ sub detect_constants($)
 	};
 }
 
-sub parse_progs($)
+sub parse_progs($$)
 {
-	my ($fh) = @_;
+	my ($fh, $lnofh) = @_;
 
 	my %p = ();
 
 	print STDERR "Parsing header...\n";
 	$p{header} = parse_section $fh, DPROGRAMS_T, 0, undef, 1;
 	
+	if (defined $lnofh) {
+		print STDERR "Parsing LNO...\n";
+		my $lnoheader = parse_section $lnofh, LNOHEADER_T, 0, undef, 1;
+		eval {
+			die "Not a LNOF"
+				if $lnoheader->{lnotype} != unpack 'V', 'LNOF';
+			die "Not version 1"
+				if $lnoheader->{version} != 1;
+			die "Not same count of globaldefs"
+				if $lnoheader->{numglobaldefs} != $p{header}{numglobaldefs};
+			die "Not same count of globals"
+				if $lnoheader->{numglobals} != $p{header}{numglobals};
+			die "Not same count of fielddefs"
+				if $lnoheader->{numfielddefs} != $p{header}{numfielddefs};
+			die "Not same count of statements"
+				if $lnoheader->{numstatements} != $p{header}{numstatements};
+			$p{lno} = [parse_section $lnofh, LNO_T, 24, undef, $lnoheader->{numstatements}];
+			eval {
+				$p{lno} = [parse_section $lnofh, LNO_T, 24, undef, $lnoheader->{numstatements} * 2];
+				$p{cno} = [splice $p{lno}, $lnoheader->{numstatements}];
+				print STDERR "Cool, this LNO even has column number info!\n";
+			};
+		} or warn "Skipping LNO: $@";
+	}
+
 	print STDERR "Parsing strings...\n";
 	$p{strings} = get_section $fh, $p{header}{ofs_strings}, $p{header}{numstrings};
 	$p{getstring} = sub
@@ -1207,6 +1316,7 @@ sub parse_progs($)
 		my $name = $p{getstring}->($g->{s_name});
 		die "Out of range ofs $g->{ofs} in fielddef $_ (name: \"$name\")"
 			if $g->{ofs} >= $p{header}{entityfields};
+		push @{$p{entityfieldnames}[$g->{ofs}]}, $name;
 	}
 
 	print STDERR "Parsing statements...\n";
@@ -1303,20 +1413,21 @@ sub parse_progs($)
 		}
 	}
 
-	print STDERR "Looking for error()...\n";
-	$p{error_func} = {};
+	print STDERR "Looking for error(), setmodel(), setmodelindex(), setorigin(), setsize()...\n";
+	$p{builtins} = { error => {}, setmodel => {}, setmodelindex => {}, setorigin => {}, setsize => {} };
 	for(@{$p{globaldefs}})
 	{
+		my $name = $p{getstring}($_->{s_name});
 		next
-			if $p{getstring}($_->{s_name}) ne 'error';
+			if not exists $p{builtins}{$name};
 		my $v = $p{globals}[$_->{ofs}]{v}{int};
 		next
 			if $v <= 0 || $v >= @{$p{functions}};
 		my $first = $p{functions}[$v]{first_statement};
 		next
 			if $first >= 0;
-		print STDERR "Detected error() at offset $_->{ofs} (builtin #@{[-$first]})\n";
-		$p{error_func}{$_->{ofs}} = 1;
+		print STDERR "Detected $name() at offset $_->{ofs} (builtin #@{[-$first]})\n";
+		$p{builtins}{$name}{$_->{ofs}} = 1;
 	}
 
 	print STDERR "Scanning functions...\n";
@@ -1430,5 +1541,15 @@ sub parse_progs($)
 	}
 }
 
-open my $fh, '<', $ARGV[0];
-parse_progs $fh;
+for my $progs (@ARGV) {
+	my $lno = "$progs.lno";
+	$lno =~ s/\.dat\.lno$/.lno/;
+
+	open my $fh, '<', $progs
+		or die "$progs: $!";
+
+	open my $lnofh, '<', $lno
+		or warn "$lno: $!";
+
+	parse_progs $fh, $lnofh;
+}
