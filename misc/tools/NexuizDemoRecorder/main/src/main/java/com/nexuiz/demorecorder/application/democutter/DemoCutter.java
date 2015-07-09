@@ -63,7 +63,6 @@ public class DemoCutter {
 		boolean endIsReached = false;
 		boolean finalInjectionDone = false;
 		boolean disconnectIssued = false;
-		int svcLoops = 0;
 		float firstSvcTime = -1;
 		float lastSvcTime = -1;
 		
@@ -96,42 +95,39 @@ public class DemoCutter {
 					}
 					lastSvcTime = svctime;
 					
-					if (firstLoop) {
-						injectBuffer = "\011\n" + injectAtStart + ";slowmo " + ffwSpeedFirstStage + "\n\000";
-						firstLoop = false;
-					}
 					if (demoStarted < 1 && svctime > (startTime - 50)) {
-						if (svcLoops == 0) {
-							//make sure that for short demos (duration less than 50 sec)
-							//the injectAtStart is still honored
-							injectBuffer = "\011\n" + injectAtStart + ";slowmo " + ffwSpeedSecondStage + "\n\000";
-						} else {
-							injectBuffer = "\011\nslowmo " + ffwSpeedSecondStage + "\n\000";
-						}
-						
+						injectBuffer = "slowmo " + ffwSpeedSecondStage;
 						demoStarted = 1;
 					}
 					if (demoStarted < 2 && svctime > (startTime - 5)) {
-						injectBuffer = "\011\nslowmo 1;" + injectBeforeCap +"\n\000";
+						injectBuffer = "slowmo 1;" + injectBeforeCap;
 						demoStarted = 2;
 					}
 					if (demoStarted < 3 && svctime > startTime) {
-						injectBuffer = "\011\ncl_capturevideo 1\n\000";
+						injectBuffer = "cl_capturevideo 1";
 						demoStarted = 3;
 					}
 					if (!endIsReached && svctime > endTime) {
-						injectBuffer = "\011\ncl_capturevideo 0\n\000";
+						injectBuffer = "cl_capturevideo 0";
 						endIsReached = true;
 					}
 					if (endIsReached && !finalInjectionDone && svctime > (endTime + 1)) {
-						injectBuffer = "\011\n" + injectAfterCap + "\n\000";
+						injectBuffer = injectAfterCap;
 						finalInjectionDone = true;
 					}
 					if (finalInjectionDone && !disconnectIssued && svctime > (endTime + 2)) {
-						injectBuffer = "\011\ndisconnect\n\000";
+						injectBuffer = "disconnect";
 						disconnectIssued = true;
 					}
-					svcLoops++;
+					// ensure injectAtStart runs exactly once, before everything else
+					if (firstLoop) {
+						injectBuffer = injectAtStart + ";slowmo " + ffwSpeedFirstStage + ";" + injectBuffer;
+						firstLoop = false;
+					}
+					// add Buffer head and tail
+					if (injectAtStart.length() > 0) {
+						injectBuffer = "\011\n" + checkInjectString(injectBuffer) + "\n\000";
+					}
 				}
 
 				byte[] injectBufferAsBytes = null;

@@ -144,7 +144,7 @@ public class SwingGUI extends JFrame implements WindowListener, DemoRecorderUI {
 	private static final String mainHelpSetName = "help/DemoRecorderHelp.hs";
 
 	public SwingGUI(DemoRecorderApplication appLayer) {
-		super("Nexuiz Demo Recorder v0.3");
+		super("Nexuiz Demo Recorder v0.3.1");
 		addWindowListener(this);
 
 		this.appLayer = appLayer;
