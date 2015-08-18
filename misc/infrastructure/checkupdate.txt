@@ -27,26 +27,15 @@ U http://www.xonotic.org/
 
 # Emergency packs. Specify as:
 # E http://packurl/pack.pk3 file-in-pack.txt
-E http://dl.xonotic.org/zzzz-xonotic-0.8hotfix_chatbubble.pk3 scripts/chatbubble_hotfix.shader
+#E http://dl.xonotic.org/zzzz-xonotic-0.8hotfix_chatbubble.pk3 scripts/chatbubble_hotfix.shader
 
 # Recommended servers.
 # R <key or IP here>
-R fWd+2u8EYhG5U+/ZnpDSGF+knew+O0drJprpYpFz8ns=
-R /EZWYMnsu4meVRYyr00tMJQUSZwhkJuJQgEnjiYQpPI=
-R LI+DHYy+7uiSuCg7L6ASDYA9ZCXuwhPJbts9aZBb3AI=
-R AYQDHffb3DyZCchaJKjNcDrtNV2ln4/VAayaTzLMmwA=
-R 4M0JWnfPJefyNIIqvn7XDJ4EjMql5f3h0WOpt2QQ8XI=
-R DqnhpOb5AKJqnvt0GvhemrxJk7jRKRfwL3w61eSbCXA=
-R opTq7hWyIWi0fAa8YyGiHoQ/mstaabzwBnTns6fn988=
-R Ws/yvWENfrsab3HIR6oCsW7GvjuT8SYKC0f5iXVEswo=
+R 3TgWwpTKPPdrrunW27tMQDg5O/Ch2q4YtH6w1dSVXFg=
 R J9JepdOZjvCBXYfz8fj3civ4PulKF4/asnK9u5ZojYg=
 R 6QtAVwbWcJFYZDvSeuZHEaaJE4JoTzmNni/LPZUSOKE=
-R 43qjhvu/xqmD6IiDY0zhRJk36UoDLGKgmOCOxgOBluw=
-R E6vPsyfte6Ly/gZt8H33yHq9UF6uXaoV0KBlshXrSy4=
-R H3SZqxR8MHf/F2IGnY3T9EcNdI3CWd9ZwxmvPgll8b4=
-R 6WyCZXErVDQTa6PsPCqiMRJnlCA4SjRssHwPBKvMxO4=
-R V1w2u7Zt3yFlB3poz3dF+t+4SMsQeIhZiirbjR9GnAQ=
-R 3TgWwpTKPPdrrunW27tMQDg5O/Ch2q4YtH6w1dSVXFg=
+R Lh+WWOrY7IjXqP7pekmlgy6R+N+tTBm6DBV1gUZvtZ4=
+R ggH3OBVqbVeCCBkLQZtFLvwxuTpfBAz+/scg3OwsPVo=
 
 # Promoted servers. Always show up as recommended, even if "slow".
 # P <key or IP here>
