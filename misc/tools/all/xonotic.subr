@@ -348,6 +348,10 @@ case "$cmd" in
 			fi
 			exit 1
 		fi
+		echo "compressing"
+		cd ~/.xonotic/data/demos/
+#		pwd
+		tar --remove-files -cf - `find  ~/.xonotic/data/demos/  -type f | grep "\.dem$"`    | xz -9 -c - > "games_`date +%Y_%m_%d__%H:%M:%S`.tar.xz" ;  
 		;;
 	help)
 		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
