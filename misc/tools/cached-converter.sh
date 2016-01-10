@@ -380,7 +380,7 @@ for F in "$@"; do
 		esac
 	fi
 	case "$f" in
-		./sounds/misc/talk*.wav) will_ogg=false ;; # engine "feature"
+		./sound/misc/talk*.wav) will_ogg=false ;; # engine "feature"
 		*_bump) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
 		./models/sprites/*) will_dds=false ;;
