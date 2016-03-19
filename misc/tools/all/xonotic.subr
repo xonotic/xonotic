@@ -249,11 +249,16 @@ case "$cmd" in
 			verbose make $MAKEFLAGS gmqcc
 		fi
 
+		if [ -n "$MSYSTEM" ]; then
+			DATAMAKE=mingw32-make
+		else
+			DATAMAKE=make
+		fi
 		verbose cd "$d0/data/xonotic-data.pk3dir"
 		if $cleanqc; then
-			verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+			verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
 		fi
-		verbose make QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+		verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
 		# 4 levels up: data, xonotic-data, qcsrc, server
 
 		verbose cd "$d0/darkplaces"
