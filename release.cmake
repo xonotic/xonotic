@@ -7,6 +7,7 @@
 add_custom_target(release)
 
 string(TIMESTAMP stamp "%Y%m%d")
+string(TIMESTAMP filestamp "%Y-%m-%d")
 
 file(STRINGS data/xonotic-data.pk3dir/defaultXonotic.cfg _contents REGEX "^gameversion ")
 if (NOT _contents)
@@ -97,25 +98,26 @@ function(buildpk3 pk3)
     message("registered pk3 ${pk3}")
     set(deps)
     foreach (file IN LISTS files)
-        get_filename_component(rel ${file} DIRECTORY)
-        set(marker "done.data/${pk3}/${file}")
+        set(marker "done.data/${pk3}dir/${file}")
         string(REPLACE "#" "_" marker ${marker})  # OUTPUT cannot contain '#'
+        list(APPEND deps "${marker}")
+        get_filename_component(rel ${file} DIRECTORY)
         add_custom_command(OUTPUT ${marker}
+                DEPENDS "${dir}/${file}"
                 COMMAND ${CMAKE_COMMAND}
                 "-Dsrc=${PROJECT_SOURCE_DIR}/${dir}/${file}"
-                "-Ddst=data/${pk3}/${rel}"
-                "-Dconv=data/${pk3}/${file}"
+                "-Ddst=data/${pk3}dir/${rel}"
+                "-Dconv=data/${pk3}dir/${file}"
                 -P "transform-${filter}.cmake"
                 VERBATIM)
-        list(APPEND deps ${marker})
     endforeach ()
-    add_custom_target(${pk3} DEPENDS ${deps})
-    add_custom_target(${pk3}-zip DEPENDS ${pk3}.zip)
-    add_dependencies(release ${pk3}-zip)
-    add_custom_command(OUTPUT ${pk3}.zip
-            DEPENDS ${pk3}
-            COMMAND ${CMAKE_COMMAND} -E tar "cfv" "../../${pk3}.zip" --format=zip *
-            WORKING_DIRECTORY "data/${pk3}")
+    add_custom_target(${pk3}dir DEPENDS ${deps})
+    add_custom_target(${pk3}dir-zip DEPENDS ${pk3})
+    add_dependencies(release ${pk3}dir-zip)
+    add_custom_command(OUTPUT ${pk3}
+            DEPENDS ${pk3}dir
+            COMMAND ${CMAKE_COMMAND} -E tar cvf "../../${pk3}" --mtime=${filestamp} --format=zip -- *  # TODO: no wildcard
+            WORKING_DIRECTORY "data/${pk3}dir")
 endfunction()
 
 function(deftransform name)
@@ -132,6 +134,7 @@ function(deftransform name)
             "        COMMAND ${CMAKE_COMMAND} -E copy \${src} \${conv}\n"
             "        COMMAND ${PROJECT_SOURCE_DIR}/misc/tools/cached-converter.sh \${conv}\n"
             "        COMMAND ${CMAKE_COMMAND} -E make_directory done.\${conv}\n"
+            "        COMMAND ${CMAKE_COMMAND} -E touch done.\${conv}\n"
             "        RESULT_VARIABLE res_var\n"
             ")")
 endfunction()
@@ -139,6 +142,7 @@ file(WRITE ${PROJECT_BINARY_DIR}/transform-raw.cmake
         "execute_process(\n"
         "        COMMAND ${CMAKE_COMMAND} -E copy \${src} \${conv}\n"
         "        COMMAND ${CMAKE_COMMAND} -E make_directory done.\${conv}\n"
+        "        COMMAND ${CMAKE_COMMAND} -E touch done.\${conv}\n"
         ")")
 
 # default to "del_src\;true"
