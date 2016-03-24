@@ -18,6 +18,7 @@ excludes="
 	Xonotic/data/xonotic-*-maps-low.pk3
 	Xonotic/data/xonotic-*-music-low.pk3
 	Xonotic/data/font-nimbussansl-*.pk3
+	Xonotic/data/font-unifont-*.pk3
 	Xonotic/data/font-xolonium-*.pk3
 "
 

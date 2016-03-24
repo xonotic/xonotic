@@ -1,50 +1,47 @@
 This subdirectory contains scripts and a config file that can be used
-to start a dedicated Xonotic server on linux, mac or windows systems
+to start a dedicated Xonotic server on Linux, Mac and Windows systems
 and also some tools that help with maintaining your server.
 
-You will need to copy the right script for your system into your
-Xonotic main directory, where the normal binaries are.  You then need
-to copy and ADJUST the config file which is called server.cfg.  You
-can copy it either into the Xonotic/data directory where the big
-data*.pk3 file is or when running on linux or mac you can as well copy
-it into a special directory named '~/.xonotic/data'.  After you have
-setup everything and have adjusted the config file you can start the
-server by running the server script.
+You will need to copy the right server_* script for your system into
+your Xonotic main directory, where the normal binaries are. 
+You should then COPY the provided server.cfg to user's game directory
+(Linux: '~/.xonotic/data'
+ Mac: '~/Library/Application Support/xonotic/data'
+ Windows: '%UserProfile%\Saved Games\xonotic\data')
 
-Please make sure your server is always uptodate!  Just signup the
-Xonotic release mailinglist to get informed about new releases.
-https://lists.sourceforge.net/lists/listinfo/xonotic-releases
+After you have setup everything and have adjusted the config file 
+you can start the server by running the server script.
 
-An important thing is to make sure that your firewall does allow
-players to connect to your server.  This typicly means you will have
+An important thing is to make sure that your firewall allows
+players to connect to your server.  This typically means you will have
 to open or forward the port (see the line that sets the variable port
-in your config.cfg for the right port number, default is 26000) to the
+in your server.cfg for the right port number, default is 26000) to the
 computer running your server.  How to do this does depend on your
 computer and network setup.
 
 If you plan to install custom maps on your server you should read the
 file Xonotic/Docs/mapdownload.txt to learn how to setup automatic map
-download.
+downloads.
 
-In case you want to rename the server.cfg file, e.g. because you want
-to run several servers on one machine, you have to edit the script and
+In case you want to rename the server.cfg file (e.g. because you want
+to run several servers on one machine), you have to edit the script and
 change the name there too.
 
 A very useful tool for running and controlling a server is the
 application 'gnu screen'.  It should be available for all usual
 operating systems.  You can find some hints about its usage here:
-http://jmcpherson.org/screen.html
+http://www.gnu.org/software/screen/manual/screen.html
 
 The options in the config file are only the most interesting and
 important ones.  You can get a list of all available commands and
 variables with 'cmdlist' and 'cvarlist' in the server console.
 
 rcon.pl is a perl script that implements rcon which can be used to
-remotely control your server.
+remotely control your server.  Refer to the file itself for usage.
 
 rcon2irc is a Xonotic server to irc gateway.  It allows you to watch
-and communicate with active players on your server via irc.  Read its
-rcon2irc.txt to learn how to setup and use it!
+and communicate with active players on your server via irc.
+Refer to rcon2irc.txt for usage and instructions.
 
 help.cfg is a Xonotic config file providing a simple help message
 system.  It prints all the messages from a list, one after the other

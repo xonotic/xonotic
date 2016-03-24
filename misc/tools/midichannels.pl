@@ -62,7 +62,11 @@ while(<STDIN>)
 	my @arg = split /\s+/, $_;
 	my $cmd = shift @arg;
 	print "Executing: $cmd @arg\n";
-	if($cmd eq 'clean')
+	if($cmd eq '#')
+	{
+		# Just a comment.
+	}
+	elsif($cmd eq 'clean')
 	{
 		my $tracks = $opus->tracks_r();
 		$tracks->[$_]->events_r([clean($tracks->[$_]->events())])
@@ -152,7 +156,7 @@ while(<STDIN>)
 				if(defined $p)
 				{
 					my $c = $_->[$p] + 1;
-					if($channel eq '*' || $c == $channel)
+					if($channel eq '*' ? $c != 10 : $c == $channel)
 					{
 						if($_->[0] eq 'note_on' || $_->[0] eq 'note_off')
 						{
@@ -173,15 +177,20 @@ while(<STDIN>)
 			for(abstime $tracks->[$_]->events())
 			{
 				my $p = $chanpos{$_->[0]};
-				if(defined $p)
+				if(!defined $p)
 				{
-					my $c = $_->[$p] + 1;
-					$c = $chanmap{$c} // $chanmap{'*'} // $c;
+					push @events, $_;
+					next;
+				}
+				my $c = $_->[$p] + 1;
+				my @c = split /,/, ($chanmap{$c} // $chanmap{'*'} // $c);
+				for my $c(@c) {
 					next
 						if $c == 0; # kill by setting channel to 0
-					$_->[$p] = $c - 1;
+					my @copy = @$_;
+					$copy[$p] = $c - 1;
+					push @events, \@copy;
 				}
-				push @events, $_;
 			}
 			$tracks->[$_]->events_r([reltime @events]);
 		}

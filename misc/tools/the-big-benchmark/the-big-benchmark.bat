@@ -48,7 +48,7 @@ goto done
 :nomed
 if not "%e%" == "med" goto nomed2
 find "Using GL1.3 rendering path" data\engine.log >nul
-if errorlevel 1 goto nomed
+if errorlevel 1 goto nomed2
 echo OpenGL 2.0 rendering disabled, exiting.
 goto done
 :nomed2

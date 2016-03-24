@@ -443,6 +443,7 @@ case "$cmd" in
 				verbose "$d0"/mediasource/gfx/menu/luminos_versionbuilder/versionbuilder "$versionstr"
 				verbose rm background_l2.svg
 			)
+			verbose "$d0"/mediasource/gfx/luma/render-version.sh "$d0/mediasource/gfx/luma" "$PWD" "$versionstr"
 		fi
 		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
 			for X in ../../data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
@@ -486,6 +487,7 @@ case "$cmd" in
 		;;
 	release-pack)
 		release_common
+		verbose "$SELF" release-buildpk3s data/font-unifont.pk3dir      raw ''
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
 		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' normal '-high'
@@ -533,6 +535,7 @@ case "$cmd" in
 				Xonotic/gmqcc \
 				Xonotic/server \
 				Xonotic/key_0.d0pk \
+				Xonotic/data/font-unifont-$pk3stamp.pk3 \
 				Xonotic/data/font-xolonium-$pk3stamp.pk3
 			verbose cp Xonotic-$stamp-enginesource$suffix.zip Xonotic-$stamp-source$suffix.zip
 			verbose mkzip Xonotic-$stamp-source$suffix.zip \
