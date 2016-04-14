@@ -1,6 +1,6 @@
 /build/
+/daemon
 /darkplaces
-/fteqcc
 /gmqcc
 /div0-gittools
 /netradiant
@@ -13,3 +13,5 @@
 /xonstat/
 /xonstatdb/
 /wiki
+
+.idea/

@@ -10,6 +10,7 @@ macro(subproject name)
     endif ()
 endmacro()
 
+subproject(daemon)
 subproject(darkplaces)
 subproject(data/xonotic-data.pk3dir)
 subproject(gmqcc)
