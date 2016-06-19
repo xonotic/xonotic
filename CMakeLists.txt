@@ -11,6 +11,7 @@ macro(subproject name)
 endmacro()
 
 subproject(daemon)
+subproject(d0_blind_id)
 subproject(darkplaces)
 subproject(data/xonotic-data.pk3dir)
 subproject(gmqcc)
