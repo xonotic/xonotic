@@ -24,6 +24,8 @@ U http://www.xonotic.org/
 #     [a:b:c:d:
 #     [a:b:c:
 # B 8.8.8.8:
+B 104.238.159.167:
+B 108.61.164.188:
 
 # Emergency packs. Specify as:
 # E http://packurl/pack.pk3 file-in-pack.txt
