@@ -19,10 +19,6 @@ initrepo()
 	base=
 	pushbase=
 	allrepos initrepo_ "`git config remote.origin.url`" "`git config remote.origin.pushurl`"
-	if [ -z "$base" ]; then
-		msg "The main repo is not xonotic.git, what have you done?"
-		exit 1
-	fi
 	msg "Found main repo = $base"
 	if [ -n "$pushbase" ]; then
 		msg "Found push repo = $pushbase"
