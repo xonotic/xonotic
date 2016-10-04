@@ -1,11 +1,10 @@
 [Desktop Entry]
 Type=Application
-Version=2.5
-Encoding=UTF-8
+Version=1.0
 Name=Xonotic (SDL)
 Comment=a free open-source first person shooter
-Icon=/usr/share/pixmaps/xonotic.png
-Exec=/usr/bin/xonotic-sdl
+Icon=xonotic
+Exec=xonotic-sdl
 Terminal=false
 StartupNotify=false
 Categories=Game;
