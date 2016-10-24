@@ -19,15 +19,20 @@ LF="
 ESC=""
 
 d00=`pwd`
-while ! [ -f ./all ]; do
-	if [ x"`pwd`" = x"/" ]; then
+case "$0" in
+	/*/all)
+		export d0=${0%/all}
+		;;
+	*/all)
+		export d0=$d00/${0%/all}
+		;;
+	*)
 		$ECHO "Cannot find myself."
 		$ECHO "Please run this script with the working directory inside a Xonotic checkout."
-		exit 1
-	fi
-	cd ..
-done
-export d0=`pwd`
+		;;
+esac
+cd "$d0"
+d0=`pwd`
 SELF="$d0/all"
 
 # If we are on WINDOWS:
