@@ -119,6 +119,10 @@ case "$cmd" in
 			fi
 		fi
 
+		if [ -z "$MAKE" ]; then
+			MAKE=make
+		fi
+
 		if [ -z "$MAKEFLAGS" ]; then
 			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
 			if [ $ncpus -gt 1 ]; then
@@ -229,30 +233,30 @@ case "$cmd" in
 		if $compiled0; then
 			if $cleand0; then
 				if [ -f Makefile ]; then
-					verbose make $MAKEFLAGS distclean
+					verbose $MAKE $MAKEFLAGS distclean
 				fi
 			fi
 			if ! [ -f Makefile ]; then
 				verbose sh autogen.sh
 				verbose ./configure
 			fi
-			verbose make $MAKEFLAGS
+			verbose $MAKE $MAKEFLAGS
 		fi
 
 		verbose cd "$d0/gmqcc"
 		if $cleanqcc; then
-			verbose make $MAKEFLAGS clean
+			verbose $MAKE $MAKEFLAGS clean
 		fi
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			verbose make $MAKEFLAGS gmqcc.exe
+			verbose $MAKE $MAKEFLAGS gmqcc.exe
 		else
-			verbose make $MAKEFLAGS gmqcc
+			verbose $MAKE $MAKEFLAGS gmqcc
 		fi
 
 		if [ -n "$MSYSTEM" ]; then
 			DATAMAKE=mingw32-make
 		else
-			DATAMAKE=make
+			DATAMAKE=$MAKE
 		fi
 		verbose cd "$d0/data/xonotic-data.pk3dir"
 		if $cleanqc; then
@@ -266,10 +270,10 @@ case "$cmd" in
 			$ECHO "Warning: invalid empty client, default clients will be used."
 		fi
 		if $cleandp; then
-			verbose make $MAKEFLAGS clean
+			verbose $MAKE $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
-			verbose make $MAKEFLAGS STRIP=: "$@" "$T"
+			verbose $MAKE $MAKEFLAGS STRIP=: "$@" "$T"
 		done
 		for T in $BAD_TARGETS; do
 			$ECHO "Warning: discarded invalid client $T."
