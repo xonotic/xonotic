@@ -16,6 +16,7 @@ allrepos()
 	"$@" gmqcc                         gmqcc.git                    master         ""
 	"$@" xonstat                       xonstat.git                  master         "no"
 	"$@" xonstatdb                     xonstatdb.git                master         "no"
+	"$@" xonotic.org                   xonotic.org.git              master         "no"
 	"$@" wiki                          xonotic.wiki.git             master         "no"
 }
 
