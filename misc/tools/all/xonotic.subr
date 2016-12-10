@@ -290,7 +290,7 @@ case "$cmd" in
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
 			client=-sdl
 		else
-			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs"
+			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 			client=-sdl
 		fi
 		case "$1" in
