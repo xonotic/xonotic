@@ -1,0 +1,23 @@
+#!/bin/bash
+inputPK3=$1
+
+echo "Extracting"
+unsquashfs -d extractDir ${inputPK3}
+cd extractDir
+
+#$FLIF needs to point towards the flif binary 
+
+echo "Converting"
+for file in `find . | grep "\.flif"`; do # in theory we could make this parallel
+	$FLIF -e ${file} "${file%.flif}.png" # flif -> png
+	convert "${file%.flif}.png" "${file%.flif}.tga" # png -> tga
+	rm $file # rm flif
+	rm ${file%.flif}.png # rm png
+done
+
+echo "Compressing"
+cd ..
+echo `pwd`
+zip -9 -r ${inputPK3%.sqfs}.pk3 extractDir/*
+
+rm -r extractDir # clean up
