@@ -1,9 +1,9 @@
 #!/bin/bash
 # name: encode-demos.sh
-# version: 0.6.1
-# author: Tyler "-z-" Mulligan
+# version: 0.6.2
+# author: Tyler "-z-" Mulligan <z@xnz.me>
 # license: GPL & MIT
-# date: 24-02-2017
+# date: 26-02-2017
 # description: headless encoding of demo files to HD video concurrently with Xfvb and parallel
 #
 # The encoding is done with a full Xonotic client inside Xfvb.
@@ -41,10 +41,10 @@
 #
 
 # Customize
-XONDIR=${HOME}/xonotic/xonotic                      # path to ./all
 USERDIR=${HOME}/.xonotic-clean                      # path to Xonotic userdir for client that does encoding
+GAMEDIR=${USERDIR}/data                             # path to Xonotic userdir for client that does encoding
 XONOTIC_BIN="./all"                                 # binary used to launch Xonotic
-JOB_TIMEOUT="1h"                                    # if demo doesn't quit itself or hangs
+JOB_TIMEOUT="4h"                                    # if demo doesn't quit itself or hangs
 JOBS=4                                              # number of concurrent jobs
 DEFAULT_DEMO_LIST_FILE="demos.txt"                  # for batch
 DISPLAY=:1.0                                        # display for Xvfb
@@ -70,6 +70,25 @@ REGEX_VIDEO_TYPES="^(mp4|webm)$"
 
 # State
 export KILLER_KEYWORD_WATCHING=true
+
+# Xonotic Helpers
+
+_check_xonotic_dir() {
+    local xon_dir=$1
+    if [[ ! -d ${xon_dir} ]]; then
+        echo "[ ERROR ] Unable to locate Xonotic"; exit 1
+    fi
+}
+
+_get_xonotic_dir() {
+    relative_dir=$(dirname $0)/../..
+    _check_xonotic_dir ${relative_dir}
+    export XONOTIC_DIR=$(cd ${relative_dir}; pwd)
+}
+
+_kill_xonotic() {
+    pkill -f "\-simsound \-sessionid xonotic_${SCRIPT_NAME}_"
+}
 
 # Data Helpers
 ###############
@@ -103,7 +122,7 @@ _get_demo_command() {
     local demo_file=$1
     local index=$2
     name_format=$(basename "${demo_file}" .dem)
-    command="${XONDIR}/${XONOTIC_BIN} run sdl -simsound -sessionid xonotic_${SCRIPT_NAME}_${index} -userdir \"${USERDIR}\" \
+    command="${XONOTIC_DIR}/${XONOTIC_BIN} run sdl -simsound -sessionid xonotic_${SCRIPT_NAME}_${index} -userdir \"${USERDIR}\" \
         +log_file \"xonotic_${SCRIPT_NAME}_${index}_${name_format}.log\" \
         +cl_capturevideo_nameformat \"${name_format}_\" \
         +cl_capturevideo_number 0 \
@@ -145,7 +164,7 @@ _queue_add_compression_jobs() {
     local type=$1; shift
     local videos="$@"
     for video_file in ${videos[@]}; do
-        local command=$(_get_compression_command ${USERDIR}/data/${video_file} ${type})
+        local command=$(_get_compression_command ${GAMEDIR}/${video_file} ${type})
         _queue_add_job ${queue_file} "${command}" ${video_file}
     done
 }
@@ -256,7 +275,7 @@ _run_demo_jobs() {
 _cleanup() {
     rm -f ${QUEUE_FILE_DEMOS}
     rm -f ${LOCK_FILE}
-    rm -f ${USERDIR}/data/*.log
+    rm -f ${GAMEDIR}/*.log
     export KILLER_KEYWORD_WATCHING=false
     sleep 1
     _kill_xonotic
@@ -268,10 +287,6 @@ _cleanup_children() {
 
 _cleanup_compress() {
     rm -f ${QUEUE_FILE_COMPRESSING}
-}
-
-_kill_xonotic() {
-    pkill -f "\-simsound \-sessionid xonotic_${SCRIPT_NAME}_"
 }
 
 # Application Helpers
@@ -330,7 +345,7 @@ compress() {
     fi
 
     # compress
-    local command=$(_get_compression_command ${USERDIR}/data/${video_file} ${type})
+    local command=$(_get_compression_command ${GAMEDIR}/${video_file} ${type})
     echo ${command}
     echo "[ INFO ] Compressing '${video_file}'"
     _queue_add_compression_jobs ${QUEUE_FILE_COMPRESSING} ${type} ${video_file[@]}
@@ -417,13 +432,13 @@ log_keyword_grep() {
     local keyword="$@"
     for worker in $(_get_active_demo_workers); do
         local log_file="${worker}.log"
-        local keyword_count=$(grep -c "${keyword}" "${USERDIR}/data/${log_file}")
+        local keyword_count=$(grep -c "${keyword}" "${GAMEDIR}/${log_file}")
         if [[ ${keyword_count} > 0 ]]; then
             if [[ ${type} == "worker" ]]; then
                 echo "${worker}"
             else
                 echo "[ worker ] ${worker}"
-                grep "${keyword}" "${USERDIR}/data/${log_file}"
+                grep "${keyword}" "${GAMEDIR}/${log_file}"
             fi
         fi
     done
@@ -531,8 +546,22 @@ EXAMPLES
 
     # follow a completed job log
     ./encode-demos.sh log -f
+
+    # Override the path to Xonotic (assumed from relative location of this script)
+    XONOTIC_DIR=\$HOME/some/other/dir; ./misc/tools/encode-demos.sh --version
 "
 }
+
+# Init
+######
+
+# Allow for overriding the path assumption
+# XONOTIC_DIR=$HOME/some/other/dir; ./misc/tools/encode-demos.sh --version
+if [[ -z ${XONOTIC_DIR} ]]; then
+    _get_xonotic_dir
+else
+    _check_xonotic_dir ${XONOTIC_DIR}
+fi
 
 case $1 in
     # flags
