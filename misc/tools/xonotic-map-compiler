@@ -31,7 +31,7 @@ use File::Temp;
 	our $MINIMAPFLAGS = '';
 
 	# Default order of commands
-	our $ORDER = 'vis,scale,light';
+	our $ORDER = 'vis,light,scale';
 
 # end of user changable part
 
