@@ -5,10 +5,10 @@
 # It is necessary for linking the library.
 
 # The name that we can dlopen(3).
-dlname='../bin/SDL2.dll'
+dlname=''
 
 # Names of this library.
-library_names='libSDL2.dll.a'
+library_names=''
 
 # The name of the static archive.
 old_library='libSDL2.a'
@@ -25,7 +25,7 @@ weak_library_names=''
 # Version information for libSDL2.
 current=4
 age=4
-revision=0
+revision=1
 
 # Is this an already installed library?
 installed=yes
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/slouken/release/SDL/SDL2-2.0.4/i686-w64-mingw32/lib'
+libdir='/var/home/rpolzer/xonotic/misc/buildsrc/tmp/SDL2-2.0.5/../32/lib'
