@@ -295,20 +295,20 @@ getthemap()
 	M=$4
 	blobhash=$5
 	commithash=$6
-	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3"; then
+	if mv "$bspdir_old/$M-$blobhash.pk3" "$bspdir/$M-$blobhash.pk3" >& /dev/null; then
 		if unzip -l "$bspdir/$M-$blobhash.pk3" >/dev/null 2>&1; then
 			return 0
 		fi
 	fi
-	if ! wget -c -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
-		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
-			rm -f "$bspdir/$M-$blobhash.pk3"
+	if ! wget -c -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3" >& /dev/null; then
+		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3" >& /dev/null; then
+			rm -f "$bspdir/$M-$blobhash.pk3" >& /dev/null
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
 			getthemap_fail=true
 			return 0
 		fi
 	fi
-	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
+	if ! unzip -l "$bspdir/$M-$blobhash.pk3" >& /dev/null; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
 		getthemap_fail=true
