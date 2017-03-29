@@ -197,23 +197,17 @@ case "$cmd" in
 						case `uname -m` in
 							x86_64)
 								# No cp commands, we want to use static linking instead.
-								export CC="$CC -I../../../../misc/builddeps/linux64/d0_blind_id/include"
-								export CC="$CC -L../../../../misc/builddeps/linux64/d0_blind_id/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/d0_blind_id/lib"
-								export CC="$CC -I../../../../misc/builddeps/linux64/gmp/include"
-								export CC="$CC -L../../../../misc/builddeps/linux64/gmp/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/gmp/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux64/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_rijndael.a"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
+								export CC="$CC -I../../../../"
+								export CC="$CC -L../../../../d0_blind_id/.libs"
+								export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
 								;;
 							*86)
 								# No cp commands, we want to use static linking instead.
-								export CC="$CC -I../../../../misc/builddeps/linux32/d0_blind_id/include"
-								export CC="$CC -L../../../../misc/builddeps/linux32/d0_blind_id/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/d0_blind_id/lib"
-								export CC="$CC -I../../../../misc/builddeps/linux32/gmp/include"
-								export CC="$CC -L../../../../misc/builddeps/linux32/gmp/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/gmp/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
+								export CC="$CC -I../../../../"
+								export CC="$CC -L../../../../d0_blind_id/.libs"
+								export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
 								;;
 							*)
 								compiled0=true
