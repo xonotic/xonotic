@@ -1,12 +1,12 @@
 # Current released version.
-V 0.8.1
+V 0.8.2
 
 # Download URL.
-D http://dl.xonotic.org/xonotic-0.8.1.zip
+D http://dl.xonotic.org/xonotic-0.8.2.zip
 
 # When releasing, create this string by:
 # date -u +%Y%m%d%H%M%S -d'now + 3 months'
-C 20151127205957
+C 20170701181425
 
 # Website URL.
 U http://www.xonotic.org/
