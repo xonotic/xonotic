@@ -26,7 +26,7 @@ case "$cmd" in
 		cleandp=false
 		cleanqcc=false
 		cleanqc=false
-		compiled0=false
+		compiled0=true
 		debug=debug
 		if [ -z "$CC" ]; then
 			export CC="gcc"
