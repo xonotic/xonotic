@@ -26,7 +26,7 @@ goto postarg
 if exist data\the-big-benchmark.log del data\the-big-benchmark.log
 if exist data\benchmark.log del data\benchmark.log
 if exist data\engine.log del data\engine.log
-set p=+vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
+set p=+menu_updatecheck 0 +vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_allow_uid2name 0 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem
 
 goto start
 

@@ -61,7 +61,7 @@ rm -f data/benchmark.log
 rm -f data/engine.log
 
 # for next version of benchmark: remove +cl_playerdetailreduction 0 and add +showfps 1
-p="+vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
+p="+menu_updatecheck 0 +vid_width 1024 +vid_height 768 +vid_desktopfullscreen 0 +cl_curl_enabled 0 +r_texture_dds_load 1 +cl_allow_ui2dname 0 +cl_playerdetailreduction 0 +developer 1 -nohome -benchmarkruns 4 -benchmarkruns_skipfirst -benchmark demos/the-big-keybench.dem"
 
 for e in omg low med normal high ultra ultimate; do
 	echo "Benchmarking on $e"
