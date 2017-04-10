@@ -63,7 +63,7 @@ mirrorspeed()
 	# now actually time it
 	(
 		set +x
-		export REPO=$1 # so that the sh -c subshell can use it
+		export REPO="$1" # so that the sh -c subshell can use it
 		{ measure_time sh -c 'git ls-remote "$REPO" refs/heads/master >/dev/null 2>&1'; } 2>&1 >/dev/null | head -n 1 | cut -d ' ' -f 2 | tr -d . | sed 's,^0*,,' | grep . || echo 0
 			# unit: clock ticks (depends on what "time" returns
 	)
