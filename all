@@ -21,10 +21,10 @@ ESC=""
 d00=`pwd`
 case "$0" in
 	/*/all)
-		export d0=${0%/all}
+		export d0="${0%/all}"
 		;;
 	*/all)
-		export d0=$d00/${0%/all}
+		export d0="$d00/${0%/all}"
 		;;
 	*)
 		$ECHO "Cannot find myself."

@@ -83,7 +83,7 @@ _check_xonotic_dir() {
 _get_xonotic_dir() {
     relative_dir=$(dirname $0)/../..
     _check_xonotic_dir ${relative_dir}
-    export XONOTIC_DIR=$(cd ${relative_dir}; pwd)
+    export XONOTIC_DIR="$(cd ${relative_dir}; pwd)"
 }
 
 _kill_xonotic() {

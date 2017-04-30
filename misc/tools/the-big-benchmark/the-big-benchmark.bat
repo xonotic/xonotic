@@ -16,10 +16,10 @@ goto postarg
 :noarg
 if "%ProgramFiles(x86)%" == "" goto bit32
 :bit64
-set xonotic=xonotic-x64.exe
+set xonotic=xonotic.exe
 goto postarg
 :bit32
-set xonotic=xonotic.exe
+set xonotic=xonotic-x86.exe
 goto postarg
 :postarg
 

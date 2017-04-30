@@ -64,7 +64,7 @@ while [ -n "$allfiles" ]; do
 done
 
 export do_jpeg=true
-export dp_jpeg_if_not_dds=false
+export do_jpeg_if_not_dds=false
 export jpeg_qual_rgb=70
 export jpeg_qual_a=90
 export do_dds=false
