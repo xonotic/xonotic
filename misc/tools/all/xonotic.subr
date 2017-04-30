@@ -26,7 +26,7 @@ case "$cmd" in
 		cleandp=false
 		cleanqcc=false
 		cleanqc=false
-		compiled0=true
+		compiled0=false
 		debug=debug
 		if [ -z "$CC" ]; then
 			export CC="gcc"
@@ -193,27 +193,6 @@ case "$cmd" in
 				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
 			else
 				case "`uname`" in
-					Linux)
-						case `uname -m` in
-							x86_64)
-								# No cp commands, we want to use static linking instead.
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
-								export CC="$CC -I../../../../"
-								export CC="$CC -L../../../../d0_blind_id/.libs"
-								export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
-								;;
-							*86)
-								# No cp commands, we want to use static linking instead.
-								export CC="$CC -I../../../../"
-								export CC="$CC -L../../../../d0_blind_id/.libs"
-								export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
-								;;
-							*)
-								compiled0=true
-								;;
-						esac
-						;;
 					Darwin)
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
@@ -235,6 +214,25 @@ case "$cmd" in
 				verbose ./configure
 			fi
 			verbose $MAKE $MAKEFLAGS
+			case "`uname`" in
+				Linux)
+					case `uname -m` in
+						x86_64)
+							# No cp commands, we want to use static linking instead.
+							MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
+							export CC="$CC -I../../../../"
+							export CC="$CC -L../../../../d0_blind_id/.libs"
+							export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
+							;;
+						*86)
+							# No cp commands, we want to use static linking instead.
+							export CC="$CC -I../../../../"
+							export CC="$CC -L../../../../d0_blind_id/.libs"
+							export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
+							MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
+							;;
+					esac
+			esac
 		fi
 
 		verbose cd "$d0/gmqcc"
