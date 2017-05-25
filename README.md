@@ -8,17 +8,17 @@ Xonotic is an addictive, arena-style first person shooter with crisp movement an
 
 ## Download
 
-### LATEST RELEASE: Xonotic 0.8.1 for Linux, Windows, and Mac
+### LATEST RELEASE: Xonotic 0.8.2 for Linux, Windows, and macOS
 
 If you're just here to play, you can download Xonotic as a zip package, torrent, or by using one of [these alternative methods](http://xonotic.org/download/).
 
-- [Download as torrent](http://dl.xonotic.org/xonotic-0.8.1.zip.torrent)
-- [Download as zip](http://dl.xonotic.org/xonotic-0.8.1.zip)
+- [Download as torrent](http://dl.xonotic.org/xonotic-0.8.2.zip.torrent)
+- [Download as zip](http://dl.xonotic.org/xonotic-0.8.2.zip)
 
 No installation required, just unpack and run. Got questions? See the [FAQ](http://xonotic.org/faq) or [live chat](http://xonotic.org/chat/) with us.
 
-**MD5**: f7a9cd8ab68a00336acca164f983b569
-**Package size**: 940M
+**MD5**: 1bd46c1fb79aae42bb13e74f5a0ff46e
+**Package size**: 946M
 
 ## Developing
 
