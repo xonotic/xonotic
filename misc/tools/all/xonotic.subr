@@ -135,7 +135,7 @@ case "$cmd" in
 
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			# win32: use SDL2
-			MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win32/sdl/bin/sdl2-config"
+			MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win64/sdl/bin/sdl2-config"
 
 			# win32: don't rely on jpeg includes
 			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
@@ -188,9 +188,9 @@ case "$cmd" in
 			# use binaries then, if we can...
 			mkdir -p .libs
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
-				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
-				verbose cp "$d0/misc/buildfiles/win32/libd0_rijndael"-* .libs/
-				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win64/libd0_blind_id"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win64/libd0_rijndael"-* .libs/
+				verbose cp "$d0/misc/buildfiles/win64/libgmp"-* .libs/
 			else
 				case "`uname`" in
 					Linux)
@@ -284,7 +284,7 @@ case "$cmd" in
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			client=
-			export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
+			export PATH="$d0/misc/buildfiles/win64:$d0/d0_blind_id/.libs:$PATH"
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
