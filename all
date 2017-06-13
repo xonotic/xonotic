@@ -26,6 +26,8 @@ case "$0" in
 	*/all)
 		export d0="$d00/${0%/all}"
 		;;
+	*/all.xonotic.sh)
+		;;
 	*)
 		$ECHO "Cannot find myself."
 		$ECHO "Please run this script with the working directory inside a Xonotic checkout."
