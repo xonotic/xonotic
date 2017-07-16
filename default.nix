@@ -8,16 +8,14 @@ let
     VERSION = "0.8.2";
     targets = rec {
         xonotic = stdenv.mkDerivation rec {
+            name = "xonotic-${version}";
+            version = VERSION;
 
             XON_NO_DAEMON = true;
             XON_NO_RADIANT = true;
 
             XON_NO_QCC = true;
             QCC = "${gmqcc}/gmqcc";
-
-            version = VERSION;
-
-            name = "xonotic-${version}";
 
             src = lib.sourceFilesBySuffices ./. [
                 ".txt" ".cmake" ".in"
@@ -79,9 +77,8 @@ let
         };
 
         gmqcc = stdenv.mkDerivation rec {
-            version = "xonotic-${VERSION}";
-
             name = "gmqcc-${version}";
+            version = "xonotic-${VERSION}";
 
             src = ./gmqcc;
 
@@ -91,6 +88,49 @@ let
                 mkdir $out
                 cp -r . $out
             '';
+        };
+
+        netradiant = stdenv.mkDerivation rec {
+            name = "netradiant-${version}";
+            version = VERSION;
+
+            XON_NO_DAEMON = true;
+            XON_NO_DP = true;
+            XON_NO_PKI = true;
+            XON_NO_QCC = true;
+            XON_NO_DATA = true;
+
+            src = ./netradiant;
+
+            enableParallelBuilding = true;
+
+            cmakeFlags = [
+                "-DDOWNLOAD_MAPS=0"
+            ];
+
+            nativeBuildInputs = [
+                cmake   # for building
+                git     # for versioning
+            ];
+
+            buildInputs = [
+                pkgconfig
+                glib
+                libxml2
+                ncurses
+                libjpeg
+                libpng
+
+                mesa
+
+                xorg.libXt
+                xorg.libXmu
+                xorg.libSM
+                xorg.libICE
+
+                gnome2.gtk
+                gnome2.gtkglext
+            ];
         };
     };
 in targets
