@@ -106,6 +106,7 @@ let
 
             cmakeFlags = [
                 "-DDOWNLOAD_MAPS=0"
+                "-DGTK_NS=GTK"
             ];
 
             nativeBuildInputs = [
