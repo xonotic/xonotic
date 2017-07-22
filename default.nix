@@ -124,6 +124,7 @@ let
                 ncurses
                 libjpeg
                 libpng
+                minizip
 
                 mesa
 
