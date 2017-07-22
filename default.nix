@@ -1,11 +1,14 @@
 # nix-shell -A xonotic
+# --argstr cc clang
 {
     nixpkgs ? <nixpkgs>,
-    pkgs ? (import nixpkgs) {}
+    pkgs ? (import nixpkgs) {},
+    cc ? null,
 }:
 with pkgs;
 let
     VERSION = "0.8.2";
+    stdenv = if (cc != null) then overrideCC pkgs.stdenv pkgs."${cc}" else pkgs.stdenv;
     targets = rec {
         xonotic = stdenv.mkDerivation rec {
             name = "xonotic-${version}";
