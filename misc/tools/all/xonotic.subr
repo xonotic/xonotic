@@ -216,22 +216,11 @@ case "$cmd" in
 			verbose $MAKE $MAKEFLAGS
 			case "`uname`" in
 				Linux)
-					case `uname -m` in
-						x86_64)
-							# No cp commands, we want to use static linking instead.
-							MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
-							export CC="$CC -I../../../../"
-							export CC="$CC -L../../../../d0_blind_id/.libs"
-							export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
-							;;
-						*86)
-							# No cp commands, we want to use static linking instead.
-							export CC="$CC -I../../../../"
-							export CC="$CC -L../../../../d0_blind_id/.libs"
-							export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
-							MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
-							;;
-					esac
+					# No cp commands, we want to use static linking instead.
+					MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
+					export CC="$CC -I../../../../"
+					export CC="$CC -L../../../../d0_blind_id/.libs"
+					export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
 			esac
 		fi
 
