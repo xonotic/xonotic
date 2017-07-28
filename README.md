@@ -20,9 +20,23 @@ No installation required, just unpack and run. Got questions? See the [FAQ](http
 **MD5**: 1bd46c1fb79aae42bb13e74f5a0ff46e
 **Package size**: 946M
 
+## Contributing
+
+We're currently looking for help in the following areas:
+
+- Modeling and texturing
+  - We're looking for someone with texturing skills to paint new glowy skins for our player models
+- Documentation
+  - Some of it is still scattered in [Docs](https://gitlab.com/xonotic/xonotic/tree/master/Docs) instead of being on our [wiki](https://gitlab.com/xonotic/xonotic/wikis/home)
+  - Some [wiki](https://gitlab.com/xonotic/xonotic/wikis/home) pages are slightly out of date or contain links to empty pages
+  - Fixing typos everywhere and anywhere - attention to detail is important to make a good impression on potential players
+  - Even if you're new, just letting us know what you're struggling with helps so we can focus on improving those areas first
+- Testing
+  - If you're running a server or play off-line often, please consider using the autobuild or git versions to help us find bugs
+
 ## Developing
 
-To install from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git), or check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see development activity and code ([xonotic-data](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
+To compile the latest version from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git), or check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see development activity and code ([xonotic-data](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
 
 ## Community
 
