@@ -38,7 +38,7 @@ We're currently looking for help in the following areas:
 
 ## Developing
 
-To compile the latest version from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git), or check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see development activity and code ([xonotic-data](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
+To compile the latest revision from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git), or check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see development activity and code ([xonotic-data](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
 
 ## Community
 
