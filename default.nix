@@ -109,7 +109,6 @@ let
 
             cmakeFlags = [
                 "-DDOWNLOAD_MAPS=0"
-                "-DGTK_NS=GTK"
             ];
 
             nativeBuildInputs = [
@@ -120,6 +119,7 @@ let
             buildInputs = [
                 pkgconfig
                 glib
+                pcre
                 libxml2
                 ncurses
                 libjpeg
@@ -132,7 +132,10 @@ let
                 xorg.libXmu
                 xorg.libSM
                 xorg.libICE
+                xorg.libpthreadstubs
+                xorg.libXdmcp
 
+                gnome3.gtk
                 gnome2.gtk
                 gnome2.gtkglext
             ];
