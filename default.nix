@@ -8,6 +8,7 @@
 with pkgs;
 let
     VERSION = "0.8.2";
+    cmake = pkgs.cmake_2_8;
     targets = rec {
         xonotic = mkDerivation { pki = true; dp = true; data = true; } rec {
             name = "xonotic-${version}";
