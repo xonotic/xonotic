@@ -23,7 +23,7 @@ let
             ];
 
             env = {
-                QCC = "${gmqcc}/gmqcc";
+                QCC = "${gmqcc}/bin/gmqcc";
             };
 
             nativeBuildInputs = [
@@ -78,8 +78,8 @@ let
             src = ./gmqcc;
 
             installPhase = ''
-                mkdir $out
-                cp -r . $out
+                mkdir -p $out/bin
+                cp gmqcc $out/bin
             '';
         };
 
