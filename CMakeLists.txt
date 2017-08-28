@@ -1,21 +1,24 @@
-cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(xonotic)
 
 option(DOWNLOAD_MAPS "Download new maps from the build server" ON)
 option(BUILD_RELEASE "Package a release" OFF)
 
-macro(subproject name)
+function(subproject id name)
+    if ($ENV{XON_NO_${id}})
+        return()
+    endif ()
     if (EXISTS "${PROJECT_SOURCE_DIR}/${name}/CMakeLists.txt")
         add_subdirectory(${name} ${ARGN})
     endif ()
-endmacro()
+endfunction()
 
-subproject(daemon)
-subproject(d0_blind_id)
-subproject(darkplaces)
-subproject(data/xonotic-data.pk3dir)
-subproject(gmqcc)
-subproject(netradiant)
+subproject(DAEMON daemon)
+subproject(PKI d0_blind_id)
+subproject(DP darkplaces)
+subproject(DATA data/xonotic-data.pk3dir)
+subproject(QCC gmqcc)
+subproject(RADIANT netradiant)
 
 if (DOWNLOAD_MAPS)
     add_custom_target(update-maps ALL
