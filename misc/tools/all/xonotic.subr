@@ -342,7 +342,15 @@ case "$cmd" in
 		if [ x"$USE_RLWRAP" != x"no" ] && which rlwrap >/dev/null 2>&1; then
 			set -- rlwrap -A -g '^quit' -q "\"" -s 10000 -S ']' -w 100 "$@"
 		fi
+
+		# winpty fixes dedicated servers not accepting input in the shell console
+		# sadly for some reason it doesn't work for non-dedicated servers
+		if [ -n "$WE_HATE_OUR_USERS" ] && [ x"$client" == x"-dedicated" ] && which winpty >/dev/null 2>&1; then
+			set -- winpty "$@"
+		fi
+
 		rm -f xonotic.core
+
 		verbose measure_time "$@" || true
 		if [ -f xonotic.core ]; then
 			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
