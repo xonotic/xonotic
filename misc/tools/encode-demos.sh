@@ -1,9 +1,9 @@
 #!/bin/bash
 # name: encode-demos.sh
-# version: 0.6.2
+# version: 0.6.3
 # author: Tyler "-z-" Mulligan <z@xnz.me>
 # license: GPL & MIT
-# date: 26-02-2017
+# date: 01-04-2017
 # description: headless encoding of demo files to HD video concurrently with Xfvb and parallel
 #
 # The encoding is done with a full Xonotic client inside Xfvb.
@@ -42,7 +42,7 @@
 
 # Customize
 USERDIR=${HOME}/.xonotic-clean                      # path to Xonotic userdir for client that does encoding
-GAMEDIR=${USERDIR}/data                             # path to Xonotic userdir for client that does encoding
+GAMEDIR=${USERDIR}/data                             # path to Xonotic gamedir for client that does encoding
 XONOTIC_BIN="./all"                                 # binary used to launch Xonotic
 JOB_TIMEOUT="4h"                                    # if demo doesn't quit itself or hangs
 JOBS=4                                              # number of concurrent jobs
@@ -358,6 +358,24 @@ compress() {
     fi
 }
 
+create_gif() {
+    local video=$1
+    local fps=${2:-15}
+    local width=${3:-320}
+    local start=${4:-0}
+    local length=${5:-999999}
+    local loop=${6:-1}
+    local output=$(basename ${video%.*}.gif)
+
+    # Generate palette for better quality
+    ${FFMPEG} -i ${GAMEDIR}/${video} -vf fps=${fps},scale=${width}:-1:flags=lanczos,palettegen ${GAMEDIR}/tmp_palette.png
+
+    # Generate gif using palette
+    ${FFMPEG} -i ${GAMEDIR}/${video} -i ${GAMEDIR}/tmp_palette.png -ss ${start} -t ${length} -loop ${loop} -filter_complex "fps=${fps},scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse" ${GAMEDIR}/${output}
+
+    rm ${GAMEDIR}/tmp_palette.png
+}
+
 list_jobs() {
     completed_jobs=$(_get_completed_jobs)
     active_jobs=$(_get_active_demo_jobs)
@@ -510,19 +528,23 @@ COMMANDS
 
     Encoding
     --------
-    batch  [demos.txt] [timeout] [--compress]   batch process a list of demos from file relative to \$USERDIR/data
-    single <demo> [timeout] [--compress]        process a single demo file in \$USERDIR/data. ex: demos/cool.dem
-                                                'timeout' does not include '--compress', compress starts a new job
+    batch  [demos.txt] [timeout] [--compress]           batch process a list of demos from file relative to \$USERDIR/data
+    single <demo> [timeout] [--compress]                process a single demo file in \$USERDIR/data. ex: demos/cool.dem
+                                                        'timeout' does not include '--compress', compress starts a new job
     Compression
     -----------
-    compress <video> [mp4|webm] [--cleanup]     compress an encoded ogv in \$USERDIR/data, ex: video/cool.ogv
+    compress <video> [mp4|webm] [--cleanup]             compress an encoded ogv in \$USERDIR/data, ex: video/cool.ogv
+
+    Convert
+    -----------
+    gif <video> [fps] [width] [start] [length] [loop]   convert a video to gif in \$USERDIR/data, ex: video/cool.ogv
 
     Job Management
     --------------
-    grep <keyword>                              grep the server logs of the workers
-    kkill <keyword>                             keyword kill, kill a worker if string is matched
-    list [-f]                                   list currently active/queued/completed jobs
-    log [-f]                                    tail the current log (-f follows log)
+    grep <keyword>                                      grep the server logs of the workers
+    kkill <keyword>                                     keyword kill, kill a worker if string is matched
+    list [-f]                                           list currently active/queued/completed jobs
+    log [-f]                                            tail the current log (-f follows log)
 
 EXAMPLES
 
@@ -537,6 +559,9 @@ EXAMPLES
 
     # compress a video in \$USERDIR/data (outputs test.mp4, and deletes the original)
     ./encode-demos.sh compress video/test.ogv --cleanup
+
+    # convert video to gif (14 fps, 640 width, start at 4s, length of 4s, loop 100 times)
+    ./encode-demos.sh gif video/2017-04-01_11-53_afterslime_000.ogv 14 640 4 4 100
 
     # list jobs
     ./encode-demos.sh list
@@ -572,6 +597,8 @@ case $1 in
     'single')           _run_xvfb; process_single $2 $3 $4;;
     # compression
     'compress')         compress $2 $3 $4;;
+    # convert
+    'gif')              create_gif $2 $3 $4 $5 $6 $7;;
     # monitoring/management
     'grep')             log_keyword_grep 'normal' $2;;
     'kkill')            log_killer_keyword $2;;
