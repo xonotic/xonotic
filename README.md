@@ -35,7 +35,7 @@ We're mainly looking for help in the following areas:
 - Testing
   - If you're running a server or play off-line often, please consider using the [autobuild](https://gitlab.com/xonotic/xonotic/wikis/Autobuilds) or [git](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access) versions to help us find bugs (when playing online, the server's version of the gamecode is downloaded and used by all clients so you have to play offline or run your own server for testing)
 - PR
-  - Please don't create anything that looks official (social media accounts, entries on pages like steam, etc.) we like to do that ourselves so we can manage them
+  - Please don't create anything that looks official (social media accounts, entries on pages like steam, etc.), we like to do that ourselves so we can manage things and keep the information up to date
   - All other kinds of PR are very welcome - make videos or articles, share links, spread the word
 
 ## Developing
