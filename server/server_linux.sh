@@ -1,8 +1,8 @@
 #!/bin/sh
 
 case "$(uname -m)" in
-  x86_64)	executable="xonotic-linux64-dedicated" ;;
-  *)		executable="xonotic-linux32-dedicated" ;;
+  i?86)	executable="xonotic-linux32-dedicated" ;;  # Not supported anymore but you can build your own.
+  *)	executable="xonotic-linux64-dedicated" ;;
 esac
 
 cd "`dirname "${0}"`"

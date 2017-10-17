@@ -72,17 +72,8 @@ if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 			excludes="$excludes --exclude=/Xonotic*.app"
 			excludes="$excludes --exclude=/xonotic-osx-*"
 			excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
-			if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
-				excludes="$excludes --exclude=/xonotic-linux32-*"
-				excludes="$excludes --exclude=/gmqcc/gmqcc.linux32"
-			fi
-			;;
-		Linux:i?86)
-			excludes="$excludes --exclude=/Xonotic*.app"
-			excludes="$excludes --exclude=/xonotic-osx-*"
-			excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
-			excludes="$excludes --exclude=/xonotic-linux64-*"
-			excludes="$excludes --exclude=/gmqcc/gmqcc.linux64"
+			excludes="$excludes --exclude=/xonotic-linux32-*"
+			excludes="$excludes --exclude=/gmqcc/gmqcc.linux32"
 			;;
 		*)
 			echo >&2 "WARNING: Could not detect architecture - downloading all architectures"
