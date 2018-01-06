@@ -19,9 +19,9 @@ _1st_arguments=(
     'serverbench:run the server benchmark'
     'fix_upstream_rebase:fix upstream rebase'
     'fix_config:fix .git/config'
-    'keygen:generate ssh key for repo access'
-    {checkout,switch}':checkout a specific branch'
-    'branch:create a branch in a repo'
+    'keygen:generate ssh key for repo access if one does not exist yet'
+    {checkout,switch}':checkout a specific branch in repos where it exists and default branch elsewhere'
+    'branch:create a branch in a repo (asks for repo)'
     {push,commit}':commit and push changes'
     {each,foreach}':run a command in each repo'
     'grep:run "git grep" in all repos'
@@ -78,7 +78,7 @@ case $state in
 
         update|pull)
             _arguments \
-                "-N[don't allow pull]" \
+                "-N[reset git config for each repo]" \
                 '-l[find the best mirror in the specified location]' \
                 - '(ssh)' \
                     {-p,-s}'[set ssh as push protocol and find the best mirror]' \
