@@ -32,8 +32,7 @@ allmirrors()
 	"$@" http ''   http://us.git.xonotic.org/xonotic/  ''
 
 	# Gitlab host (divVerent).
-	# Disabled because of https://gitlab.com/gitlab-com/support-forum/issues/15
-	"$@" http ''   https://gitlab.com/xonotic/         ''
+	"$@" http gitlab   https://gitlab.com/xonotic/     ''
 
 	# German host (divVerent).
 	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
