@@ -1,0 +1,95 @@
+#compdef all
+
+zstyle ":completion:*:descriptions" format "%B%d%b"
+
+
+local context state line ret=1
+typeset -A opt_args
+
+
+local -a _1st_arguments
+_1st_arguments=(
+    'help:print the help message'
+    {update,pull}':update all repos'
+    'compile:compile the source code'
+    'clean:clean all repos'
+    'run:run the game'
+    'update-maps:download the latest version of all official maps from the autobuild server'
+    'compile-map:compile the specified maps'
+    'serverbench:run the server benchmark'
+    'fix_upstream_rebase:fix upstream rebase'
+    'fix_config:fix .git/config'
+    'keygen:generate ssh key for repo access if one does not exist yet'
+    {checkout,switch}':checkout a specific branch in repos where it exists and default branch elsewhere'
+    'branch:create a branch in a repo (asks for repo)'
+    {push,commit}':commit and push changes'
+    {each,foreach}':run a command in each repo'
+    'grep:run "git grep" in all repos'
+)
+
+_arguments -C \
+    '1: :->cmds' \
+    '*:: :->args' && ret=0
+
+
+case $state in
+    cmds)
+        _describe -t actions 'commands' _1st_arguments
+        ret=0
+        ;;
+
+    args)
+        case $words[1] in
+        run)
+            # choose version and autocomplete cvars
+            # possible TODO: check for OS and adapt to it
+            _arguments \
+                '1:Version:(sdl glx dedicated)' && ret=0
+            ;;
+
+        compile)
+            _arguments \
+                '1:Version:(sdl glx dedicated)' \
+                "-0[don't use precompiled d0_blind_id]" \
+                '-c[clean all before building]' \
+                '-qc[clean QuakeC binaries]' \
+                - '(release)' \
+                    '-r[build in release mode]' \
+                - '(profile)' \
+                    '-p[build in profile mode]' && ret=0
+            ;;
+
+        compile-map)
+            _files -W "(data/xonotic-maps.pk3dir/maps)" -g "*.map(:r)" && ret=0
+            ;;
+
+        clean)
+            _arguments \
+                - '(noreclone)' \
+                    '-f[force clean]' \
+                    '-u[go to upstream]' \
+                    '-U[go to upstream and fetch master]' \
+                    '-m[go to master]' \
+                    '-r[remove untracked files]' \
+                    '-D[kill branches]' \
+                - '(reclone)' \
+                    '--reclone[set all the other flags (effectively a reclone)]' && ret=0
+            ;;
+
+        update|pull)
+            _arguments \
+                "-N[reset git config for each repo]" \
+                '-l[find the best mirror in the specified location]' \
+                - '(ssh)' \
+                    {-p,-s}'[set ssh as push protocol and find the best mirror]' \
+                - '(git)' \
+                    '-g[set git as push protocol and find the best mirror]' \
+                - '(http)' \
+                    '-h[set http as push protocol and find the best mirror]' && ret=0
+            ;;
+
+        esac
+        ;;
+esac
+
+return ret

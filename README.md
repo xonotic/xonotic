@@ -34,4 +34,4 @@ The community is primarily active in the [forums](http://forums.xonotic.org/) an
 
 ## License
 
-Distributed under the GPLv2 license. See the [LICENSE](LICENSE) file for more details.
+Distributed under the GPLv2 license. See the [COPYING](COPYING) file for more details.

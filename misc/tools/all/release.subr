@@ -130,7 +130,6 @@ case "$cmd" in
 				# - .ssh/config must be configured so the following
 				#   host names are reachable and have a compile
 				#   infrastructure set up:
-				#   - xonotic-build-linux32 (with gcc on x86)
 				#   - xonotic-build-linux64 (with gcc on x86_64)
 				#   - xonotic-build-win32 (with i586-mingw32msvc-g++)
 				#   - xonotic-build-win64 (with amd64-mingw32msvc-g++
@@ -241,14 +240,6 @@ case "$cmd" in
 		verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || good=false
 		$good
 		;;
-	release-engine-linux32)
-		release_common
-		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-sdl || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-glx || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux32-dedicated || good=false
-		$good
-		;;
 	release-engine-linux64)
 		release_common
 		good=true
@@ -261,7 +252,6 @@ case "$cmd" in
 		release_common
 		# TODO report failures here.
 		good=false
-		verbose "$SELF" release-engine-linux32 && good=true
 		verbose "$SELF" release-engine-linux64 && good=true
 		verbose "$SELF" release-engine-win32 && good=true
 		verbose "$SELF" release-engine-win64 && good=true

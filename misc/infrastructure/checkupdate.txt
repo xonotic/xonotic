@@ -41,6 +41,8 @@ R J9JepdOZjvCBXYfz8fj3civ4PulKF4/asnK9u5ZojYg=
 R 6QtAVwbWcJFYZDvSeuZHEaaJE4JoTzmNni/LPZUSOKE=
 R Lh+WWOrY7IjXqP7pekmlgy6R+N+tTBm6DBV1gUZvtZ4=
 R ggH3OBVqbVeCCBkLQZtFLvwxuTpfBAz+/scg3OwsPVo=
+R kV3UkVGqke8UhrgIWKhTOU/nDhk3f+OT7TVEfqh9xy0=
+R AaQzHJT+/f6XHfZ4Zabz2KR7dXwQsoKJ1XYICRNo7to=
 
 # Promoted servers. Always show up as recommended, even if "slow".
 # P <key or IP here>

@@ -67,10 +67,6 @@ if (0)
     getbinary(Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin) # +x
     getbinary(Xonotic/xonotic-osx-dedicated) # +x
 
-    getbinary(Xonotic/xonotic-linux32-sdl) # +x
-    getbinary(Xonotic/xonotic-linux32-glx) # +x
-    getbinary(Xonotic/xonotic-linux32-dedicated) # +x
-
     getbinary(Xonotic/xonotic-linux64-sdl) # +x
     getbinary(Xonotic/xonotic-linux64-glx) # +x
     getbinary(Xonotic/xonotic-linux64-dedicated) # +x

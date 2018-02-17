@@ -13,8 +13,8 @@ case "${0##*/}" in
 esac
 
 case "$(uname -m)" in
-  x86_64)	arch="linux64" ;;
-  *)		arch="linux32" ;;
+  i?86)	arch="linux32" ;;  # Not supported anymore but you can build your own.
+  *)	arch="linux64" ;;
 esac
 
 xonotic="xonotic-${arch}-${mode}"
