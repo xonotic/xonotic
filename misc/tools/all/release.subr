@@ -88,7 +88,7 @@ release_common()
 
 	getversion()
 	{
-		gv=`grep "^gameversion " "$1/defaultXonotic.cfg" | awk '{ print $2 }'`
+		gv=`grep "^gameversion " "$1/xonotic-common.cfg" | awk '{ print $2 }'`
 		major=$(($gv / 10000))
 		minor=$((($gv / 100) - ($major * 100)))
 		patch=$(($gv - ($major * 10000) - ($minor * 100)))
@@ -409,21 +409,21 @@ case "$cmd" in
 					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
 					s/^gameversion_min [0-9]*/gameversion_min     0/;
 					s/^gameversion_max [0-9]*/gameversion_max  9999/;
-				" < defaultXonotic.cfg > defaultXonotic.cfg.new
+				" < xonotic-common.cfg > xonotic-common.cfg.new
 			else
 				# >= 1.0
 				verbose sed "
 					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
 					s/^gameversion_min [0-9]*/gameversion_min $(( ($gv / 100) * 100 - 100 ))/;
 					s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
-				" < defaultXonotic.cfg > defaultXonotic.cfg.new
+				" < xonotic-common.cfg > xonotic-common.cfg.new
 			fi
-			mv defaultXonotic.cfg.new defaultXonotic.cfg
+			mv xonotic-common.cfg.new xonotic-common.cfg
 			case "$RELEASETYPE" in
 				release)
-					echo "" >> defaultXonotic.cfg
-					echo "// nicer menu" >> defaultXonotic.cfg
-					echo "set menu_watermark \"\"" >> defaultXonotic.cfg
+					echo "" >> xonotic-common.cfg
+					echo "// nicer menu" >> xonotic-common.cfg
+					echo "set menu_watermark \"\"" >> xonotic-common.cfg
 					;;
 			esac
 			(
