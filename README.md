@@ -24,6 +24,7 @@ No installation required, just unpack and run. Got questions? See the [FAQ](http
 
 We're mainly looking for help in the following areas:
 
+- [Translations](https://www.transifex.com/team-xonotic/xonotic/)
 - [Modeling and texturing](https://gitlab.com/xonotic/xonotic-data.pk3dir/issues?label_name=Area%3A+Assets)
 - Documentation
   - Some of it is still scattered in [Docs](https://gitlab.com/xonotic/xonotic/tree/master/Docs) instead of being on our [wiki](https://gitlab.com/xonotic/xonotic/wikis/home)
