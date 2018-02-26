@@ -30,11 +30,12 @@ Licensing Grant
 ---------------
 
 All source files (as defined by the respective license) in scope of this
-document are under the GPL version 2 or any later version, at your choice.
+document are under the GPL version 3 or any later version, at your choice.
 
-Linux and Windows binaries however link to a library that is under the LGPL
-version 3 with the "or any later version" clause. Thus, they can only be
-distributed under the GPL version 3 or any later version, at your choice.
+The source code of the game engine, DarkPlaces, is licensed under the GPL
+version 2 or any later version, at your choice. Furthermore, some source code
+inside the qcsrc/ directory may also be usable under other licenses as
+indicated by COPYING files therein.
 
 The two relevant licenses are provided in the files GPL-2 and GPL-3 in this
 package.
@@ -52,12 +53,11 @@ Contributions
 -------------
 
 By committing data/files, you agree to license all the changes/additions
-contained in your commits to Team Xonotic under the terms of the General Public
-License version 2, with the "any later version" clause active. In particular,
-you guarantee that you have acquired all the necessary rights from possible
-other copyright holders to be able to license your work under this license. Any
-submission which does not fulfill this condition may lead to legal action
-against the submitter.
+contained in your commits to Team Xonotic under the terms of the applicable
+license as described above. In particular, you guarantee that you have
+acquired all the necessary rights from possible other copyright holders to be
+able to license your work under this license. Any submission which does not
+fulfill this condition may lead to legal action against the submitter.
 
 Exceptions however may be made on request, but in any case, Team Xonotic must
 be allowed to distribute the changes as part of the git repository, and others
