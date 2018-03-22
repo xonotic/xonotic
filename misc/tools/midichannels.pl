@@ -354,6 +354,7 @@ while(<STDIN>)
 		print "  channel <track|*> <channel|*> <channel> [<channel> <channel> ...]\n";
 		print "  percussion <track|*> <channel|*> <from> <to> [<from> <to> ...]\n";
 		print "  tracks [trackno] [trackno] ...\n";
+		print "  save <filename.mid>\n";
 	}
 	print "Done with: $cmd @arg\n";
 }
