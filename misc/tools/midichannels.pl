@@ -60,7 +60,7 @@ for(@others)
 while(<STDIN>)
 {
 	chomp;
-	my @arg = split /\s+/, $_;
+	my @arg = grep { $_ ne '' } split /\s+/, $_;
 	my $cmd = shift @arg;
 	print "Executing: $cmd @arg\n";
 	if($cmd eq '#')
