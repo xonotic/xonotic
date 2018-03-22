@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use MIDI;
+use MIDI::Event;
 use MIDI::Opus;
+use MIDI::Track;
 
 my ($filename, @others) = @ARGV;
 my $opus = MIDI::Opus->new({from_file => $filename});
@@ -135,6 +136,37 @@ while(<STDIN>)
 						{
 							push @events, ['patch_change', $_->[1], $c-1, $program-1]
 								if $program;
+							$added = 1;
+						}
+					}
+				}
+				push @events, $_;
+			}
+			$tracks->[$_]->events_r([reltime @events]);
+		}
+	}
+	elsif($cmd eq 'control')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, $control, $value) = @arg;
+		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			my $added = 0;
+			for(abstime $tracks->[$_]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
+					{
+						next
+							if $_->[0] eq 'control_change' && $_->[3] == $control;
+						if(!$added)
+						{
+							push @events, ['control_change', $_->[1], $c-1, $control, $value]
+								if $value ne '';
 							$added = 1;
 						}
 					}
@@ -317,6 +349,7 @@ while(<STDIN>)
 		print "  ticks [value]\n";
 		print "  retrack\n";
 		print "  program <track|*> <channel|*> <program (1-based)>\n";
+		print "  control <track|*> <channel|*> <control> <value>\n";
 		print "  transpose <track|*> <channel|*> <delta>\n";
 		print "  channel <track|*> <channel|*> <channel> [<channel> <channel> ...]\n";
 		print "  percussion <track|*> <channel|*> <from> <to> [<from> <to> ...]\n";
