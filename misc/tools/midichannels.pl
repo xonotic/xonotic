@@ -118,11 +118,11 @@ while(<STDIN>)
 	{
 		my $tracks = $opus->tracks_r();
 		my ($track, $channel, $program) = @arg;
-		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		for my $t(($track eq '*') ? (0..@$tracks-1) : $track)
 		{
 			my @events = ();
-			my $added = 0;
-			for(abstime $tracks->[$_]->events())
+			my %added = ();
+			for(abstime $tracks->[$t]->events())
 			{
 				my $p = $chanpos{$_->[0]};
 				if(defined $p)
@@ -132,28 +132,28 @@ while(<STDIN>)
 					{
 						next
 							if $_->[0] eq 'patch_change';
-						if(!$added)
+						if(!$added{$t}{$c})
 						{
 							push @events, ['patch_change', $_->[1], $c-1, $program-1]
 								if $program;
-							$added = 1;
+							$added{$t}{$c} = 1;
 						}
 					}
 				}
 				push @events, $_;
 			}
-			$tracks->[$_]->events_r([reltime @events]);
+			$tracks->[$t]->events_r([reltime @events]);
 		}
 	}
 	elsif($cmd eq 'control')
 	{
 		my $tracks = $opus->tracks_r();
 		my ($track, $channel, $control, $value) = @arg;
-		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		for my $t(($track eq '*') ? (0..@$tracks-1) : $track)
 		{
 			my @events = ();
-			my $added = 0;
-			for(abstime $tracks->[$_]->events())
+			my %added = ();
+			for(abstime $tracks->[$t]->events())
 			{
 				my $p = $chanpos{$_->[0]};
 				if(defined $p)
@@ -163,17 +163,17 @@ while(<STDIN>)
 					{
 						next
 							if $_->[0] eq 'control_change' && $_->[3] == $control;
-						if(!$added)
+						if(!$added{$t}{$c})
 						{
 							push @events, ['control_change', $_->[1], $c-1, $control, $value]
 								if $value ne '';
-							$added = 1;
+							$added{$t}{$c} = 1;
 						}
 					}
 				}
 				push @events, $_;
 			}
-			$tracks->[$_]->events_r([reltime @events]);
+			$tracks->[$t]->events_r([reltime @events]);
 		}
 	}
 	elsif($cmd eq 'transpose')
