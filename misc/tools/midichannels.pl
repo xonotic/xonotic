@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
-use MIDI;
+use MIDI::Event;
 use MIDI::Opus;
+use MIDI::Track;
 
 my ($filename, @others) = @ARGV;
 my $opus = MIDI::Opus->new({from_file => $filename});
@@ -59,7 +60,7 @@ for(@others)
 while(<STDIN>)
 {
 	chomp;
-	my @arg = split /\s+/, $_;
+	my @arg = grep { $_ ne '' } split /\s+/, $_;
 	my $cmd = shift @arg;
 	print "Executing: $cmd @arg\n";
 	if($cmd eq '#')
@@ -117,11 +118,11 @@ while(<STDIN>)
 	{
 		my $tracks = $opus->tracks_r();
 		my ($track, $channel, $program) = @arg;
-		for(($track eq '*') ? (0..@$tracks-1) : $track)
+		for my $t(($track eq '*') ? (0..@$tracks-1) : $track)
 		{
 			my @events = ();
-			my $added = 0;
-			for(abstime $tracks->[$_]->events())
+			my %added = ();
+			for(abstime $tracks->[$t]->events())
 			{
 				my $p = $chanpos{$_->[0]};
 				if(defined $p)
@@ -131,17 +132,48 @@ while(<STDIN>)
 					{
 						next
 							if $_->[0] eq 'patch_change';
-						if(!$added)
+						if(!$added{$t}{$c})
 						{
 							push @events, ['patch_change', $_->[1], $c-1, $program-1]
 								if $program;
-							$added = 1;
+							$added{$t}{$c} = 1;
 						}
 					}
 				}
 				push @events, $_;
 			}
-			$tracks->[$_]->events_r([reltime @events]);
+			$tracks->[$t]->events_r([reltime @events]);
+		}
+	}
+	elsif($cmd eq 'control')
+	{
+		my $tracks = $opus->tracks_r();
+		my ($track, $channel, $control, $value) = @arg;
+		for my $t(($track eq '*') ? (0..@$tracks-1) : $track)
+		{
+			my @events = ();
+			my %added = ();
+			for(abstime $tracks->[$t]->events())
+			{
+				my $p = $chanpos{$_->[0]};
+				if(defined $p)
+				{
+					my $c = $_->[$p] + 1;
+					if($channel eq '*' || $c == $channel)
+					{
+						next
+							if $_->[0] eq 'control_change' && $_->[3] == $control;
+						if(!$added{$t}{$c})
+						{
+							push @events, ['control_change', $_->[1], $c-1, $control, $value]
+								if $value ne '';
+							$added{$t}{$c} = 1;
+						}
+					}
+				}
+				push @events, $_;
+			}
+			$tracks->[$t]->events_r([reltime @events]);
 		}
 	}
 	elsif($cmd eq 'transpose')
@@ -317,10 +349,12 @@ while(<STDIN>)
 		print "  ticks [value]\n";
 		print "  retrack\n";
 		print "  program <track|*> <channel|*> <program (1-based)>\n";
+		print "  control <track|*> <channel|*> <control> <value>\n";
 		print "  transpose <track|*> <channel|*> <delta>\n";
 		print "  channel <track|*> <channel|*> <channel> [<channel> <channel> ...]\n";
 		print "  percussion <track|*> <channel|*> <from> <to> [<from> <to> ...]\n";
 		print "  tracks [trackno] [trackno] ...\n";
+		print "  save <filename.mid>\n";
 	}
 	print "Done with: $cmd @arg\n";
 }

@@ -380,9 +380,9 @@ mapinfo file.
 
 To do this, I can add the following lines to my mapinfo file:
 
-    settemp_for_type ctf g_balance_laser_primary_force 200
-    settemp_for_type all g_start_weapon_shotgun 0
-    settemp_for_type all g_start_weapon_uzi 1
+    settemp_for_type ctf g_balance_blaster_primary_force 200
+    settemp_for_type all g_balance_shotgun_weaponstart 0
+    settemp_for_type all g_balance_machinegun_weaponstart 1
     settemp_for_type all sv_cullentities_trace 0
 
 These "settemp" settings are automatically removed when the map is left and
