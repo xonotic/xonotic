@@ -195,16 +195,6 @@ case "$cmd" in
 				case "`uname`" in
 					Linux)
 						case `uname -m` in
-							x86_64)
-								# No cp commands, we want to use static linking instead.
-								export CC="$CC -I../../../../misc/builddeps/linux64/d0_blind_id/include"
-								export CC="$CC -L../../../../misc/builddeps/linux64/d0_blind_id/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/d0_blind_id/lib"
-								export CC="$CC -I../../../../misc/builddeps/linux64/gmp/include"
-								export CC="$CC -L../../../../misc/builddeps/linux64/gmp/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux64/gmp/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux64/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux64/d0_blind_id/lib/libd0_rijndael.a"
-								;;
 							*86)
 								# No cp commands, we want to use static linking instead.
 								export CC="$CC -I../../../../misc/builddeps/linux32/d0_blind_id/include"
@@ -216,6 +206,7 @@ case "$cmd" in
 								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
 								;;
 							*)
+								msg "Always need to compile libd0_blind_id on Linux `uname -m`."
 								compiled0=true
 								;;
 						esac
@@ -225,6 +216,7 @@ case "$cmd" in
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
 						;;
 					*)
+						msg "Always need to compile libd0_blind_id on `uname`."
 						compiled0=true
 						;;
 				esac
