@@ -198,6 +198,7 @@ case "$cmd" in
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
 						;;
 					*)
+						msg "Always need to compile libd0_blind_id on `uname`."
 						compiled0=true
 						;;
 				esac
