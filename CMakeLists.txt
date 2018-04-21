@@ -13,12 +13,12 @@ function(subproject id name)
     endif ()
 endfunction()
 
-subproject(DAEMON daemon)
 subproject(PKI d0_blind_id)
+subproject(DAEMON daemon)
 subproject(DP darkplaces)
-subproject(DATA data/xonotic-data.pk3dir)
 subproject(QCC gmqcc)
 subproject(RADIANT netradiant)
+subproject(DATA data/xonotic-data.pk3dir)
 
 if (DOWNLOAD_MAPS)
     add_custom_target(update-maps ALL
