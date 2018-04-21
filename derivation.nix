@@ -1,6 +1,7 @@
 # nix-shell -A shell
 # nix-build -A xonotic
 # --argstr cc clang
+# for it in $(nix-build -A dockerImage --no-out-link); do docker load -i $it; done
 {
     pkgs, lib,
     cc ? null,
@@ -89,6 +90,20 @@ let
             || (lib.hasSuffix ".zym" baseName)
         );
     in result;
+
+    pk3 = drv: mkDerivation {
+        name = "${drv.name}.pk3";
+        version = drv.version;
+
+        nativeBuildInputs = with pkgs; [
+            zip
+        ];
+
+        phases = [ "installPhase" ];
+        installPhase = ''
+            (cd ${drv} && zip -r ${drv.pk3args or ""} $out .)
+        '';
+    };
 
     targets = rec {
         font-dejavu = mkDerivation rec {
@@ -318,6 +333,48 @@ let
             '';
         };
 
+        # todo: build
+        xonotic-maps = mkDerivation rec {
+            name = "xonotic-maps-${version}";
+            version = "xonotic-${VERSION}";
+
+            src = srcs."data/xonotic-maps";
+
+            phases = [ "installPhase" ];
+            installPhase = ''
+                mkdir $out
+                cp -r $src/. $out
+            '';
+        };
+
+        xonotic-music = mkDerivation rec {
+            name = "xonotic-music-${version}";
+            version = "xonotic-${VERSION}";
+
+            src = srcs."data/xonotic-music";
+
+            phases = [ "installPhase" ];
+            installPhase = ''
+                mkdir $out
+                cp -r $src/. $out
+            '';
+
+            passthru.pk3args = "-0";
+        };
+
+        xonotic-nexcompat = mkDerivation rec {
+            name = "xonotic-nexcompat-${version}";
+            version = "xonotic-${VERSION}";
+
+            src = srcs."data/xonotic-nexcompat";
+
+            phases = [ "installPhase" ];
+            installPhase = ''
+                mkdir $out
+                cp -r $src/. $out
+            '';
+        };
+
         xonotic = mkDerivation rec {
             name = "xonotic-${version}";
             version = VERSION;
@@ -328,31 +385,77 @@ let
                 XON_NO_DAEMON = "1";
             };
 
+            passthru.paks = {
+                inherit
+                    font-dejavu
+                    font-nimbussansl
+                    font-unifont
+                    font-xolonium
+                    xonotic-data
+                    xonotic-data-code
+                    xonotic-maps
+                    xonotic-music
+                    xonotic-nexcompat
+                ;
+            };
+
             phases = [ "installPhase" ];
 
-            # test: `ln -s`
-            # release: `cp -r`
             installPhase = ''
                 mkdir $out
                 cp -r $src/. $out
                 cp ${darkplaces}/bin/* $out
 
                 mkdir -p $out/data
-                ln -s ${font-dejavu} $out/data/font-dejavu.pk3dir
-                ln -s ${font-nimbussansl} $out/data/font-nimbussansl.pk3dir
-                ln -s ${font-unifont} $out/data/font-unifont.pk3dir
-                ln -s ${font-xolonium} $out/data/font-xolonium.pk3dir
-
-                ln -s ${xonotic-data} $out/data/xonotic-data.pk3dir
-                ln -s ${xonotic-data-code} $out/data/xonotic-data-code.pk3dir
-                ln -s ${srcs."data/xonotic-maps"} $out/data/xonotic-maps.pk3dir # todo: build
-                ln -s ${srcs."data/xonotic-music"} $out/data/xonotic-music.pk3dir
-                ln -s ${srcs."data/xonotic-nexcompat"} $out/data/xonotic-nexcompat.pk3dir
+                ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v:
+                    # "cp ${pk3 v} $out/data/${k}.pk3"
+                    "ln -s ${v} $out/data/${k}.pk3dir"
+                ) passthru.paks)}
 
                 mkdir -p $out/mapping
                 ln -s ${netradiant} $out/mapping/${netradiant.name}
             '';
         };
+
+        dockerImage = let
+            main = pkgs.dockerTools.buildImage {
+                name = "xonotic";
+                tag = VERSION;
+                contents = mkDerivation {
+                    name = "xonotic-init";
+                    phases = [ "installPhase" ];
+                    installPhase = ''
+                        mkdir -p $out
+                        cat > $out/init <<EOF
+                        #!${stdenv.shell}
+                        ${pkgs.coreutils}/bin/ls -l /data
+                        exec ${darkplaces}/bin/xonotic-linux64-dedicated
+                        EOF
+                        chmod +x $out/init
+                    '';
+                };
+                config.Entrypoint = "/init";
+            };
+            unpackImage = { name, from, to }: pkgs.dockerTools.buildImage {
+                name = "xonotic_${name}";
+                tag = VERSION;
+                contents = mkDerivation {
+                    name = "xonotic-${name}-init";
+                    phases = [ "installPhase" ];
+                    installPhase = ''
+                        mkdir -p $out
+                        cat > $out/init <<EOF
+                        #!${stdenv.shell}
+                        ${pkgs.coreutils}/bin/cp -r ${from} /data/${to}
+                        EOF
+                        chmod +x $out/init
+                    '';
+                };
+                config.Entrypoint = "/init";
+            };
+        in { main = main; }
+            // (lib.mapAttrs (k: v: unpackImage { name = k; from = pk3 v; to = "${k}.pk3"; }) xonotic.paks)
+        ;
     };
 
     cleanSourceFilter = name: type: let
@@ -387,10 +490,10 @@ let
         }
     );
 
-    shell = let inputs = (lib.mapAttrsToList (n: v: v) targets); in stdenv.mkDerivation (rec {
+    shell = let inputs = (lib.mapAttrsToList (k: v: v) targets); in stdenv.mkDerivation (rec {
         name = "xonotic-shell";
-        nativeBuildInputs = builtins.map (it: it.nativeBuildInputs) inputs;
-        buildInputs = builtins.map (it: it.buildInputs) inputs;
+        nativeBuildInputs = builtins.map (it: it.nativeBuildInputs) (builtins.filter (it: it?nativeBuildInputs) inputs);
+        buildInputs = builtins.map (it: it.buildInputs) (builtins.filter (it: it?buildInputs) inputs);
         shellHook = builtins.map (it: it.shellHook) (builtins.filter (it: it?shellHook) inputs);
     });
 in { inherit shell; } // targets
