@@ -9,58 +9,6 @@
 let
     VERSION = "0.8.2";
 
-    stdenv = if (cc == null) then pkgs.stdenv
-        else pkgs.overrideCC pkgs.stdenv pkgs."${cc}";
-
-    cleanSourceFilter = name: type: let
-        baseName = baseNameOf (toString name);
-        result = (lib.cleanSourceFilter name type)
-            && !(lib.hasSuffix ".nix" baseName)
-            && !(type == "directory" && baseName == ".git")
-            && !(type == "directory" && baseName == ".idea")
-            && !(type == "directory" && (lib.hasPrefix "cmake-build-" baseName))
-        ;
-    in result;
-
-    localFilesCustom = src: filter:
-        builtins.filterSource (name: type: (cleanSourceFilter name type) && (filter name type)) src
-    ;
-    localFiles = src: localFilesCustom src (name: type: true);
-
-    localFilesMain = src: let
-        project = toString ./.;
-        cleanSourceFilterMain = name: type: let
-            baseName = baseNameOf (toString name);
-            result = (cleanSourceFilter name type)
-                && !(name == "${project}/release")
-                && !(name == "${project}/d0_blind_id")
-                && !(name == "${project}/daemon")
-                && !(name == "${project}/darkplaces")
-                && !(name == "${project}/data")
-                && !(name == "${project}/gmqcc")
-                && !(name == "${project}/netradiant")
-                && !(name == "${project}/wiki" || name == "${project}/wiki.yes")
-                && !(name == "${project}/xonstat" || name == "${project}/xonstat.yes")
-            ;
-        in result;
-    in builtins.filterSource cleanSourceFilterMain src;
-
-    isCode = name: let
-        baseName = baseNameOf (toString name);
-        result = false
-            || (lib.hasSuffix ".txt" baseName)
-            || (lib.hasSuffix ".cmake" baseName)
-            || (lib.hasSuffix ".in" baseName)
-            || (lib.hasSuffix ".sh" baseName)
-
-            || (lib.hasSuffix ".qc" baseName)
-            || (lib.hasSuffix ".qh" baseName)
-            || (lib.hasSuffix ".inc" baseName)
-
-            || (lib.hasSuffix ".cfg" baseName)
-        ;
-    in result;
-
     srcs = {
         # https://gitlab.com/xonotic/xonotic
         "xonotic" = localFilesMain ./.;
@@ -94,6 +42,53 @@ let
         # https://gitlab.com/xonotic/xonotic-nexcompat.pk3dir
         "data/xonotic-nexcompat" = localFiles ./data/xonotic-nexcompat.pk3dir;
     };
+
+    localFilesMain = src: let
+        project = toString ./.;
+        cleanSourceFilterMain = name: type: let
+            baseName = baseNameOf (toString name);
+            result = (cleanSourceFilter name type)
+                && !(name == "${project}/release")
+                && !(name == "${project}/d0_blind_id")
+                && !(name == "${project}/daemon")
+                && !(name == "${project}/darkplaces")
+                && !(name == "${project}/data")
+                && !(name == "${project}/gmqcc")
+                && !(name == "${project}/netradiant")
+                && !(name == "${project}/wiki" || name == "${project}/wiki.yes")
+                && !(name == "${project}/xonstat" || name == "${project}/xonstat.yes")
+            ;
+        in result;
+    in builtins.filterSource cleanSourceFilterMain src;
+
+    isCode = name: let
+        baseName = baseNameOf (toString name);
+        result = !(false
+            || (lib.hasSuffix ".ase" baseName)
+            || (lib.hasSuffix ".dem" baseName)
+            || (lib.hasSuffix ".dpm" baseName)
+            || (lib.hasSuffix ".framegroups" baseName)
+            || (lib.hasSuffix ".iqm" baseName)
+            || (lib.hasSuffix ".jpg" baseName)
+            || (lib.hasSuffix ".lmp" baseName)
+            || (lib.hasSuffix ".md3" baseName)
+            || (lib.hasSuffix ".mdl" baseName)
+            || (lib.hasSuffix ".obj" baseName)
+            || (lib.hasSuffix ".ogg" baseName)
+            || (lib.hasSuffix ".png" baseName)
+            || (lib.hasSuffix ".shader" baseName)
+            || (lib.hasSuffix ".skin" baseName)
+            || (lib.hasSuffix ".sounds" baseName)
+            || (lib.hasSuffix ".sp2" baseName)
+            || (lib.hasSuffix ".spr" baseName)
+            || (lib.hasSuffix ".spr32" baseName)
+            || (lib.hasSuffix ".svg" baseName)
+            || (lib.hasSuffix ".tga" baseName)
+            || (lib.hasSuffix ".wav" baseName)
+            || (lib.hasSuffix ".width" baseName)
+            || (lib.hasSuffix ".zym" baseName)
+        );
+    in result;
 
     targets = rec {
         font-dejavu = mkDerivation rec {
@@ -360,6 +355,25 @@ let
         };
     };
 
+    cleanSourceFilter = name: type: let
+        baseName = baseNameOf (toString name);
+        result = (lib.cleanSourceFilter name type)
+            && !(lib.hasSuffix ".nix" baseName)
+            && !(type == "directory" && baseName == ".git")
+            && !(type == "directory" && baseName == ".idea")
+            && !(type == "directory" && (lib.hasPrefix "cmake-build-" baseName))
+        ;
+    in result;
+
+    localFilesCustom = src: filter:
+        builtins.filterSource (name: type: (cleanSourceFilter name type) && (filter name type)) src
+    ;
+
+    localFiles = src: localFilesCustom src (name: type: true);
+
+    stdenv = if (cc == null) then pkgs.stdenv
+            else pkgs.overrideCC pkgs.stdenv pkgs."${cc}";
+
     mkDerivation = {env ? {}, shellHook ? "", runtimeInputs ? [], ...}@args: stdenv.mkDerivation ({}
         // { enableParallelBuilding = true; }
         // (removeAttrs args ["env" "shellHook" "runtimeInputs"])
@@ -372,6 +386,7 @@ let
             '';
         }
     );
+
     shell = let inputs = (lib.mapAttrsToList (n: v: v) targets); in stdenv.mkDerivation (rec {
         name = "xonotic-shell";
         nativeBuildInputs = builtins.map (it: it.nativeBuildInputs) inputs;
