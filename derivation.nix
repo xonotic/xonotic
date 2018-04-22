@@ -229,14 +229,12 @@ let
                     chmod +w bin/*
                     cd bin
 
-                    for exe in darkplaces-sdl; do
-                        rpath=$(patchelf --print-rpath $exe)
-                        rpath=''${rpath:+$rpath:}${lib.makeLibraryPath runtimeInputs}
-                        patchelf --set-rpath $rpath $exe
-                    done
-
                     for exe in dedicated sdl; do
-                        cp darkplaces-$exe $out/bin/xonotic-linux64-$exe
+                        f=darkplaces-$exe
+                        rpath=$(patchelf --print-rpath $f)
+                        rpath=''${rpath:+$rpath:}${lib.makeLibraryPath runtimeInputs}
+                        patchelf --set-rpath $rpath $f
+                        cp $f $out/bin/xonotic-linux64-$exe
                     done
                 '';
             };
@@ -345,6 +343,24 @@ let
                 mkdir $out
                 cp -r $src/. $out
             '';
+
+            passthru.dance = mkDerivation rec {
+                name = "dance";
+                version = "xonotic-${VERSION}";
+
+                src = pkgs.fetchurl {
+                    url = http://beta.xonotic.org/autobuild-bsp/dance-full-88c416b8c11bdcecfdb889af2a2b97b4c0e2b8de-319ee7234504199da56f07ce25185f6d6cb889cd.pk3;
+                    sha256 = "1jgdg4mz56kbxcy3mwn4h5qlf3ahm1cmarp9l70fz9nfn6cnaknq";
+                };
+
+                phases = [ "installPhase" ];
+
+                installPhase = ''
+                    mkdir -p $out
+                    cd $out
+                    ${pkgs.unzip}/bin/unzip $src
+                '';
+            };
         };
 
         xonotic-music = mkDerivation rec {
@@ -397,6 +413,9 @@ let
                     xonotic-music
                     xonotic-nexcompat
                 ;
+                inherit (xonotic-maps)
+                    dance
+                ;
             };
 
             phases = [ "installPhase" ];
@@ -429,7 +448,7 @@ let
                         cat > $out/init <<EOF
                         #!${stdenv.shell}
                         ${pkgs.coreutils}/bin/ls -l /data
-                        exec ${darkplaces}/bin/xonotic-linux64-dedicated
+                        exec ${darkplaces}/bin/xonotic-linux64-dedicated "\''${@}"
                         EOF
                         chmod +x $out/init
                     '';
