@@ -391,6 +391,23 @@ let
             '';
         };
 
+        mapserv = mkDerivation rec {
+            name = "mapserv-${version}";
+            version = "xonotic-${VERSION}";
+
+            src = "${srcs."xonotic"}/server/mapserv";
+
+            buildInputs = with pkgs; [
+                python3
+                mypy
+            ];
+            phases = [ "installPhase" ];
+            installPhase = ''
+                mkdir $out
+                cp -r $src/. $out
+            '';
+        };
+
         xonotic = mkDerivation rec {
             name = "xonotic-${version}";
             version = VERSION;
@@ -511,8 +528,8 @@ let
 
     shell = let inputs = (lib.mapAttrsToList (k: v: v) targets); in stdenv.mkDerivation (rec {
         name = "xonotic-shell";
-        nativeBuildInputs = builtins.map (it: it.nativeBuildInputs) (builtins.filter (it: it?nativeBuildInputs) inputs);
-        buildInputs = builtins.map (it: it.buildInputs) (builtins.filter (it: it?buildInputs) inputs);
+        nativeBuildInputs = lib.unique (builtins.map (it: it.nativeBuildInputs) (builtins.filter (it: it?nativeBuildInputs) inputs));
+        buildInputs = lib.unique (builtins.map (it: it.buildInputs) (builtins.filter (it: it?buildInputs) inputs));
         shellHook = builtins.map (it: it.shellHook) (builtins.filter (it: it?shellHook) inputs);
     });
 in { inherit shell; } // targets
