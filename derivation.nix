@@ -1,7 +1,7 @@
 # nix-shell -A shell
-# nix-build -A xonotic
+# ./nix-build.sh -A xonotic
 # --argstr cc clang
-# for it in $(nix-build -A dockerImage --no-out-link); do docker load -i $it; done
+# for it in $(./nix-build.sh -A dockerImage --no-out-link); do docker load -i $it; done
 {
     pkgs, lib,
     cc ? null,
@@ -10,39 +10,65 @@
 let
     VERSION = "0.8.2";
 
-    srcs = {
+    x = {
         # https://gitlab.com/xonotic/xonotic
-        "xonotic" = localFilesMain ./.;
-        "data/font-dejavu" = localFiles ./data/font-dejavu.pk3dir;
-        "data/font-nimbussansl" = localFiles ./data/font-nimbussansl.pk3dir;
-        "data/font-unifont" = localFiles ./data/font-unifont.pk3dir;
-        "data/font-xolonium" = localFiles ./data/font-xolonium.pk3dir;
+        srcs."xonotic" = localFilesMain ./.;
+        vers."xonotic" = "${VERSION}";
+
+        srcs."data/font-dejavu" = localFiles ./data/font-dejavu.pk3dir;
+        vers."data/font-dejavu" = "xonotic-${VERSION}";
+
+        srcs."data/font-nimbussansl" = localFiles ./data/font-nimbussansl.pk3dir;
+        vers."data/font-nimbussansl" = "xonotic-${VERSION}";
+
+        srcs."data/font-unifont" = localFiles ./data/font-unifont.pk3dir;
+        vers."data/font-unifont" = "xonotic-${VERSION}";
+
+        srcs."data/font-xolonium" = localFiles ./data/font-xolonium.pk3dir;
+        vers."data/font-xolonium" = "xonotic-${VERSION}";
+
 
         # https://gitlab.com/xonotic/d0_blind_id
-        "d0_blind_id" = localFiles ./d0_blind_id;
+        srcs."d0_blind_id" = localFiles ./d0_blind_id;
+        vers."d0_blind_id" = "xonotic-${VERSION}";
+
 
         # https://gitlab.com/xonotic/darkplaces
-        "darkplaces" = localFiles ./darkplaces;
+        srcs."darkplaces" = localFiles ./darkplaces;
+        vers."darkplaces" = "xonotic-${VERSION}";
+
 
         # https://gitlab.com/xonotic/gmqcc
-        "gmqcc" = localFiles ./gmqcc;
+        srcs."gmqcc" = localFiles ./gmqcc;
+        vers."gmqcc" = "xonotic-${VERSION}";
+
 
         # https://gitlab.com/xonotic/netradiant
-        "netradiant" = localFiles ./netradiant;
+        srcs."netradiant" = localFiles ./netradiant;
+        vers."netradiant" = "xonotic-${VERSION}";
+
 
         # https://gitlab.com/xonotic/xonotic-data.pk3dir
-        "data/xonotic-data" = localFilesCustom ./data/xonotic-data.pk3dir (name: type: type == "directory" || !(isCode name));
-        "data/xonotic-data/qcsrc" = localFilesCustom ./data/xonotic-data.pk3dir (name: type: type == "directory" || (isCode name));
+        srcs."data/xonotic-data" = localFilesCustom ./data/xonotic-data.pk3dir (name: type: type == "directory" || !(isCode name));
+        vers."data/xonotic-data" = builtins.getEnv "VERSION_data_xonotic_data_pk3dir";
+
+        srcs."data/xonotic-data/qcsrc" = localFilesCustom ./data/xonotic-data.pk3dir (name: type: type == "directory" || (isCode name));
+        vers."data/xonotic-data/qcsrc" = vers."data/xonotic-data";
+
 
         # https://gitlab.com/xonotic/xonotic-maps.pk3dir
-        "data/xonotic-maps" = localFiles ./data/xonotic-maps.pk3dir;
+        srcs."data/xonotic-maps" = localFiles ./data/xonotic-maps.pk3dir;
+        vers."data/xonotic-maps" = "${VERSION}";
 
         # https://gitlab.com/xonotic/xonotic-music.pk3dir
-        "data/xonotic-music" = localFiles ./data/xonotic-music.pk3dir;
+        srcs."data/xonotic-music" = localFiles ./data/xonotic-music.pk3dir;
+        vers."data/xonotic-music" = "${VERSION}";
 
         # https://gitlab.com/xonotic/xonotic-nexcompat.pk3dir
-        "data/xonotic-nexcompat" = localFiles ./data/xonotic-nexcompat.pk3dir;
+        srcs."data/xonotic-nexcompat" = localFiles ./data/xonotic-nexcompat.pk3dir;
+        vers."data/xonotic-nexcompat" = "${VERSION}";
     };
+    inherit (x) srcs vers;
 
     localFilesMain = src: let
         project = toString ./.;
@@ -108,7 +134,7 @@ let
     targets = rec {
         font-dejavu = mkDerivation rec {
             name = "font-dejavu-${version}";
-            version = VERSION;
+            version = vers."data/font-dejavu";
 
             src = srcs."data/font-dejavu";
 
@@ -120,7 +146,7 @@ let
 
         font-nimbussansl = mkDerivation rec {
             name = "font-nimbussansl-${version}";
-            version = VERSION;
+            version = vers."data/font-nimbussansl";
 
             src = srcs."data/font-nimbussansl";
 
@@ -132,7 +158,7 @@ let
 
         font-unifont = mkDerivation rec {
             name = "font-unifont-${version}";
-            version = VERSION;
+            version = vers."data/font-unifont";
 
             src = srcs."data/font-unifont";
 
@@ -144,7 +170,7 @@ let
 
         font-xolonium = mkDerivation rec {
             name = "font-xolonium-${version}";
-            version = VERSION;
+            version = vers."data/font-xolonium";
 
             src = srcs."data/font-xolonium";
 
@@ -156,7 +182,7 @@ let
 
         d0_blind_id = mkDerivation rec {
             name = "d0_blind_id-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."d0_blind_id";
 
             src = srcs."d0_blind_id";
 
@@ -183,7 +209,7 @@ let
         darkplaces = let
             unwrapped = mkDerivation rec {
                 name = "darkplaces-unwrapped-${version}";
-                version = "xonotic-${VERSION}";
+                version = vers."darkplaces";
 
                 src = srcs."darkplaces";
 
@@ -205,7 +231,7 @@ let
             };
             result = mkDerivation rec {
                 name = "darkplaces-${version}";
-                version = "xonotic-${VERSION}";
+                version = vers."darkplaces";
 
                 buildInputs = unwrapped.buildInputs ++ runtimeInputs;
                 runtimeInputs = with pkgs; [
@@ -245,7 +271,7 @@ let
 
         gmqcc = mkDerivation rec {
             name = "gmqcc-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."gmqcc";
 
             src = srcs."gmqcc";
 
@@ -261,7 +287,7 @@ let
 
         netradiant = mkDerivation rec {
             name = "netradiant-${version}";
-            version = VERSION;
+            version = vers."netradiant";
 
             src = srcs."netradiant";
 
@@ -297,7 +323,7 @@ let
 
         xonotic-data = mkDerivation rec {
             name = "xonotic-data-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."data/xonotic-data";
 
             src = srcs."data/xonotic-data";
 
@@ -312,12 +338,13 @@ let
 
         xonotic-data-code = mkDerivation rec {
             name = "xonotic-data-code-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."data/xonotic-data/qcsrc";
 
             src = srcs."data/xonotic-data/qcsrc";
 
             env = {
                 QCC = "${gmqcc}/bin/gmqcc";
+                VERSION = version;
             };
 
             nativeBuildInputs = with pkgs; [
@@ -330,14 +357,20 @@ let
                 cp -r $src/. $out
                 chmod -R +w $out
                 cp {menu,progs,csprogs}.{dat,lno} $out
+                cp csprogs-${version}.{dat,lno,txt} $out/.tmp
                 find $out -depth -type d -empty -exec rmdir {} \;
+            '';
+
+            passthru.csprogs = pkgs.runCommand "xonotic-data-csprogs-${version}" { inherit version; pk3name = "csprogs-${version}"; } ''
+                mkdir $out
+                cp ${xonotic-data-code}/.tmp/csprogs-${version}.{dat,lno,txt} $out
             '';
         };
 
         # todo: build
         xonotic-maps = mkDerivation rec {
             name = "xonotic-maps-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."data/xonotic-maps";
 
             src = srcs."data/xonotic-maps";
 
@@ -349,7 +382,7 @@ let
 
             passthru.dance = mkDerivation rec {
                 name = "dance";
-                version = "xonotic-${VERSION}";
+                version = vers."data/xonotic-maps";
 
                 src = pkgs.fetchurl {
                     url = http://beta.xonotic.org/autobuild-bsp/dance-full-88c416b8c11bdcecfdb889af2a2b97b4c0e2b8de-319ee7234504199da56f07ce25185f6d6cb889cd.pk3;
@@ -368,7 +401,7 @@ let
 
         xonotic-music = mkDerivation rec {
             name = "xonotic-music-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."data/xonotic-music";
 
             src = srcs."data/xonotic-music";
 
@@ -383,7 +416,7 @@ let
 
         xonotic-nexcompat = mkDerivation rec {
             name = "xonotic-nexcompat-${version}";
-            version = "xonotic-${VERSION}";
+            version = vers."data/xonotic-nexcompat";
 
             src = srcs."data/xonotic-nexcompat";
 
@@ -396,7 +429,7 @@ let
 
         xonotic-keys = mkDerivation rec {
             name = "xonotic-keys-${version}";
-            version = VERSION;
+            version = vers."xonotic";
 
             src = srcs."xonotic";
 
@@ -410,7 +443,7 @@ let
 
         xonotic = mkDerivation rec {
             name = "xonotic-${version}";
-            version = VERSION;
+            version = vers."xonotic";
 
             src = srcs."xonotic";
 
@@ -430,6 +463,7 @@ let
                     xonotic-music
                     xonotic-nexcompat
                 ;
+                xonotic-data-csprogs = xonotic-data-code.passthru.csprogs;
                 inherit (xonotic-maps)
                     dance
                 ;
@@ -492,9 +526,23 @@ let
                     '';
                 };
                 config.Entrypoint = "/init";
+                fromImage = pkgs.dockerTools.buildImage {
+                    name = "xonotic_deps";
+                    contents = mkDerivation {
+                        name = "xonotic_deps";
+                        phases = [ "installPhase" ];
+                        installPhase = ''
+                            mkdir -p $out
+                            cat > $out/init <<EOF
+                            ${stdenv.shell}
+                            ${pkgs.coreutils}
+                            EOF
+                        '';
+                    };
+                };
             };
         in { main = main; }
-            // (lib.mapAttrs (k: v: unpackImage { name = k; from = pk3 v; to = "${k}.pk3"; }) xonotic.paks)
+            // (lib.mapAttrs (k: v: unpackImage { name = k; from = pk3 v; to = "${v.pk3name or k}.pk3"; }) xonotic.paks)
         ;
     };
 
