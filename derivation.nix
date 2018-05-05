@@ -170,10 +170,13 @@ let
 
             installPhase = ''
                 mkdir -p $out/lib
-                cp libd0_blind_id.so $out/lib
-
                 mkdir -p $out/include/d0_blind_id
-                (cd $src; cp d0_blind_id.h d0.h $out/include/d0_blind_id)
+
+                cp libd0_blind_id.so $out/lib
+                (cd $src; cp d0.h d0_blind_id.h $out/include/d0_blind_id)
+
+                cp libd0_rijndael.so $out/lib
+                (cd $src; cp d0_rijndael.h $out/include/d0_blind_id)
             '';
         };
 
@@ -391,6 +394,20 @@ let
             '';
         };
 
+        xonotic-keys = mkDerivation rec {
+            name = "xonotic-keys-${version}";
+            version = VERSION;
+
+            src = srcs."xonotic";
+
+            phases = [ "installPhase" ];
+
+            installPhase = ''
+                mkdir $out
+                cp $src/*.d0pk $out
+            '';
+        };
+
         xonotic = mkDerivation rec {
             name = "xonotic-${version}";
             version = VERSION;
@@ -447,7 +464,11 @@ let
                         mkdir -p $out
                         cat > $out/init <<EOF
                         #!${stdenv.shell}
+                        ${pkgs.coreutils}/bin/ln -s ${xonotic-keys}/* /
+
+                        ${pkgs.coreutils}/bin/ls -l /
                         ${pkgs.coreutils}/bin/ls -l /data
+
                         exec ${darkplaces}/bin/xonotic-linux64-dedicated "\''${@}"
                         EOF
                         chmod +x $out/init
