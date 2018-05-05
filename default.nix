@@ -1,2 +1,2 @@
-{ pkgs ? import <nixpkgs> {} }:
-pkgs.callPackage ./derivation.nix {}
+{ pkgs ? import <nixpkgs> {}, cc ? null }@args:
+pkgs.callPackage ./derivation.nix args
