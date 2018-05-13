@@ -441,6 +441,33 @@ let
             '';
         };
 
+        slist = mkDerivation rec {
+            name = "slist-${version}";
+            version = "xonotic-${VERSION}";
+
+            src = "${srcs."xonotic"}/misc/infrastructure/python/slist";
+
+            buildInputs = with pkgs; [
+                python3
+                python3Packages.attrs
+                (python3Packages.buildPythonApplication rec {
+                    pname = "mypy";
+                    version = "0.600";
+                    doCheck = false;
+                    src = python3Packages.fetchPypi {
+                        inherit pname version;
+                        sha256 = "1pd3kkz435wlvi9fwqbi3xag5zs59jcjqi6c9gzdjdn23friq9dw";
+                    };
+                    propagatedBuildInputs = with python3Packages; [ lxml typed-ast psutil ];
+                })
+            ];
+            phases = [ "installPhase" ];
+            installPhase = ''
+                mkdir $out
+                cp -r $src/. $out
+            '';
+        };
+
         xonotic = mkDerivation rec {
             name = "xonotic-${version}";
             version = vers."xonotic";
@@ -580,8 +607,8 @@ let
 
     shell = let inputs = (lib.mapAttrsToList (k: v: v) targets); in stdenv.mkDerivation (rec {
         name = "xonotic-shell";
-        nativeBuildInputs = builtins.map (it: it.nativeBuildInputs) (builtins.filter (it: it?nativeBuildInputs) inputs);
-        buildInputs = builtins.map (it: it.buildInputs) (builtins.filter (it: it?buildInputs) inputs);
+        nativeBuildInputs = lib.unique (builtins.map (it: it.nativeBuildInputs) (builtins.filter (it: it?nativeBuildInputs) inputs));
+        buildInputs = lib.unique (builtins.map (it: it.buildInputs) (builtins.filter (it: it?buildInputs) inputs));
         shellHook = builtins.map (it: it.shellHook) (builtins.filter (it: it?shellHook) inputs);
     });
 in { inherit shell; } // targets
