@@ -1,12 +1,9 @@
 import ipaddress
-import logging
 from struct import Struct
 
 import attr
 
 from .utils import *
-
-logger = logging.getLogger(__name__)
 
 HEADER = b"\xFF\xFF\xFF\xFF"
 
@@ -103,26 +100,3 @@ def sv_parse() -> Generator[Optional[SVMessage], bytes, None]:
                 if ret:
                     getservers_ext_gen = None
                 continue
-
-
-if __name__ == "__main__":
-    import socket
-
-    connection = Tuple[str, int]
-    connections: Dict[connection, Generator[Optional[SVMessage], bytes, None]] = {}
-
-    conn = (socket.gethostbyname("dpmaster.deathmask.net"), 27950)
-    connections[conn] = sv_parse()
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    q = CLGetServersExt(game="Xonotic", protocol=3)
-    sock.sendto(q.encode(), conn)
-    while True:
-        logger.debug("wait")
-        data, addr = sock.recvfrom(1400)
-        logger.debug(f"recv({addr}): {data}")
-        msg = connections[addr].send(data)
-        if msg:
-            logger.info(f"recv({addr}): {msg}")
-            if isinstance(msg, SVGetServersExtResponse):
-                logger.info(f"servers: {len(msg.servers)}")
