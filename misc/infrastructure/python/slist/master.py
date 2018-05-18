@@ -5,8 +5,6 @@ import attr
 
 from .utils import *
 
-HEADER = b"\xFF\xFF\xFF\xFF"
-
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
 class CLGetServersExt(Writable):
@@ -14,7 +12,7 @@ class CLGetServersExt(Writable):
     protocol: int
 
     def encode(self) -> bytes:
-        return HEADER + f"getserversExt {self.game} {self.protocol} empty full".encode(UTF_8)
+        return HEADER + f"getserversExt {self.game} {self.protocol} empty full ipv4 ipv6".encode(UTF_8)
 
 
 @attr.s(auto_attribs=True, frozen=True, slots=True)
@@ -81,13 +79,13 @@ SVMessage = Union[SVGetServersExtResponse]
 
 
 @generator
-def sv_parse() -> Generator[Optional[SVMessage], bytes, None]:
+def sv_parse() -> Generator[Optional[SVMessage], Tuple[Connection, bytes], None]:
     getservers_ext_response = b"getserversExtResponse"
     getservers_ext_gen: Optional[Generator[Optional[SVGetServersExtResponse], bytes, None]] = None
     ret: Optional[SVMessage] = None
     while True:
         buf: bytes
-        buf = yield ret
+        _, buf = yield ret
         ret = None
         if buf.startswith(HEADER):
             buf = buf[len(HEADER):]
