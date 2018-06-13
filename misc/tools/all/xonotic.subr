@@ -26,7 +26,7 @@ case "$cmd" in
 		cleandp=false
 		cleanqcc=false
 		cleanqc=false
-		compiled0=false
+		compiled0=
 		debug=debug
 		if [ -z "$CC" ]; then
 			export CC="gcc"
@@ -36,6 +36,10 @@ case "$cmd" in
 			case "$1" in
 				-0)
 					compiled0=true
+					shift
+					;;
+				-1)
+					compiled0=false
 					shift
 					;;
 				-c)
@@ -183,7 +187,10 @@ case "$cmd" in
 		rm -f conftest
 
 		verbose cd "$d0/d0_blind_id"
-		if ! $compiled0; then
+		if [ -z "$compiled0" ]; then
+			# In doubt, compile.
+			compiled0=true
+
 			# compilation of crypto library failed
 			# use binaries then, if we can...
 			mkdir -p .libs
@@ -191,6 +198,7 @@ case "$cmd" in
 				verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
 				verbose cp "$d0/misc/buildfiles/win32/libd0_rijndael"-* .libs/
 				verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+				compiled0=false
 			else
 				case "`uname`" in
 					Linux)
@@ -204,20 +212,20 @@ case "$cmd" in
 								export CC="$CC -L../../../../misc/builddeps/linux32/gmp/lib"
 								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/gmp/lib"
 								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
+								compiled0=false
 								;;
 							*)
 								msg "Always need to compile libd0_blind_id on Linux `uname -m`."
-								compiled0=true
 								;;
 						esac
 						;;
 					Darwin)
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
+						compiled0=false
 						;;
 					*)
 						msg "Always need to compile libd0_blind_id on `uname`."
-						compiled0=true
 						;;
 				esac
 			fi

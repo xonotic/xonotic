@@ -16,6 +16,7 @@ git reset --hard origin/master
 # Mode parameter:
 #   po:  just update the translations.
 #   all: also update the translation template. Will create a new commit every time, as the date header changes.
+export BATCH=true
 sh tx.sh po
 
 if [ x"`git ls-files -dm`" = x".tx/merge-base" ]; then
