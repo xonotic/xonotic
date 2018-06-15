@@ -164,7 +164,8 @@ buildthemap()
 	blobhash=$4
 	commithash=$5
 	if lwp-request -m HEAD "$url$M-$blobhash.pk3"; then
-		continue
+		# already compiled
+		return
 	fi
 
 	git reset --hard
@@ -237,13 +238,19 @@ screenshotthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
+	if ! [ -f "$bspdir/$M-$blobhash.pkg" ]; then
+		# not downloaded yet
+		return
+	fi
+
 	if lwp-request -m HEAD "$url$M-$blobhash/$M-000000.jpg"; then
-		continue
+		# already done
+		return
 	fi
 
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp"; then
 		# no BSP file
-		continue
+		return
 	fi
 
 	rm -rf ~/.xonotic/data
@@ -304,14 +311,12 @@ getthemap()
 		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 			rm -f "$bspdir/$M-$blobhash.pk3"
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
-			getthemap_fail=true
 			return 0
 		fi
 	fi
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
-		getthemap_fail=true
 		return 0
 	fi
 }
@@ -378,11 +383,14 @@ case "$1" in
 
 			getthemap_fail=false
 			rundownload
-			if $getthemap_fail; then
-				continue
-			fi
 
 			allmaps "$HASH" screenshotthemap "$REFNAME" "$url_http"
+
+			if $getthemap_fail; then
+				# If any map fetch failed, we've skipped them and thus need to try again later.
+				# Note that we're not going to re-screenshot maps because of this as we'll check for uploaded screenshots first.
+				continue
+			fi
 
 			touch "$screenshot_cachedir/$HASH"
 		done
