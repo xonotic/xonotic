@@ -376,6 +376,7 @@ case "$1" in
 			git clean -xfd
 			git checkout -f "$HASH"
 
+			getthemap_fail=false
 			rundownload
 			if $getthemap_fail; then
 				continue
