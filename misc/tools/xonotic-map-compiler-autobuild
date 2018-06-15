@@ -238,7 +238,7 @@ screenshotthemap()
 	M=$3
 	blobhash=$4
 	commithash=$5
-	if ! [ -f "$bspdir/$M-$blobhash.pkg" ]; then
+	if ! [ -f "$bspdir/$M-$blobhash.pk3" ]; then
 		# not downloaded yet
 		return
 	fi
