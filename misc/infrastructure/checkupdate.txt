@@ -29,6 +29,8 @@ B 108.61.164.188:
 B 85.25.139.30:
 B 51.15.46.239:
 B 163.172.104.191:
+B 89.163.144.198:
+B 51.38.113.134:
 
 # Emergency packs. Specify as:
 # E http://packurl/pack.pk3 file-in-pack.txt

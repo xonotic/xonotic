@@ -57,14 +57,13 @@ data/data/wazat1.mapinfo for me. The file may look like:
     _diameter 1966.839355
     _spawnpoints 5
     has weapons
-	cdtrack 5
+    cdtrack 5
     gametype dm // defaults: timelimit=20 pointlimit=30 leadlimit=0
     gametype dom // defaults: timelimit=20 pointlimit=200 teams=2 leadlimit=0
     gametype lms // defaults: timelimit=20 lives=9 leadlimit=0
-    gametype arena // defaults: timelimit=20 pointlimit=10 leadlimit=0
 
 As I see, the menu autodetected that my map may be suitable for deathmatch,
-domination, last man standing and arena. But I want the map to be played in
+domination, last man standing and keepaway. But I want the map to be played in
 domination, deathmatch, team deathmatch only, and I also want different
 timelimits/fraglimits, so I will change the "gametype" lines to:
 
@@ -98,7 +97,6 @@ Team Deathmatch | gametype tdm [timelimit=...] [pointlimit=...] [teams=...] [lea
 Domination      | gametype dom [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                | 2, 3, or 4 teams, only if map has no dom_team ents
 CTF             | gametype ctf [timelimit=...] [caplimit=...] [leadlimit=...]                                              |
 LMS             | gametype lms [timelimit=...] [lives=...] [leadlimit=...]                                                 |
-Arena           | gametype arena [timelimit=...] [pointlinit=...] [leadlimit=...]                                          |
 Key Hunt        | gametype kh [timelimit=...] [pointlimit=...] [teams=...] [leadlimit=...]                                 | 2, 3, or 4 teams
 Assault         | gametype as [timelimit=...]                                                                              | never uses points
 Onslaught       | gametype ons [timelimit=...]                                                                             | never uses points
