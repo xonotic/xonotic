@@ -1,15 +1,4 @@
----
-author: Antibody
-date: 2010-05-30 14:50:21+00:00
-type: faq
-title: FAQ
-aliases:
-- /the-game/faq
----
-
 # Xonotic FAQs
-
-<a name="install"></a>
 ## How do I install Xonotic?
 
 **There is no need to install Xonotic!** The zip file you downloaded from the homepage has everything. All binaries to run the game on Linux, Windows and macOS are inside of it. Just unzip the archive and run the appropriate executable for your OS.
@@ -40,7 +29,7 @@ Another aspect of the logo is the center ring, which has some  similarities to t
 
 ## When I join a server or after a map change I see nothing but a black screen, but I can still move and shoot
 
-This is probably because you don't have the map that's running on the server or it didn't download correctly. Try clearing your _dlcache_ (in [\<your config folder\>](#config)/data/dlcache) and restarting Xonotic.
+This is probably because you don't have the map that's running on the server or it didn't download correctly. Try clearing your _dlcache_ in your config folder and restarting Xonotic.
 
 For Linux users: you need to have libcurl installed, otherwise you won't be able to download any maps. libcurl should be available in any Linux distribution, just search for "libcurl" and install it in your distribution's package manager.
 
@@ -55,8 +44,6 @@ This happens because Xonotic is not signed using an Apple developer key.
 ## When I start Xonotic all I see is a black screen or a black screen with some checkered squares
 
 This happens when the engine can't load the data*.pk3 file or has trouble to initialize OpenGL. The reasons could be:
-
-  * You unpacked the zip file without folder names, see [How do I install Xonotic?]({{< relref "#how-do-i-install-xonotic" >}})
   * On Linux: the current directory is not your Xonotic/ folder.
   * On Mac: you tried to extract and move the files from a Xonotic update and it deleted the old files. When using the mac GUI please be sure to move only the files not the folders as that will delete the old files or use the mv console command which will not delete the old files.
   * The engine could not initialize OpenGL. Please install the latest drivers for your graphic card. You will probably find one for your card there: [intel](http://intel.com), [AMD](http://amd.com), [nvidia](http://nvidia.com).
@@ -85,9 +72,8 @@ Try run xonotic-sdl.exe instead of xonotic.exe (on Windows). Adding the command 
 
 ## Mouse is too slow and sensitivity is at top (on Mac / Linux)
 
-Mac: The default mouse acceleration on Mac is very high and strange. The Xonotic defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Xonotic defaults. Try to **disable the option Turn off OS mouse acceleration** in the Settings / Input menu. Or the same via console: _apple_mouse_noaccel 0; vid_restart_ ([How do I open the console?]({{< relref "#how-do-i-open-the-console" >}}))
-
-Linux: A similar problem can arise on Linux. It's also Turn off OS mouse acceleration in the Settings / Input menu but the console command is different: _vid_dga 0; vid_restart_ ([How do I open the console?]({{< relref "#how-do-i-open-the-console" >}}))
+Mac: The default mouse acceleration on Mac is very high and strange. The Xonotic defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Xonotic defaults. Try to **disable the option Turn off OS mouse acceleration** in the Settings / Input menu. Or the same via console: _apple_mouse_noaccel 0; vid_restart_
+Linux: A similar problem can arise on Linux. It's also Turn off OS mouse acceleration in the Settings / Input menu but the console command is different: _vid_dga 0; vid_restart;
 
 ## I can't switch to 32 bit color depth (on Windows)
 
@@ -125,7 +111,7 @@ The config directory (sometimes called user directory) has a specific [location]
 
 ## How do I install new maps?
 
-Maps usually ship as .pk3 file. All you have to do is to copy this file to the [\<config folder\>](#config)/data/ directory. Map packages that were downloaded from a server during playing end up in [\<your config folder\>](#config)/data/dlcache/ and are only used till you exit Xonotic. If you want to play them locally or use them to setup a server of your own you can "accept" the packages by moving it one level up - right next to your config.cfg.
+Maps usually ship as .pk3 file. All you have to do is to copy this file to the config folder <your config folder>/data/ directory. Map packages that were downloaded from a server during playing end up in <your config folder>/data/dlcache and are only used till you exit Xonotic. If you want to play them locally or use them to setup a server of your own you can "accept" the packages by moving it one level up - right next to your config.cfg.
 
 An extensive list of maps is at [xonotic.co](http://xonotic.co)
 
@@ -139,7 +125,7 @@ Press [shift]+[escape]. To close it press [escape]. While playing \` or ^ will a
 
 ## What console commands/variables are there?
 
-An searchable list is available [here](http://www.xonotic.org/tools/cacs/), or you can search in-game using _apropos_ in console ([How do I open the console?]({{< relref "#how-do-i-open-the-console" >}})).
+An searchable list is available [here](http://www.xonotic.org/tools/cacs/), or you can search in-game using _apropos_ in console.
 
 ## How can I use colors in my nickname and messages?
 
@@ -202,9 +188,9 @@ It should also be noted that IllFonic's code may be in violation of  the GPL as 
 
 ## Was a compromise attempted?
 
-Yes, many in the Nexuiz community tried to [reach a compromise](http://alientrap.org/forum/viewtopic.php?f=4&t=6079), such as having Illfonic  contribute some artwork and/or gamecode back to Nexuiz GPL and for them  to use a derivative name for their project, e.g. "Nexuiz Reloaded".  <del>Illfonic [flatly refused](https://web.archive.org/web/20101212220555/http://alientrap.org/forum/viewtopic.php?p=76108&f=7) all such suggestions.</del> This, along  with the clear stance that Alientrap has taken on this issue, made it  clear that no compromise could be reached.
+Yes, many in the Nexuiz community tried to [reach a compromise](http://alientrap.org/forum/viewtopic.php?f=4&t=6079), such as having Illfonic  contribute some artwork and/or gamecode back to Nexuiz GPL and for them  to use a derivative name for their project, e.g. "Nexuiz Reloaded". ~~ IllFonic flatly refused such suggestions. ~~ This, along  with the clear stance that Alientrap has taken on this issue, made it  clear that no compromise could be reached.
 
-**Update** It has been clarified that, despite some of misleading wording in previous communication, Illfonic will be contributing _some_ of the game code back to Nexuiz GPL, mainly having to do with bandwidth improvements and animation blending.
+**Update!** It has been clarified that, despite some of misleading wording in previous communication, Illfonic will be contributing _some_ of the game code back to Nexuiz GPL, mainly having to do with bandwidth improvements and animation blending.
 
 ## Do you despise Vermeulen, LordHavoc or Illfonic?
 
