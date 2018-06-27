@@ -17,15 +17,6 @@ Only update the entities.
 "...q3map2.exe" -onlyents "...xonoticmap.map"
 
 ------------
-bloodprison.map
-------------
-
-"...q3map2.exe" -meta -samplesize 8 -mv 1000000 -mi 6000000 "...bloodprisonctf.map"
-"...q3map2.exe" -scale 1.2 "...bloodprisonctf.bsp"
-"...q3map2.exe" -vis "...bloodprisonctf.bsp"
-"...q3map2.exe" -light -deluxe -fast -filter -deluxe -patchshadows -samples 3 "...bloodprisonctf.bsp"
-
-------------
 final_rage.map
 ------------
 
@@ -40,11 +31,3 @@ reslimed.map
 "...q3map2.exe" -meta -patchmeta -v "...reslimed.map"
 "...q3map2.exe" -vis "...reslimed.bsp"
 "...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...reslimed.bsp"
-
-------------
-strength.map
-------------
-
-"...q3map2.exe" -meta "...strength.map"
-"...q3map2.exe" -vis "...strength.bsp"
-"...q3map2.exe" -light -bounce 3 -deluxe -fast -filter -patchshadows -samples 2 "...strength.bsp"
