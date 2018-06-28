@@ -95,7 +95,6 @@ Visit the official Xonotic [forum](http://forums.xonotic.org/), there is a suppo
 
 # General questions
 
-<a name="config"></a>
 ## Where are the configuration files located?
 
   * Linux: ~/.xonotic
