@@ -8,8 +8,8 @@ Should already work without configuration. You can however use the following
 cvars for further tuning:
 
    cl_curl_enabled              download support enabled (master switch, default: 1)
-   cl_curl_maxdownloads         maximum number of downloads at once (default: 1)
-   cl_curl_maxspeed             maximum total speed in KiB/s (default: 100)
+   cl_curl_maxdownloads         maximum number of downloads at once (default: 3)
+   cl_curl_maxspeed             maximum total speed in KiB/s (default: 0)
 
 Downloaded packages end up in |Xonotic/data/dlcache/| or
 |~/.xonotic/data/dlcache/| and are only used till you exit Xonotic.
