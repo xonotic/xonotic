@@ -1,11 +1,10 @@
-cvars:
+cvars (see xonotic.org/tools/cacs for more up-to-date information):
 ______________
 
-   sv_logscores_console		print scores to serverconsole after each match (default: 0, set to 1 to enable)
-   sv_logscores_file		print scores to a file after each match (default: 0)
-   sv_logscores_filename	filename of the output file if sv_logscores_file is enabled (default: "scores.log",
-   				  the file will be stored in Xonotic/data/data or ~/.xonotic/data/data)
-   sv_logscores_bots		choose whether bot are included in stats or not (default: 0)
+   sv_logscores_console		print scores to serverconsole after each match (set to 1 to enable)
+   sv_logscores_file		print scores to a file after each match 
+   sv_logscores_filename	filename of the output file if sv_logscores_file is enabled (the file will be stored in Xonotic/data/data or ~/.xonotic/data/data)
+   sv_logscores_bots		choose whether bot are included in stats or not
 
 
 commands:

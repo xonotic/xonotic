@@ -1,15 +1,15 @@
-cvars:
+cvars (see xonotic.org/tools/cacs for more up-to-date information):
 ______________
 
-   sv_eventlog                    master switch (default: 0)
-   sv_eventlog_files              print frags, scores and captures for separate files each match (default: 0)
-   sv_eventlog_console            print frags, scores and captures to serverconsole during the match (default: 1)
-   sv_logscores_bots              choose whether bot are included in stats or not (default: 0)
+   sv_eventlog                    master switch
+   sv_eventlog_files              print frags, scores and captures for separate files each match
+   sv_eventlog_console            print frags, scores and captures to serverconsole during the match
+   sv_logscores_bots              choose whether bot are included in stats or not
                                 
    sv_eventlog_files_counter      number of matches logged until now
-   sv_eventlog_files_nameprefix   file name prefix to be used (default: xonotic)
-   sv_eventlog_files_namesuffix   file name extension to be used (default: .log)
-   sv_eventlog_files_timestamps   prefix log lines in the files with :time events (default: 1)
+   sv_eventlog_files_nameprefix   file name prefix to be used 
+   sv_eventlog_files_namesuffix   file name extension to be used
+   sv_eventlog_files_timestamps   prefix log lines in the files with :time events
 
 log format:
 ______________

@@ -5,11 +5,11 @@ ______________
 CLIENT SIDE:
 
 Should already work without configuration. You can however use the following
-cvars for further tuning:
+cvars for further tuning (see xonotic.org/tools/cacs for more up-to-date information):
 
-   cl_curl_enabled              download support enabled (master switch, default: 1)
-   cl_curl_maxdownloads         maximum number of downloads at once (default: 1)
-   cl_curl_maxspeed             maximum total speed in KiB/s (default: 100)
+   cl_curl_enabled              download support enabled (master switch)
+   cl_curl_maxdownloads         maximum number of downloads at once
+   cl_curl_maxspeed             maximum total speed in KiB/s
 
 Downloaded packages end up in |Xonotic/data/dlcache/| or
 |~/.xonotic/data/dlcache/| and are only used till you exit Xonotic.
