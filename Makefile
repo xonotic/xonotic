@@ -30,7 +30,7 @@ all-zip-source:
 	( cd source/d0_blind_id && ./configure --enable-static --disable-shared $(RIJNDAELDETECT_CONFIGURE) )
 	$(MAKE) -C source/d0_blind_id
 	$(MAKE) -C source/gmqcc
-	$(MAKE) -C source/qcsrc FTEQCC=$(CURDIR)/source/gmqcc/gmqcc
+	$(MAKE) -C source/qcsrc QCC=$(CURDIR)/source/gmqcc/gmqcc
 	$(MAKE) -C source/darkplaces sv-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
 	$(MAKE) -C source/darkplaces cl-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
 	$(MAKE) -C source/darkplaces sdl-release DP_CRYPTO_STATIC_LIBDIR=$(CURDIR)/source/d0_blind_id/.libs
@@ -49,7 +49,7 @@ clean-zip-binary:
 
 .PHONY: clean-zip
 clean-zip-source:
-	-$(MAKE) -C source/d0_blind_id distclean
+	$(MAKE) -C source/d0_blind_id distclean
 	$(MAKE) -C source/gmqcc clean
 	$(MAKE) -C source/qcsrc clean
 	$(MAKE) -C source/darkplaces clean
