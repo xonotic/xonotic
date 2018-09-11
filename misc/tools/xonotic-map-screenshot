@@ -10,12 +10,14 @@ count=`yes x | head -n "$count" | tr -cd x`
 
 ./all run \
 	-nosound \
+	-noconfig \
 	+'locksession 0' \
 	+'scr_screenshot_timestamp 0' \
 	+'vid_fullscreen 0' \
 	+'exec effects-ultra.cfg' \
 	"$@" \
 	+'sv_precacheplayermodels 0' \
+	+'cl_hidewaypoints 1' \
 	+'r_motionblur 0' \
 	+'r_damageblur 0' \
 	+'r_letterbox -1' \
@@ -33,7 +35,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'alias EGAD "noclip; NARF POIT"' \
 	+'alias POIT "$catchme; set catchme \"${catchme}x\"; impulse 911; NARF TROZ"' \
 	+'alias TROZ "screenshot; NARF POIT"' \
-	+'alias cl_hook_gamestart_all "cmd join; defer 2 ZORT"' \
+	+'alias cl_hook_gamestart_all "defer 1.1 \"cmd join\"; defer 2 ZORT"' \
 	+"defer \"$watchdog\" quit" \
 	+"map \"$map\"" \
 	+'timelimit 0' \
