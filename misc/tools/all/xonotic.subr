@@ -8,9 +8,10 @@ case "$cmd" in
 			msg "Usage: ./all compile-map mapname1 mapname2 mapname3"
 			msg "For example: ./all compile-map dance xoylent"
 		fi
-		if ! [ -f "netradiant/install/q3map2" ] ; then
-			msg "q3map2 needed! Building netradiant..."
-			make -C netradiant BUILD=native install/q3map2
+		if ! [ -f "netradiant/build/q3map2" ] ; then
+			msg "q3map2 needed! Building q3map2..."
+			cmake -H'netradiant' -B'netradiant/build' -G'Unix Makefiles' -D'CMAKE_BUILD_TYPE=Release' -DBUILD_RADIANT=OFF -DDOWNLOAD_GAMEPACKS=OFF
+			cmake --build 'netradiant/build' -- q3map2
 		fi
 		for mapfile in "$@"; do
 			mapfile="data/xonotic-maps.pk3dir/maps/$mapfile.map"

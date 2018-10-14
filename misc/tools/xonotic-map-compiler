@@ -11,9 +11,9 @@ use File::Temp;
 	# Path to Xonotic (where the data directory is in)
 	our $XONOTICDIR  = getcwd();
 
-	# Path to your q3map2 program. You find it in your GtkRadiant/install
+	# Path to your q3map2 program. You find it in your netradiant/build
 	# directory.
-	our $Q3MAP2      = getcwd() . '/netradiant/install/q3map2';
+	our $Q3MAP2      = getcwd() . '/netradiant/build/q3map2';
 
 	# General flags for q3map2 (for example -threads 4)
 	our $Q3MAP2FLAGS = '-fs_forbiddenpath xonotic*-data*.pk3* -fs_forbiddenpath xonotic*-nexcompat*.pk3*';
