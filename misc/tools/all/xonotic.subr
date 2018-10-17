@@ -83,11 +83,9 @@ case "$cmd" in
 			esac
 		done
 
+		TARGETS="sv-$debug sdl-$debug"
 		if [ x"`uname`" = x"Darwin" ]; then
-			TARGETS="sv-$debug sdl-$debug"
 			export CC="$CC -fno-reorder-blocks"
-		else
-			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
 
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
@@ -103,9 +101,6 @@ case "$cmd" in
 				case "$X" in
 					sdl)
 						TARGETS="$TARGETS sdl-$debug"
-						;;
-					glx|wgl)
-						TARGETS="$TARGETS cl-$debug"
 						;;
 					dedicated)
 						TARGETS="$TARGETS sv-$debug"
@@ -322,14 +317,9 @@ case "$cmd" in
 				client=-$1
 				shift
 				;;
-			sdl|glx)
+			sdl)
 				USE_RLWRAP=no
 				client=-$1
-				shift
-				;;
-			wgl)
-				USE_RLWRAP=no
-				client=
 				shift
 				;;
 		esac
@@ -383,9 +373,9 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|glx|wgl|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|dedicated]"
 		$ECHO "  $SELF update-maps"
-		$ECHO "  $SELF run [sdl|glx|wgl|dedicated] options..."
+		$ECHO "  $SELF run [sdl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;

@@ -85,31 +85,25 @@ install-engine: install-engine-$(SUFFIX)
 .PHONY: install-engine-git
 install-engine-git: all-git
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL) xonotic-linux-glx.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-sdl.sh
 	$(INSTALL) xonotic-linux-dedicated.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-dedicated.sh
 	$(INSTALL) darkplaces/darkplaces-sdl $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-sdl
-	$(INSTALL) darkplaces/darkplaces-glx $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-glx
 	$(INSTALL) darkplaces/darkplaces-dedicated $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 .PHONY: install-engine-zip-binary
 install-engine-zip-binary: all-zip-binary
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL) xonotic-linux-glx.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-sdl.sh
 	$(INSTALL) xonotic-linux-dedicated.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-dedicated.sh
 	$(INSTALL) xonotic-$(ARCH)-sdl $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-sdl
-	$(INSTALL) xonotic-$(ARCH)-glx $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-glx
 	$(INSTALL) xonotic-$(ARCH)-dedicated $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 .PHONY: install-engine-zip-source
 install-engine-zip-source: all-zip-source
 	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL) xonotic-linux-glx.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-glx.sh
 	$(INSTALL) xonotic-linux-sdl.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-sdl.sh
 	$(INSTALL) xonotic-linux-dedicated.sh $(DESTDIR)$(LIBDIR)/xonotic-linux-dedicated.sh
 	$(INSTALL) source/darkplaces/darkplaces-sdl $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-sdl
-	$(INSTALL) source/darkplaces/darkplaces-glx $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-glx
 	$(INSTALL) source/darkplaces/darkplaces-dedicated $(DESTDIR)$(LIBDIR)/xonotic-$(ARCH)-dedicated
 
 
@@ -117,7 +111,6 @@ install-engine-zip-source: all-zip-source
 install-links:
 	$(INSTALL) -d $(BINDIR)
 	$(LN) -snf $(LIBDIR)/xonotic-linux-sdl.sh $(DESTDIR)$(BINDIR)/xonotic-sdl
-	$(LN) -snf $(LIBDIR)/xonotic-linux-glx.sh $(DESTDIR)$(BINDIR)/xonotic-glx
 	$(LN) -snf $(LIBDIR)/xonotic-linux-dedicated.sh $(DESTDIR)$(BINDIR)/xonotic-dedicated
 
 

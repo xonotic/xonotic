@@ -58,17 +58,14 @@ if (0)
     message(STATUS "Downloading Darkplaces")
 
     getbinary(Xonotic/xonotic-x86.exe)
-    getbinary(Xonotic/xonotic-x86-wgl.exe)
     getbinary(Xonotic/xonotic-x86-dedicated.exe)
     getbinary(Xonotic/xonotic.exe)
-    getbinary(Xonotic/xonotic-wgl.exe)
     getbinary(Xonotic/xonotic-dedicated.exe)
 
     getbinary(Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin) # +x
     getbinary(Xonotic/xonotic-osx-dedicated) # +x
 
     getbinary(Xonotic/xonotic-linux64-sdl) # +x
-    getbinary(Xonotic/xonotic-linux64-glx) # +x
     getbinary(Xonotic/xonotic-linux64-dedicated) # +x
 endif ()
 
