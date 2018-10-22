@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Xonotic (SDL)
-Comment=a free open-source first person shooter
+Name=Xonotic
+Comment=Multiplayer, deathmatch oriented first person shooter
 Icon=xonotic
 Exec=xonotic-sdl
 Terminal=false
 StartupNotify=false
-Categories=Game;
+Categories=Game;ActionGame;
