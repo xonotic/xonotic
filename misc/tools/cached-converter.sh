@@ -375,13 +375,13 @@ for F in "$@"; do
 	will_dds=$do_dds
 	will_ogg=$do_ogg
 	if ! $ogg_ogg; then
-		case "$f" in
+		case "$F" in
 			*.ogg) will_ogg=false ;;
 		esac
 	fi
-	case "$f" in
+	case "$F" in
 		./sound/misc/talk*.wav) will_ogg=false ;; # engine "feature"
-		*_bump) will_dds=false ;;
+		*_bump.*) will_dds=false ;;
 		./models/player/*) will_dds=false ;;
 		./models/sprites/*) will_dds=false ;;
 		./models/*) ;;
