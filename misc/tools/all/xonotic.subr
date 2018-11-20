@@ -161,7 +161,7 @@ case "$cmd" in
 				MAKEFLAGS="$MAKEFLAGS CFLAGS_SSE= CFLAGS_SSE2="
 				;;
 		esac
-		
+
 		if ! verbose $CC misc/tools/conftest.c -o conftest; then
 			msg ""
 			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -295,7 +295,6 @@ case "$cmd" in
 		;;
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			client=
 			case `uname -m` in
 				x86_64)
 					export PATH="$d0/misc/buildfiles/win64:$d0/d0_blind_id/.libs:$PATH"
@@ -307,22 +306,23 @@ case "$cmd" in
 		elif [ x"`uname`" = x"Darwin" ]; then
 			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS:$d0/d0_blind_id/.libs"
 			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
-			client=-sdl
 		else
 			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-			client=-sdl
 		fi
+
+		client=-sdl
+		USE_RLWRAP=no
 		case "$1" in
 			dedicated)
 				client=-$1
+				USE_RLWRAP=
 				shift
 				;;
 			sdl)
-				USE_RLWRAP=no
-				client=-$1
 				shift
 				;;
 		esac
+
 		if ! [ -x "darkplaces/darkplaces$client" ]; then
 			if [ -x "darkplaces/darkplaces$client.exe" ]; then
 				client=$client.exe
