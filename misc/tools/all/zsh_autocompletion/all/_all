@@ -51,6 +51,7 @@ case $state in
             _arguments \
                 '1:Version:(sdl dedicated)' \
                 "-0[don't use precompiled d0_blind_id]" \
+                "-1[don't compile d0_blind_id]" \
                 '-c[clean all before building]' \
                 '-qc[clean QuakeC binaries]' \
                 - '(release)' \

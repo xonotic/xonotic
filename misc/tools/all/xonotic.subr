@@ -373,7 +373,7 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [sdl|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [-1] [sdl|dedicated]"
 		$ECHO "  $SELF update-maps"
 		$ECHO "  $SELF run [sdl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
