@@ -66,6 +66,7 @@ if (0)
     getbinary(Xonotic/xonotic-osx-dedicated) # +x
 
     getbinary(Xonotic/xonotic-linux64-sdl) # +x
+    getbinary(Xonotic/xonotic-linux64-glx) # +x
     getbinary(Xonotic/xonotic-linux64-dedicated) # +x
 endif ()
 
