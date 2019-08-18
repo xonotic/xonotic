@@ -1,1 +1,0 @@
-xonotic-linux-sdl.sh
