@@ -85,7 +85,7 @@ Use our [issue tracker](http://gitlab.com/xonotic/xonotic-data.pk3dir/issues) on
 
 If you want to investigate further:
 
-On Linux: In a xterm, cd into your Xonotic installation directory, start catchsegv ./xonotic-linux-686-sdl -condebug -developer > crash.txt 2>&1 and give the file crash.txt to the developers. Note that you can also use ./xonotic-linux-686-glx or if you have a 64bit system ./xonotic-linux-x86_64-sdl and ./xonotic-linux-x86_64-glx
+On Linux: In a xterm, cd into your Xonotic installation directory, start catchsegv ./xonotic-linux64-sdl -condebug -developer > crash.txt 2>&1 and give the file crash.txt to the developers. On a 32bit system you should instead use ./xonotic-linux32-sdl. Note that you can also use ./xonotic-linux64-glx or if you have a 32bit system ./xonotic-linux32-glx
 
 On Windows: Click Start->Run, and enter drwtsn32, click Ok in the next window, run Xonotic and wait for the crash. Then go to C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson there should be a file called "drwtsn32.log", give that file along with the engine's build date to the developers. You'll see that date when you open the ingame console (How do I open the console?). Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
 
