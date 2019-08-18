@@ -8,6 +8,7 @@ cd "${path}"
 
 case "${0##*/}" in
   *dedicated*)	mode="dedicated" ;;
+  *glx*)	mode="glx" ;;
   *)		mode="sdl" ;;
 esac
 

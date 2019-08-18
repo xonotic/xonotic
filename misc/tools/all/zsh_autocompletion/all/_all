@@ -44,12 +44,12 @@ case $state in
             # choose version and autocomplete cvars
             # possible TODO: check for OS and adapt to it
             _arguments \
-                '1:Version:(sdl dedicated)' && ret=0
+                '1:Version:(sdl glx dedicated)' && ret=0
             ;;
 
         compile)
             _arguments \
-                '1:Version:(sdl dedicated)' \
+                '1:Version:(sdl glx dedicated)' \
                 "-0[don't use precompiled d0_blind_id]" \
                 "-1[don't compile d0_blind_id]" \
                 '-c[clean all before building]' \
