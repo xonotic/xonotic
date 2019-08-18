@@ -1,1 +1,1 @@
-xonotic-linux-sdl.sh
+xonotic-linux-glx.sh

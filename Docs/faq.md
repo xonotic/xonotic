@@ -3,7 +3,7 @@
 
 **There is no need to install Xonotic!** The zip file you downloaded from the homepage has everything. All binaries to run the game on Linux, Windows and macOS are inside of it. Just unzip the archive and run the appropriate executable for your OS.
 
-For example, on Windows or macOS you can start the game by double-clicking the Xonotic logo. On Linux you can run xonotic-linux-sdl.sh.
+For example, on Windows or macOS you can start the game by double-clicking the Xonotic logo. On Linux you can run xonotic-linux-glx.sh or xonotic-linux-sdl.sh - whichever one works better on your hardware.
 
 ## Is there a Debian package available?
 
@@ -85,7 +85,7 @@ Use our [issue tracker](http://gitlab.com/xonotic/xonotic-data.pk3dir/issues) on
 
 If you want to investigate further:
 
-On Linux: In a xterm, cd into your Xonotic installation directory, start catchsegv ./xonotic-linux64-sdl -condebug -developer > crash.txt 2>&1 and give the file crash.txt to the developers. On a 32bit system you should instead use ./xonotic-linux32-sdl.
+On Linux: In a xterm, cd into your Xonotic installation directory, start catchsegv ./xonotic-linux-686-sdl -condebug -developer > crash.txt 2>&1 and give the file crash.txt to the developers. Note that you can also use ./xonotic-linux-686-glx or if you have a 64bit system ./xonotic-linux-x86_64-sdl and ./xonotic-linux-x86_64-glx
 
 On Windows: Click Start->Run, and enter drwtsn32, click Ok in the next window, run Xonotic and wait for the crash. Then go to C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson there should be a file called "drwtsn32.log", give that file along with the engine's build date to the developers. You'll see that date when you open the ingame console (How do I open the console?). Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
 
@@ -116,7 +116,7 @@ An extensive list of maps is at [xonotic.co](http://xonotic.co)
 
 ## How can I place a shortcut to Xonotic on my Linux desktop?
 
-Use the script xonotic-linux-sdl.sh instead of the binaries. The scripts will use the correct working directory, choose the right version (32 or 64 bit) and also allow you to start a extra X server.
+Use the script xonotic-linux-sdl.sh or xonotic-linux-glx.sh instead of the binaries. The scripts will use the correct working directory, choose the right version (32 or 64 bit) and also allow you to start a extra X server.
 
 ## How do I open the console?
 
