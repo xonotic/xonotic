@@ -480,7 +480,7 @@ case "$cmd" in
 		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw '' low '-low'
-		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir                   normaldds ''
+		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir        low '-low' normaldds ''                    normal '-high'
 		;;
 	release-pack-needsx11)
 		release_common
@@ -541,12 +541,14 @@ case "$cmd" in
 			verbose mkzip0 Xonotic-$stamp-low$suffix.zip \
 				Xonotic/data/xonotic-$pk3stamp-data-low.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-maps-low.pk3 \
-				Xonotic/data/xonotic-$pk3stamp-music-low.pk3
+				Xonotic/data/xonotic-$pk3stamp-music-low.pk3 \
+				Xonotic/data/xonotic-$pk3stamp-nexcompat-low.pk3
 			verbose mv Xonotic-$stamp-common$suffix.zip Xonotic-$stamp-high$suffix.zip
 			verbose mkzip0 Xonotic-$stamp-high$suffix.zip \
 				Xonotic/data/xonotic-$pk3stamp-data-high.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-maps-high.pk3 \
-				Xonotic/data/xonotic-$pk3stamp-music.pk3
+				Xonotic/data/xonotic-$pk3stamp-music.pk3 \
+				Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3
 			# let's pass crypto import laws of some nasty countries
 			find Xonotic -name \*d0_rijndael\*.so -o -name \*d0_rijndael\*.dylib -o -name \*d0_rijndael\*.dll -o -name \*d0_rijndael\*.c -delete
 		done
