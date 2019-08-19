@@ -2,9 +2,9 @@
 Type=Application
 Version=1.0
 Name=Xonotic (GLX)
-Comment=a free open-source first person shooter
+Comment=Multiplayer, deathmatch oriented first person shooter
 Icon=xonotic
 Exec=xonotic-glx
 Terminal=false
 StartupNotify=false
-Categories=Game;
+Categories=Game;ActionGame;
