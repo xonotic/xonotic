@@ -56,7 +56,13 @@ for EXECUTABLE in "$@"; do
 			esac
 			;;
 		*PE*)
-			uses_ico=true
+			case "$EXECUTABLE" in
+				*-dedicated)
+					;;
+				*)
+					uses_ico=true
+					;;
+			esac
 			;;
 	esac
 
