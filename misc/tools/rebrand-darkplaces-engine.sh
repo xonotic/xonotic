@@ -57,7 +57,7 @@ for EXECUTABLE in "$@"; do
 			;;
 		*PE*)
 			case "$EXECUTABLE" in
-				*-dedicated)
+				*-dedicated.exe)
 					;;
 				*)
 					uses_ico=true
