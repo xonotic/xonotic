@@ -3,6 +3,7 @@ Type=Application
 Version=1.0
 Name=Xonotic (GLX)
 Comment=Multiplayer, deathmatch oriented first person shooter
+Comment[de]=Deathmatch- und Mehrspieler-orientierter Ego-Shooter
 Icon=xonotic
 Exec=xonotic-glx
 Terminal=false
