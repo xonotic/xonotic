@@ -17,15 +17,15 @@ old_library='libSDL2.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid'
+dependency_libs=' -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
 
 # Version information for libSDL2.
-current=4
-age=4
-revision=1
+current=10
+age=10
+revision=0
 
 # Is this an already installed library?
 installed=yes
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/var/home/rpolzer/xonotic/misc/buildsrc/tmp/SDL2-2.0.5/../64/lib'
+libdir='/Users/valve/release/SDL/SDL2-2.0.10/x86_64-w64-mingw32/lib'
