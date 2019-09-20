@@ -36,7 +36,7 @@ fi
 
 if [ -f ./all ]; then
 	./all clean -fU -m -r
-	./all compile -r
+	./all compile
 	export USE_GDB=no
 	set -- ./all run "$@"
 elif [ -z "$*" ]; then
