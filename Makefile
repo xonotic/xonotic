@@ -1,4 +1,4 @@
-DESTDIR ?= 
+DESTDIR ?=
 PREFIX ?= /usr/local
 BINDIR ?= $(PREFIX)/bin
 LIBDIR ?= $(PREFIX)/lib/xonotic
@@ -19,7 +19,7 @@ all: all-$(SUFFIX)
 
 .PHONY: all-git
 all-git:
-	./all compile -r
+	./all compile
 
 .PHONY: all-zip-binary
 all-zip-binary:

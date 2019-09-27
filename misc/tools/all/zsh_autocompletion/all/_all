@@ -54,10 +54,12 @@ case $state in
                 "-1[don't compile d0_blind_id]" \
                 '-c[clean all before building]' \
                 '-qc[clean QuakeC binaries]' \
-                - '(release)' \
-                    '-r[build in release mode]' \
+                - '(debug)' \
+                    '-d[build in debug mode]' \
                 - '(profile)' \
-                    '-p[build in profile mode]' && ret=0
+                    '-p[build in profile mode]' \
+                - '(release)' \
+                    '-r[build in release mode (default)]' && ret=0
             ;;
 
         compile-map)
