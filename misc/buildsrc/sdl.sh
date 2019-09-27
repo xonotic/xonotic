@@ -16,7 +16,7 @@ leave() {
 }
 
 enter
-curl -O http://libsdl.org/release/SDL2-2.0.5.dmg
+curl -O http://libsdl.org/release/SDL2-2.0.10.dmg
 7z x *.dmg
 7z x *.hfs
 rm -rf "$buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL2.framework/Versions/A"
@@ -25,7 +25,7 @@ git add "$buildfiles/osx/Xonotic.app/Contents/Frameworks/SDL2.framework/Versions
 leave
 
 enter
-curl -O http://libsdl.org/release/SDL2-2.0.5.tar.gz
+curl -O http://libsdl.org/release/SDL2-2.0.10.tar.gz
 tar xvf *.tar.gz
 cd SDL2*/
 LD_LIBRARY_PATH="$HOME/opt/cross_toolchain_32/x86_64-slackware-linux/i686-w64-mingw32/lib:$HOME/opt/cross_toolchain_32/libexec/gcc/i686-w64-mingw32/4.8.3" \

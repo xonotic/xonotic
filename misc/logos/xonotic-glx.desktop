@@ -4,6 +4,7 @@ Version=1.0
 Name=Xonotic (GLX)
 Comment=Multiplayer, deathmatch oriented first person shooter
 Comment[de]=Deathmatch- und Mehrspieler-orientierter Ego-Shooter
+Comment[fr]=Jeu de tir à la première personne multijoueur
 Icon=xonotic
 Exec=xonotic-glx
 Terminal=false

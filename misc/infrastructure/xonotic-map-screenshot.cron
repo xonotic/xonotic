@@ -8,7 +8,7 @@ set -e
 cd xonotic
 ./all clean -m -fU -D
 # like reclone but do not delete untracked, so q3map2.x86 compile stays
-./all compile -r
+./all compile
 export DRIVER=soft
 #export DRIVERFLAGS="+gl_texturecompression 1 -nofbo"
 #export DRIVERFLAGS="+gl_texturecompression 1"

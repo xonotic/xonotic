@@ -27,7 +27,7 @@ case "$cmd" in
 		cleanqcc=false
 		cleanqc=false
 		compiled0=
-		debug=debug
+		debug=release  # when changing this default, change the description in the zsh autocompletion script
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
@@ -53,8 +53,11 @@ case "$cmd" in
 					cleanqc=true
 					shift
 					;;
-				-r|-p)
+				-d|-p|-r)
 					case "$1" in
+						-d)
+							debug=debug
+							;;
 						-p)
 							debug=profile
 							;;
@@ -384,7 +387,7 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-qc] [-r|-p] [-0] [-1] [sdl|glx|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-d|-p|-r] [-0] [-1] [sdl|glx|dedicated]"
 		$ECHO "  $SELF update-maps"
 		$ECHO "  $SELF run [sdl|glx|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
