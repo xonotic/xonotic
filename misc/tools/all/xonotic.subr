@@ -27,7 +27,7 @@ case "$cmd" in
 		cleanqcc=false
 		cleanqc=false
 		compiled0=
-		debug=release
+		debug=release  # when changing this default, change the description in the zsh autocompletion script
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
