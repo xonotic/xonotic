@@ -6,6 +6,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <name>Xonotic</name>
   <summary>Multiplayer, deathmatch oriented first person shooter</summary>
+  <summary xml:lang="de">Deathmatch- und Mehrspieler-orientierter Ego-Shooter</summary>
   <summary xml:lang="fr">Jeu de tir à la première personne multijoueur</summary>
   <description>
     <p>
@@ -13,6 +14,10 @@
       addictive, arena-style gameplay with rapid movement and a wide array of
       weapons.
     </p>
+    <p xml:lang="de">
+      Xonotic ist ein freier und schneller Ego-Shooter, der ein
+      Gameplay im Arenastil mit hektischen Manövern und einer großen Auswahl
+      an Waffen kombiniert.
     <p xml:lang="fr">
       Xonotic est un jeu de tir à la première personne gratuit, qui combine un
       style de jeu en arène rapide et addictif avec une large sélection d'armes.
@@ -25,6 +30,14 @@
       Xonotic allows every e-sport enthusiast to participate in competitions
       hosted by its open-minded community.
     </p>
+    <p xml:lang="de">
+      Xonotic ist leicht zu erlernen, aber schwer zu meistern. Neben einer
+      aufregenden Action für den Gelegenheitsspieler bietet das Spiel außerdem
+      Möglichkeiten für den E-Sport für alle, die an Wettkämpfen Spaß haben.
+      Von Kartengestaltungswettbewerben über monatlichen Schnellwettbewerben
+      bis zu gesponsorten Turnieren ermöglicht Xonotic jedem E-Sport-Liebhaber
+      eine Teilnahme in Wettbewerben, die von der aufgeschlossenen Gemeinschaft
+      veranstaltet werden.
     <p xml:lang="fr">
       Xonotic est facile à apprendre, mais difficile à maîtriser ! Outre une
       action intense pour les joueurs débutants, le jeu propose aussi des
@@ -36,6 +49,11 @@
       functioning anticheat system, the spectator mode, and the opportunity to
       watch and record games makes Xonotic attractive to competitive players.
     </p>
+    <p xml:lang="de">
+      Features wie z.B. einfache Gegenstände, vollständig anpassbare
+      Einstellungen und Server, ein funktionierendes Anti-Cheat-System,
+      der Zuschauermodus, und die Möglichkeit, Spielen zuzusehen und
+      sie aufzuzeichnen, machen Xonotic interessant für wetteifernde Spieler.
     <p xml:lang="fr">
       Des fonctionnalités comme les items à apparence simplifiée, des
       configurations et serveurs entièrement personnalisables, un système

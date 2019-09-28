@@ -3,6 +3,7 @@ Type=Application
 Version=1.0
 Name=Xonotic
 Comment=Multiplayer, deathmatch oriented first person shooter
+Comment[de]=Deathmatch- und Mehrspieler-orientierter Ego-Shooter
 Comment[fr]=Jeu de tir à la première personne multijoueur
 Icon=xonotic
 Exec=xonotic-sdl
