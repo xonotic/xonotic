@@ -1,0 +1,6 @@
+# RedmineExporter users file
+# This file overrides/complements user data found in the wiki
+# handle (LHS) will be replaced with author name and email (RHS)
+#
+nyov = nyov <nyov@nexnode.net>
+# ... (scrubbed)
