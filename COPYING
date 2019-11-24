@@ -20,7 +20,7 @@ Xonotic-owned branches, such as:
 - Files downloaded from a web server by Xonotic (e.g. automatic map downloads)
 
 - Branches of our repository that are owned by a user of the repository, and
-  thus not owned by Team Xonotic (these branches are always prefixed with user
+  thus not owned by Team Xonotic (these branches are usually prefixed with user
   name and a slash, as in "divVerent/")
 
 For status of such content, please contact its author.
