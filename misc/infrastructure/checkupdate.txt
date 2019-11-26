@@ -32,9 +32,9 @@ B 51.15.46.239:
 B 163.172.104.191:
 B 51.38.113.134:
 B 178.162.196.237:
-# fpsclassico.de - faking activity
+# fpsclassico.de - faking activity (adds a spectator bot posing as a client when empty)
 B 85.10.203.92:
-# Xonotic 0.8.2 server - faking activity:
+# Xonotic 0.8.2 server - faking activity
 B 89.163.144.198:
 B 85.114.138.57:
 B 89.163.214.186:
