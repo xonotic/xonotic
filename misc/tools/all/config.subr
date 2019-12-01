@@ -4,10 +4,10 @@ gitsite_url="http://gitlab.com/groups/xonotic/"
 allrepos()
 {
 	"$@" .                             xonotic.git                  master         ""
-	"$@" data/xonotic-data.pk3dir      xonotic-data.pk3dir.git      master         ""
+	"$@" data/xonotic-data.pk3dir      xonotic-data.pk3dir.git      hpbuild         ""
 	"$@" data/xonotic-music.pk3dir     xonotic-music.pk3dir.git     master         ""
 	"$@" data/xonotic-nexcompat.pk3dir xonotic-nexcompat.pk3dir.git master         "no"
-	"$@" darkplaces                    darkplaces.git               div0-stable    "svn"
+	"$@" darkplaces                    darkplaces.git               horsepower    "svn"
 	"$@" netradiant                    netradiant.git               master         ""
 	"$@" div0-gittools                 div0-gittools.git            master         "no"
 	"$@" d0_blind_id                   d0_blind_id.git              master         ""

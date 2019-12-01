@@ -289,18 +289,20 @@ case "$cmd" in
 		# 4 levels up: data, xonotic-data, qcsrc, server
 
 		verbose cd "$d0/darkplaces"
-		if [ x"$BAD_TARGETS" = x" " ]; then
-			$ECHO "Warning: invalid empty client, default clients will be used."
-		fi
-		if $cleandp; then
-			verbose $MAKE $MAKEFLAGS clean
-		fi
-		for T in $TARGETS; do
-			verbose $MAKE $MAKEFLAGS STRIP=: "$@" "$T"
-		done
-		for T in $BAD_TARGETS; do
-			$ECHO "Warning: discarded invalid client $T."
-		done
+		#if [ x"$BAD_TARGETS" = x" " ]; then
+		#	$ECHO "Warning: invalid empty client, default clients will be used."
+		#fi
+		#if $cleandp; then
+		#	verbose $MAKE $MAKEFLAGS clean
+		#fi
+		#for T in $TARGETS; do
+		#	verbose $MAKE $MAKEFLAGS STRIP=: "$@" "$T"
+		#done
+		#for T in $BAD_TARGETS; do
+		#	$ECHO "Warning: discarded invalid client $T."
+		#done
+
+		verbose ./build.sh --nocache --auto --j8 --config-dir="$d0/data/xonotic-data.pk3dir" --build-dir="$d0/darkplaces" xonotic
 
 		verbose "$SELF" update-maps
 		;;
@@ -321,10 +323,10 @@ case "$cmd" in
 			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 		fi
 
-		client=-sdl
+		client=""
 		USE_RLWRAP=no
 		case "$1" in
-			dedicated)
+			sv)
 				client=-$1
 				USE_RLWRAP=
 				shift
@@ -338,15 +340,15 @@ case "$cmd" in
 				;;
 		esac
 
-		if ! [ -x "darkplaces/darkplaces$client" ]; then
-			if [ -x "darkplaces/darkplaces$client.exe" ]; then
+		if ! [ -x "darkplaces/xonotic$client" ]; then
+			if [ -x "darkplaces/xonotic$client.exe" ]; then
 				client=$client.exe
 			else
-				$ECHO "Client darkplaces/darkplaces$client not found, aborting"
+				$ECHO "Client darkplaces/xonotic$client not found, aborting"
 				exit 1
 			fi
 		fi
-		set -- "darkplaces/darkplaces$client" -xonotic "$@"
+		set -- "darkplaces/xonotic$client" -xonotic "$@"
 
 		# if pulseaudio is running: USE IT
 		if [ -z "$SDL_AUDIODRIVER" ] && ! [ -n "$WE_HATE_OUR_USERS" ] && ! [ x"`uname`" = x"Darwin" ]; then
