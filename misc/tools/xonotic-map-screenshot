@@ -18,6 +18,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	"$@" \
 	+'sv_precacheplayermodels 0' \
 	+'cl_hidewaypoints 1' \
+	+'cl_movement 0' \
 	+'r_motionblur 0' \
 	+'r_damageblur 0' \
 	+'r_letterbox -1' \
