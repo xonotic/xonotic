@@ -77,7 +77,7 @@ let
             result = (cleanSourceFilter name type)
                 && !(name == "${project}/release")
                 && !(name == "${project}/d0_blind_id")
-                && !(name == "${project}/daemon")
+                && !(name == "${project}/daemon-glue")
                 && !(name == "${project}/darkplaces")
                 && !(name == "${project}/data")
                 && !(name == "${project}/gmqcc")

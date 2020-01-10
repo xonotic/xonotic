@@ -14,7 +14,7 @@ function(subproject id name)
 endfunction()
 
 subproject(PKI d0_blind_id)
-subproject(DAEMON daemon)
+subproject(DAEMON daemon-glue)
 subproject(DP darkplaces)
 subproject(QCC gmqcc)
 subproject(RADIANT netradiant)
