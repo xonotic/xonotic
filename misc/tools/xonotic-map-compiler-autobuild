@@ -3,7 +3,7 @@
 set -e
 
 bspdir="$PWD/data"
-url_http=http://beta.xonotic.org/autobuild-bsp/
+url_http=https://beta.xonotic.org/autobuild-bsp/
 url_ssh=xonotic-beta:autobuild-bsp/
 build_cachedir="$HOME/xonotic-map-compiler.cache/"
 screenshot_cachedir="$HOME/xonotic-map-screenshot.cache/"
@@ -308,7 +308,7 @@ getthemap()
 		fi
 	fi
 	if ! wget -c -O "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
-		if ! curl -o "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
+		if ! curl -Lo "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 			rm -f "$bspdir/$M-$blobhash.pk3"
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
 			return 0
