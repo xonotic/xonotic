@@ -396,7 +396,9 @@ case "$cmd" in
 		;;
 	serverbench)
 		# TODO(rpolzer): Why does :anticheat: output differ? Total game time differs? Why?
-		verbose "$SELF" run "$@" -noconfig -nohome +exec serverbench.cfg |\
+		trap "rm -rf .serverbench_temp" 0 1 2 3 11 13 15
+		mkdir -p .serverbench_temp
+		verbose "$SELF" run dedicated "$@" -noconfig -userdir .serverbench_temp +exec serverbench.cfg |\
 			tee /dev/stderr |\
 			grep '^:' |\
 			grep -v '^:gamestart:' |\
