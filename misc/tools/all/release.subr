@@ -262,7 +262,7 @@ case "$cmd" in
 		;;
 	release-qc)
 		release_common
-		verbose make -C "$d0/gmqcc" all
+		verbose make -C "$d0/gmqcc" gmqcc
 		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source QCC="$d0/gmqcc/gmqcc" XON_BUILDSYSTEM=1 clean all
 		;;
 	release-buildpk3-transform-raw)
