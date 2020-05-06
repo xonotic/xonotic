@@ -8,5 +8,6 @@ Comment[fr]=Jeu de tir à la première personne multijoueur
 Icon=xonotic
 Exec=xonotic-glx
 Terminal=false
+PrefersNonDefaultGPU=true
 StartupNotify=false
 Categories=Game;ActionGame;
