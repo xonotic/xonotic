@@ -39,13 +39,15 @@ cd ~/xonotic-release-build
 # map branches that we include:
 #   winners in the poll for upcoming CTF maps
 #   maps near completion
+# uncomment below when a branch is needed
+# the listed branches are examples only
 
-for b in \
-	origin/fruitiex/runningmanctf \
-	origin/mintox/geoplanetary
-do
-	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
-done
+#for b in \
+#	origin/fruitiex/runningmanctf \
+#	origin/mintox/geoplanetary
+#do
+#	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
+#done
 ./all update -N
 d0=`date +%Y%m%d`
 d=$d0
