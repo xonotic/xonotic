@@ -172,7 +172,7 @@ case "$cmd" in
 		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
-			verbose mkdir data gmqcc source source/darkplaces source/gmqcc source/d0_blind_id mapping
+			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
 			verbose rm -rf misc/builddeps
 			verbose mv misc/buildfiles/win32 bin32 || true
 			verbose mv bin32/SDL.dll . || true
