@@ -9,6 +9,7 @@ dummy=$1; shift
 count=`yes x | head -n "$count" | tr -cd x`
 
 ./all run \
+	-nocrashdialog \
 	-nosound \
 	-noconfig \
 	+'locksession 0' \

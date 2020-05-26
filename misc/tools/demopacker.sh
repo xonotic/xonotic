@@ -8,7 +8,7 @@ demobase=${demo##*/}
 
 cp "$demo" data/"$demobase"
 
-USE_RLWRAP=no strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window "$@" -demo "$demobase"
+USE_RLWRAP=no strace -qo strace.txt -f -e trace=open ./all run -nohome -readonly -forceqmenu -window -nocrashdialog "$@" -demo "$demobase"
 
 allfiles()
 {

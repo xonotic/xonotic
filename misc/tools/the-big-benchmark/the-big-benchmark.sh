@@ -38,7 +38,7 @@ if [ -f ./all ]; then
 	./all clean -fU -m -r
 	./all compile
 	export USE_GDB=no
-	set -- ./all run "$@"
+	set -- ./all run -nocrashdialog "$@"
 elif [ -z "$*" ]; then
 	case "`uname`" in
 		Darwin)
