@@ -13,7 +13,7 @@ allrepos()
 	"$@" d0_blind_id                   d0_blind_id.git              master         ""
 	"$@" data/xonotic-maps.pk3dir      xonotic-maps.pk3dir.git      master         ""
 	"$@" mediasource                   mediasource.git              master         "no"
-	"$@" gmqcc                         gmqcc.git                    master         ""
+	"$@" gmqcc                         gmqcc.git                    main           ""
 	"$@" xonstat                       xonstat.git                  master         "no"
 	"$@" xonstatdb                     xonstatdb.git                master         "no"
 	"$@" xonotic.org                   xonotic.org.git              master         "no"
