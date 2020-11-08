@@ -34,9 +34,9 @@ allmirrors()
 	# Gitlab host (divVerent).
 	"$@" http gitlab   https://gitlab.com/xonotic/     ''
 
-	# German host (divVerent).
-	"$@" git  de   git://de.git.xonotic.org/xonotic/   ''
-	"$@" http de   http://de.git.xonotic.org/xonotic/  ''
+	# German host - disabled (divVerent).
+	"$@" git  ''   git://de.git.xonotic.org/xonotic/   ''
+	"$@" http ''   http://de.git.xonotic.org/xonotic/  ''
 
 	# Pushing destination (authoritative server; merlijn).
 	"$@" ssh  push ssh://git@gitlab.com/xonotic/       ''
