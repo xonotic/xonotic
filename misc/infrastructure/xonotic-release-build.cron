@@ -1,28 +1,48 @@
 #!/bin/sh
 
+if [ -z "$RELEASETYPE" ]; then
+	export RELEASETYPE=autobuild
+	#export RELEASETYPE=release
+fi
+
+case "$RELEASETYPE" in
+	autobuild)
+		RELEASETYPEDIR=
+		RELEASETYPENAME="$RELEASETYPE"
+		;;
+	*)
+		RELEASETYPEDIR="$RELEASETYPE/"
+		RELEASETYPENAME="$RELEASETYPE-like build"
+		;;
+esac
+
 # is being run as cronjob, better set PATH
-export PATH=/home/xonotic-build/bin:/usr/local/bin:/usr/bin:/bin:/usr/games
+export PATH=/home/xonotic-build/ccache:/home/xonotic-build/bin:/usr/local/bin:/usr/bin:/bin:/usr/games
+
+# TEST: use s2tc, high quality
+#export dds_tool=s2tc
 
 mepwd=$PWD
 me=$0
-if ! lockfile-create "$me"; then
-	exit 1
+
+if rm "$me.not-today" 2>/dev/null; then
+	echo "No build today (not-today marker removed)!"
+	exit 0
 fi
-lockfile-touch "$me" & lockpid=$!
-trap 'kill $lockpid || true; cd "$mepwd"; lockfile-remove "$me"' EXIT
-trap 'exit 1' INT TERM
 
 set -ex
-export HOSTS_THAT_ARE_MYSELF="xonotic-build-win32 xonotic-build-win64"
-export HOSTS_THAT_ARE_DISABLED=""
-ssh xonotic-beta '
-	cd autobuild/;
+
+ssh autobuild-release-uploader@beta.xonotic.org '
+	set -e;
+	cd HTML/autobuild/;
 	s0=`date -d "now - 7 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
-	for X in *; do
+	for X in * */*; do
 		[ -f "$X" ] || continue;
-		d=${X#Xonotic-};
-		d=${d%%[_-.]*};
+		d=${X##*/};
+		d=${d#Xonotic-};
+		d=${d#gmqcc-};
+		d=${d%%[-_.]*};
 		[ x"$d" != x"latest" ] || continue;
 		w=`date -d $d +%w`;
 		s=`date -d $d +%s`;
@@ -33,34 +53,35 @@ ssh xonotic-beta '
 '
 cd ~/xonotic-release-build
 ./all clean --reclone
+# ./all checkout maint
+./all checkout
 ./all each git checkout HEAD^0
 # add all feature branches we want
 
 # map branches that we include:
 #   winners in the poll for upcoming CTF maps
 #   maps near completion
-# uncomment below when a branch is needed
-# the listed branches are examples only
 
-#for b in \
-#	origin/fruitiex/runningmanctf \
-#	origin/mintox/geoplanetary
-#do
-#	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
-#done
+## for b in \
+## 	origin/divVerent/rebase/for-autobuild \
+## ; do
+## 	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
+## done
 ./all update -N
 d0=`date +%Y%m%d`
 d=$d0
 i=1
-while HEAD http://xonotic:g-23@beta.xonotic.org/autobuild/"Xonotic-$d.zip"; do
+while HEAD http://xonotic:g-23@beta.xonotic.org/autobuild/"$RELEASETYPEDIR""Xonotic-$d.zip"; do
 	i=$(($i+1))
 	d="$d0"_"$i"
 done
-RELEASETYPE=beta RELEASEDATE=$d ./all release
+RELEASEDATE=$d xvfb-run ./all release
 for X in Xonotic-$d*.zip; do
 	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
 done
-rsync -vaSHP Xonotic*.zip xonotic-beta:autobuild/
-ssh xonotic-beta sh update-rsync.sh "$d"
-echo "Finished a new beta build at http://beta.xonotic.org/autobuild/" | $IRCSPAM
+rsync -vaSHP Xonotic*.zip autobuild-release-uploader@beta.xonotic.org:HTML/autobuild/"$RELEASETYPEDIR"
+if [ -z "$RELEASETYPEDIR" ]; then
+	ssh autobuild-release-uploader@beta.xonotic.org sh update-rsync.sh "$d"
+fi
+echo "Finished a new $RELEASETYPENAME at http://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
 cd
