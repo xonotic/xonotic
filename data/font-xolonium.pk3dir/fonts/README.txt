@@ -1,9 +1,9 @@
-Copyright 2011-2016 Severin Meyer <sev.ch@web.de>
+Copyright 2011-2020 Severin Meyer <sev.ch@web.de>
 
 
 This is a special GPL version of the Xolonium font,
 intended for Xonotic. Find the public release at
-<http://fontlibrary.org/font/xolonium>
+<https://gitlab.com/sev/xolonium>
 
 
 This font is free software. You can redistribute and/or
