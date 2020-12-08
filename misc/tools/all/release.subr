@@ -553,8 +553,6 @@ case "$cmd" in
 				Xonotic/data/xonotic-$pk3stamp-maps-high.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-music.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3
-			# let's pass crypto import laws of some nasty countries
-			find Xonotic -name \*d0_rijndael\*.so -o -name \*d0_rijndael\*.dylib -o -name \*d0_rijndael\*.dll -o -name \*d0_rijndael\*.c -delete
 		done
 		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
