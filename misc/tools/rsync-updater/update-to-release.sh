@@ -9,6 +9,13 @@ if ! which rsync >/dev/null; then
 	exit 1
 fi
 
+read -rp "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]?" choice
+case "$choice" in
+  Y) ;;
+  y) ;;
+  *) exit 1 ;;
+esac
+
 case "${0##*/}" in
 	update-to-autobuild.sh)
 		buildtype=autobuild

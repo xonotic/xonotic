@@ -10,6 +10,9 @@ exit
 
 :copied
 
+set /p choice=This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]?
+if /i not "%choice%" == "Y" goto end
+
 set buildtype=release
 if "%~n0" == "update-to-autobuild" set buildtype=autobuild
 
