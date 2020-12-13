@@ -9,7 +9,7 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/g
 cd /var/www/update.xonotic.org
 
 rm -f checkupdate.txt
-wget -qO checkupdate.txt "http://git.xonotic.org/?p=xonotic/xonotic.git;a=blob_plain;f=misc/infrastructure/checkupdate.txt"
+wget -qO checkupdate.txt "https://gitlab.com/xonotic/xonotic/-/raw/master/misc/infrastructure/checkupdate.txt"
 {
 	grep "^V " checkupdate.txt | head -n 1 | cut -c 3-
 	grep "^D " checkupdate.txt | head -n 1 | cut -c 3-
