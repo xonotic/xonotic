@@ -8,5 +8,12 @@ set -e
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
 cd /var/www/update.xonotic.org/HTML
 
-rm -f tos.txt
-wget -qO tos.txt "https://gitlab.com/xonotic/xonotic/-/raw/master/misc/infrastructure/tos.txt"
+wget -qO tos.txt.new "https://gitlab.com/xonotic/xonotic/-/raw/master/misc/infrastructure/tos.txt"
+
+if [ `wc -l tos.txt.new | awk '{print $1}'` -ge "2" ]; then
+        echo "tos.txt update succeeded."
+	mv tos.txt.new tos.txt
+else
+	echo "tos.txt updating failed. Please debug."
+fi
+
