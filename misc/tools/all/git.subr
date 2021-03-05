@@ -452,7 +452,7 @@ case "$cmd" in
 		allrepos ifrepoenabled 0 fix_config_
 		;;
 	keygen)
-		if [ -f ~/.ssh/id_rsa.pub ]; then
+		if [ -f ~/.ssh/id_ef25519.pub ]; then
 			msg ""
 			msg "A key already exists and no new one will be generated. If you"
 			msg "already have done the procedure for getting your key approved, you"
@@ -461,7 +461,22 @@ case "$cmd" in
 			msg "To get access, your key has to be approved first. For that, visit"
 			msg "$gitsite_url, then log in, enter the"
 			msg "\"xonotic\" project, create an \"Issue\" tagged \"Repository Access\""
-			msg "to apply for access and paste the following output into the issue:"
+			msg "to apply for access."
+			msg ""
+			msg "After that, go to your profile settings, \"SSH Keys\", \"Add SSH Key\""
+			msg "and paste the following output:"
+			msg ""
+			msg "`cat ~/.ssh/id_ef25519.pub`"
+		elif [ -f ~/.ssh/id_rsa.pub ]; then
+			msg ""
+			msg "A key already exists and no new one will be generated. If you"
+			msg "already have done the procedure for getting your key approved, you"
+			msg "can skip the following paragraph and already use the repository."
+			msg ""
+			msg "To get access, your key has to be approved first. For that, visit"
+			msg "$gitsite_url, then log in, enter the"
+			msg "\"xonotic\" project, create an \"Issue\" tagged \"Repository Access\""
+			msg "to apply for access."
 			msg ""
 			msg "After that, go to your profile settings, \"SSH Keys\", \"Add SSH Key\""
 			msg "and paste the following output:"
@@ -476,7 +491,7 @@ case "$cmd" in
 			msg "To get access, your key has to be approved first. For that, visit"
 			msg "$gitsite_url, then log in, enter the"
 			msg "\"xonotic\" project, create an \"Issue\" tagged \"Repository Access\""
-			msg "to apply for access and paste the following output into the issue:"
+			msg "to apply for access."
 			msg ""
 			msg "After that, go to your profile settings, \"SSH Keys\", \"Add SSH Key\""
 			msg "and paste the following output:"
@@ -494,7 +509,7 @@ case "$cmd" in
 			msg "To get access, your key has to be approved first. For that, visit"
 			msg "$gitsite_url, then log in, enter the"
 			msg "\"xonotic\" project, create an \"Issue\" tagged \"Repository Access\""
-			msg "to apply for access and paste the following output into the issue:"
+			msg "to apply for access."
 			msg ""
 			msg "After that, go to your profile settings, \"SSH Keys\", \"Add SSH Key\""
 			msg "and paste the following output:"
@@ -577,7 +592,7 @@ case "$cmd" in
 			fi
 			shift
 		done
-		
+
 		if $need_bestmirror; then
 			newbase=`bestmirror "$base" "$newprotocol" "$newlocation"`
 			if [ -z "$newbase" ]; then
