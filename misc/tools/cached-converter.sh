@@ -209,7 +209,7 @@ reduce_jpeg2_dds()
 {
 	i=$1; shift
 	ia=$1; shift
-	o=$1; shift; shift 
+	o=$1; shift; shift
 	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
@@ -218,7 +218,7 @@ reduce_jpeg2_dds_premul()
 {
 	i=$1; shift
 	ia=$1; shift
-	o=$1; shift; shift 
+	o=$1; shift; shift
 	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
@@ -398,6 +398,11 @@ for F in "$@"; do
 
 	# configure S2TC
 	case "$f" in
+		./maps/*/lm_[0-9][0-9][0-9][13579]) # deluxemap
+			export S2TC_COLORDIST_MODE=NORMALMAP
+			export S2TC_RANDOM_COLORS=256
+			export S2TC_REFINE_COLORS=LOOP
+			;;
 		*_norm)
 			export S2TC_COLORDIST_MODE=NORMALMAP
 			export S2TC_RANDOM_COLORS=256
