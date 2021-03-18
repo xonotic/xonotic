@@ -404,7 +404,10 @@ for F in "$@"; do
 			export S2TC_REFINE_COLORS=LOOP
 			export S2TC_DITHER_MODE=NONE
 			# Engine ignores alpha channel on these, so we can use the DXT1 black encoding.
-			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -renormalize -rtopmip -uniformMetrics -usetransparentindicesforblack'
+			# Not that that color should happen very often on a deluxemap, but who knows.
+			# NOT renormalizing, as DP does its own renormalization anyway in the GLSL shader
+			# and crunch's renormalizing looks like it can cause banding artifacts.
+			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -uniformMetrics -usetransparentindicesforblack'
 			;;
 		*_norm)
 			export S2TC_COLORDIST_MODE=NORMALMAP
@@ -412,7 +415,9 @@ for F in "$@"; do
 			export S2TC_REFINE_COLORS=LOOP
 			export S2TC_DITHER_MODE=NONE
 			# Alpha channel here means height.
-			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -renormalize -rtopmip -uniformMetrics'
+			# NOT renormalizing, as DP does its own renormalization anyway in the GLSL shader
+			# and crunch's renormalizing looks like it can cause banding artifacts.
+			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -uniformMetrics'
 			;;
 		*)
 			export S2TC_COLORDIST_MODE=SRGB_MIXED
