@@ -396,25 +396,31 @@ for F in "$@"; do
 			;;
 	esac
 
-	# configure S2TC
+	# Specific hacks for normalmaps.
 	case "$f" in
 		./maps/*/lm_[0-9][0-9][0-9][13579]) # deluxemap
 			export S2TC_COLORDIST_MODE=NORMALMAP
 			export S2TC_RANDOM_COLORS=256
 			export S2TC_REFINE_COLORS=LOOP
 			export S2TC_DITHER_MODE=NONE
+			# Engine ignores alpha channel on these, so we can use the DXT1 black encoding.
+			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -renormalize -rtopmip -uniformMetrics -usetransparentindicesforblack'
 			;;
 		*_norm)
 			export S2TC_COLORDIST_MODE=NORMALMAP
 			export S2TC_RANDOM_COLORS=256
 			export S2TC_REFINE_COLORS=LOOP
 			export S2TC_DITHER_MODE=NONE
+			# Alpha channel here means height.
+			export CRUNCH_TEXTYPEFLAGS='-gamma 1.0 -renormalize -rtopmip -uniformMetrics'
 			;;
 		*)
 			export S2TC_COLORDIST_MODE=SRGB_MIXED
 			export S2TC_RANDOM_COLORS=64
 			export S2TC_REFINE_COLORS=LOOP
 			export S2TC_DITHER_MODE=FLOYDSTEINBERG
+			# Color channel-like images - consider as sRGB.
+			export CRUNCH_TEXTYPEFLAGS='-gamma 2.2'
 			;;
 	esac
 

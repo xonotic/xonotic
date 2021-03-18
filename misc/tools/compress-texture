@@ -17,8 +17,8 @@ f=
 
 fourcchack=
 case "$tool" in
-	compressonator-dxtc)
-		# we still have to preprocess the image to premultiply alpha, as it seems
+	compressonator-dxtc|crunch)
+		# We still have to preprocess the image to premultiply alpha, as it seems
 		case "$format" in
 			dxt2)
 				fourcchack=DXT2
@@ -30,7 +30,8 @@ case "$tool" in
 				;;
 		esac
 		;;
-	*)
+	compressonator-atic|nvcompress|s2tc)
+		# These tools don't support DXT2/4 at all.
 		case "$format" in
 			dxt2)
 				fourcchack=DXT2
@@ -41,6 +42,9 @@ case "$tool" in
 				format=dxt5
 				;;
 		esac
+		;;
+	*)
+		echo >&2 "Please figure out the DXT2/DXT4 story for $tool."
 		;;
 esac
 
@@ -92,6 +96,16 @@ case "$tool" in
 			dxt5) f="-t DXT5" ;;
 		esac
 		s2tc_compress $f "$@" -i "$src" -o "$dst"
+		;;
+	crunch)
+		case "$format" in
+			dxt1) f="-DXT1" ;;
+			dxt2) f="-DXT2" ;;
+			dxt3) f="-DXT3" ;;
+			dxt4) f="-DXT4" ;;
+			dxt5) f="-DXT5" ;;
+		esac
+		crunch $f "$@" -noprogress -nostats -quality 255 -mipMode Generate -dxtQuality uber $CRUNCH_TEXTYPEFLAGS -file "$src" -out "$dst"
 		;;
 esac
 
