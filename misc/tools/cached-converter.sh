@@ -21,8 +21,8 @@ set -e
 : ${del_src:=false}
 : ${git_src_repo:=}
 : ${dds_noalpha:=dxt1}
-: ${dds_prealpha:=dxt2 dxt4}
-: ${dds_sepalpha:=dxt3 dxt5}
+: ${dds_prealpha:=dxt1 dxt2 dxt4}
+: ${dds_sepalpha:=dxt1 dxt3 dxt5}
 
 selfprofile_t0=`date +%s`
 selfprofile_step=init
