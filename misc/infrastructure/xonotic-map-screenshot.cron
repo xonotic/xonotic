@@ -6,9 +6,10 @@ export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/bi
 
 set -e
 cd xonotic
-./all clean -m -fU -D
+./all clean -fU -D
 # like reclone but do not delete untracked, so q3map2.x86 compile stays
-./all compile
+export CC="gcc -DMEMCLUMPING=1 -DFILE_BACKED_MALLOC=1 -DSUPPORTIPV6 -DMEMWANTCLUMPSIZE='(1<<28)'"
+./all compile -r -1
 export DRIVER=soft
 #export DRIVERFLAGS="+gl_texturecompression 1 -nofbo"
 #export DRIVERFLAGS="+gl_texturecompression 1"
