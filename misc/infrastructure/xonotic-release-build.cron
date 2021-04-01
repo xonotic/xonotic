@@ -22,6 +22,10 @@ export PATH=/home/xonotic-build/ccache:/home/xonotic-build/bin:/usr/local/bin:/u
 # TEST: use s2tc, high quality
 #export dds_tool=s2tc
 
+# Try crunch.
+export CACHEDIR=$HOME/.xonotic-cached-converter-crunch
+export dds_tool=crunch
+
 mepwd=$PWD
 me=$0
 
@@ -71,7 +75,7 @@ cd ~/xonotic-release-build
 d0=`date +%Y%m%d`
 d=$d0
 i=1
-while HEAD http://xonotic:g-23@beta.xonotic.org/autobuild/"$RELEASETYPEDIR""Xonotic-$d.zip"; do
+while HEAD -C xonotic:g-23 http://beta.xonotic.org/autobuild/"$RELEASETYPEDIR""Xonotic-$d.zip"; do
 	i=$(($i+1))
 	d="$d0"_"$i"
 done
