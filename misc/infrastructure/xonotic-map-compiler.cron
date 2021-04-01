@@ -9,7 +9,7 @@ lockfile-touch "$me" & lockpid=$!
 trap 'kill $lockpid || true; cd "$mepwd"; lockfile-remove "$me"' EXIT
 trap 'exit 1' INT TERM
 
-set -e
+set -ex
 [ -d xonotic-map-compiler ] || git clone git://git.xonotic.org/xonotic/xonotic.git xonotic-map-compiler
 cd xonotic-map-compiler
 ./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
@@ -17,4 +17,4 @@ cd netradiant
 cmake -G "Unix Makefiles" -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
 cmake --build build -- q3map2
 cd ..
-./misc/tools/xonotic-map-compiler-autobuild build
+sh -x ./misc/tools/xonotic-map-compiler-autobuild build
