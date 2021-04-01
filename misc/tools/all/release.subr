@@ -568,7 +568,7 @@ case "$cmd" in
 		verbose "$SELF" release-maps
 		verbose "$SELF" release-engine
 		verbose "$SELF" release-qc
-		verbose "$SELF" release-pack-needsx11
+		verbose "$SELF" release-pack
 		verbose "$SELF" release-zip
 		;;
 	*)
