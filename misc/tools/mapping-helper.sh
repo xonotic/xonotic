@@ -16,8 +16,8 @@ create_stub () {
     [[ -d "${BASEDIR}/map-${MAPNAME}.pk3dir" ]] && { echo "Map ${MAPNAME} already exists"; exit -1; }
     TEMP=$(find ${BASEDIR} -maxdepth 1 -type d -name "map-"${MAPNAME}"_[[:digit:]].[[:digit:]][[:digit:]].pk3dir")
     [[ -n "${TEMP}" ]] && { echo "Map ${MAPNAME} already exists"; exit -1; }
-    mkdir -p "${BASEDIR}/map-${MAPNAME}_0.01.pk3dir/"{cubemaps,env,map,models,scripts,sounds,textures}
-    touch "${BASEDIR}/map-${MAPNAME}_0.01.pk3dir/map/${MAPNAME}_0.01.map"
+    mkdir -p "${BASEDIR}/map-${MAPNAME}_0.01.pk3dir/"{cubemaps,env,maps,models,scripts,sounds,textures}
+    touch "${BASEDIR}/map-${MAPNAME}_0.01.pk3dir/maps/${MAPNAME}_0.01.map"
 }
 
 package () {
