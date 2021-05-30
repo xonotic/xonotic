@@ -24,7 +24,8 @@ if exist ..\..\..\.git goto xonoticdatagit
 if exist ..\..\..\data goto xonoticdata
 goto xonotic
 :xonoticlow
-	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
+        echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 	set target=Xonotic-low/
 	goto endxonotic
 :xonotichigh
@@ -51,10 +52,12 @@ goto xonotic
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatalow
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
+		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 		goto endxonoticdata
 :xonoticdatalowfuzzy
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-low/
+		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
 		set options=%options% -y
 		goto endxonoticdata
 :xonoticdatahigh

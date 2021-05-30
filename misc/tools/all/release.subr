@@ -300,51 +300,6 @@ case "$cmd" in
 		verbose export del_src=true
 		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
 		;;
-	release-buildpk3-transform-low)
-		release_common
-		dir=$1
-		verbose cd "$dir"
-		# texture: convert to jpeg and dds
-		# music: reduce bitrate
-		verbose export do_jpeg=true
-		verbose export jpeg_qual_rgb=80
-		verbose export jpeg_qual_a=97
-		verbose export do_dds=false
-		verbose export do_ogg=true
-		verbose export ogg_qual=1
-		verbose export del_src=true
-		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
-		;;
-	release-buildpk3-transform-webp)
-		release_common
-		dir=$1
-		verbose cd "$dir"
-		# texture: convert to jpeg and dds
-		verbose export do_jpeg=false
-		verbose export do_webp=true
-		verbose export do_dds=false
-		verbose export do_ogg=false
-		verbose export ogg_ogg=false
-		verbose export del_src=true
-		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
-		;;
-	release-buildpk3-transform-lowdds)
-		release_common
-		dir=$1
-		verbose cd "$dir"
-		# texture: convert to jpeg and dds
-		# music: reduce bitrate
-		verbose export do_jpeg=false
-		verbose export do_jpeg_if_not_dds=true
-		verbose export jpeg_qual_rgb=80
-		verbose export jpeg_qual_a=99
-		verbose export do_dds=true
-		verbose export dds_flags=
-		verbose export do_ogg=true
-		verbose export ogg_qual=1
-		verbose export del_src=true
-		find . -type f -print0 | verbose xargs -0 "$d0"/misc/tools/cached-converter.sh
-		;;
 	release-buildpk3-transform-mapping)
 		release_common
 		dir=$1
@@ -481,10 +436,10 @@ case "$cmd" in
 		release_common
 		verbose "$SELF" release-buildpk3s data/font-unifont.pk3dir      raw ''
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
-		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             low '-low' normaldds ''                    normal '-high'
-		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             low '-low' normaldds '' mapping '-mapping' normal '-high'
-		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw '' low '-low'
-		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir        low '-low' normaldds ''                    normal '-high'
+		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             normaldds ''                    normal '-high'
+		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             normaldds '' mapping '-mapping' normal '-high'
+		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw ''
+		verbose "$SELF" release-buildpk3s data/xonotic-nexcompat.pk3dir        normaldds ''                    normal '-high'
 		;;
 	release-pack-needsx11)
 		release_common
@@ -541,12 +496,6 @@ case "$cmd" in
 				Xonotic/data/xonotic-$pk3stamp-maps.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-music.pk3 \
 				Xonotic/data/xonotic-$pk3stamp-nexcompat.pk3
-			verbose cp Xonotic-$stamp-common$suffix.zip Xonotic-$stamp-low$suffix.zip
-			verbose mkzip0 Xonotic-$stamp-low$suffix.zip \
-				Xonotic/data/xonotic-$pk3stamp-data-low.pk3 \
-				Xonotic/data/xonotic-$pk3stamp-maps-low.pk3 \
-				Xonotic/data/xonotic-$pk3stamp-music-low.pk3 \
-				Xonotic/data/xonotic-$pk3stamp-nexcompat-low.pk3
 			verbose mv Xonotic-$stamp-common$suffix.zip Xonotic-$stamp-high$suffix.zip
 			verbose mkzip0 Xonotic-$stamp-high$suffix.zip \
 				Xonotic/data/xonotic-$pk3stamp-data-high.pk3 \

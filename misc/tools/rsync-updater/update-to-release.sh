@@ -28,7 +28,8 @@ esac
 options="-Prtzil --executability --delete-after --delete-excluded --stats"
 
 if [ -d "Xonotic-low" ]; then
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic-low/"
+        echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	target="Xonotic-low/"
 elif [ -d "Xonotic-high" ]; then
 	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
@@ -38,9 +39,11 @@ elif [ -d "../../../.git" ]; then
 	exec ../../../all update
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-low.pk3 ]; then
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-low/"
+        	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	elif [ -f ../../../data/xonotic-*-data-low.pk3 ]; then
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-low/"
+        	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
