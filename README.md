@@ -44,7 +44,13 @@ To compile the latest revision from git, [follow this guide](https://gitlab.com/
 
 ## Community
 
-The community is primarily active in the [forums](http://forums.xonotic.org/) and IRC, `#xonotic` on either `irc.freenode.net` (developer chat) or `irc.quakenet.org` (player chat).
+The community is primarily active in the [forums](https://forums.xonotic.org/), Matrix and QuakeNet IRC.
+
+Developer chat is in Matrix in [#dev:xonotic.org](https://matrix.to/#/#dev:xonotic.org)
+
+General chat and help in Matrix in [#main:xonotic.org](https://matrix.to/#/#main:xonotic.org)
+
+General chat and help in [#xonotic on irc.quakenet.org](https://webchat.quakenet.org/?channels=xonotic)
 
 ## Wiki
 
