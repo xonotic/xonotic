@@ -36,7 +36,8 @@ fi
 
 set -ex
 
-ssh autobuild-release-uploader@beta.xonotic.org '
+# TODO re-enable this cleanup script
+: ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
 	cd HTML/autobuild/;
 	s0=`date -d "now - 7 days - 12 hours" +%s`;
@@ -79,13 +80,13 @@ while HEAD -C xonotic:g-23 http://beta.xonotic.org/autobuild/"$RELEASETYPEDIR""X
 	i=$(($i+1))
 	d="$d0"_"$i"
 done
-RELEASEDATE=$d xvfb-run ./all release
+RELEASEDATE=$d ./all release
 for X in Xonotic-$d*.zip; do
 	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
 done
-rsync -vaSHP Xonotic*.zip autobuild-release-uploader@beta.xonotic.org:HTML/autobuild/"$RELEASETYPEDIR"
+rsync -vaSHP Xonotic*.zip autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
-	ssh autobuild-release-uploader@beta.xonotic.org sh update-rsync.sh "$d"
+	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
 fi
 echo "Finished a new $RELEASETYPENAME at http://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
 cd
