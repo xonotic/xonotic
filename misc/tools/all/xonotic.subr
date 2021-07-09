@@ -224,24 +224,6 @@ case "$cmd" in
 				esac
 			else
 				case "`uname`" in
-					Linux)
-						case `uname -m` in
-							*86)
-								# No cp commands, we want to use static linking instead.
-								export CC="$CC -I../../../../misc/builddeps/linux32/d0_blind_id/include"
-								export CC="$CC -L../../../../misc/builddeps/linux32/d0_blind_id/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/d0_blind_id/lib"
-								export CC="$CC -I../../../../misc/builddeps/linux32/gmp/include"
-								export CC="$CC -L../../../../misc/builddeps/linux32/gmp/lib"
-								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/linux32/gmp/lib"
-								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a"
-								compiled0=false
-								;;
-							*)
-								msg "Always need to compile libd0_blind_id on Linux `uname -m`."
-								;;
-						esac
-						;;
 					Darwin)
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
 						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
@@ -264,6 +246,14 @@ case "$cmd" in
 				verbose ./configure
 			fi
 			verbose $MAKE $MAKEFLAGS
+			case "`uname`" in
+				Linux)
+					# No cp commands, we want to use static linking instead.
+					MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared"
+					export CC="$CC -I../../../../"
+					export CC="$CC -L../../../../d0_blind_id/.libs"
+					export CC="$CC -Wl,-rpath,./d0_blind_id/.libs"
+			esac
 		fi
 
 		verbose cd "$d0/gmqcc"
