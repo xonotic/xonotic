@@ -1,21 +1,21 @@
 # Xonotic
 
-![Xonotic Logo](http://xonotic.org/static/img/xonotic-logo.png)
+![Xonotic Logo](https://xonotic.org/static/img/xonotic-logo.png)
 
-Xonotic is an addictive, arena-style first person shooter with crisp movement and a wide array of weapons. It combines intuitive mechanics with in-your-face action to elevate your heart rate. Xonotic is and will always be free-to-play. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html) license.
+Xonotic is an addictive, arena-style first person shooter with crisp movement and a wide array of weapons. It combines intuitive mechanics with in-your-face action to elevate your heart rate. Xonotic is and will always be free-to-play. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv2](https://www.gnu.org/licenses/gpl-2.0.html) license.
 
-*Please note, [Gitlab](http://gitlab.com/xonotic/) is our home for repositories, issue tracking, wikis, etc. The repositories on GitHub are mirrors of GitLab's unless specified otherwise.*
+*Please note, [Gitlab](https://gitlab.com/xonotic/) is our home for repositories, issue tracking, wikis, etc. The repositories on GitHub are mirrors of GitLab's unless specified otherwise.*
 
 ## Download
 
 ### LATEST RELEASE: Xonotic 0.8.2 for Linux, Windows, and macOS
 
-If you're just here to play, you can download Xonotic as a zip package, torrent, or by using one of [these alternative methods](http://xonotic.org/download/).
+If you're just here to play, you can download Xonotic as a zip package, torrent, or by using one of [these alternative methods](https://xonotic.org/download/).
 
-- [Download as torrent](http://dl.xonotic.org/xonotic-0.8.2.zip.torrent)
-- [Download as zip](http://dl.xonotic.org/xonotic-0.8.2.zip)
+- [Download as torrent](https://dl.xonotic.org/xonotic-0.8.2.zip.torrent)
+- [Download as zip](https://dl.xonotic.org/xonotic-0.8.2.zip)
 
-No installation required, just unpack and run. Got questions? See the [FAQ](http://xonotic.org/faq) or [live chat](http://xonotic.org/chat/) with us.
+No installation required, just unpack and run. Got questions? See the [FAQ](https://xonotic.org/faq) or [live chat](https://xonotic.org/chat/) with us.
 
 **sha256sum**: a22f7230f486c5825b55cfdadd73399c9b0fae98c9e081dd8ac76eca08359ad5  
 **Package size**: 946M  
