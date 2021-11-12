@@ -26,6 +26,9 @@ export PATH=/home/xonotic-build/ccache:/home/xonotic-build/bin:/usr/local/bin:/u
 export CACHEDIR=$HOME/.xonotic-cached-converter-crunch
 export dds_tool=crunch
 
+# Build locally.
+export HOSTS_THAT_ARE_MYSELF='xonotic-build-linux64 xonotic-build-win32 xonotic-build-win64'
+
 mepwd=$PWD
 me=$0
 
@@ -36,10 +39,8 @@ fi
 
 set -ex
 
-# TODO re-enable this cleanup script
-: ssh autobuild-release-uploader@beta.xonotic.org '
+ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
-	cd HTML/autobuild/;
 	s0=`date -d "now - 7 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
 	for X in * */*; do
@@ -67,11 +68,11 @@ cd ~/xonotic-release-build
 #   winners in the poll for upcoming CTF maps
 #   maps near completion
 
-## for b in \
-## 	origin/divVerent/rebase/for-autobuild \
-## ; do
-## 	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
-## done
+for b in \
+	origin/divVerent/selfbuildagain \
+; do
+	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
+done
 ./all update -N
 d0=`date +%Y%m%d`
 d=$d0
