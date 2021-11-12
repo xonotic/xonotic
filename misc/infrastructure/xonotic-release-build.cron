@@ -68,11 +68,11 @@ cd ~/xonotic-release-build
 #   winners in the poll for upcoming CTF maps
 #   maps near completion
 
-for b in \
-	origin/divVerent/selfbuildagain \
-; do
-	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
-done
+#for b in \
+#	origin/divVerent/selfbuildagain \
+#; do
+#	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
+#done
 ./all update -N
 d0=`date +%Y%m%d`
 d=$d0
