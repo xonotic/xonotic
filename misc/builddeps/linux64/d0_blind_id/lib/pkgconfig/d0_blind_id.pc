@@ -1,4 +1,4 @@
-prefix=/usr/local
+prefix=/home/rpolzer/Games/xonotic/misc/builddeps/linux64/d0_blind_id
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
