@@ -202,6 +202,61 @@ case "$cmd" in
 		)
 		./all each git rev-parse HEAD > Xonotic/misc/git-revisions.txt
 		;;
+	release-compile-run)
+		release_common
+		host=$1
+		buildpath=$2
+		maketargets=$3
+		makeflags=$4
+		srcdir=$5
+		depsdir=$6
+		targetfiles=$7
+		set -x
+		if [ -z "$targetfiles" ]; then
+			exit
+		fi
+		case " $HOSTS_THAT_ARE_DISABLED " in
+			*\ $host\ *)
+				exit
+				;;
+		esac
+		case " $HOSTS_THAT_ARE_MYSELF " in
+			*\ $host\ *)
+				verbose rsync --delete -zLvaSHP "$srcdir"/ "$buildpath/"
+				verbose rsync --delete -zLvaSHP "$depsdir"/*/ "$buildpath.deps/"
+				verbose ln -snf "$buildpath.deps" "$buildpath/.deps"
+				verbose eval make -C "$buildpath" clean $maketargets $makeflags
+				for f in $targetfiles; do
+					verbose mv "$buildpath/${f%:*}" "${f##*:}" || true
+				done
+				;;
+			*)
+				verbose rsync --delete -zLvaSHP "$srcdir"/ "$host":"$buildpath/"
+				verbose rsync --delete -zLvaSHP "$depsdir"/*/ "$host":"$buildpath.deps/"
+				verbose ssh "$host" "[ -f /etc/profile ] && . /etc/profile; [ -f ~/.profile ] && . ~/.profile; export LC_ALL=C; ln -snf $buildpath.deps $buildpath/.deps && cd $buildpath && nice -`nice` make clean $maketargets $makeflags"
+				for f in $targetfiles; do
+					verbose rsync -zvaSHP "$host:$buildpath/${f%:*}" "${f##*:}" || true
+				done
+				;;
+		esac
+		# now rebrand the binaries...
+		for f in $targetfiles; do
+			case "${f##*:}" in
+				Xonotic/xonotic*.exe)
+					verbose "$d0/misc/tools/change-icon-of-exe.sh" "$d0/misc/logos/icons_ico/xonotic.ico" "${f##*:}"
+					;;
+			esac
+		done
+		;;
+	release-compile)
+		release_common
+		suffix=$1
+		makeflags=$2
+		darkplaces_maketargets=$3
+		darkplaces_files=$4
+		host=xonotic-build-$suffix
+		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/$suffix" "$darkplaces_files"
+		;;
 	release-getbinary)
 		release_common
 		binary=$1
@@ -219,32 +274,44 @@ case "$cmd" in
 		;;
 	release-engine-win32)
 		release_common
-		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x86.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
-		$good
+		#good=true
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86.exe || good=false
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
+		#$good
+		verbose "$SELF" release-compile win32 \
+			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="i586-mingw32msvc-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DUSE_WSPIAPI_H -DSUPPORTIPV6" WINDRES="i586-mingw32msvc-windres" SDL_CONFIG="../../../.deps/bin/sdl-config" DP_LINK_ZLIB=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen WIN32RELEASE=1 D3D=1' \
+			release 'darkplaces.exe:Xonotic/xonotic.exe darkplaces-sdl.exe:Xonotic/xonotic-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-win64)
 		release_common
-		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
-		$good
+		#good=true
+		#verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
+		#$good
+		verbose "$SELF" release-compile win64 \
+			'STRIP=: DP_MAKE_TARGET=mingw UNAME=MINGW32 CC="amd64-mingw32msvc-gcc -g1 -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="amd64-mingw32msvc-windres" SDL_CONFIG="../../../.deps/bin/sdl-config" DP_LINK_ZLIB=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen WIN64RELEASE=1 D3D=1' \
+			release 'darkplaces.exe:Xonotic/xonotic-x64.exe darkplaces-sdl.exe:Xonotic/xonotic-x64-sdl.exe darkplaces-dedicated.exe:Xonotic/xonotic-x64-dedicated.exe'
 		;;
 	release-engine-osx)
 		release_common
-		good=true
-		verbose "$SELF" release-getbinary Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || good=false
-		$good
+		#good=true
+		#verbose "$SELF" release-getbinary Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin || good=false
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || good=false
+		#$good
+		verbose "$SELF" release-compile osx \
+			'STRIP=: CC="gcc -g1 -arch i386 -arch ppc -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.4 -I../../../.deps/include -L../../../.deps/lib -fno-reorder-blocks -DSUPPORTIPV6" DP_LINK_ZLIB=shared DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
+			'sv-release sdl-release' 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux64)
 		release_common
-		good=true
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-sdl || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || good=false
-		verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
-		$good
+		#good=true
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-sdl || good=false
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-glx || good=false
+		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
+		#$good
+		verbose "$SELF" release-compile linux64 \
+			'STRIP=: CC="gcc -m64 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" LIB_JPEG=../../../.deps/lib/libjpeg.a LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_ZLIB=shared DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=dlopen' \
+			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
 		release_common
@@ -253,7 +320,7 @@ case "$cmd" in
 		verbose "$SELF" release-engine-linux64 && good=true
 		verbose "$SELF" release-engine-win32 && good=true
 		verbose "$SELF" release-engine-win64 && good=true
-		verbose "$SELF" release-engine-osx && good=true
+		#verbose "$SELF" release-engine-osx && good=true
 		$good
 		;;
 	release-maps)
