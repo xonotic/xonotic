@@ -6,6 +6,8 @@ defaultoctave=1
 defaultlength=4
 baseoctave=1
 gato=-0.1
+mingato=0.034
+maxgato=-0.034
 
 tuba_note_42="moveleft back crouch fire"
 tuba_note_43="back crouch fire"
@@ -123,6 +125,14 @@ playnote() {
 				noteoff=$(echo "$time + $gato" | bc -l)
 				;;
 		esac
+		noteoff=$(echo "
+			minnoteoff = $time + $mingato;
+			maxnoteoff = $time + $duration + $maxgato;
+			noteoff = $noteoff;
+			if (noteoff > maxnoteoff) { noteoff = maxnoteoff; }
+			if (noteoff < minnoteoff) { noteoff = minnoteoff; }
+			noteoff;
+		" | bc -l)
 		echo "defer $time \"$(tuba +)\""
 		echo "defer $noteoff \"$(tuba -)\""
 	fi
