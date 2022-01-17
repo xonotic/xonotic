@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # Usage:
-#   convert image.tga -depth 8 RGBA:- | perl fiximage.pl 72 | convert -depth 8 -size 72x56 RGBA:- output.tga
+#   convert image.tga -auto-orient -depth 8 RGBA:- | perl fiximage.pl 72 | convert -auto-orient -depth 8 -size 72x56 RGBA:- output.tga
 
 my ($width) = @ARGV;
 
