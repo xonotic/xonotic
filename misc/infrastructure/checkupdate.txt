@@ -11,6 +11,10 @@ C 20170701181425
 # Website URL.
 U http://www.xonotic.org/
 
+# Terms of Service revision number (integer).
+# Increase by 1 every time tos.txt is updated.
+T 1
+
 # List of startswith tests for banned servers, separated by space.
 # Supports up to 16 banned servers.
 # Possible items:
