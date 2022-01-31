@@ -272,10 +272,10 @@ screenshotthemap()
 	) 2>&1 | tee ~/.xonotic/data/autoscreenshot.log
 	good=false
 	if mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
-		ss2spam "$M" "$url/$M-$blobhash/" "$REFNAME" "$commithash" 0 > ~/.xonotic/data/"$M.ircss"
+		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 0 > ~/.xonotic/data/"$M.ircss"
 	else
 		mkdir "$M-$blobhash"
-		ss2spam "$M" "$url/$M-$blobhash/" "$REFNAME" "$commithash" 1 > ~/.xonotic/data/"$M.ircss"
+		ss2spam "$M" "$url$M-$blobhash/" "$REFNAME" "$commithash" 1 > ~/.xonotic/data/"$M.ircss"
 	fi
 	mv ~/.xonotic/data/"$M.ircss" "$M-$blobhash"/
 	mv ~/.xonotic/data/autoscreenshot.log "$M-$blobhash"/
