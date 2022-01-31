@@ -8,13 +8,17 @@ set -e
 cd xonotic
 ./all clean -fU -D
 # like reclone but do not delete untracked, so q3map2.x86 compile stays
+
+#export USE_GDB=core
 export CC="gcc -DMEMCLUMPING=1 -DFILE_BACKED_MALLOC=1 -DSUPPORTIPV6 -DMEMWANTCLUMPSIZE='(1<<28)'"
 ./all compile -r -1
+
 export DRIVER=soft
 #export DRIVERFLAGS="+gl_texturecompression 1 -nofbo"
 #export DRIVERFLAGS="+gl_texturecompression 1"
 
 #startx /bin/sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot -- /usr/bin/Xvfb :7 -screen 0 1024x768x24
+export BUILD_ONE=true
 sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot
 
-lwp-request -m GET http://beta.xonotic.org/autobuild-bsp/?d,c >/dev/null
+#lwp-request -m GET http://beta.xonotic.org/autobuild-bsp/?d,c >/dev/null
