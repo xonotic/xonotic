@@ -2,23 +2,23 @@
 
 mepwd=$PWD
 me=$0
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/bin/vendor_perl:/usr/bin/core_perl
+export PATH=/home/xonotic/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 
 set -e
-cd xonotic
-./all clean -fU -D
+cd xonotic-map-screenshot
+./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
 # like reclone but do not delete untracked, so q3map2.x86 compile stays
 
 #export USE_GDB=core
-export CC="gcc -DMEMCLUMPING=1 -DFILE_BACKED_MALLOC=1 -DSUPPORTIPV6 -DMEMWANTCLUMPSIZE='(1<<28)'"
+#export CC="gcc -DMEMCLUMPING=1 -DFILE_BACKED_MALLOC=1 -DSUPPORTIPV6 -DMEMWANTCLUMPSIZE='(1<<28)'"
 ./all compile -r -1
 
-export DRIVER=soft
+#export DRIVER=soft
 #export DRIVERFLAGS="+gl_texturecompression 1 -nofbo"
 #export DRIVERFLAGS="+gl_texturecompression 1"
 
-#startx /bin/sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot -- /usr/bin/Xvfb :7 -screen 0 1024x768x24
 export BUILD_ONE=true
-sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot
+startx /bin/sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot -- /usr/bin/Xvfb :7 -screen 0 1024x768x24
+#sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot
 
 #lwp-request -m GET http://beta.xonotic.org/autobuild-bsp/?d,c >/dev/null
