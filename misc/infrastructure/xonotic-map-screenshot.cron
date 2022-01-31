@@ -17,7 +17,6 @@ cd xonotic-map-screenshot
 #export DRIVERFLAGS="+gl_texturecompression 1 -nofbo"
 #export DRIVERFLAGS="+gl_texturecompression 1"
 
-export BUILD_ONE=true
 startx /bin/sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot -- /usr/bin/Xvfb :7 -screen 0 1024x768x24
 #sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot
 
