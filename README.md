@@ -8,17 +8,9 @@ Xonotic is an addictive, arena-style first person shooter with crisp movement an
 
 ## Download
 
-### LATEST RELEASE: Xonotic 0.8.2 for Linux, Windows, and macOS
+Stable releases and related info are available at https://xonotic.org/download
 
-If you're just here to play, you can download Xonotic as a zip package, torrent, or by using one of [these alternative methods](http://xonotic.org/download/).
-
-- [Download as torrent](http://dl.xonotic.org/xonotic-0.8.2.zip.torrent)
-- [Download as zip](http://dl.xonotic.org/xonotic-0.8.2.zip)
-
-No installation required, just unpack and run. Got questions? See the [FAQ](http://xonotic.org/faq) or [live chat](http://xonotic.org/chat/) with us.
-
-**sha256sum**: a22f7230f486c5825b55cfdadd73399c9b0fae98c9e081dd8ac76eca08359ad5  
-**Package size**: 946M  
+[Beta builds](https://gitlab.com/xonotic/xonotic/-/wikis/Autobuilds) are available at https://beta.xonotic.org/autobuild
 
 ## Contributing
 
@@ -44,17 +36,15 @@ To compile the latest revision from git, [follow this guide](https://gitlab.com/
 
 ## Community
 
-The community is primarily active in the [forums](https://forums.xonotic.org/), Matrix and QuakeNet IRC.
+The community is primarily active in the [forums](https://forums.xonotic.org/) and [chat rooms](https://gitlab.com/xonotic/xonotic/-/wikis/Chat-Rooms).
 
-Developer chat is in Matrix in [#dev:xonotic.org](https://matrix.to/#/#dev:xonotic.org)
+## Documentation
 
-General chat and help in Matrix in [#main:xonotic.org](https://matrix.to/#/#main:xonotic.org)
-
-General chat and help in [#xonotic on irc.quakenet.org](https://webchat.quakenet.org/?channels=xonotic)
-
-## Wiki
-
-[Our Gitlab wiki](https://gitlab.com/xonotic/xonotic/wikis/home) has a lot of information related to developing, playing or otherwise contributing to the game.
+[Halogene's Newbie Guide](https://xonotic.org/guide) gives gameplay and client configuration advice.  
+[Frequently Asked Questions](https://xonotic.org/faq) cover common tech support topics.  
+[The GitLab wiki](https://gitlab.com/xonotic/xonotic/-/wikis/home) has detailed articles and links for many relevant topics.  
+[Command Alias & Cvar Search](https://xonotic.org/tools/cacs) is a web interface to browse Xonotic console features.  
+[Doxygen](https://xonotic.org/doxygen) makes it easier to discover details and dependencies in the code.  
 
 ## License
 
