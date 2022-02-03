@@ -2,9 +2,11 @@
 
 ![Xonotic Logo](http://xonotic.org/static/img/xonotic-logo.png)
 
-Xonotic is an addictive, arena-style first person shooter with crisp movement and a wide array of weapons. It combines intuitive mechanics with in-your-face action to elevate your heart rate. Xonotic is and will always be free-to-play. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv2](http://www.gnu.org/licenses/gpl-2.0.html) license.
+Xonotic is an addictive, arena-style first person shooter with crisp movement and a wide array of weapons. It combines intuitive mechanics with in-your-face action to elevate your heart rate.
 
-*Please note, [Gitlab](http://gitlab.com/xonotic/) is our home for repositories, issue tracking, wikis, etc. The repositories on GitHub are mirrors of GitLab's unless specified otherwise.*
+## License
+
+Xonotic is and will always be free and open source. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv3+](https://www.gnu.org/licenses/gpl-3.0.html) license (see the [COPYING](COPYING) file for details).
 
 ## Download
 
@@ -12,9 +14,29 @@ Stable releases and related info are available at https://xonotic.org/download
 
 [Beta builds](https://gitlab.com/xonotic/xonotic/-/wikis/Autobuilds) are available at https://beta.xonotic.org/autobuild
 
+*Please note, [Gitlab](https://gitlab.com/xonotic/) is our home for repositories, issue tracking, wikis, etc. The repositories on GitHub are mirrors of GitLab's unless specified otherwise.*
+
+## Community
+
+The community is primarily active in the [forums](https://forums.xonotic.org/) and [chat rooms](https://gitlab.com/xonotic/xonotic/-/wikis/Chat-Rooms).
+
+## Documentation
+
+[Halogene's Newbie Guide](https://xonotic.org/guide) gives gameplay and client configuration advice.  
+[Frequently Asked Questions](https://xonotic.org/faq) cover common tech support topics.  
+[The GitLab wiki](https://gitlab.com/xonotic/xonotic/-/wikis/home) has detailed articles and links for many relevant topics.  
+[Command Alias & Cvar Search](https://xonotic.org/tools/cacs) is a web interface to browse Xonotic console features.  
+[Doxygen](https://xonotic.org/doxygen) makes it easier to discover details and dependencies in the code.  
+
+## Developing
+
+To compile the latest revision from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git). Check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see [development activity](https://gitlab.com/groups/xonotic/-/activity) and code ([xonotic-data.pk3dir](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
+
+Please ensure you've read and understood [Contributing and Getting Write Access](https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access#contributing-and-getting-write-access) before pushing commits or opening merge requests.
+
 ## Contributing
 
-We're mainly looking for help in the following areas:
+We're looking for help in the following areas:
 
 - [Translations](https://www.transifex.com/team-xonotic/xonotic/)
   - More info [on the wiki](https://gitlab.com/xonotic/xonotic/-/wikis/home#translating)
@@ -30,22 +52,3 @@ We're mainly looking for help in the following areas:
   - Please don't create anything that looks official (social media accounts, entries on pages like steam, etc.) without contacting us, we like to manage things ourselves to keep the information up to date
   - All other kinds of PR are very welcome - make videos or articles, share links, spread the word
 
-## Developing
-
-To compile the latest revision from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git), or check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see development activity and code ([xonotic-data](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
-
-## Community
-
-The community is primarily active in the [forums](https://forums.xonotic.org/) and [chat rooms](https://gitlab.com/xonotic/xonotic/-/wikis/Chat-Rooms).
-
-## Documentation
-
-[Halogene's Newbie Guide](https://xonotic.org/guide) gives gameplay and client configuration advice.  
-[Frequently Asked Questions](https://xonotic.org/faq) cover common tech support topics.  
-[The GitLab wiki](https://gitlab.com/xonotic/xonotic/-/wikis/home) has detailed articles and links for many relevant topics.  
-[Command Alias & Cvar Search](https://xonotic.org/tools/cacs) is a web interface to browse Xonotic console features.  
-[Doxygen](https://xonotic.org/doxygen) makes it easier to discover details and dependencies in the code.  
-
-## License
-
-Distributed under the GPLv2 license. See the [COPYING](COPYING) file for more details.
