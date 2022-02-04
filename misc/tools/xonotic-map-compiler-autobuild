@@ -311,12 +311,14 @@ getthemap()
 		if ! curl -Lo "$bspdir/$M-$blobhash.pk3" "$url$M-$blobhash.pk3"; then
 			rm -f "$bspdir/$M-$blobhash.pk3"
 			echo "WARNING: could not download $url$M-$blobhash.pk3, maybe not ready yet"
+			getthemap_fail=true
 			return 0
 		fi
 	fi
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3"; then
 		rm -f "$bspdir/$M-$blobhash.pk3"
 		echo "WARNING: could not download $url$M-$blobhash.pk3, invalid zip file"
+		getthemap_fail=true
 		return 0
 	fi
 }
