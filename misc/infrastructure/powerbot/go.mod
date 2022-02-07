@@ -1,4 +1,4 @@
-module github.com/divVerent/matrixbot
+module powerbot
 
 go 1.15
 
