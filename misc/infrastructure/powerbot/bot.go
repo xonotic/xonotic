@@ -197,11 +197,16 @@ func Run() (err error) {
 			return
 		}
 		mem := evt.Content.AsMember()
+		key := evt.StateKey
+		if key == nil {
+			return
+		}
+		member := id.UserID(*key)
 		switch mem.Membership {
 		case event.MembershipJoin:
-			handleJoin(eventTime(evt), evt.RoomID, evt.StateKey, evt)
+			handleJoin(eventTime(evt), evt.RoomID, member, evt)
 		case event.MembershipLeave:
-			handleLeave(eventTime(evt), evt.RoomID, evt.StateKey, evt)
+			handleLeave(eventTime(evt), evt.RoomID, member, evt)
 		default: // Ignore.
 		}
 	})
