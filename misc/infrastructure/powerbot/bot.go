@@ -199,9 +199,9 @@ func Run() (err error) {
 		mem := evt.Content.AsMember()
 		switch mem.Membership {
 		case event.MembershipJoin:
-			handleJoin(eventTime(evt), evt.RoomID, evt.Sender, evt)
+			handleJoin(eventTime(evt), evt.RoomID, evt.StateKey, evt)
 		case event.MembershipLeave:
-			handleLeave(eventTime(evt), evt.RoomID, evt.Sender, evt)
+			handleLeave(eventTime(evt), evt.RoomID, evt.StateKey, evt)
 		default: // Ignore.
 		}
 	})
