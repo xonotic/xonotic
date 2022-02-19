@@ -324,7 +324,7 @@ case "$cmd" in
 	release-qc)
 		release_common
 		verbose make -C "$d0/gmqcc" gmqcc
-		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source QCC="$d0/gmqcc/gmqcc" XON_BUILDSYSTEM=1 clean qc
+		verbose env GIT_DIR="$d0/data/xonotic-data.pk3dir/.git" make -C Xonotic/source QCC="$d0/gmqcc/gmqcc" XON_BUILDSYSTEM=1 QCCFLAGS_WATERMARK='$(shell git describe --tags)' clean qc
 		;;
 	release-buildpk3-transform-raw)
 		release_common
