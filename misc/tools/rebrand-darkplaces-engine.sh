@@ -73,7 +73,7 @@ for EXECUTABLE in "$@"; do
 		cp "$icon_xpm" "$t/darkplaces-icon.xpm"
 		cnt=
 		for i in $icons_tga; do
-			convert "$i" "$t/darkplaces-icon$cnt.tga"
+			convert "$i" -auto-orient "$t/darkplaces-icon$cnt.tga"
 			if [ -z "$cnt" ]; then
 				cnt=2
 			else

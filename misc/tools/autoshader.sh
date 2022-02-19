@@ -147,7 +147,7 @@ has_shader()
 
 has_alpha()
 {
-	[ -f "${1%.jpg}_alpha.jpg" ] || convert "$1" -depth 8 RGBA:- | xxd -c 4 -g 1 | grep -v " ff  " >/dev/null
+	[ -f "${1%.jpg}_alpha.jpg" ] || convert "$1" -auto-orient -depth 8 RGBA:- | xxd -c 4 -g 1 | grep -v " ff  " >/dev/null
 }
 
 autoshaders()

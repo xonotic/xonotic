@@ -210,7 +210,7 @@ reduce_jpeg2_dds()
 	i=$1; shift
 	ia=$1; shift
 	o=$1; shift; shift
-	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
+	convert "$i" "$ia" -auto-orient -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -219,7 +219,7 @@ reduce_jpeg2_dds_premul()
 	i=$1; shift
 	ia=$1; shift
 	o=$1; shift; shift
-	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
+	convert "$i" "$ia" -auto-orient -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -229,14 +229,14 @@ reduce_jpeg2_jpeg2()
 	ia=$1; shift
 	o=$1; shift
 	oa=$1; shift
-	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+	if convert "$i" -auto-orient TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		if [ "`stat -c %s "$i"`" -lt "`stat -c %s "$o"`" ]; then
 			cp "$i" "$o"
 		fi
 	else
 		return 1
 	fi
-	if convert "$ia" TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
+	if convert "$ia" -auto-orient TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
 		if [ "`stat -c %s "$ia"`" -lt "`stat -c %s "$oa"`" ]; then
 			cp "$ia" "$oa"
 		fi
@@ -251,7 +251,7 @@ reduce_jpeg2_webp()
 	ia=$1; shift
 	o=$1; shift; shift
 	# this one MUST run
-	convert "$i" "$ia" -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.png" && \
+	convert "$i" "$ia" -auto-orient -compose CopyOpacity -composite -type TrueColorMatte "$tmpdir/x.png" && \
 	cwebp $1 "$tmpdir/x.png" -o "$o"
 }
 
@@ -259,7 +259,7 @@ reduce_jpeg_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+	if convert "$i" -auto-orient TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		if [ "`stat -c %s "$i"`" -lt "`stat -c %s "$o"`" ]; then
 			cp "$i" "$o"
 		fi
@@ -289,7 +289,7 @@ reduce_rgba_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" -type TrueColorMatte "$tmpdir/x.tga" && \
+	convert "$i" -auto-orient -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_sepalpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -297,7 +297,7 @@ reduce_rgba_dds_premul()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" -type TrueColorMatte "$tmpdir/x.tga" && \
+	convert "$i" -auto-orient -type TrueColorMatte "$tmpdir/x.tga" && \
 	pickdxta "$dds_tool" "$dds_prealpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -306,12 +306,12 @@ reduce_rgba_jpeg2()
 	i=$1; shift; shift
 	o=$1; shift
 	oa=$1; shift
-	if convert "$i" -alpha off TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+	if convert "$i" -auto-orient -alpha off TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		:
 	else
 		return 1
 	fi
-	if convert "$i" -alpha extract TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
+	if convert "$i" -auto-orient -alpha extract TGA:- | cjpeg -targa -quality "$2" -optimize -sample 1x1,1x1,1x1 > "$oa"; then
 		:
 	else
 		return 1
@@ -322,7 +322,7 @@ reduce_rgb_dds()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" -type TrueColor "$tmpdir/x.tga" && \
+	convert "$i" -auto-orient -type TrueColor "$tmpdir/x.tga" && \
 	"$meprefix"compress-texture "$dds_tool" "$dds_noalpha" "$tmpdir/x.tga" "$o" $1
 }
 
@@ -330,7 +330,7 @@ reduce_rgb_jpeg()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	if convert "$i" TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
+	if convert "$i" -auto-orient TGA:- | cjpeg -targa -quality "$1" -optimize -sample 1x1,1x1,1x1 > "$o"; then
 		:
 	else
 		return 1
@@ -341,7 +341,7 @@ reduce_rgba_webp()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	convert "$i" "$tmpdir/x.png" && \
+	convert "$i" -auto-orient "$tmpdir/x.png" && \
 	cwebp $1 "$tmpdir/x.png" -o "$o"
 }
 
@@ -349,7 +349,7 @@ has_alpha()
 {
 	i=$1; shift; shift
 	o=$1; shift; shift
-	if convert "$i" -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
+	if convert "$i" -auto-orient -depth 16 RGBA:- | perl -e 'while(read STDIN, $_, 8) { substr($_, 6, 2) eq "\xFF\xFF" or exit 1; } exit 0;'; then
 		# no alpha
 		: > "$o"
 	else
