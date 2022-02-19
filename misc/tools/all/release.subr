@@ -304,7 +304,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
 		#$good
 		verbose "$SELF" release-compile linux64 \
-			'STRIP=: CC="gcc -m64 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" DP_LINK_CRYPTO=shared LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=shared CFLAGS_ODE="-DUSEODE -DLINK_TO_LIBODE -DdDOUBLE" LIB_ODE="../../../.deps/lib/libode.a -lstdc++ -pthread" DP_LINK_ZLIB=shared' \
+			'STRIP=: CC="gcc -m64 -g1 -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" DP_LINK_CRYPTO=shared LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_CRYPTO_RIJNDAEL=shared DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=shared CFLAGS_ODE="-DUSEODE -DLINK_TO_LIBODE -DdDOUBLE" LIB_ODE="../../../.deps/lib/libode.a -lstdc++ -pthread" DP_LINK_ZLIB=shared' \
 			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
