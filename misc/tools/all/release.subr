@@ -173,9 +173,12 @@ case "$cmd" in
 			verbose cd Xonotic
 			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
 			verbose rm -rf misc/builddeps
-			verbose mv misc/buildfiles/win32 bin32 || true
-			verbose mv bin32/SDL.dll . || true
-			verbose mv misc/buildfiles/win64 bin64 || true
+			#verbose mv bin32/SDL.dll . || true # Leftover?
+
+			# We're going to be building these later
+			#verbose mv misc/buildfiles/win32 bin32 || true
+			#verbose mv misc/buildfiles/win64 bin64 || true
+
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
 			verbose rm -rf misc/pki
@@ -271,6 +274,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86.exe || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
 		#$good
+		verbose "$d0/misc/buildsrc/dlls.sh" all win32 Xonotic/bin32
 		verbose "$SELF" release-compile win32 \
 			'STRIP=: D3D=1 DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -g1 -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="i686-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
 			release 'darkplaces.exe:Xonotic/xonotic-x86-wgl.exe darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
@@ -281,6 +285,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
+		verbose "$d0/misc/buildsrc/dlls.sh" all win64 Xonotic/bin64
 		verbose "$SELF" release-compile win64 \
 			'STRIP=: D3D=1 DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -g1 -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
 			release 'darkplaces.exe:Xonotic/xonotic-wgl.exe darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
