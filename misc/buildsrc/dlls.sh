@@ -4,6 +4,7 @@
 # by z411
 
 d0=$(pwd)
+cjobs=$(($(nproc) + 1))
 echo "Working directory is $d0"
 
 require () {
@@ -100,7 +101,7 @@ build_zlib () {
 	      -DBUILD_SHARED_LIBS=ON \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }	
 
@@ -114,7 +115,7 @@ build_gmp () {
 			      --enable-fat \
 			      --disable-static \
 			      --enable-shared
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -135,7 +136,7 @@ build_libd0 () {
 	"$src_dir/d0_blind_id/configure" --with-pic \
 		                         --prefix="$pkg_dir" \
 					 --host="$CHOST"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -150,7 +151,7 @@ build_libogg() {
 	      -DBUILD_SHARED_LIBS=ON \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -169,7 +170,7 @@ build_libvorbis () {
 	      -DOGG_LIBRARY="$pkg_dir/lib/libogg.dll.a" \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -193,7 +194,7 @@ build_libtheora () {
 			      --disable-sdltest \
 			      --disable-vorbistest \
 			      --disable-oggtest
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -206,7 +207,7 @@ build_freetype () {
 	      -DCMAKE_BUILD_TYPE=Release \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -221,7 +222,7 @@ build_libpng16 () {
 	      -DZLIB_LIBRARY="$pkg_dir/lib/libzlib.dll.a" \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -236,7 +237,7 @@ build_libjpeg () {
 	      -DENABLE_STATIC=OFF \
 	      -DWITH_TURBOJPEG=OFF \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
@@ -257,7 +258,7 @@ build_curl () {
 	      -DBUILD_CURL_EXE=OFF \
 	      -DHTTP_ONLY=ON \
 	      -G"Unix Makefiles" "$this_src"
-	make
+	make -j${cjobs}
 	make install
 }
 
