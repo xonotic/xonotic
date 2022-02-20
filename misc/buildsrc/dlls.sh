@@ -14,11 +14,6 @@ require () {
 }
 
 prepare () {
-    if [ -z $out_dir ]; then
-        echo "Out directory not set."
-        exit 1
-    fi
-
 	case $target_arch in
 		win32)	  ARCH="i686" ;;
 		win64)	  ARCH="x86_64" ;;
@@ -26,9 +21,10 @@ prepare () {
 	esac
 
 	# Set directories
-	src_dir="$d0/dlls/src"
-	work_dir="$d0/dlls/work/$target_arch"
-	pkg_dir="$d0/dlls/pkg/$target_arch"
+	src_dir="$buildpath/src"
+	work_dir="$buildpath/work/$target_arch"
+	pkg_dir="$buildpath/pkg/$target_arch"
+	out_dir="$buildpath/out/$target_arch"
 
 	# Set arch vars
 	CHOST="$ARCH-w64-mingw32"
@@ -300,9 +296,10 @@ install () {
 }
 
 clean () {
-	rm -rf "$d0/dlls/src"
-	rm -rf "$d0/dlls/work"
-	rm -rf "$d0/dlls/pkg"
+	rm -rf "$buildpath/src"
+	rm -rf "$buildpath/work"
+	rm -rf "$buildpath/pkg"
+	rm -rf "$buildpath/out"
 }
 
 list () {
@@ -324,7 +321,7 @@ usage () {
 	echo "Experimental Windows DLL cross-compiling for Xonotic"
 	echo "by z411"
 	echo
-	echo "usage: $0 <step> [arch] [out directory]"
+	echo "usage: $0 <step> [build path] [arch]"
 	echo
 	echo "available steps (require arch):"
 	echo "  <library name>: build specified library"
@@ -342,8 +339,8 @@ usage () {
 }
 
 step=$1
-target_arch=$2
-out_dir=$3
+buildpath=$2
+target_arch=$3
 
 case $step in
 	gmp)           prepare && build_gmp ;;
