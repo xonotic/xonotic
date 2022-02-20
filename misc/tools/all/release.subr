@@ -315,7 +315,6 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
-		verbose "$SELF" release-dlls win64 /tmp/dlls Xonotic/bin64
 		verbose "$SELF" release-compile win64 \
 			'STRIP=: D3D=1 DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -g1 -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
 			release 'darkplaces.exe:Xonotic/xonotic-wgl.exe darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
