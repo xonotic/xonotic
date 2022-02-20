@@ -276,7 +276,7 @@ case "$cmd" in
 		mkdir -p "$d0/$targetdir"
 		cd "$d0/misc/buildsrc"
 		verbose ./dlls.sh all "$buildpath" "$arch"
-		verbose mv "$buildpath/out/$arch" "$d0/$targetdir"
+		verbose cp -v $buildpath/out/$arch/* "$d0/$targetdir"
 		cd "$d0"
 		;;
     release-dlls-win32)
