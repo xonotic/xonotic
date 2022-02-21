@@ -273,23 +273,24 @@ case "$cmd" in
 		arch=$1
 		buildpath=$2
 		targetdir=$3
-		mkdir -p "$d0/$targetdir"
-		cd "$d0/misc/buildsrc"
-		verbose ./dlls.sh all "$buildpath" "$arch"
-		verbose cp -v $buildpath/out/$arch/* "$d0/$targetdir"
-		cd "$d0"
+		mkdir -p "$targetdir"
+		(
+			cd "$misc/buildsrc"
+			verbose ./dlls.sh all "$buildpath" "$arch"
+		)
+		verbose cp -v $buildpath/out/$arch/* "$targetdir"
 		;;
-    release-dlls-win32)
+	release-dlls-win32)
 		release_common
 		verbose "$SELF" release-dlls-compile win32 /tmp/dlls Xonotic/bin32
 		;;
-    release-dlls-win64)
+	release-dlls-win64)
 		release_common
 		verbose "$SELF" release-dlls-compile win64 /tmp/dlls Xonotic/bin64
 		;;
 	release-dlls-clean)
 		release_common
-		verbose $d0/misc/buildsrc/dlls.sh clean /tmp/dlls
+		verbose misc/buildsrc/dlls.sh clean /tmp/dlls
 		;;
 	release-dlls)
 		release_common
