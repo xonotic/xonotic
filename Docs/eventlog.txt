@@ -5,7 +5,7 @@ ______________
    sv_eventlog_files              print frags, scores and captures for separate files each match
    sv_eventlog_console            print frags, scores and captures to serverconsole during the match
    sv_logscores_bots              choose whether bot are included in stats or not
-
+                                
    sv_eventlog_files_counter      number of matches logged until now
    sv_eventlog_files_nameprefix   file name prefix to be used 
    sv_eventlog_files_namesuffix   file name extension to be used
@@ -39,7 +39,6 @@ ______________
    :ctf:return:<flagcolor>:<ID of defender>
    :ctf:returned:<flagcolor>
    :dom:taken:<previouscolor>:<ID of player>
-   :ft:revival:<ID of revived player>:<comma separated list of IDs of revivers>
    :keyhunt:capture:<ID of player>:<points for player>:<ID of key owner>:<points for key owner>:<name of key>
    :keyhunt:carrierfrag:<ID of player>:<points for player>:<ID of key owner>:<points for key owner>:<name of key>
    :keyhunt:collect:<ID of player>:<points for player>:<ID of key owner>:<points for key owner>:<name of key>
