@@ -2,6 +2,13 @@ release_common()
 {
 	export LC_ALL=C
 
+	if [ -z "$MAKEFLAGS" ]; then
+		ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+		if [ $ncpus -gt 1 ]; then
+			export MAKEFLAGS=-j$ncpus
+		fi
+	fi
+
 	release_args="$cmd $*"
 	msg "*** $release_args: start"
 	release_starttime=`date +%s`
