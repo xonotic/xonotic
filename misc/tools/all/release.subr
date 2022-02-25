@@ -288,17 +288,11 @@ case "$cmd" in
 		release_common
 		verbose "$SELF" release-dlls-compile win64 /tmp/dlls Xonotic/bin64
 		;;
-	release-dlls-clean)
-		release_common
-		verbose misc/buildsrc/dlls.sh clean /tmp/dlls
-		;;
 	release-dlls)
 		release_common
-		good=false
 		verbose "$SELF" release-dlls-win32
 		verbose "$SELF" release-dlls-win64
-		verbose "$SELF" release-dlls-clean
-		$good
+		verbose rm -rf /tmp/dlls
 		;;
 	release-engine-win32)
 		release_common

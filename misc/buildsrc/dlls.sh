@@ -5,7 +5,6 @@
 
 d0=$(pwd)
 cjobs=$(($(nproc) + 1))
-echo "Working directory is $d0"
 
 require () {
 	if ! dpkg -s "$1" >/dev/null 2>&1 ; then
