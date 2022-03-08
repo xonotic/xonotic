@@ -3,6 +3,7 @@ project(xonotic)
 
 option(DOWNLOAD_MAPS "Download new maps from the build server" ON)
 option(BUILD_RELEASE "Package a release" OFF)
+set(SED "gsed" CACHE STRING "")
 
 function(subproject id name)
     if ($ENV{XON_NO_${id}})

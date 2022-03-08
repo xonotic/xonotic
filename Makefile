@@ -8,6 +8,7 @@ INSTALL ?= install
 ARCH ?= $(shell if [ x"`uname -m`" = x"x86_64" ]; then echo linux64; else echo linux32; fi)
 LN ?= ln
 CP ?= cp
+SED ?= sed
 BINARY ?= yes
 SUFFIX ?= $(shell if [ -d .git ]; then echo git; elif [ x"$(BINARY)" = x"yes" ]; then echo zip-binary; else echo zip-source; fi)
 RIJNDAELDETECT_CONFIGURE ?= $(shell if ! [ -f source/d0_blind_id/d0_rijndael.c ]; then echo --disable-rijndael; fi)
