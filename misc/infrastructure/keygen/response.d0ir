@@ -82,20 +82,30 @@ sub check_dnsbl($$@)
 	return 0;
 }
 
+# MySQL
 # create table ip ( id INT AUTO_INCREMENT PRIMARY KEY, ip VARCHAR(64), t DATETIME, error BOOLEAN, INDEX(ip), INDEX(t), INDEX(error) );
+# standard SQL
+# CREATE TABLE ip ( id INT PRIMARY KEY generated always as identity, ip VARCHAR(64), t TIMESTAMP, error BOOLEAN );
+# CREATE INDEX ip_index ON ip ( ip, t, error );
 our $__CACHED_DBH__;
 
 sub check_ip_record
 {
 	my ($DBH, $tbl, $ip) = @_;
-	my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>date_sub(now(), interval 7 day)", undef, $ip)
+	# MySQL
+	#my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>date_sub(now(), interval 7 day)", undef, $ip)
+	# standard SQL
+	my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>(now() - interval '7' day)", undef, $ip)
 		or die "DBI/DBD: $!";
 	return $status->[0];
 }
 sub insert_ip_record
 {
 	my ($DBH, $tbl, $ip) = @_;
-	my $status = $DBH->selectall_arrayref("select error, t>date_sub(now(), interval 7 day) from $tbl where ip=?", undef, $ip)
+	# MySQL
+	#my $status = $DBH->selectall_arrayref("select error, t>date_sub(now(), interval 7 day) from $tbl where ip=?", undef, $ip)
+	# standard SQL
+	my $status = $DBH->selectall_arrayref("select error, t>(now() - interval '7' day) from $tbl where ip=?", undef, $ip)
 		or die "DBI/DBD: $!";
 	if(@$status)
 	{
@@ -128,9 +138,13 @@ sub check_sql($$$$$$$$$)
 	my $DBH = ($__CACHED_DBH__ ? $__CACHED_DBH__ : ($__CACHED_DBH__ = DBI->connect($dsn, $u, $p, { RaiseError => 1, AutoCommit => 0 })))
 		or die "DBI/DBD: $!";
 	eval {
-		$DBH->do("set character set utf8");
-		$DBH->do("set names utf8");
-		$DBH->do("set time_zone = '+0:00'");
+		# PostgreSQL defaults to utf8 everywhere so we don't need to set it
+		# MySQL defaults to latin1
+		#$DBH->do("set character set utf8");
+		#$DBH->do("set names utf8");
+		#$DBH->do("set time_zone = '+0:00'");
+		# standard SQL
+		$DBH->do("SET TIME ZONE +0");
 	} or do {
 		undef $__CACHED_DBH__;
 		die $@;
