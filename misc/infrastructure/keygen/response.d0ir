@@ -2,7 +2,7 @@
 
 BEGIN
 {
-        $ENV{PATH} = "/usr/bin:/bin";
+	$ENV{PATH} = "/usr/bin:/bin";
 }
 
 # if we are suid, set uid := euid
@@ -24,6 +24,14 @@ sub error($)
 	exit 0;
 }
 
+sub check_ipfiles($)
+{
+	my ($dir) = @_;
+	my $ip = $ENV{REMOTE_ADDR};
+	return 0 if -f "$dir/$ip";
+	return -1;
+}
+
 sub check_dnsbl($$@)
 {
 	my ($goodpatterns, $badpatterns, $list) = @_;
@@ -34,20 +42,28 @@ sub check_dnsbl($$@)
 	# check goodpatterns
 	for(@$goodpatterns)
 	{
-		return 0
-			if $name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/;
+		if($name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/)
+		{
+			return 0;
+		}
 	}
 	# check badpatterns
 	for(@$badpatterns)
 	{
-		return -1
-			if $name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/;
+		if($name =~ /^(??{$_})$/ || $addr =~ /^(??{$_})$/)
+		{
+			warn "$addr/$name blocked by $_";
+			return -1;
+		}
 	}
 
 	# is he tor?
 	my $h = gethostbyname $addr;
-	return -1
-		if not defined $h;
+	if(not defined $h)
+	{
+		warn "$addr blocked by gethostbyname()";
+		return -1;
+	}
 	
 	my $blprefix = join '.', reverse unpack 'C4', $h;
 	my $i = 0;
@@ -58,6 +74,8 @@ sub check_dnsbl($$@)
 		my $h2 = gethostbyname $hn;
 		next
 			if not defined $h2;
+		my $h2_text = join '.', reverse unpack 'C4', $h2;
+		warn "$addr blocked by $hn -> $h2_text";
 		return -1;
 	}
 
@@ -67,54 +85,83 @@ sub check_dnsbl($$@)
 # create table ip ( id INT AUTO_INCREMENT PRIMARY KEY, ip VARCHAR(64), t DATETIME, error BOOLEAN, INDEX(ip), INDEX(t), INDEX(error) );
 our $__CACHED_DBH__;
 
-sub check_sql($$$$$)
+sub check_ip_record
 {
-	my ($dsn, $u, $p, $tbl, $inc) = @_;
+	my ($DBH, $tbl, $ip) = @_;
+	my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>date_sub(now(), interval 7 day)", undef, $ip)
+		or die "DBI/DBD: $!";
+	return $status->[0];
+}
+sub insert_ip_record
+{
+	my ($DBH, $tbl, $ip) = @_;
+	my $status = $DBH->selectall_arrayref("select error, t>date_sub(now(), interval 7 day) from $tbl where ip=?", undef, $ip)
+		or die "DBI/DBD: $!";
+	if(@$status)
+	{
+		if($status->[0][0] || !$status->[0][1]) # error, or after interval
+		{
+			$DBH->do("update $tbl set error=false, t=now() where ip=?", undef, $ip);
+			return 0;
+		}
+		else # too soon
+		{
+			return 1;
+		}
+	}
+	else
+	{
+		$DBH->do("insert into $tbl(ip, error, t) values(?, false, now())", undef, $ip);
+		return 0;
+	}
+}
+sub delete_ip_record
+{
+	my ($DBH, $tbl, $ip) = @_;
+	$DBH->do("update $tbl set error=true where ip=?", undef, $ip);
+}
+
+sub check_sql($$$$$$$$$)
+{
+	my ($dsn, $u, $p, $tbl, $per32, $per24, $per16, $per8, $inc) = @_;
 	my $ip = $ENV{REMOTE_ADDR};
 	my $DBH = ($__CACHED_DBH__ ? $__CACHED_DBH__ : ($__CACHED_DBH__ = DBI->connect($dsn, $u, $p, { RaiseError => 1, AutoCommit => 0 })))
 		or die "DBI/DBD: $!";
-	$DBH->do("set character set utf8");
-	$DBH->do("set names utf8");
+	eval {
+		$DBH->do("set character set utf8");
+		$DBH->do("set names utf8");
+		$DBH->do("set time_zone = '+0:00'");
+	} or do {
+		undef $__CACHED_DBH__;
+		die $@;
+	};
 	if($inc < 0)
 	{
-		$DBH->do("update $tbl set error=true where ip=?", undef, $ip);
+		delete_ip_record($DBH, $tbl, $ip);
 		$DBH->commit();
 		$DBH->disconnect();
 		return 0;
 	}
 	elsif($inc == 0)
 	{
-		my $status = $DBH->selectrow_arrayref("select count(*) from $tbl where ip=? and error=false and t>date_sub(now(), interval 7 day)", undef, $ip)
-			or die "DBI/DBD: $!";
+		my $status = check_ip_record($DBH, $tbl, $ip);
 		$DBH->disconnect();
-		return $status->[0] ? -1 : 0;
+		if ($status)
+		{
+			warn "$ip blocked by SQL";
+		}
+		return $status;
 	}
 	else
 	{
-		my $status = $DBH->selectall_arrayref("select error, t>date_sub(now(), interval 7 day) from $tbl where ip=?", undef, $ip)
-			or die "DBI/DBD: $!";
-		if(@$status)
+		my $status = insert_ip_record($DBH, $tbl, $ip);
+		$DBH->commit();
+		$DBH->disconnect();
+		if ($status)
 		{
-			if($status->[0][0] || !$status->[0][1]) # error, or after interval
-			{
-				$DBH->do("update $tbl set error=false, t=now() where ip=?", undef, $ip);
-				$DBH->commit();
-				$DBH->disconnect();
-				return 0;
-			}
-			else # too soon
-			{
-				$DBH->disconnect();
-				return -1;
-			}
+			warn "$ip blocked by SQL";
 		}
-		else
-		{
-			$DBH->do("insert into $tbl(ip, error, t) values(?, false, now())", undef, $ip);
-			$DBH->commit();
-			$DBH->disconnect();
-			return 0;
-		}
+		return $status;
 	}
 }
 
@@ -126,7 +173,11 @@ sub check_banlist($)
 	for(0..@s/4-1)
 	{
 		my $i = $s[4*$_];
-		return 1 if "$ip." =~ /^\Q$i\E\./;
+		if("$ip." =~ /^\Q$i\E\./)
+		{
+			warn "$ip blocked by SQL";
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -214,6 +265,9 @@ Content-type: text/html
 	<hr>
 	To use another CA, please enter its number here before using this page:
 	<input type="text" name="ca" value="$default_ca" size="2">
+	<hr>
+	REMOTE_HOST=$ENV{REMOTE_HOST}<br>
+	REMOTE_ADDR=$ENV{REMOTE_ADDR}
 </body>
 </html>
 EOF
