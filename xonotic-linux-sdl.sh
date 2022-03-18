@@ -17,7 +17,10 @@ case "$(uname -m)" in
   *)	arch="linux64" ;;
 esac
 
-xonotic="xonotic-${arch}-${mode}"
+# prefer locally built binary if available (see: Makefile)
+xonotic="xonotic-local-${mode}"
+[ -x "$xonotic" ] || xonotic="xonotic-${arch}-${mode}"
+echo "Executing: $xonotic ${@}"
 
 set -- ./${xonotic} "${@}"
 
