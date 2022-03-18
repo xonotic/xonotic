@@ -2,6 +2,13 @@ release_common()
 {
 	export LC_ALL=C
 
+	if [ -z "$MAKEFLAGS" ]; then
+		ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+		if [ $ncpus -gt 1 ]; then
+			export MAKEFLAGS=-j$ncpus
+		fi
+	fi
+
 	release_args="$cmd $*"
 	msg "*** $release_args: start"
 	release_starttime=`date +%s`
@@ -173,9 +180,12 @@ case "$cmd" in
 			verbose cd Xonotic
 			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
 			verbose rm -rf misc/builddeps
-			verbose mv misc/buildfiles/win32 bin32 || true
-			verbose mv bin32/SDL.dll . || true
-			verbose mv misc/buildfiles/win64 bin64 || true
+			#verbose mv bin32/SDL.dll . || true # Leftover?
+
+			# We're going to be building these later
+			#verbose mv misc/buildfiles/win32 bin32 || true
+			#verbose mv misc/buildfiles/win64 bin64 || true
+
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
 			verbose rm -rf misc/pki
@@ -264,6 +274,32 @@ case "$cmd" in
 				chmod +x "$binary"
 				;;
 		esac
+		;;
+	release-dlls-compile)
+		release_common
+		arch=$1
+		buildpath=$2
+		targetdir=$3
+		mkdir -p "$targetdir"
+		(
+			cd "misc/buildsrc"
+			verbose ./dlls.sh all "$buildpath" "$arch"
+		)
+		verbose cp -v $buildpath/out/$arch/* "$targetdir"
+		;;
+	release-dlls-win32)
+		release_common
+		verbose "$SELF" release-dlls-compile win32 /tmp/dlls Xonotic/bin32
+		;;
+	release-dlls-win64)
+		release_common
+		verbose "$SELF" release-dlls-compile win64 /tmp/dlls Xonotic/bin64
+		;;
+	release-dlls)
+		release_common
+		verbose "$SELF" release-dlls-win32
+		verbose "$SELF" release-dlls-win64
+		verbose rm -rf /tmp/dlls
 		;;
 	release-engine-win32)
 		release_common
@@ -574,6 +610,7 @@ case "$cmd" in
 		release_common
 		verbose "$SELF" release-prepare
 		verbose "$SELF" release-maps
+		verbose "$SELF" release-dlls
 		verbose "$SELF" release-engine
 		verbose "$SELF" release-qc
 		verbose "$SELF" release-pack
