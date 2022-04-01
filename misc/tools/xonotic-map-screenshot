@@ -17,6 +17,7 @@ count=`yes x | head -n "$count" | tr -cd x`
 	+'vid_fullscreen 0' \
 	+'exec effects-ultra.cfg' \
 	"$@" \
+	+'cl_welcome_in_menu_dialog 0' \
 	+'sv_precacheplayermodels 0' \
 	+'cl_hidewaypoints 1' \
 	+'cl_movement 0' \
