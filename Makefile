@@ -75,18 +75,20 @@ update-stable: nogit
 update-beta: nogit
 	misc/tools/rsync-updater/update-to-autobuild.sh
 
-.PHONY: crypto
-crypto: nogit
+$(D0SRC)/Makefile:
 	( cd $(D0SRC) && ./autogen.sh && ./configure --enable-static --disable-shared )
+
+.PHONY: d0_blind_id
+d0_blind_id: nogit $(D0SRC)/Makefile
 	$(MAKE) -C $(D0SRC)
 
 .PHONY: server
-server: crypto
+server: d0_blind_id
 	$(MAKE) -C $(DPSRC) sv-release
 	cp -v $(DPSRC)/darkplaces-dedicated $(SERVER)
 
 .PHONY: client
-client: crypto
+client: d0_blind_id
 	$(MAKE) -C $(DPSRC) sdl-release
 	cp -v $(DPSRC)/darkplaces-sdl $(CLIENT)
 
