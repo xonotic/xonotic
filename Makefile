@@ -7,7 +7,7 @@ SERVER = xonotic-local-dedicated
 # use CFLAGS to set default optimisations and support user override
 CFLAGS ?= -pipe -march=native -mtune=native -flto=auto
 # user can override this with make -j
-MAKEFLAGS = -j$(shell nproc)
+MAKEFLAGS := -j$(shell nproc)
 # DP makefile overrides CFLAGS (exporting CFLAGS does work for d0_blind_id but so does this)
 export CC += $(CFLAGS)
 
@@ -51,15 +51,15 @@ help:
 	@echo "  make both"
 	@echo
 
-.PHONY: nogit
-nogit:
-	@if [ -d .git ]; then \
-		echo "To compile from git sources, please use ./all instead!"; \
-		exit 1; \
-	fi
+GIT := $(shell [ -d .git ] && echo "To compile from git, please read https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access ")
+ifdef GIT
+  $(error $(GIT))
+endif
+
+.EXTRA_PREREQS := $(findstring update-stable,$(MAKECMDGOALS)) $(findstring update-beta,$(MAKECMDGOALS))
 
 .PHONY: clean-sources
-clean-sources: nogit
+clean-sources:
 	$(MAKE) -C $(DPSRC) clean
 	$(MAKE) -C $(D0SRC) clean
 
@@ -68,18 +68,18 @@ clean: clean-sources
 	$(RM) $(CLIENT) $(SERVER)
 
 .PHONY: update-stable
-update-stable: nogit
+update-stable:
 	misc/tools/rsync-updater/update-to-release.sh
 
 .PHONY: update-beta
-update-beta: nogit
+update-beta:
 	misc/tools/rsync-updater/update-to-autobuild.sh
 
 $(D0SRC)/Makefile:
 	( cd $(D0SRC) && ./autogen.sh && ./configure --enable-static --disable-shared )
 
 .PHONY: d0_blind_id
-d0_blind_id: nogit $(D0SRC)/Makefile
+d0_blind_id: $(D0SRC)/Makefile
 	$(MAKE) -C $(D0SRC)
 
 .PHONY: server
