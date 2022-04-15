@@ -28,30 +28,30 @@ export DP_LINK_CRYPTO_RIJNDAEL=shared
 .PHONY: help
 help:
 	@echo
-	@echo "  ===== Xonotic Makefile for stable and beta releases ====="
+	@printf "     \e[1;33m===== Xonotic Makefile for stable and beta releases =====\e[m\n"
 	@echo
-	@echo "The DarkPlaces engine builds will be named $(CLIENT) and $(SERVER) and"
-	@echo "will be preferred by the xonotic-linux-sdl.sh and xonotic-linux-dedicated.sh scripts."
+	@printf "The DarkPlaces Engine builds will be named \e[1m$(CLIENT) \e[mand \e[1m$(SERVER)\e[m\n"
+	@printf "and will be preferred by \e[1mxonotic-linux-sdl.sh \e[mand \e[1mxonotic-linux-dedicated.sh \e[mscripts.\n"
 	@echo
-	@echo "For more info, see https://gitlab.com/xonotic/xonotic/-/wikis/Compiling"
+	@printf "More info is available at \e[1;36mhttps://gitlab.com/xonotic/xonotic/-/wikis/Compiling\e[m\n"
 	@echo
-	@echo "-O3 is already enabled for DarkPlaces. Do not add any math flags!"
+	@echo   "-O3 is already enabled for DarkPlaces Engine. Do not add any math flags!"
 	@echo
-	@echo "MAKEFLAGS=$(MAKEFLAGS)"
-	@echo "CFLAGS= $(CFLAGS)"
+	@echo   "MAKEFLAGS=$(MAKEFLAGS)"
+	@echo   "CFLAGS= $(CFLAGS)"
 	@echo
-	@echo "  make clean-sources         Delete build objects"
-	@echo "  make clean                 Delete engine builds and build objects"
+	@echo   "  make clean-sources         Delete build objects"
+	@echo   "  make clean                 Delete engine builds and build objects"
 	@echo
-	@echo "  make update-stable         Update to the latest stable release via rsync"
-	@echo "  make update-beta           Update to the latest daily autobuild via rsync"
+	@echo   "  make update-stable         Update to the latest stable release via rsync"
+	@echo   "  make update-beta           Update to the latest daily autobuild via rsync"
 	@echo
-	@echo "  make server                Compile $(SERVER)"
-	@echo "  make client                Compile $(CLIENT)"
-	@echo "  make both"
+	@printf "  make server                Compile \e[1m$(SERVER)\e[m\n"
+	@printf "  make client                Compile \e[1m$(CLIENT)\e[m\n"
+	@echo   "  make both"
 	@echo
 
-GIT := $(shell [ -d .git ] && echo "To compile from git, please read https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access ")
+GIT := $(shell [ -d .git ] && printf "\e[1;31mTo compile from git, please read https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access\e[m")
 ifdef GIT
   $(error $(GIT))
 endif
