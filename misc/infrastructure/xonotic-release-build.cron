@@ -39,7 +39,7 @@ fi
 
 set -ex
 
-ssh autobuild-release-uploader@beta.xonotic.org '
+test "$RELEASETYPE" = "autobuild" && ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
 	s0=`date -d "now - 7 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
@@ -57,6 +57,7 @@ ssh autobuild-release-uploader@beta.xonotic.org '
 		fi;
 	done
 '
+
 cd ~/xonotic-release-build
 ./all clean --reclone
 # ./all checkout maint
