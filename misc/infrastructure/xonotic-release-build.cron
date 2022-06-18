@@ -39,7 +39,7 @@ fi
 
 set -ex
 
-test "$RELEASETYPE" = "autobuild" && ssh autobuild-release-uploader@beta.xonotic.org '
+test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
 	s0=`date -d "now - 7 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
