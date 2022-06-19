@@ -83,10 +83,12 @@ while HEAD -C xonotic:g-23 http://beta.xonotic.org/autobuild/"$RELEASETYPEDIR""X
 	d="$d0"_"$i"
 done
 RELEASEDATE=$d ./all release
+sha512sum Xonotic-$d*.zip > Xonotic-$d.sha512
 for X in Xonotic-$d*.zip; do
 	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
 done
-rsync -vaSHP Xonotic*.zip autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
+ln -snf Xonotic-$d.sha512 Xonotic-latest.sha512
+rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
 fi
