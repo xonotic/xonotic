@@ -87,7 +87,7 @@ sha512sum Xonotic-$d*.zip > Xonotic-$d.sha512
 for X in Xonotic-$d*.zip; do
 	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
 done
-ln -snf Xonotic-$d.sha512 Xonotic-latest.sha512
+sha512sum Xonotic-latest*.zip > Xonotic-latest.sha512
 rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
