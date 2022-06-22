@@ -200,9 +200,9 @@ case "$cmd" in
 		)
 		rm -f Xonotic/key_15.d0pk
 		(
+			verbose cd Xonotic/mapping
 			# bones_was_here: don't ship 10 year old netradiant
 			# also seems better to update netradiant independently of xonotic versions
-			#verbose cd Xonotic/mapping
 			#verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120301.tar.bz2
 			#verbose wget http://www.icculus.org/netradiant/files/netradiant-1.5.0-20120301-win32-7z.exe
 			#for X in *-7z.exe; do
