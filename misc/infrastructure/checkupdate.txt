@@ -1,15 +1,15 @@
 # Current released version.
-V 0.8.2
+V 0.8.5
 
 # Download URL.
-D http://dl.xonotic.org/xonotic-0.8.2.zip
+D https://dl.xonotic.org/xonotic-0.8.5.zip
 
 # When releasing, create this string by:
 # date -u +%Y%m%d%H%M%S -d'now + 3 months'
-C 20170701181425
+C 20220930222800
 
 # Website URL.
-U http://www.xonotic.org/
+U https://xonotic.org
 
 # Terms of Service revision number (integer).
 # Increase by 1 every time tos.txt is updated.
