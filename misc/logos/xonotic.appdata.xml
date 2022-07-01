@@ -18,6 +18,7 @@
       Xonotic ist ein freier und schneller Ego-Shooter, der ein
       Gameplay im Arenastil mit hektischen Manövern und einer großen Auswahl
       an Waffen kombiniert.
+    </p>
     <p xml:lang="fr">
       Xonotic est un jeu de tir à la première personne gratuit, qui combine un
       style de jeu en arène rapide et addictif avec une large sélection d'armes.
@@ -38,6 +39,7 @@
       bis zu gesponsorten Turnieren ermöglicht Xonotic jedem E-Sport-Liebhaber
       eine Teilnahme in Wettbewerben, die von der aufgeschlossenen Gemeinschaft
       veranstaltet werden.
+    </p>
     <p xml:lang="fr">
       Xonotic est facile à apprendre, mais difficile à maîtriser ! Outre une
       action intense pour les joueurs débutants, le jeu propose aussi des
@@ -54,6 +56,7 @@
       Einstellungen und Server, ein funktionierendes Anti-Cheat-System,
       der Zuschauermodus, und die Möglichkeit, Spielen zuzusehen und
       sie aufzuzeichnen, machen Xonotic interessant für wetteifernde Spieler.
+    </p>
     <p xml:lang="fr">
       Des fonctionnalités comme les items à apparence simplifiée, des
       configurations et serveurs entièrement personnalisables, un système
@@ -62,13 +65,13 @@
       compétitifs.
     </p>
   </description>
-  <url type="homepage">https://www.xonotic.org</url>
+  <url type="homepage">https://xonotic.org</url>
   <screenshots>
-    <screenshot type="default">https://www.xonotic.org/m/uploads/2012/07/frontpage_005.jpg</screenshot>
-    <screenshot>https://www.xonotic.org/m/uploads/2012/07/frontpage_006.jpg</screenshot>
-    <screenshot>https://www.xonotic.org/m/uploads/2012/07/frontpage_007.jpg</screenshot>
-    <screenshot>https://www.xonotic.org/m/uploads/2012/07/frontpage_008.jpg</screenshot>
-    <screenshot>https://www.xonotic.org/m/uploads/2012/07/frontpage_003.jpg</screenshot>
+    <screenshot type="default">https://xonotic.org/m/uploads/2012/07/frontpage_005.jpg</screenshot>
+    <screenshot>https://xonotic.org/m/uploads/2012/07/frontpage_006.jpg</screenshot>
+    <screenshot>https://xonotic.org/m/uploads/2012/07/frontpage_007.jpg</screenshot>
+    <screenshot>https://xonotic.org/m/uploads/2012/07/frontpage_008.jpg</screenshot>
+    <screenshot>https://xonotic.org/m/uploads/2012/07/frontpage_003.jpg</screenshot>
   </screenshots>
   <update_contact>mail@asciiwolf.com</update_contact>
   <content_rating type="oars-1.1">
