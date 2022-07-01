@@ -87,13 +87,9 @@ case "$cmd" in
 			esac
 		done
 
+		TARGETS="sv-$debug sdl-$debug"
 		if [ x"`uname`" = x"Darwin" ]; then
-			TARGETS="sv-$debug sdl-$debug"
 			export CC="$CC -fno-reorder-blocks"
-		elif [ -n "$WE_HATE_OUR_USERS" ]; then
-			TARGETS="sv-$debug sdl-$debug"
-		else
-			TARGETS="sv-$debug cl-$debug sdl-$debug"
 		fi
 
 		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
@@ -109,9 +105,6 @@ case "$cmd" in
 				case "$X" in
 					sdl)
 						TARGETS="$TARGETS sdl-$debug"
-						;;
-					glx)
-						TARGETS="$TARGETS cl-$debug"
 						;;
 					dedicated)
 						TARGETS="$TARGETS sv-$debug"
@@ -332,10 +325,6 @@ case "$cmd" in
 			sdl)
 				shift
 				;;
-			glx)
-				client=-$1
-				shift
-				;;
 		esac
 
 		if ! [ -x "darkplaces/darkplaces$client" ]; then
@@ -379,9 +368,9 @@ case "$cmd" in
 		fi
 		;;
 	help)
-		$ECHO "  $SELF compile [-c] [-qc] [-d|-p|-r] [-0] [-1] [sdl|glx|dedicated]"
+		$ECHO "  $SELF compile [-c] [-qc] [-d|-p|-r] [-0] [-1] [sdl|dedicated]"
 		$ECHO "  $SELF update-maps"
-		$ECHO "  $SELF run [sdl|glx|dedicated] options..."
+		$ECHO "  $SELF run [sdl|dedicated] options..."
 		$ECHO "  $SELF compile-map mapname1 mapname2... (e.g. \"./all compile-map dance drain fuse\")"
 		handled=false
 		;;
