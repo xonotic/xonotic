@@ -9,12 +9,11 @@ if ! which rsync >/dev/null; then
 	exit 1
 fi
 
-read -rp "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]?" choice
-case "$choice" in
-  Y) ;;
-  y) ;;
-  *) exit 1 ;;
-esac
+[ "$1" = "-y" ] && choice=y
+until [ "$choice" = y ] || [ "$choice" = Y ]; do
+	read -rp "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? " choice
+	[ "$choice" = n ] || [ "$choice" = N ] && exit 1
+done
 
 case "${0##*/}" in
 	update-to-autobuild.sh)
@@ -28,7 +27,7 @@ esac
 options="-Prtzil --executability --delete-after --delete-excluded --stats"
 
 if [ -d "Xonotic-low" ]; then
-        echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
 	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	target="Xonotic-low/"
 elif [ -d "Xonotic-high" ]; then
@@ -39,10 +38,10 @@ elif [ -d "../../../.git" ]; then
 	exec ../../../all update
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-low.pk3 ]; then
-        	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	elif [ -f ../../../data/xonotic-*-data-low.pk3 ]; then
-        	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
+		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
