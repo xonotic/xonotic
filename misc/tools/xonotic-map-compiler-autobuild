@@ -269,6 +269,11 @@ screenshotthemap()
 					;;
 			esac
 		fi
+
+		# map preview for menu and map vote screen genertaed from the first auto-screenshot
+		# input image must be in 4:3 format (1024x768 is ok), output image has to be 512x512
+		convert ~/.xonotic/data/screenshots/$M-000000.jpg -scale 1:1 -scale 512 ~/.xonotic/data/screenshots/$M.jpg
+
 	) 2>&1 | tee ~/.xonotic/data/autoscreenshot.log
 	good=false
 	if mv ~/.xonotic/data/screenshots "$M-$blobhash"; then
