@@ -1,6 +1,6 @@
 # Xonotic
 
-![Xonotic Logo](http://xonotic.org/static/img/xonotic-logo.png)
+![Xonotic Logo](https://xonotic.org/static/img/xonotic_logo_web.svg)
 
 Xonotic is an addictive, arena-style first person shooter with crisp movement and a wide array of weapons. It combines intuitive mechanics with in-your-face action to elevate your heart rate.
 
