@@ -205,7 +205,7 @@ func Run() (err error) {
 		switch mem.Membership {
 		case event.MembershipJoin:
 			handleJoin(eventTime(evt), evt.RoomID, member, evt)
-		case event.MembershipLeave:
+		case event.MembershipLeave, event.MembershipBan:
 			handleLeave(eventTime(evt), evt.RoomID, member, evt)
 		default: // Ignore.
 		}
