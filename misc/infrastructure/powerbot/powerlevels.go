@@ -20,6 +20,9 @@ const (
 	// 1 year fulltime active dev = PL 10.
 	maxPowerScore = 3600 * (365*24*idleScore + 8*261*(activeScore-idleScore))
 	maxPowerLevel = 9
+	// Do not touch users outside this range.
+	minApplyLevel = 0
+	maxApplyLevel = 9
 	// Expire power level if no event for 1 month. Level comes back on next event, including join.
 	powerExpireTime = time.Hour * 24 * 30
 	// Maximum count of ACL entries. Should avoid hitting the 64k limit.
@@ -142,12 +145,16 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []id.Room
 				raw = otherRaw
 			}
 		}
-		if level > prevLevel {
+		if prevLevel < minApplyLevel {
+			log.Printf("room %v user %v power level: SKIP_TOO_LOW %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
+		} else if prevLevel > maxApplyLevel {
+			log.Printf("room %v user %v power level: SKIP_TOO_HIGH %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
+		} else if level < prevLevel {
+			log.Printf("room %v user %v power level: SKIP_WOULD_LOWER %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
+		} else if level > prevLevel {
 			log.Printf("room %v user %v power level: INCREASE %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
 			newRoomLevels.Users[user] = level
 			dirty = true
-		} else if level < prevLevel {
-			log.Printf("room %v user %v power level: SKIP %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
 		} else {
 			log.Printf("room %v user %v power level: KEEP %v -> %v (%v, %v)", room, user, prevLevel, level, raw, score)
 		}
