@@ -91,6 +91,12 @@ sha512sum Xonotic-latest*.zip > Xonotic-latest.sha512
 rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
+
+	PIPELINE_GMQCC=gmqcc/gmqcc
+	PIPELINE_DP=Xonotic/xonotic-linux64-dedicated
+	if [ -x "$PIPELINE_GMQCC" ] && [ -x "$PIPELINE_DP" ]; then
+		rsync -vSP "$PIPELINE_GMQCC" "$PIPELINE_DP" autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
+	fi
 fi
 echo "Finished a new $RELEASETYPENAME at http://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
 cd
