@@ -51,7 +51,7 @@ help:
 	@echo   "  make both"
 	@echo
 
-GIT := $(shell [ -d .git ] && printf "\e[1;31mTo compile from git, please read https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access\e[m")
+GIT := $(shell [ -d .git ] && printf "\e[1;31mThis Makefile only supports stable releases and autobuilds, whereas you are using a git repository.  To compile from git, please read https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access\e[m")
 ifdef GIT
   $(error $(GIT))
 endif

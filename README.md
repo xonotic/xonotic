@@ -14,6 +14,8 @@ Stable releases and related info are available at https://xonotic.org/download
 
 [Beta builds](https://gitlab.com/xonotic/xonotic/-/wikis/Autobuilds) are available at https://beta.xonotic.org/autobuild
 
+The source code included in stable releases and autobuilds can be [compiled as described on the wiki](https://gitlab.com/xonotic/xonotic/-/wikis/Compiling).  This is much "lighter" than a full git clone.
+
 *Please note, [Gitlab](https://gitlab.com/xonotic/) is our home for repositories, issue tracking, wikis, etc. The repositories on GitHub are mirrors of GitLab's unless specified otherwise.*
 
 ## Community
