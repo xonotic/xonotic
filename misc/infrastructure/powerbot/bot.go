@@ -223,7 +223,7 @@ func Run() (err error) {
 		if since != "" && !fullySynced {
 			log.Print("Fully synced.")
 			for room, users := range roomUsers {
-				if len(users) == 0 {
+				if _, found := users[config.UserID]; !found {
 					log.Printf("Not actually joined %v yet...", room)
 					_, err := client.JoinRoom(string(room), "", nil)
 					if err != nil {
