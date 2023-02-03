@@ -2,7 +2,8 @@
 
 set -ex
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+export PATH=$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+export GIT_SSH_COMMAND='ssh -i $HOME/.ssh/id_xonotic'
 
 cd ~/xonotic/data/xonotic-data.pk3dir
 git checkout master
