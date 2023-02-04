@@ -962,7 +962,6 @@ case "$cmd" in
 						verbose git branch -D "${B#refs/heads/}"
 					fi
 				done
-				git rev-parse refs/heads/master >/dev/null 2>&1 || verbose git branch --track master origin/master || true
 				git rev-parse "refs/heads/$branch" >/dev/null 2>&1 || verbose git branch --track "$branch" origin/"$branch" || true
 			fi
 			checkself "$cmd" "$@"
