@@ -7,6 +7,7 @@ import (
 	"maunium.net/go/mautrix"
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
+	"reflect"
 	"time"
 )
 
@@ -173,11 +174,44 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []id.Room
 	if dirty {
 		diff := cmp.Diff(roomLevels.Users, newRoomLevels.Users)
 		log.Printf("room %v power level update:\n%v", room, diff)
-		_, err := client.SendStateEvent(room, event.StatePowerLevels, "", newRoomLevels)
+		_, err := client.SendStateEvent(room, event.StatePowerLevels, "", makeDefaultsExplicit(&newRoomLevels))
 		if err != nil {
 			log.Printf("Failed to update power levels: %v", err)
 		}
 	} else {
 		log.Printf("room %v nothing to update", room)
 	}
+}
+
+type powerLevelsWithDefaults struct {
+	// This struct is a copy of the public stuff in event.PowerLevelsEventContent,
+	// but with omitempty removed on users_default and events_default to work around
+	// https://github.com/matrix-org/dendrite/issues/2983
+	Users           map[id.UserID]int              `json:"users"`
+	UsersDefault    int                            `json:"users_default,omitempty"`
+	Events          map[string]int                 `json:"events"`
+	EventsDefault   int                            `json:"events_default,omitempty"`
+	Notifications   *event.NotificationPowerLevels `json:"notifications,omitempty"`
+	StateDefaultPtr *int                           `json:"state_default,omitempty"`
+	InvitePtr       *int                           `json:"invite,omitempty"`
+	KickPtr         *int                           `json:"kick,omitempty"`
+	BanPtr          *int                           `json:"ban,omitempty"`
+	RedactPtr       *int                           `json:"redact,omitempty"`
+	HistoricalPtr   *int                           `json:"historical,omitempty"`
+}
+
+func makeDefaultsExplicit(roomLevels *event.PowerLevelsEventContent) *powerLevelsWithDefaults {
+	// Copying over all exported fields using reflect.
+	// Doing it this way so if a new field is added to event.PowerLevelsEventContent, this code panics.
+	var withDefaults powerLevelsWithDefaults
+	src := reflect.ValueOf(roomLevels).Elem()
+	dst := reflect.ValueOf(&withDefaults).Elem()
+	for i := 0; i < src.Type().NumField(); i++ {
+		srcField := src.Type().Field(i)
+		if !srcField.IsExported() {
+			continue
+		}
+		dst.FieldByName(srcField.Name).Set(src.Field(i))
+	}
+	return &withDefaults
 }
