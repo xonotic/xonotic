@@ -187,10 +187,10 @@ type powerLevelsWithDefaults struct {
 	// This struct is a copy of the public stuff in event.PowerLevelsEventContent,
 	// but with omitempty removed on users_default and events_default to work around
 	// https://github.com/matrix-org/dendrite/issues/2983
-	Users           map[id.UserID]int              `json:"users"`
-	UsersDefault    int                            `json:"users_default,omitempty"`
-	Events          map[string]int                 `json:"events"`
-	EventsDefault   int                            `json:"events_default,omitempty"`
+	Users           map[id.UserID]int              `json:"users,omitempty"`
+	UsersDefault    int                            `json:"users_default"`
+	Events          map[string]int                 `json:"events,omitempty"`
+	EventsDefault   int                            `json:"events_default"`
 	Notifications   *event.NotificationPowerLevels `json:"notifications,omitempty"`
 	StateDefaultPtr *int                           `json:"state_default,omitempty"`
 	InvitePtr       *int                           `json:"invite,omitempty"`
