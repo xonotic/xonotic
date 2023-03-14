@@ -59,7 +59,7 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 '
 
 cd ~/xonotic-release-build
-./all clean --reclone
+./all clean --reclone # FIXME this updates timestamps of most unchanged files, making rsync slower, why?
 # ./all checkout maint
 ./all checkout
 ./all each git checkout HEAD^0
@@ -92,11 +92,13 @@ rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonoti
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
 
-	PIPELINE_GMQCC=gmqcc/gmqcc
-	PIPELINE_DP=Xonotic/xonotic-linux64-dedicated
-	if [ -x "$PIPELINE_GMQCC" ] && [ -x "$PIPELINE_DP" ]; then
-		rsync -vSP "$PIPELINE_GMQCC" "$PIPELINE_DP" autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
-	fi
+	# pipeline files, see: .gitlab-ci.yml in xonotic-data.pk3dir
+	cp data/stormkeep-????????????????????????????????????????-????????????????????????????????????????.pk3 stormkeep.pk3
+	PIPELINE_FILES="gmqcc/gmqcc Xonotic/xonotic-linux64-dedicated stormkeep.pk3"
+	for FILE in $PIPELINE_FILES; do
+		rsync -vSP "$FILE" autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
+	done
+	rm -f stormkeep.pk3
 fi
 echo "Finished a new $RELEASETYPENAME at http://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
 cd
