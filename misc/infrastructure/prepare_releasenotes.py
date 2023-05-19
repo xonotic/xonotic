@@ -29,7 +29,7 @@ MR_TYPE_PREFIX = "MR Content: "
 MR_SIZE_PREFIX = "MR Size::"
 
 MAIN_PROJECT_ID = 73434
-EXCLUDED_PROJECT_IDS = []
+EXCLUDED_PROJECT_IDS: list[int] = []
 TARGET_BRANCHES = ["master", "develop", "pending-release"]
 
 GROUP_NAME = "xonotic"
@@ -98,7 +98,7 @@ def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, li
     # extract type, size and topic from labels for easier filtering/ordering
     # extract short description from description
     # extract author->name
-    processed_data = {mr_type: {} for mr_type in MR_TYPE}
+    processed_data: dict = {mr_type: {} for mr_type in MR_TYPE}
     for item in data:
         if item["project_id"] in EXCLUDED_PROJECT_IDS:
             continue
