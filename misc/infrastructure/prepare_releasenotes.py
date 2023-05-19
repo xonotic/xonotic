@@ -94,7 +94,7 @@ def process_description(description: str) -> str:
 
 
 
-def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, MergeRequestInfo]]:
+def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, list[MergeRequestInfo]]]:
     # extract type, size and topic from labels for easier filtering/ordering
     # extract short description from description
     # extract author->name
@@ -156,7 +156,7 @@ def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, Me
     return processed_data
 
 
-def draft_releasenotes(fp: TextIO, data: dict[MR_TYPE, dict[str, MergeRequestInfo]]) -> None:
+def draft_releasenotes(fp: TextIO, data: dict[MR_TYPE, dict[str, list[MergeRequestInfo]]]) -> None:
     fp.writelines(["Release Notes\n", "===\n", "\n"])
     for mr_type, sectioned_mr_data in data.items():
         type_written = False
