@@ -42,6 +42,7 @@ class MergeRequestInfo(NamedTuple):
     iid: int
     size: MR_SIZE
     author: str
+    reviewers: list[str]
     short_desc: str
     web_url: str
 
@@ -144,10 +145,13 @@ def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, Me
                             f"{item['iid']}: {e}")
             short_desc = item["title"]
         author = item["author"]["name"]
+        reviewers = []
+        for reviewer in item["reviewers"]:
+            reviewers.append(reviewer["name"])
         if section not in processed_data[mr_type]:
             processed_data[mr_type][section] = []
         processed_data[mr_type][section].append(MergeRequestInfo(
-            iid=item["iid"], size=size, author=author,
+            iid=item["iid"], size=size, author=author, reviewers=reviewers,
             short_desc=short_desc, web_url=item["web_url"]))
     return processed_data
 
@@ -160,9 +164,12 @@ def draft_releasenotes(fp: TextIO, data: dict[MR_TYPE, dict[str, MergeRequestInf
             formatted_items = []
             merge_requests.sort(key=lambda x: x.size.value)
             for item in merge_requests:
-                authors = item.author
-                formatted_items.append(f"- {item.short_desc} by {authors} "
-                                       f"([{item.iid}]({item.web_url}))\n")
+                author = item.author
+                reviewer_str = ""
+                if item.reviewers:
+                    reviewer_str = ", Reviewer(s): " + ", ".join(item.reviewers)
+                formatted_items.append(f"- {item.short_desc} (Author: {author}{reviewer_str})"
+                                       f" [{item.iid}]({item.web_url})\n")
             if formatted_items:
                 if not type_written:
                     fp.writelines([f"{mr_type.name}\n", "---\n"])
