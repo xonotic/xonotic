@@ -2,6 +2,7 @@ from enum import Enum
 import logging
 import requests
 from typing import NamedTuple, TextIO
+from datetime import datetime
 
 # TODO: remove after testing
 import os
@@ -92,7 +93,7 @@ def process_description(description: str) -> str:
 
 
 
-def process(data: list[dict]) -> dict[MR_TYPE, dict[str, MergeRequestInfo]]:
+def process(timestamp: datetime, data: list[dict]) -> dict[MR_TYPE, dict[str, MergeRequestInfo]]:
     # extract type, size and topic from labels for easier filtering/ordering
     # extract short description from description
     # extract author->name
@@ -101,6 +102,15 @@ def process(data: list[dict]) -> dict[MR_TYPE, dict[str, MergeRequestInfo]]:
         if item["project_id"] in EXCLUDED_PROJECT_IDS:
             continue
         if item["target_branch"] not in TARGET_BRANCHES:
+            continue
+        # Workaround for missing merge information
+        if "merged_at" not in item or not isinstance(item["merged_at"], str):
+            logging.warning(f"Invalid merge information for {item['iid']} "
+                            f"(project: {item['project_id']})")
+            continue
+        # GitLab's rest API doesn't offer a way to filter by "merged_after", so
+        # check the "merge_at" field
+        if datetime.fromisoformat(item["merged_at"]) < timestamp:
             continue
         mr_type = MR_TYPE.NO_TYPE_GIVEN
         size = MR_SIZE.UNKNOWN
@@ -162,10 +172,11 @@ def draft_releasenotes(fp: TextIO, data: dict[MR_TYPE, dict[str, MergeRequestInf
 
 
 def main() -> None:
-    release_timestamp = get_time_of_latest_release()
-    merge_requests = get_merge_requests(release_timestamp)
-    processed_data = process(merge_requests)
-    with open(f"RN_draft_since_{release_timestamp}.md", "w") as f:
+    release_timestamp_str = get_time_of_latest_release()
+    release_timestamp = datetime.fromisoformat(release_timestamp_str)
+    merge_requests = get_merge_requests(release_timestamp_str)
+    processed_data = process(release_timestamp, merge_requests)
+    with open(f"RN_draft_since_{release_timestamp_str}.md", "w") as f:
         draft_releasenotes(f, processed_data)
 
 
