@@ -1,17 +1,18 @@
 #!/bin/sh
 
-if [ -d "${0%/*}" ]; then
-	cd "${0%/*}"
-fi
+cd "${0%/*}" || exit 1
 
-if ! which rsync >/dev/null; then
+if ! which rsync > /dev/null; then
 	echo >&2 "FATAL: rsync not found, please install the rsync package"
 	exit 1
 fi
 
-[ "$1" = "-y" ] && choice=y
+if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
+	choice=y
+fi
 until [ "$choice" = y ] || [ "$choice" = Y ]; do
-	read -rp "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? " choice
+	printf "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? "
+	read -r choice
 	[ "$choice" = n ] || [ "$choice" = N ] && exit 1
 done
 
@@ -26,32 +27,38 @@ esac
 
 options="-Prtzil --executability --delete-after --delete-excluded --stats"
 
-if [ -d "Xonotic-low" ]; then
-	echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-	target="Xonotic-low/"
-elif [ -d "Xonotic-high" ]; then
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
-	target="Xonotic-high/"
-elif [ -d "../../../.git" ]; then
+if [ -d "../../../.git" ]; then
 	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
 	exec ../../../all update
+elif [ -e "Xonotic" ]; then
+	echo "found manually created 'Xonotic' file"
+	echo "targetting the normal $buildtype version"
+	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
+	target="../../.."
+	options="$options -y" # use fuzzy matching because file names may differ
+elif [ -e "Xonotic-high" ]; then
+	echo "found manually created 'Xonotic-high' file"
+	echo "targetting the high $buildtype version"
+	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
+	target="../../.."
+	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -d "../../../data" ]; then
-	if [ -f ../../../data/xonotic-rsync-data-low.pk3 ]; then
-		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-	elif [ -f ../../../data/xonotic-*-data-low.pk3 ]; then
-		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-		options="$options -y" # use fuzzy matching because file names differ
-	elif [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
+	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
+		echo "found rsync high data files"
+		echo "targetting the high $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
 	elif [ -f ../../../data/xonotic-*-data-high.pk3 ]; then
+		echo "found release high data files"
+		echo "targetting the high $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
 		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
+		echo "found Xonotic rsync data files"
+		echo "targetting the normal $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
+		echo "found Xonotic release data files"
+		echo "targetting the normal $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 		options="$options -y" # use fuzzy matching because file names differ
 	else
@@ -67,25 +74,27 @@ fi
 excludes=
 if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 	excludes="$excludes --exclude=/*.exe"
-	excludes="$excludes --exclude=/gmqcc/*.exe"
 	excludes="$excludes --exclude=/bin32"
 	excludes="$excludes --exclude=/*.dll"
 	excludes="$excludes --exclude=/bin64"
 
-	case `uname`:`uname -m` in
+	case $(uname):$(uname -m) in
 		Darwin:*)
 			excludes="$excludes --exclude=/xonotic-linux*"
-			excludes="$excludes --exclude=/gmqcc/gmqcc.linux*"
 			;;
 		Linux:x86_64)
 			excludes="$excludes --exclude=/Xonotic*.app"
 			excludes="$excludes --exclude=/xonotic-osx-*"
-			excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
-			excludes="$excludes --exclude=/xonotic-linux32-*"
-			excludes="$excludes --exclude=/gmqcc/gmqcc.linux32"
 			;;
 		*)
-			echo >&2 "WARNING: Could not detect architecture - downloading all architectures"
+			printf >&2 "\e[1;31m"
+			printf >&2 "WARNING: Could not detect architecture\n"
+			printf >&2 "WARNING: Xonotic does NOT provide pre-built %s executables\n" "$(uname):$(uname -m)"
+			printf >&2 "WARNING: Please run make. More info is available at\n"
+			printf >&2 "WARNING: \e[1;36mhttps://gitlab.com/xonotic/xonotic/-/wikis/Compiling\e[m\n"
+			excludes="$excludes --exclude=/Xonotic*.app"
+			excludes="$excludes --exclude=/xonotic-osx-*"
+			excludes="$excludes --exclude=/xonotic-linux64-*"
 			;;
 	esac
 fi
