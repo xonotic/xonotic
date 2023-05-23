@@ -18,23 +18,26 @@ if "%~n0" == "update-to-autobuild" set buildtype=autobuild
 
 set options=-Prtzil --executability --delete-after --delete-excluded --stats
 
-if exist Xonotic-low goto xonoticlow
-if exist Xonotic-high goto xonotichigh
 if exist ..\..\..\.git goto xonoticdatagit
+if exist Xonotic goto xonoticswitchtonormal
+if exist Xonotic-high goto xonoticswitchtohigh
 if exist ..\..\..\data goto xonoticdata
 goto xonotic
-:xonoticlow
-        echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
-	set target=Xonotic-low/
-	goto endxonotic
-:xonotichigh
-	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
-	set target=Xonotic-high/
-	goto endxonotic
 :xonoticdatagit
 	echo NOTE: this is a git repository download. Using the regular update method.
 	..\..\..\all update
+	goto end
+:xonoticswitchtohigh
+	set PATH=misc\tools\rsync-updater;%PATH%
+	cd ..\..\..
+	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatahighfuzzy
+	echo FATAL: rsync not in misc\tools\rsync-updater. This update script cannot be used.
+	goto end
+:xonoticswitchtonormal
+	set PATH=misc\tools\rsync-updater;%PATH%
+	cd ..\..\..
+	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatanormalfuzzy
+	echo FATAL: rsync not in misc\tools\rsync-updater. This update script cannot be used.
 	goto end
 :xonoticdata
 	if exist ..\..\..\misc\tools\rsync-updater\rsync.exe goto xonoticdatarsync
@@ -43,23 +46,12 @@ goto xonotic
 :xonoticdatarsync
 	set PATH=misc\tools\rsync-updater;%PATH%
 	cd ..\..\..
-	if exist data\xonotic-rsync-data-low.pk3 goto xonoticdatalow
-	if exist data\xonotic-*-data-low.pk3 goto xonoticdatalowfuzzy
 	if exist data\xonotic-rsync-data-high.pk3 goto xonoticdatahigh
 	if exist data\xonotic-*-data-high.pk3 goto xonoticdatahighfuzzy
 	if exist data\xonotic-rsync-data.pk3 goto xonoticdatanormal
 	if exist data\xonotic-*-data.pk3 goto xonoticdatanormalfuzzy
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
-:xonoticdatalow
-		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
-		goto endxonoticdata
-:xonoticdatalowfuzzy
-		echo NOTE: Xonotic-low is gone, downloading normal Xonotic.
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
-		set options=%options% -y
-		goto endxonoticdata
 :xonoticdatahigh
 		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
 		goto endxonoticdata
