@@ -1,26 +1,26 @@
 #!/bin/sh
 
-path=`dirname "${0}"`
-link=`readlink -f "${0}"`
+path=$(dirname "${0}")
+link=$(readlink -f "${0}")
 
-[ -n "${link}" ] && path=`dirname "${link}"`
-cd "${path}"
+[ -n "${link}" ] && path=$(dirname "${link}")
+cd "${path}" || exit 1
 
 case "${0##*/}" in
-  *dedicated*)	mode="dedicated" ;;
-  *glx*)	mode="glx" ;;
-  *)		mode="sdl" ;;
+  *dedicated*)  mode="dedicated" ;;
+  *glx*)        mode="glx" ;;
+  *)            mode="sdl" ;;
 esac
 
-case "$(uname -m)" in
-  i?86)	arch="linux32" ;;  # Not supported anymore but you can build your own.
-  *)	arch="linux64" ;;
+case $(uname):$(uname -m) in
+  Linux:x86_64)  arch="linux64" ;;
+  *)             arch="local"   ;;  # Not pre-built but you can build your own
 esac
 
 # prefer locally built binary if available (see: Makefile)
 xonotic="xonotic-local-${mode}"
 [ -x "$xonotic" ] || xonotic="xonotic-${arch}-${mode}"
-echo "Executing: $xonotic ${@}"
+echo "Executing: $xonotic ${*}"
 
 set -- ./${xonotic} "${@}"
 
@@ -122,4 +122,14 @@ case "$xserver" in
 		;;
 esac
 
-exec "$@"
+if which "$1" > /dev/null
+then
+	exec "$@"
+else
+	echo "Could not find $1 to exec"
+	if [ "$arch" = "local" ]
+	then
+		printf "%b\n%b\n" "Xonotic does not currently provide pre-built $(uname):$(uname -m) builds, please compile one using make" \
+			"More info is available at \e[1;36mhttps://gitlab.com/xonotic/xonotic/-/wikis/Compiling\e[m"
+	fi
+fi
