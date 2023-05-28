@@ -150,7 +150,7 @@ case "$cmd" in
 				#   (YYYYMMDD)
 				exit 1
 				;;
-			release)
+			release|RC*)
 				msg "Building a FINISHED RELEASE"
 				getversion data/xonotic-data.pk3dir
 				verbose "$SELF" each -k git tag -m "TEMP TAG" -f "xonotic-v$versionstr"
@@ -164,7 +164,7 @@ case "$cmd" in
 		if [ -n "$RELEASEDATE" ]; then
 			verbose $ECHO "$RELEASEDATE" > Xonotic/stamp.txt
 			case "$RELEASETYPE" in
-				release)
+				release|RC*)
 					verbose $ECHO "${RELEASEDATE%_*}" > Xonotic/pk3stamp.txt
 					;;
 				*)
@@ -456,6 +456,9 @@ case "$cmd" in
 			case "$RELEASETYPE" in
 				release)
 					;;
+				RC*)
+					versionstr="$versionstr $RELEASETYPE"
+					;;
 				*)
 					versionstr="$versionstr$RELEASETYPE"
 					;;
@@ -479,7 +482,7 @@ case "$cmd" in
 			fi
 			mv xonotic-common.cfg.new xonotic-common.cfg
 			case "$RELEASETYPE" in
-				release)
+				release|RC*)
 					echo "" >> xonotic-common.cfg
 					echo "// nicer menu" >> xonotic-common.cfg
 					echo "set menu_watermark \"\"" >> xonotic-common.cfg

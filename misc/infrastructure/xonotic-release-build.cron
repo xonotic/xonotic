@@ -10,6 +10,10 @@ case "$RELEASETYPE" in
 		RELEASETYPEDIR=
 		RELEASETYPENAME="$RELEASETYPE"
 		;;
+	RC*)
+		RELEASETYPEDIR="$RELEASETYPE/"
+		RELEASETYPENAME="$RELEASETYPE build"
+		;;
 	*)
 		RELEASETYPEDIR="$RELEASETYPE/"
 		RELEASETYPENAME="$RELEASETYPE-like build"
@@ -95,9 +99,7 @@ if [ -z "$RELEASETYPEDIR" ]; then
 	# pipeline files, see: .gitlab-ci.yml in xonotic-data.pk3dir
 	cp data/stormkeep-????????????????????????????????????????-????????????????????????????????????????.pk3 stormkeep.pk3
 	PIPELINE_FILES="gmqcc/gmqcc Xonotic/xonotic-linux64-dedicated stormkeep.pk3"
-	for FILE in $PIPELINE_FILES; do
-		rsync -vSP "$FILE" autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
-	done
+	rsync -vSP $PIPELINE_FILES autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
 	rm -f stormkeep.pk3
 fi
 echo "Finished a new $RELEASETYPENAME at http://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
