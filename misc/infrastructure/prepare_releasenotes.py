@@ -29,7 +29,9 @@ MR_TYPE_PREFIX = "MR Content: "
 MR_SIZE_PREFIX = "MR Size::"
 
 MAIN_PROJECT_ID = 73434
-EXCLUDED_PROJECT_IDS: list[int] = []
+# 73444: mediasource
+# 144002: xonotic.org
+EXCLUDED_PROJECT_IDS: list[int] = [73444, 144002]
 TARGET_BRANCHES = ["master", "develop", "pending-release"]
 
 GROUP_NAME = "xonotic"
