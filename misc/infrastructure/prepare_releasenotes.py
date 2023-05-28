@@ -32,7 +32,7 @@ MAIN_PROJECT_ID = 73434
 # 73444: mediasource
 # 144002: xonotic.org
 EXCLUDED_PROJECT_IDS: list[int] = [73444, 144002]
-TARGET_BRANCHES = ["master", "develop", "pending-release"]
+TARGET_BRANCHES = ["master", "pending-release"]
 
 GROUP_NAME = "xonotic"
 BASEURL = "https://gitlab.com/api/v4"
