@@ -134,6 +134,8 @@ case "$cmd" in
 			if [ -n "$WE_HATE_OUR_USERS" ]; then
 				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
 			fi
+		elif echo $MAKEFLAGS | head -c1 | grep -qv -; then # MAKEFLAGS starts with a single letter option
+			MAKEFLAGS=-$(echo $MAKEFLAGS)                  # echo here and above will trim whitespaces
 		fi
 
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
