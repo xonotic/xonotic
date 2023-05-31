@@ -16,7 +16,7 @@ MR_TYPE = Enum("MR_TYPE", {"Feature(s)": 1,
                            "NO_TYPE_GIVEN": 9999})
 
 # for ordering
-MR_SIZE = Enum("MR_SIZE", {"Enormous": 1,
+MR_SIZE = Enum("MR_SIZE", {"Huge": 1,
                            "Large": 2,
                            "Medium": 3,
                            "Small": 4,
