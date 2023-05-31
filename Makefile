@@ -4,7 +4,7 @@ CLIENT = xonotic-local-sdl
 SERVER = xonotic-local-dedicated
 
 # CC and MAKEFLAGS are always set so ?= has no effect, therefore
-# use CFLAGS to set default optimisations and support user override
+# we use CFLAGS to set default optimisations which users may override
 CFLAGS ?= -pipe -march=native -mtune=native -flto=auto
 # user can override this with make -j
 MAKEFLAGS := -j$(shell nproc)

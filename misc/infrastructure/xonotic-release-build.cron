@@ -12,7 +12,7 @@ case "$RELEASETYPE" in
 		;;
 	RC*)
 		RELEASETYPEDIR="$RELEASETYPE/"
-		RELEASETYPENAME="$RELEASETYPE build"
+		RELEASETYPENAME="Release Candidate"
 		;;
 	*)
 		RELEASETYPEDIR="$RELEASETYPE/"
@@ -63,7 +63,7 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 '
 
 cd ~/xonotic-release-build
-./all clean --reclone # FIXME this updates timestamps of most unchanged files, making rsync slower, why?
+./all clean --reclone
 # ./all checkout maint
 ./all checkout
 ./all each git checkout HEAD^0
@@ -79,6 +79,7 @@ cd ~/xonotic-release-build
 #	b=$b ./all each sh -c 'if git rev-parse $b >/dev/null 2>&1; then git merge $b; fi'
 #done
 ./all update -N
+./all each git restore-mtime --commit-time # adding --merge would be more correct but is slow and hits git limits
 d0=`date +%Y%m%d`
 d=$d0
 i=1
@@ -88,10 +89,13 @@ while HEAD -C xonotic:g-23 http://beta.xonotic.org/autobuild/"$RELEASETYPEDIR""X
 done
 RELEASEDATE=$d ./all release
 sha512sum Xonotic-$d*.zip > Xonotic-$d.sha512
-for X in Xonotic-$d*.zip; do
-	ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
-done
-sha512sum Xonotic-latest*.zip > Xonotic-latest.sha512
+if [ -z "$RELEASETYPEDIR" ]; then
+	sleep 1 # newer timestamps for correct file sort order in web gui
+	for X in Xonotic-$d*.zip; do
+		ln -snf "$X" "Xonotic-latest${X#Xonotic-$d}"
+	done
+	sha512sum Xonotic-latest*.zip > Xonotic-latest.sha512
+fi
 rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"

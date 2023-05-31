@@ -60,26 +60,25 @@ release_common()
 	{
 		archive=$1; shift
 
-		# get rid of this hack once we have done large enough changes
-		# to be no longer rsync compatible (and then enable the below
-		# code)
+		# bones_was_here: 7za still doesn't store symlinks correctly (even with -snl)
+		# but it does now store the executable bit.
+		# compared to advzip, 7za achieves very similar final zip size, is multi threaded,
+		# and avoids https://gitlab.com/xonotic/xonotic/-/issues/371
+
 		sevenzipflags=-mx=9
 		zipflags=-9
-		find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
+		# git restore-mtime replaces this hack:
+		#find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
 		ziplist=`mktemp`
-		find "$@" -xtype f \( -executable -or -type l \) -print | sed 's,\([./][^./]*$\),\1 \1,' | sort -k2 | cut -d\  -f1 > "$ziplist"
+		find "$@" -xtype f \( -type l \) -print | sed 's,\([./][^./]*$\),\1 \1,' | sort -k2 | cut -d\  -f1 > "$ziplist"
 		7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
 		zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
 		rm -f "$ziplist"
-
-		#zipflags=-1r
-		#find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
-		#zip $zipflags -y "$archive" "$@" || true
-		#advzip -4 "$archive"
 	}
 
 	mkzip()
 	{
+		# not using this currently, see above
 		archive=$1; shift
 		zipflags=-1ry
 		zip $zipflags "$archive" "$@" || true
@@ -466,7 +465,7 @@ case "$cmd" in
 			if [ $gv -lt 9900 ]; then
 				# pre-1.0: compatible with any other pre-1.0
 				verbose sed "
-					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
+					s/^set g_xonoticversion [^ ]* /set g_xonoticversion \"$versionstr\" /;
 					s/^gameversion_max [0-9]*/gameversion_max  9999/;
 				" < xonotic-common.cfg > xonotic-common.cfg.new
 				# Following line was included in sed above, ref https://gitlab.com/xonotic/xonotic-data.pk3dir/-/merge_requests/1034
@@ -474,7 +473,7 @@ case "$cmd" in
 			else
 				# >= 1.0
 				verbose sed "
-					s/^set g_xonoticversion [^ ]* /set g_xonoticversion $versionstr /;
+					s/^set g_xonoticversion [^ ]* /set g_xonoticversion \"$versionstr\" /;
 					s/^gameversion_max [0-9]*/gameversion_max $(( ($gv / 100) * 100 + 199 ))/;
 				" < xonotic-common.cfg > xonotic-common.cfg.new
 				# Following line was included in sed above, ref https://gitlab.com/xonotic/xonotic-data.pk3dir/-/merge_requests/1034
@@ -565,12 +564,12 @@ case "$cmd" in
 		# exe and dll files do not need +x, so this makes them eligible for 7zip compression too
 		chmod a-x Xonotic/*.exe Xonotic/*.dll || true
 		# build the archives
-		verbose mkzip Xonotic-$stamp-enginesource.zip \
+		verbose mkzipr Xonotic-$stamp-enginesource.zip \
 			Xonotic/Makefile \
 			Xonotic/source/darkplaces/ \
 			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-engine.zip
-		verbose mkzip Xonotic-$stamp-engine.zip \
+		verbose mkzipr Xonotic-$stamp-engine.zip \
 			Xonotic/*.dll \
 			Xonotic/bin32/*.dll \
 			Xonotic/bin64/*.dll \
@@ -578,7 +577,7 @@ case "$cmd" in
 			Xonotic/xonotic-* \
 			Xonotic/xonotic.exe
 		verbose cp Xonotic-$stamp-engine.zip Xonotic-$stamp-common.zip
-		verbose mkzip Xonotic-$stamp-common.zip \
+		verbose mkzipr Xonotic-$stamp-common.zip \
 			Xonotic/source/d0_blind_id/ \
 			Xonotic/source/gmqcc/ \
 			Xonotic/source/qcsrc/ \
@@ -590,7 +589,7 @@ case "$cmd" in
 			Xonotic/data/font-unifont-$pk3stamp.pk3 \
 			Xonotic/data/font-xolonium-$pk3stamp.pk3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
-		verbose mkzip Xonotic-$stamp-source.zip \
+		verbose mkzipr Xonotic-$stamp-source.zip \
 			Xonotic/source/d0_blind_id/ \
 			Xonotic/source/gmqcc/ \
 			Xonotic/source/qcsrc/ \
@@ -609,11 +608,11 @@ case "$cmd" in
 			Xonotic/data/xonotic-$pk3stamp-music.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-xoncompat-high.pk3
-		verbose mkzip Xonotic-$stamp-mappingsupport.zip \
+		verbose mkzipr Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/data/xonotic-$pk3stamp-maps-mapping.pk3
-		verbose mkzip gmqcc-$stamp.zip \
+		verbose mkzipr gmqcc-$stamp.zip \
 			Xonotic/gmqcc \
 			Xonotic/source/gmqcc
 		;;
