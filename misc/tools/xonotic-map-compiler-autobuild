@@ -44,13 +44,19 @@ pre2spam()
 	url=$2
 	branch=$3
 	hash=$4
+	lasttime_formatted=$5
 
 	branch=${branch##refs/heads/}
 	branch=${branch##refs/remotes/}
 	branch=${branch##origin/}
 	hash=`echo "$hash" | cut -c 1-7`
 
-	echo "[$branch $hash] starting map compile of $map"
+	echo -n "[<font color=\"#FF00FF\">$branch</font> $hash] starting map compile of $map"
+	if [ -n "$lasttime_formatted" ]; then
+		echo ", last time it took $lasttime_formatted"
+	else
+		echo
+	fi
 }
 
 ss2spam()
@@ -73,9 +79,9 @@ ss2spam()
 	fi
 
 	if [ -n "$s_error" ]; then
-		echo "[$branch $hash] 4screenshots of $map could not be made: $s_error"
+		echo "[<font color=\"#FF00FF\">$branch</font> $hash] screenshots of $map <font color=\"#FF0000\">could not be taken: $s_error</font>"
 	else
-		echo "[$branch $hash] screenshots of $map are available on $url"
+		echo "[<font color=\"#FF00FF\">$branch</font> $hash] screenshots of $map <a href=\"$url\">are available</a>"
 	fi
 }
 
@@ -132,26 +138,26 @@ log2spam()
 	s_failshaders=`echo "$s_failshaders" | sed "s, textures/, ,g"`
 	s_failshaders=${s_failshaders# }
 	if [ -n "$s_error" ]; then
-		echo -n "[$branch $hash] 4failed"
+		echo -n "[<font color=\"#FF00FF\">$branch</font> $hash] <font color=\"#FF0000\">failed</font>"
 	else
-		echo -n "[$branch $hash] finished"
+		echo -n "[<font color=\"#FF00FF\">$branch</font> $hash] <font color=\"#00FF00\">finished</font>"
 	fi
-	echo -n " map compile of $map ($url): $time sec"
+	printf " map compile of <a href=\"$url\">$map</a> in %d:%02d:%02d" $((time/3600)) $((time%3600/60)) $((time%60))
 	if [ -n "$s_samplesize" ]; then
-		echo -n ", FIX samplesize >= $s_samplesize"
+		echo -n "<br><font color=\"#FF0000\">FIX samplesize >= $s_samplesize</font>"
 	fi
 	if [ -n "$s_failshaders" ]; then
 		if [ -n "`echo "$s_failshaders" | cut -d ' ' -f 4-`" ]; then
 			s_failshaders="`echo "$s_failshaders" | cut -d ' ' -f 1-3`..."
 		fi
-		echo -n ", FIX shaders $s_failshaders"
+		echo -n "<br><font color=\"#FF0000\">FIX shaders $s_failshaders</font>"
 	fi
 	if [ -n "$s_leaked" ]; then
-		echo -n ", FIX LEAK"
+		echo -n "<br><font color=\"#FF0000\">FIX LEAK</font>"
 	fi
 	if [ -n "$s_error" ]; then
 		s_error=`echo "$s_error" | sed "s,$PWD/\?,,g"`
-		echo -n ", ERROR: $s_error"
+		echo -n "<br><font color=\"#FF0000\">ERROR: $s_error</font>"
 	fi
 	echo
 }
@@ -172,8 +178,14 @@ buildthemap()
 	git clean -xfd
 	git checkout -f "$commithash"
 
+	mkdir -p ~/.xonotic-map-compiler-autobuild/ # to store map compile times in
+	lasttime=`cat ~/.xonotic-map-compiler-autobuild/"${M##*/}".buildtime 2>/dev/null || true`
+	if [ -n "$lasttime" ] ; then
+		lasttime_formatted=$(printf '%d:%02d:%02d' $((lasttime/3600)) $((lasttime%3600/60)) $((lasttime%60)) )
+		echo "Previous build took $lasttime_formatted"
+	fi
 	if [ -n "$IRCSPAM" ]; then
-		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" | $IRCSPAM || true
+		pre2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" "$lasttime_formatted" | $IRCSPAM || true
 	fi
 
 	t0=`date +%s`
@@ -215,6 +227,9 @@ buildthemap()
 	dt=$(($t1 - $t0))
 	if [ -n "$IRCSPAM" ]; then
 		cat "maps/$M.log" | log2spam "$M" "$url$M-$blobhash.pk3" "$REFNAME" "$commithash" "$status" "$dt" > "maps/$M.irc"
+	fi
+	if [ $status -eq 0 ]; then
+		echo "$dt" > ~/.xonotic-map-compiler-autobuild/"${M##*/}".buildtime # save time in ~/.xonotic-map-compiler-autobuild/mapname
 	fi
 	zip -9r "$M-$blobhash.pk3" "maps/$M.bsp" "maps/$M.log" "maps/$M.irc" "maps/$M/" "maps/$M.lin" "gfx/${M}_mini.tga"
 	ln -snf "../$M-$blobhash.pk3" "$M.pk3" # from ALL branches, so beware!
