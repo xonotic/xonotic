@@ -403,8 +403,8 @@ case "$cmd" in
 		release_common
 		dir=$1
 		verbose cd "$dir"
-		# don't include lightmaps and levelshots from official map builds
-		rm -rf maps
+		# don't include levelshots, lightmaps and minimaps from official map builds, as well as other unneeded folders
+		rm -rf gfx maps scripts sound
 		# remove stuff radiant has no use for
 		verbose find . -name \*_norm.\* -exec rm -f {} \;
 		verbose find . -name \*_bump.\* -exec rm -f {} \;
