@@ -45,8 +45,11 @@ B 37.157.255.36:
 # E http://packurl/pack.pk3 file-in-pack.txt
 #E http://dl.xonotic.org/zzzz-xonotic-0.8hotfix_chatbubble.pk3 scripts/chatbubble_hotfix.shader
 
-# 0.8.2 doesn't have ruleset-xonotic.cfg or https
+# 0.8.2 doesn't have ruleset-xonotic.cfg (or https), 0.8.5 does
 E http://update.xonotic.org/zzzz-menu_hotfix_0.8.2.pk3 ruleset-xonotic.cfg
+
+# 0.8.5 doesn't have weapons.cfg, 0.8.2 does
+E https://update.xonotic.org/zzzz-menu_hotfix_0.8.5.pk3 weapons.cfg
 
 # Recommended servers.
 # R <key or IP here>
