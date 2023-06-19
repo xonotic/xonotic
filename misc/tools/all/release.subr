@@ -174,7 +174,7 @@ case "$cmd" in
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile misc/buildfiles key_0.d0pk COPYING GPL-2 GPL-3
+		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
@@ -188,6 +188,7 @@ case "$cmd" in
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
 			verbose rm -rf misc/pki
+			verbose rm -rf misc/infrastructure
 		)
 		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces" .
 		release_git_extract_dir "gmqcc" "Xonotic/source/gmqcc" .
