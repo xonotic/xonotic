@@ -36,15 +36,15 @@ release_common()
 		# try to create a hardlink
 		if ln -f "$release_src/.git/HEAD" "$release_dst/.hardlink-test"; then
 			rm -f "$release_dst/.hardlink-test"
-			{
-				verbose cd "$release_src"
-				git ls-files HEAD -- "$@"
-			} | {
+			git -C "$release_src" ls-files HEAD -- "$@" |
 				while IFS= read -r F; do
 					case "$F" in */*) mkdir -p "$release_dst/${F%/*}" ;; esac
 					verbose ln -f "$release_src/$F" "$release_dst/$F"
 				done
-			}
+			git -C "$release_src" ls-tree -rd --name-only HEAD -- "$@" |
+				while IFS= read -r D; do
+					touch -cr "$release_src/$D" "$release_dst/$D"
+				done
 		else
 			{
 				verbose cd "$release_src"
@@ -174,30 +174,22 @@ case "$cmd" in
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile key_0.d0pk COPYING GPL-2 GPL-3
+		release_git_extract_dir "." "Xonotic" Docs misc/buildfiles/osx misc/buildsrc misc/logos misc/tools server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
-			verbose rm -rf misc/builddeps
-			#verbose mv bin32/SDL.dll . || true # Leftover?
-
-			# We're going to be building these later
-			#verbose mv misc/buildfiles/win32 bin32 || true
-			#verbose mv misc/buildfiles/win64 bin64 || true
-
 			verbose mv misc/buildfiles/osx/* . || true
 			verbose rm -rf misc/buildfiles
-			verbose rm -rf misc/pki
-			verbose rm -rf misc/infrastructure
 		)
 		release_git_extract_dir "darkplaces" "Xonotic/source/darkplaces" .
 		release_git_extract_dir "gmqcc" "Xonotic/source/gmqcc" .
 		release_git_extract_dir "data/xonotic-data.pk3dir" "Xonotic/source" qcsrc Makefile
 		release_git_extract_dir "d0_blind_id" "Xonotic/source/d0_blind_id" .
-		(
-			verbose cd Xonotic/source/d0_blind_id
-			verbose sh autogen.sh
-		)
+# bones_was_here: the main Makefile runs autogen.sh (and configure) when necessary
+#		(
+#			verbose cd Xonotic/source/d0_blind_id
+#			verbose sh autogen.sh
+#		)
 		rm -f Xonotic/key_15.d0pk
 		(
 			verbose cd Xonotic/mapping
