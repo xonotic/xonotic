@@ -14,7 +14,7 @@ aliases:
 
 **There is no need to install Xonotic!** The zip file you downloaded from the homepage has everything. All binaries to run the game on Linux, Windows and macOS are inside of it. Just unzip the archive and run the appropriate executable for your OS.
 
-For example, on Windows or macOS you can start the game by double-clicking the Xonotic logo. On Linux you can run xonotic-linux-glx.sh or xonotic-linux-sdl.sh - whichever one works better on your hardware.
+For example, on Windows or macOS you can start the game by double-clicking the Xonotic logo. On Linux you can run xonotic-linux-sdl.sh.
 
 ## Is there a Debian package available?
 
@@ -42,7 +42,7 @@ Another aspect of the logo is the center ring, which has some similarities to th
 
 The most likely reason Xonotic won't start is that you've accidentally launched the dedicated server (e.g. `xonotic-linux64-dedicated`) which runs silently in the background. It shares a lockfile (`~/.xonotic/lock`) with the normal executable and prevents it from launching. Kill any processes which have xonotic in the name (you might also need to remove the lockfile manually) and try again.
 
-Use the executables with sdl or glx in their name to launch Xonotic.
+Use the executable or script with "sdl" in the name to launch Xonotic.
 
 ## I can't launch Xonotic on macOS Sierra or later
 
@@ -87,13 +87,11 @@ If none of that helps, you can try compiling Xonotic from [source](http://gitlab
 
 ## The sound is broken, it crackles and stutters
 
-Try run xonotic-wgl.exe instead of xonotic.exe (on Windows). Adding the command line options -sndspeed 48000 and/or -sndstereo can also help on some systems (on Linux, Mac, Windows).
+Adding the command line options -sndspeed 48000 and/or -sndstereo may help on some systems (on Linux, Mac, Windows).
 
-## Mouse is too slow and sensitivity is at top (on Mac / Linux)
+## Mouse is too slow and sensitivity is at top on Mac
 
 Mac: The default mouse acceleration on Mac is very high and strange. The Xonotic defaults work fine with it but some mouse drivers seem to 'correct' the mouse acceleration and conflict with the Xonotic defaults. Try to **disable the option Disable system mouse acceleration** in the Settings->Input menu. Or the same via console: `apple_mouse_noaccel 0; vid_restart` ([How do I open the console?]({{< relref "#how-do-i-open-the-console" >}}))
-
-Linux: A similar problem can arise on Linux. It's also Disable system mouse acceleration in the Settings->Input menu but the console command is different (and only available in the glx executable): `vid_dga 0; vid_restart` ([How do I open the console?]({{< relref "#how-do-i-open-the-console" >}}))
 
 ## I can't switch to 32 bit color depth (on Windows)
 
@@ -105,7 +103,7 @@ Use our [issue tracker](http://gitlab.com/xonotic/xonotic-data.pk3dir/issues) on
 
 If you want to investigate crashes further:
 
-On Linux: In a terminal, `cd` into your Xonotic installation directory, execute `catchsegv ./xonotic-linux64-sdl -condebug -developer > crash.txt 2>&1` and give the file crash.txt to the developers. Note that you can also use `./xonotic-linux64-glx`.
+On Linux: In a terminal, `cd` into your Xonotic installation directory, execute `catchsegv ./xonotic-linux64-sdl -condebug -developer > crash.txt 2>&1` and give the file crash.txt to the developers.
 
 On Windows: Click Start->Run, and enter drwtsn32, click Ok in the next window, run Xonotic and wait for the crash. Then go to C:\Documents and Settings\All Users\Application Data\Microsoft\Dr Watson there should be a file called "drwtsn32.log", give that file along with the engine's build date to the developers. You'll see that date when you open the ingame console (How do I open the console?). Note that some folders of that path may be hidden or have a translated name if you're using a non-english windows.
 
@@ -139,7 +137,7 @@ There are multiple [unofficial map repositories](https://gitlab.com/xonotic/xono
 
 ## How can I place a shortcut to Xonotic on my Linux desktop?
 
-Use the script xonotic-linux-sdl.sh or xonotic-linux-glx.sh instead of the binaries. The scripts will use the correct working directory, choose the right version (32 or 64 bit) and also allow you to start a extra X server.
+Use the script xonotic-linux-sdl.sh instead of the binaries. The script will use the correct working directory, and if applicable, select the correct engine binary for your platform.
 
 ## How do I open the console?
 

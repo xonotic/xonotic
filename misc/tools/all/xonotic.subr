@@ -32,7 +32,6 @@ case "$cmd" in
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
-		export CC="$CC -DSUPPORTIPV6"
 		while :; do
 			case "$1" in
 				-0)

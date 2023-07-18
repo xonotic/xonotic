@@ -8,7 +8,7 @@ allrepos()
 	"$@" data/xonotic-music.pk3dir     xonotic-music.pk3dir.git     master         ""
 	"$@" data/xonotic-nexcompat.pk3dir xonotic-nexcompat.pk3dir.git master         "no"
 	"$@" data/xonotic-xoncompat.pk3dir xonotic-xoncompat.pk3dir.git main           "no"
-	"$@" darkplaces                    darkplaces.git               div0-stable    "svn"
+	"$@" darkplaces                    darkplaces.git               master         ""
 	"$@" netradiant                    netradiant.git               master         ""
 	"$@" div0-gittools                 div0-gittools.git            master         "no"
 	"$@" d0_blind_id                   d0_blind_id.git              master         ""

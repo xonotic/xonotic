@@ -174,7 +174,7 @@ case "$cmd" in
 			verbose date +%Y%m%d > Xonotic/stamp.txt
 			verbose date +%Y%m%d > Xonotic/pk3stamp.txt
 		fi
-		release_git_extract_dir "." "Xonotic" Docs misc/buildfiles/osx misc/logos misc/tools server xonotic-linux-glx.sh xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile key_0.d0pk COPYING GPL-2 GPL-3
+		release_git_extract_dir "." "Xonotic" Docs misc/buildfiles/osx misc/logos misc/tools server xonotic-linux-sdl.sh xonotic-linux-dedicated.sh Makefile key_0.d0pk COPYING GPL-2 GPL-3
 		(
 			verbose cd Xonotic
 			verbose mkdir data source source/darkplaces source/gmqcc source/d0_blind_id mapping
@@ -311,8 +311,8 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
 		#$good
 		verbose "$SELF" release-compile win32 \
-			'D3D=1 DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="i686-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
-			release 'darkplaces.exe:Xonotic/xonotic-x86-wgl.exe darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
+			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
+			release 'darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
 		;;
 	release-engine-win64)
 		release_common
@@ -321,8 +321,8 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
 		verbose "$SELF" release-compile win64 \
-			'D3D=1 DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
-			release 'darkplaces.exe:Xonotic/xonotic-wgl.exe darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
+			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
+			release 'darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-osx)
 		release_common
@@ -333,7 +333,7 @@ case "$cmd" in
 		# Note: travis build script also had SDLCONFIG_MACOSX* flags; need to check if they're still needed with osxcross.
 		# Note: Mac bins cannot be stripped by the standard tool.
 		verbose "$SELF" release-compile osx \
-			'STRIP=: DP_MAKE_TARGET=macosx PATH="$HOME/osxcross/out/bin:$PATH" CC="$HOME/osxcross/out/bin/o64-clang -flto -arch x86_64 -mmacosx-version-min=10.6 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" SDLCONFIG_MACOSXCFLAGS="-I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXSTATICLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared' \
+			'STRIP=: DP_MAKE_TARGET=macosx PATH="$HOME/osxcross/out/bin:$PATH" CC="$HOME/osxcross/out/bin/o64-clang -flto -arch x86_64 -mmacosx-version-min=10.6 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -I../../../.deps/include -L../../../.deps/lib" SDLCONFIG_MACOSXCFLAGS="-I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXSTATICLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared' \
 			release 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux64)
@@ -344,8 +344,8 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
 		#$good
 		verbose "$SELF" release-compile linux64 \
-			'CC="gcc -m64 -flto=auto -I../../../.deps/include -L../../../.deps/lib -DSUPPORTIPV6" DP_LINK_CRYPTO=shared LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_CRYPTO_RIJNDAEL=shared DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=shared CFLAGS_ODE="-DUSEODE -DLINK_TO_LIBODE -DdDOUBLE" LIB_ODE="../../../.deps/lib/libode.a -lstdc++ -pthread" DP_LINK_ZLIB=shared' \
-			release 'darkplaces-glx:Xonotic/xonotic-linux64-glx darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
+			'CC="gcc -m64 -flto=auto -I../../../.deps/include -L../../../.deps/lib" DP_LINK_CRYPTO=shared LIB_CRYPTO="../../../.deps/lib/libd0_blind_id.a ../../../.deps/lib/libgmp.a" DP_LINK_CRYPTO_RIJNDAEL=shared DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=shared CFLAGS_ODE="-DUSEODE -DLINK_TO_LIBODE -DdDOUBLE" LIB_ODE="../../../.deps/lib/libode.a -lstdc++ -pthread" DP_LINK_ZLIB=shared' \
+			release 'darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
 		release_common
