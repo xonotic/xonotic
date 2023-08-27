@@ -63,7 +63,7 @@ fetch_source () {
 		return 1
 	else
 		echo "Getting source for $1..."
-		apt source "$1"
+		apt-get source -t=stable "$1"
 		get_this_src "$1"
 		return 0
 	fi
