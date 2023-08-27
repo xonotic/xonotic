@@ -101,12 +101,13 @@ build_zlib () {
 	      -G"Unix Makefiles" "$this_src"
 	make
 	make install
-}	
+}
 
 build_gmp () {
 	fetch_source gmp || true
 
 	mkcd "$work_dir/gmp"
+	autoreconf -i "$this_src"
 	"$this_src/configure" --prefix="$pkg_dir" \
 			      --host="$CHOST" \
 			      --with-pic \
