@@ -278,6 +278,7 @@ case "$cmd" in
 		mkdir -p "$targetdir"
 		(
 			cd "misc/buildsrc"
+			verbose ./dlls.sh clean "$buildpath"
 			verbose ./dlls.sh all "$buildpath" "$arch"
 		)
 		verbose cp -v $buildpath/out/$arch/* "$targetdir"
