@@ -34,7 +34,7 @@ The community is primarily active in the [forums](https://forums.xonotic.org/) a
 
 To compile the latest revision from git, [follow this guide](https://gitlab.com/xonotic/xonotic/wikis/Repository_Access). Learn more about the [directory structure here](https://gitlab.com/xonotic/xonotic/wikis/Git). Check out [our project page on GitLab](https://gitlab.com/groups/xonotic) to see [development activity](https://gitlab.com/groups/xonotic/-/activity) and code ([xonotic-data.pk3dir](https://gitlab.com/xonotic/xonotic-data.pk3dir) is where most development takes place).
 
-Please ensure you've read and understood [Contributing and Getting Write Access](https://gitlab.com/xonotic/xonotic/-/wikis/Repository_Access#contributing-and-getting-write-access) before pushing commits or opening merge requests.
+Please ensure you've read and understood [CONTRIBUTING.md](CONTRIBUTING.md) before pushing commits or opening merge requests.
 
 ## Contributing
 
