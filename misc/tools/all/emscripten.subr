@@ -124,4 +124,37 @@ export CC="$CC -L../../../../misc/builddeps/emscripten/gmp/lib"
 export CC="$CC -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib"
 MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/emscripten/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_rijndael.a"
 compiled0=false
-;;
+
+if $compiled0; then
+	if $cleand0; then
+		if [ -f Makefile ]; then
+			verbose $MAKE $MAKEFLAGS distclean
+		fi
+	fi
+	if ! [ -f Makefile ]; then
+		verbose sh autogen.sh
+		verbose emconfigure ./configure
+	fi
+	verbose $MAKE $MAKEFLAGS
+fi
+verbose cd "$d0/gmqcc"
+		if $cleanqcc; then
+			verbose $MAKE $MAKEFLAGS clean
+		fi
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose $MAKE $MAKEFLAGS gmqcc.exe
+		else
+			verbose $MAKE $MAKEFLAGS gmqcc
+		fi
+
+		if [ -n "$MSYSTEM" ]; then
+			DATAMAKE=mingw32-make
+		else
+			DATAMAKE=$MAKE
+		fi
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		if $cleanqc; then
+			verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+		fi
+		verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
