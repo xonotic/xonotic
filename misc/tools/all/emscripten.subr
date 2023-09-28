@@ -138,23 +138,24 @@ if $compiled0; then
 	verbose $MAKE $MAKEFLAGS
 fi
 verbose cd "$d0/gmqcc"
-		if $cleanqcc; then
-			verbose $MAKE $MAKEFLAGS clean
-		fi
-		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			verbose $MAKE $MAKEFLAGS gmqcc.exe
-		else
-			verbose $MAKE $MAKEFLAGS gmqcc
-		fi
+MAKE="make"
+if $cleanqcc; then
+	verbose $MAKE $MAKEFLAGS clean
+fi
+if [ -n "$WE_HATE_OUR_USERS" ]; then
+	verbose $MAKE $MAKEFLAGS gmqcc.exe
+else
+	verbose $MAKE $MAKEFLAGS gmqcc
+fi
 
-		if [ -n "$MSYSTEM" ]; then
-			DATAMAKE=mingw32-make
-		else
-			DATAMAKE=$MAKE
-		fi
-		verbose cd "$d0/data/xonotic-data.pk3dir"
-		if $cleanqc; then
-			verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
-		fi
-		verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
-		# 4 levels up: data, xonotic-data, qcsrc, server
+if [ -n "$MSYSTEM" ]; then
+	DATAMAKE=mingw32-make
+else
+	DATAMAKE=make
+fi
+verbose cd "$d0/data/xonotic-data.pk3dir"
+if $cleanqc; then
+	verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+fi
+verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+# 4 levels up: data, xonotic-data, qcsrc, server
