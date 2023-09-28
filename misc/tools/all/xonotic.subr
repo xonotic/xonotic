@@ -23,7 +23,369 @@ case "$cmd" in
 		done
 		;;
 	compile-emscripten)
-	misc/tools/all/emscripten.subr $1
+		#Check for Emscripten
+		cleand0=false
+		cleandp=false
+		cleanqcc=false
+		cleanqc=false
+		compiled0=
+		debug=release
+		if [ -z $EMSDK ];
+		then
+			echo "EMSDK not installed/set up correctly, cloning and setting up temporarily"
+			mkdir -p .tmp
+			if [ ! -d ".tmp/emsdk" ] ; then git clone "https://github.com/emscripten-core/emsdk" ".tmp/emsdk"; fi
+			.tmp/emsdk/emsdk install latest
+			.tmp/emsdk/emsdk activate latest
+			cd .tmp/emsdk
+			. ./emsdk_env.sh
+			cd ../..
+			
+		fi	
+		export CC="emcc"
+		export CC="$CC -DSUPPORTIPV6 -sUSE_SDL=2 -sUSE_LIBJPEG=1"
+		while :; do
+			case "$1" in
+				-0)
+					compiled0=true
+					shift
+					;;
+				-1)
+					compiled0=false
+					shift
+					;;
+				-c)
+					cleand0=true
+					cleandp=true
+					cleanqcc=true
+					cleanqc=true
+					shift
+					;;
+				-qc)
+					cleanqc=true
+					shift
+					;;
+				-d|-p|-r)
+					case "$1" in
+						-d)
+							debug=debug
+							;;
+						-p)
+							debug=profile
+							;;
+						-r)
+							debug=release
+							;;
+					esac
+					export CC="$CC -g"
+					case "`$CC -dumpversion`" in
+						[5-9]*|[1-9][0-9]*|4.[3-9]*|4.[1-9][0-9]*)
+							# gcc 4.3 or higher
+							# -march=native is broken < 4.3
+							if $CC -mtune=native -march=native misc/tools/conftest.c -o conftest >/dev/null 2>&1; then
+								export CC="$CC -mtune=native -march=native"
+							fi
+							;;
+					esac
+					if [ -n "$WE_HATE_OUR_USERS" ]; then
+						export CC="$CC -fno-common"
+					fi
+					shift
+					;;
+				*)
+					break
+					;;
+			esac
+		done
+
+		TARGETS="sv-$debug sdl-$debug"
+		if [ x"`uname`" = x"Darwin" ]; then
+			export CC="$CC -fno-reorder-blocks"
+		fi
+
+		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
+			# if we give the command make the arg "", it will surely fail (invalid filename),
+			# so better handle it as an empty client option
+			BAD_TARGETS=" "
+			shift
+		elif [ -n "$1" ]; then
+			BAD_TARGETS=
+			TARGETS_SAVE=$TARGETS
+			TARGETS=
+			for X in $1; do
+				case "$X" in
+					sdl)
+						TARGETS="$TARGETS sdl-$debug"
+						;;
+					dedicated)
+						TARGETS="$TARGETS sv-$debug"
+						;;
+					*)
+						BAD_TARGETS="$BAD_TARGETS $X"
+						;;
+				esac
+			done
+			if [ -n "$TARGETS" ]; then # at least a valid client
+				shift
+			else # no valid client, let's assume this option is not meant to be a client then
+				TARGETS=$TARGETS_SAVE
+				BAD_TARGETS=
+			fi
+		fi
+
+		if [ -z "$MAKE" ]; then
+			MAKE=make
+		fi
+
+		if [ -z "$MAKEFLAGS" ]; then
+			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+			if [ $ncpus -gt 1 ]; then
+				MAKEFLAGS=-j$ncpus
+			fi
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=mingw"
+			fi
+		elif echo $MAKEFLAGS | head -c1 | grep -qv -; then # MAKEFLAGS starts with a single letter option
+			MAKEFLAGS=-$(echo $MAKEFLAGS)                  # echo here and above will trim whitespaces
+		fi
+
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			# win32: use SDL2
+			case `uname -m` in
+				x86_64)
+					MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win64/sdl/bin/sdl2-config"
+					;;
+				*)
+					MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win32/sdl/bin/sdl2-config"
+					;;
+			esac
+
+			# win32: don't rely on jpeg includes
+			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
+		fi
+
+		if [ x"`uname`" = x"Darwin" ]; then
+			# osx: use SDL2
+			f=$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks
+			MAKEFLAGS="$MAKEFLAGS SDLCONFIG_MACOSXCFLAGS=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXLIBS=-F$f SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=SDL2 SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=Cocoa SDLCONFIG_MACOSXLIBS+=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXSTATICLIBS=-F$f SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=SDL2 SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=Cocoa SDLCONFIG_MACOSXSTATICLIBS+=-I$f/SDL2.framework/Headers"
+		fi
+
+		# workaround ARM issue in DP's makefile.inc
+		case `uname -m` in
+			x86_64|*86)
+				;;
+			*)
+				MAKEFLAGS="$MAKEFLAGS CFLAGS_SSE= CFLAGS_SSE2="
+				;;
+		esac
+
+		if ! verbose $CC misc/tools/conftest.c -o conftest; then
+			msg ""
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~ COMPILER ~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~_...._~~~~~~~~~~"
+			msg "~~~~~~~~~~~,-'     \\\`-._~~~~~~"
+			msg "~~~~~~~~~~/     --. ><  \\~~~~~"
+			msg "~~~~~~~~~/      (*)> -<: \\~~~~"
+			msg "~~~~~~~~~(     ^~-'  (*) )~~~~"
+			msg "~~~~~~~~~\\        ^+-_/  |~~~~"
+			msg "~~~~~~~~~~\\       {vvv}  |~~~~"
+			msg "~~~~~~~~~~,\\    , {^^^},/~~~~~"
+			msg "~~~~~~~~,/  \`---.....-'~~W~~~~"
+			msg "~~~~~~,/   \\_____/_\\_W~~/~~~~~"
+			msg "~~~~~/          /~~~\\__/~~~~~~"
+			msg "~~~~/          /~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~ Y U NO COMPILE ~~~~~~~"
+			msg "~~~~~~~~~~~~ CODE ~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg ""
+			exit 1
+		fi
+		rm -f conftest conftest.wasm
+
+		verbose cd "$d0/d0_blind_id"
+		if [ -z "$compiled0" ]; then
+			# In doubt, compile.
+			compiled0=true
+
+			# compilation of crypto library failed
+			# use binaries then, if we can...
+			mkdir -p .libs
+			if [ -n "$WE_HATE_OUR_USERS" ]; then
+				case `uname -m` in
+					x86_64)
+						verbose cp "$d0/misc/buildfiles/win64/libd0_blind_id"-* .libs/
+						verbose cp "$d0/misc/buildfiles/win64/libd0_rijndael"-* .libs/
+						verbose cp "$d0/misc/buildfiles/win64/libgmp"-* .libs/
+						compiled0=false
+						;;
+					*)
+						verbose cp "$d0/misc/buildfiles/win32/libd0_blind_id"-* .libs/
+						verbose cp "$d0/misc/buildfiles/win32/libd0_rijndael"-* .libs/
+						verbose cp "$d0/misc/buildfiles/win32/libgmp"-* .libs/
+						compiled0=false
+						;;
+				esac
+			else
+				case "`uname`" in
+					Linux)
+						case `uname -m` in
+							*86)
+								# No cp commands, we want to use static linking instead.
+								export CC="$CC -I../../../../misc/builddeps/emscripten/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/emscripten/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/emscripten/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/emscripten/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/emscripten/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_rijndael.a"
+								compiled0=false
+								;;
+							*)
+								export CC="$CC -I../../../../misc/builddeps/emscripten/d0_blind_id/include"
+								export CC="$CC -L../../../../misc/builddeps/emscripten/d0_blind_id/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib"
+								export CC="$CC -I../../../../misc/builddeps/emscripten/gmp/include"
+								export CC="$CC -L../../../../misc/builddeps/emscripten/gmp/lib"
+								export CC="$CC -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib"
+								MAKEFLAGS="$MAKEFLAGS DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/emscripten/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/emscripten/d0_blind_id/lib/libd0_rijndael.a"
+								compiled0=false
+								;;
+						esac
+						;;
+					Darwin)
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_blind_id".* .libs/
+						verbose cp "$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS/libd0_rijndael".* .libs/
+						compiled0=false
+						;;
+					*)
+						msg "Always need to compile libd0_blind_id on `uname`."
+						;;
+				esac
+			fi
+		fi
+		if $compiled0; then
+			if $cleand0; then
+				if [ -f Makefile ]; then
+					verbose $MAKE $MAKEFLAGS distclean
+				fi
+			fi
+			if ! [ -f Makefile ]; then
+				verbose sh autogen.sh
+				verbose emconfigure ./configure
+			fi
+			verbose $MAKE $MAKEFLAGS
+		fi
+		#switch back to normal to compile gmqcc
+		verbose cd "$d0/gmqcc"
+		if $cleanqcc; then
+			verbose $MAKE $MAKEFLAGS clean
+		fi
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose $MAKE CC=gcc DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a gmqcc.exe
+		else
+			verbose $MAKE CC=gcc DP_LINK_CRYPTO=shared DP_LINK_CRYPTO_RIJNDAEL=shared LIB_CRYPTO=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_blind_id.a LIB_CRYPTO+=../../../../misc/builddeps/linux32/gmp/lib/libgmp.a LIB_CRYPTO_RIJNDAEL=../../../../misc/builddeps/linux32/d0_blind_id/lib/libd0_rijndael.a gmqcc
+		fi
+
+		if [ -n "$MSYSTEM" ]; then
+			DATAMAKE=mingw32-make
+		else
+			DATAMAKE=$MAKE
+		fi
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		if $cleanqc; then
+			verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+		fi
+		verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
+
+		verbose cd "$d0/darkplaces"
+		if [ x"$BAD_TARGETS" = x" " ]; then
+			$ECHO "Warning: invalid empty client, default clients will be used."
+		fi
+		if $cleandp; then
+			verbose emmake make $MAKEFLAGS clean
+		fi
+		for T in $TARGETS; do
+			verbose emmake make $MAKEFLAGS DP_SSE=0 CFLAGS_EXTRA="-I../../../../misc/builddeps/emscripten/d0_blind_id/include -L../../../../misc/builddeps/emscripten/d0_blind_id/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib -I../../../../misc/builddeps/emscripten/gmp/include -L../../../../misc/builddeps/emscripten/gmp/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib -sUSE_SDL=2 -sUSE_ZLIB=1 -sUSE_LIBJPEG=1 -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=100MB" ftype=.o LDFLAGS_EXTRA="-sINITIAL_MEMORY=100MB" STRIP=: "$@" "$T"
+		done
+		for T in $BAD_TARGETS; do
+			$ECHO "Warning: discarded invalid client $T."
+		done
+
+		verbose "$SELF" update-maps
+		;;
+	run)
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			case `uname -m` in
+				x86_64)
+					export PATH="$d0/misc/buildfiles/win64:$d0/d0_blind_id/.libs:$PATH"
+					;;
+				*)
+					export PATH="$d0/misc/buildfiles/win32:$d0/d0_blind_id/.libs:$PATH"
+					;;
+			esac
+		elif [ x"`uname`" = x"Darwin" ]; then
+			export DYLD_LIBRARY_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/MacOS:$d0/d0_blind_id/.libs"
+			export DYLD_FRAMEWORK_PATH="$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks"
+		else
+			export LD_LIBRARY_PATH="$d0/d0_blind_id/.libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+		fi
+
+		client=-sdl
+		USE_RLWRAP=no
+		case "$1" in
+			dedicated)
+				client=-$1
+				USE_RLWRAP=
+				shift
+				;;
+			sdl)
+				shift
+				;;
+		esac
+
+		if ! [ -x "darkplaces/darkplaces$client" ]; then
+			if [ -x "darkplaces/darkplaces$client.exe" ]; then
+				client=$client.exe
+			else
+				$ECHO "Client darkplaces/darkplaces$client not found, aborting"
+				exit 1
+			fi
+		fi
+		set -- "darkplaces/darkplaces$client" -xonotic "$@"
+
+		binary=$1
+
+		if [ x"$USE_GDB" = x"yes" ]; then
+			set -- gdb --args "$@"
+			USE_RLWRAP=no
+		elif [ x"$USE_GDB" = x"core" ]; then
+			set -- gdb --batch -x savecore.gdb --args "$@"
+			USE_RLWRAP=no
+		elif which catchsegv >/dev/null 2>&1; then
+			set -- catchsegv "$@"
+		fi
+		if [ x"$USE_RLWRAP" != x"no" ] && which rlwrap >/dev/null 2>&1; then
+			set -- rlwrap -A -g '^quit' -q "\"" -s 10000 -S ']' -w 100 "$@"
+		fi
+		rm -f xonotic.core
+		verbose measure_time "$@" || true
+		if [ -f xonotic.core ]; then
+			if yesno "The program has CRASHED. Do you want to examine the core dump?"; then
+				gdb "$binary" xonotic.core
+			#elif yesno "You did not want to examine the core dump. Do you want to provide it - including your DarkPlaces checkout - to the Xonotic developers?"; then
+			#	tar cvzf xonotic.core.tar.gz xonotic.core darkplaces/*.c darkplaces/*.h
+			#	# somehow send it
+			#	rm -f xonotic.core.tar.gz
+			else
+				$ECHO "The core dump can be examined later by"
+				$ECHO "  gdb $binary xonotic.core"
+			fi
+			exit 1
+		fi
 	;;
 	compile)
 		cleand0=false
