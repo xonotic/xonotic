@@ -23,7 +23,7 @@ case "$cmd" in
 		done
 		;;
 	compile-emscripten)
-	misc/tools/all/emscripten.subr $1
+	bash misc/tools/all/emscripten.subr $1
 	;;
 	compile)
 		cleand0=false

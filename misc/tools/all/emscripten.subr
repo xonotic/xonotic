@@ -1,16 +1,23 @@
-#Check for Emscripten
+#!/bin/bash
+
+
+
+
 cleand0=false
 cleandp=false
 cleanqcc=false
 cleanqc=false
 compiled0=
+
+#Check for Emscripten
 if [ -z $EMSDK ]
 then
     echo "EMSDK not installed/set up correctly, cloning and setting up temporarily"
-	mkdir -f .tmp
+	echo $(pwd)
+	mkdir .tmp
     git clone "https://github.com/emscripten-core/emsdk" ".tmp/emsdk"
-    .tmp/emsdk install latest
-    .tmp/emsdk activate latest
+    .tmp/emsdk/emsdk install latest
+    .tmp/emsdk/emsdk activate latest
     . .tmp/emsdk/emsdk_env.sh
     
 fi
@@ -85,14 +92,13 @@ elif [ -n "$1" ]; then
 	BAD_TARGETS=
 	TARGETS_SAVE=$TARGETS
 	TARGETS=
+	echo $1
 	for X in $1; do
 		case "$X" in
 			sdl)
 				TARGETS="$TARGETS sdl-$debug"
 				;;
 			dedicated)
-                export MAKE="make"
-                export CC="gcc"
 				TARGETS="$TARGETS sv-$debug"
 				;;
 			*)
@@ -128,24 +134,24 @@ compiled0=false
 if $compiled0; then
 	if $cleand0; then
 		if [ -f Makefile ]; then
-			verbose $MAKE $MAKEFLAGS distclean
+			 $MAKE $MAKEFLAGS distclean
 		fi
 	fi
 	if ! [ -f Makefile ]; then
-		verbose sh autogen.sh
-		verbose emconfigure ./configure
+		 sh autogen.sh
+		 emconfigure ./configure
 	fi
-	verbose $MAKE $MAKEFLAGS
+	 $MAKE $MAKEFLAGS
 fi
-verbose cd "$d0/gmqcc"
+ cd "$d0/gmqcc"
 MAKE="make"
 if $cleanqcc; then
-	verbose $MAKE $MAKEFLAGS clean
+	 $MAKE $MAKEFLAGS clean
 fi
 if [ -n "$WE_HATE_OUR_USERS" ]; then
-	verbose $MAKE $MAKEFLAGS gmqcc.exe
+	 $MAKE $MAKEFLAGS gmqcc.exe
 else
-	verbose $MAKE $MAKEFLAGS gmqcc
+	 $MAKE $MAKEFLAGS gmqcc
 fi
 
 if [ -n "$MSYSTEM" ]; then
@@ -153,9 +159,9 @@ if [ -n "$MSYSTEM" ]; then
 else
 	DATAMAKE=make
 fi
-verbose cd "$d0/data/xonotic-data.pk3dir"
+ cd "$d0/data/xonotic-data.pk3dir"
 if $cleanqc; then
-	verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+	 ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
 fi
-verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+ ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
 # 4 levels up: data, xonotic-data, qcsrc, server
