@@ -22,6 +22,9 @@ case "$cmd" in
 			fi
 		done
 		;;
+	compile-emscripten)
+	misc/tools/all/emscripten.subr $1
+	;;
 	compile)
 		cleand0=false
 		cleandp=false
