@@ -310,7 +310,7 @@ case "$cmd" in
 			verbose emmake make $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
-			verbose emmake make $MAKEFLAGS EXE_UNIXSDL="darkplaces-emscripten.html" DP_SSE=0 CFLAGS_EXTRA=" -DLINK_TO_LIBJPEG -L../../../../misc/builddeps/emscripten/jpeg/lib -I../../../../misc/builddeps/emscripten/jpeg/include -I../../../../misc/builddeps/emscripten/d0_blind_id/include -L../../../../misc/builddeps/emscripten/d0_blind_id/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib -I../../../../misc/builddeps/emscripten/gmp/include -L../../../../misc/builddeps/emscripten/gmp/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib -sUSE_SDL=2 -sUSE_ZLIB=1 -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=100MB" LDFLAGS_EXTRA="-sINITIAL_MEMORY=100MB -sSINGLE_FILE -sUSE_REGAL" STRIP=: "$@" "$T"
+			verbose emmake make $MAKEFLAGS EXE_UNIXSDL="darkplaces-emscripten.html" DP_SSE=0 CFLAGS_EXTRA="-I../../../../misc/builddeps/emscripten/d0_blind_id/include -L../../../../misc/builddeps/emscripten/d0_blind_id/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib -I../../../../misc/builddeps/emscripten/gmp/include -L../../../../misc/builddeps/emscripten/gmp/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib -sUSE_SDL=2 -sUSE_ZLIB=1 -sUSE_LIBJPEG=1 -sALLOW_MEMORY_GROWTH -sINITIAL_MEMORY=100MB" LDFLAGS_EXTRA="-sINITIAL_MEMORY=100MB -sSINGLE_FILE -sFULL_ES2" STRIP=: "$@" "$T"
 		done
 		for T in $BAD_TARGETS; do
 			$ECHO "Warning: discarded invalid client $T."
