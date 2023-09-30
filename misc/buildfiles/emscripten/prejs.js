@@ -10,7 +10,7 @@ cmd = function(input){
     }
     return 0
 }
-Module['preInit'] = function(){FS.mount(IDBFS,{},"/")}
+Module['preInit'] = function(){FS.mount("IDBFS",{},"/")}
 Module['arguments'] = ["-xonotic"]
 //pipes output to console
 Module['print'] = function(text){console.log(text); FS.syncfs()}
