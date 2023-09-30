@@ -77,7 +77,7 @@ func allPowerLevels(roomLevels *event.PowerLevelsEventContent) []int {
 	return ret
 }
 
-func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []id.RoomID, scores map[id.RoomID]map[id.UserID]*Score, force bool) {
+func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, scores map[id.RoomID]map[id.UserID]*Score, force bool) {
 	roomLevels := roomPowerLevels[room]
 	if roomLevels == nil {
 		log.Printf("trying to ensure power levels for room %v, but did not get power level map yet", room)
@@ -131,10 +131,10 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []id.Room
 		prevLevel := roomLevels.Users[user]
 		level, raw := computePowerLevel(roomLevels.UsersDefault, *score)
 		for _, otherRoom := range roomGroup {
-			if otherRoom == room {
+			if otherRoom.ID == room {
 				continue
 			}
-			otherScore := scores[otherRoom][user]
+			otherScore := scores[otherRoom.ID][user]
 			if otherScore == nil {
 				continue
 			}

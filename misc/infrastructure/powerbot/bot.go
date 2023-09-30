@@ -18,13 +18,18 @@ const (
 	syncForceFrequency = int(7 * 24 * time.Hour / syncInterval)
 )
 
+type Room struct {
+	ID   id.RoomID
+	Name string
+}
+
 type Config struct {
-	Homeserver  string        `json:"homeserver"`
-	UserID      id.UserID     `json:"user_id"`
-	Password    string        `json:"password,omitempty"`
-	DeviceID    id.DeviceID   `json:"device_id,omitempty"`
-	AccessToken string        `json:"access_token,omitempty"`
-	Rooms       [][]id.RoomID `json:"rooms"`
+	Homeserver  string      `json:"homeserver"`
+	UserID      id.UserID   `json:"user_id"`
+	Password    string      `json:"password,omitempty"`
+	DeviceID    id.DeviceID `json:"device_id,omitempty"`
+	AccessToken string      `json:"access_token,omitempty"`
+	Rooms       [][]Room    `json:"rooms"`
 }
 
 func (c *Config) Load() error {
@@ -178,7 +183,7 @@ func Run() (err error) {
 	}
 	for _, group := range config.Rooms {
 		for _, room := range group {
-			roomUsers[room] = map[id.UserID]struct{}{}
+			roomUsers[room.ID] = map[id.UserID]struct{}{}
 		}
 	}
 	client, err := Login(config)
@@ -254,7 +259,7 @@ func Run() (err error) {
 			}
 			for _, group := range config.Rooms {
 				for _, room := range group {
-					syncPowerLevels(client, room, group, scoreData, counter%syncForceFrequency == 0)
+					syncPowerLevels(client, room.ID, group, scoreData, counter%syncForceFrequency == 0)
 				}
 			}
 			roomUsersMu.RUnlock()
