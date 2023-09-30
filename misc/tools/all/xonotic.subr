@@ -43,7 +43,7 @@ case "$cmd" in
 			
 		fi	
 		export CC="emcc"
-		export CC="$CC -DSUPPORTIPV6 -sUSE_SDL=2 -sUSE_LIBJPEG=1"
+		export CC="$CC -DSUPPORTIPV6"
 		while :; do
 			case "$1" in
 				-0)
@@ -310,7 +310,7 @@ case "$cmd" in
 			verbose emmake make $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
-			verbose emmake make $MAKEFLAGS LDFLAGS_EXTRA='-sSINGLE_FILE -sFULL_ES2 -sUSE_ZLIB -sINITIAL_MEMORY=100MB' EXE_UNIXSDL="darkplaces-emscripten.html" DP_SSE=0 CFLAGS_EXTRA="-I../../../../misc/builddeps/emscripten/d0_blind_id/include -L../../../../misc/builddeps/emscripten/d0_blind_id/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib -I../../../../misc/builddeps/emscripten/gmp/include -L../../../../misc/builddeps/emscripten/gmp/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib -L../../../../misc/builddeps/emscripten/jpeg/lib/ -Wl,-rpath,../../../../misc/builddeps/emscripten/jpeg/lib/ -I../../../../misc/builddeps/emscripten/jpeg/include/ -sUSE_SDL=2 -sUSE_ZLIB=1 -DUSE_GLES2 " LIBM="" LIBZ="" LIBJPEG="" STRIP=: "$@" "$T"
+			verbose emmake make $MAKEFLAGS LDFLAGS_EXTRA='--pre-js ../../../../misc/buildfiles/emscripten/prejs.js -sSINGLE_FILE -sFULL_ES2 -sUSE_ZLIB -sINITIAL_MEMORY=100MB' EXE_UNIXSDL="darkplaces-emscripten.html" DP_SSE=0 CFLAGS_EXTRA="-I../../../../misc/builddeps/emscripten/d0_blind_id/include -L../../../../misc/builddeps/emscripten/d0_blind_id/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/d0_blind_id/lib -I../../../../misc/builddeps/emscripten/gmp/include -L../../../../misc/builddeps/emscripten/gmp/lib -Wl,-rpath,../../../../misc/builddeps/emscripten/gmp/lib -L../../../../misc/builddeps/emscripten/jpeg/lib/ -Wl,-rpath,../../../../misc/builddeps/emscripten/jpeg/lib/ -I../../../../misc/builddeps/emscripten/jpeg/include/ -sUSE_SDL=2 -sUSE_ZLIB=1 -DUSE_GLES2 " LIBM="" LIBZ="" LIBJPEG="" STRIP=: "$@" "$T"
 		done
 		for T in $BAD_TARGETS; do
 			$ECHO "Warning: discarded invalid client $T."
