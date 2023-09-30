@@ -10,9 +10,10 @@ cmd = function(input){
     }
     return 0
 }
+Module['preInit'] = function(){FS.mount(IDBFS,{},"/")}
 Module['arguments'] = ["-xonotic"]
 //pipes output to console
-Module['print'] = function(text){console.log(text)}
+Module['print'] = function(text){console.log(text); FS.syncfs()}
 Module['preRun'] = function(){
     function stdin(){
     //if current command is default, it just returns 0, code for null
