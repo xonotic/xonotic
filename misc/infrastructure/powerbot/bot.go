@@ -51,6 +51,9 @@ func (c *Config) Save() error {
 }
 
 func Login(config *Config) (*mautrix.Client, error) {
+	configMu.Lock()
+	defer configMu.Unlock()
+
 	// Note: we have to lower case the user ID for Matrix protocol communication.
 	uid := id.UserID(strings.ToLower(string(config.UserID)))
 	client, err := mautrix.NewClient(config.Homeserver, uid, config.AccessToken)
@@ -85,8 +88,11 @@ func Login(config *Config) (*mautrix.Client, error) {
 }
 
 var (
-	roomUsers       = map[id.RoomID]map[id.UserID]struct{}{}
-	roomUsersMu     sync.RWMutex
+	configMu sync.Mutex
+
+	roomUsersMu sync.RWMutex
+	roomUsers   = map[id.RoomID]map[id.UserID]struct{}{}
+
 	fullySynced     bool
 	roomPowerLevels = map[id.RoomID]*event.PowerLevelsEventContent{}
 )
@@ -191,6 +197,27 @@ func Run() (err error) {
 		return fmt.Errorf("failed to login: %v", err)
 	}
 	syncer := newSyncer()
+	syncer.OnEventType(event.StateTombstone, func(source mautrix.EventSource, evt *event.Event) {
+		if !isRoom(evt.RoomID) {
+			return
+		}
+		tomb := evt.Content.AsTombstone()
+		if tomb.ReplacementRoom == "" {
+			log.Printf("Replacement room in tombstone event is not set - not handling: %v", evt)
+			return
+		}
+		for _, group := range config.Rooms {
+			for _, room := range group {
+				if room.ID == evt.RoomID {
+					configMu.Lock()
+					defer configMu.Unlock()
+					room.ID = tomb.ReplacementRoom
+					config.Save()
+					log.Fatalf("room upgrade handled from %v to %v - need restart", evt.RoomID, tomb.ReplacementRoom)
+				}
+			}
+		}
+	})
 	syncer.OnEventType(event.EventMessage, func(source mautrix.EventSource, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
 			return
