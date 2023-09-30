@@ -15,7 +15,7 @@ import (
 
 const (
 	syncInterval       = time.Minute
-	syncForceFrequency = 24 * 60
+	syncForceFrequency = 7 * 24 * time.Hour /syncInterval
 )
 
 type Config struct {
