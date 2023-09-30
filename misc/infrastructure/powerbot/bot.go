@@ -213,10 +213,11 @@ func Run() (err error) {
 					defer configMu.Unlock()
 					room.ID = tomb.ReplacementRoom
 					config.Save()
-					log.Fatalf("room upgrade handled from %v to %v - need restart", evt.RoomID, tomb.ReplacementRoom)
+					log.Fatalf("room upgrade for %v handled from %v to %v - need restart", room.Name, evt.RoomID, tomb.ReplacementRoom)
 				}
 			}
 		}
+		log.Printf("Room not found in config, so not doing room upgrade: %v", evt)
 	})
 	syncer.OnEventType(event.EventMessage, func(source mautrix.EventSource, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
