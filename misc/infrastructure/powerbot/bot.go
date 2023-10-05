@@ -19,8 +19,8 @@ const (
 )
 
 type Room struct {
-	ID   id.RoomID
-	Name string
+	ID   id.RoomID `json:"id"`
+	Name string    `json:"name",omitempty`
 }
 
 type Config struct {
@@ -207,12 +207,16 @@ func Run() (err error) {
 			return
 		}
 		for _, group := range config.Rooms {
-			for _, room := range group {
+			for i := range group {
+				room := &group[i]
 				if room.ID == evt.RoomID {
 					configMu.Lock()
 					defer configMu.Unlock()
 					room.ID = tomb.ReplacementRoom
-					config.Save()
+					err := config.Save()
+					if err != nil {
+						log.Printf("failed to save config: %v", err)
+					}
 					log.Fatalf("room upgrade for %v handled from %v to %v - need restart", room.Name, evt.RoomID, tomb.ReplacementRoom)
 				}
 			}
