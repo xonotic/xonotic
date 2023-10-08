@@ -29,6 +29,6 @@ Module['preRun'] = function(){
     var stdout = null;
     var stderr = null; 
     FS.init(stdin,stdout,stderr);
-    FS.mkdir('/basedir')
-    FS.mount(IDBFS,{},"/basedir");
+    FS.mkdir('/config')
+    FS.mount(IDBFS,{},"/config");
 }
