@@ -1,5 +1,9 @@
 //current command in ascii decimal
 let currentcmd = [0,0,0] 
+let isready = function(){
+    if(FS.analyzePath("/data/",false).exists == true){return 1}
+    return 0
+}
 let cmditerate = 0
 console.log("Run Terminal Commands by running cmd(\"command to run here\")")
 cmd = function(input){
