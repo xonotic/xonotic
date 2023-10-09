@@ -169,7 +169,8 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 			break
 		}
 		if len(j) <= maxPowerLevelBytes {
-			continue
+			// No need to trim.
+			break
 		}
 		log.Printf("room %v not including power level %d to reduce message size", clearPowerLevel)
 		for user, level := range newRoomLevels.Users {
