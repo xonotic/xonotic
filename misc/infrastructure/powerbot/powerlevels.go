@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/google/go-cmp/cmp"
 	"log"
 	"math"
@@ -26,8 +27,8 @@ const (
 	maxApplyLevel = 9
 	// Expire power level if no event for 1 month. Level comes back on next event, including join.
 	powerExpireTime = time.Hour * 24 * 30
-	// Maximum count of ACL entries. Should avoid hitting the 64k limit.
-	maxPowerLevelEntries = 2048
+	// Maximum size of powerlevels message. This is a quarter of the expected Matrix limit.
+	maxPowerLevelBytes = (65535 - 1024) / 4
 )
 
 func logPowerLevelBounds() {
@@ -105,7 +106,7 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 			}
 		}
 	}
-	newRoomLevels := *roomLevels
+	newRoomLevels := makeDefaultsExplicit(roomLevels)
 	newRoomLevels.Users = make(map[id.UserID]int)
 	for user, level := range roomLevels.Users {
 		if level == roomLevels.UsersDefault {
@@ -161,7 +162,15 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 		}
 	}
 	clearPowerLevel := minPowerLevel
-	for len(newRoomLevels.Users) > maxPowerLevelEntries && clearPowerLevel <= maxPowerLevel {
+	for clearPowerLevel <= maxPowerLevel {
+		j, err := json.Marshal(newRoomLevels)
+		if err != nil {
+			log.Printf("could not marshal newRoomLevels: %v", err)
+			break
+		}
+		if len(j) <= maxPowerLevelBytes {
+			continue
+		}
 		log.Printf("room %v not including power level %d to reduce message size", clearPowerLevel)
 		for user, level := range newRoomLevels.Users {
 			if level == clearPowerLevel {
@@ -174,7 +183,7 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 	if dirty {
 		diff := cmp.Diff(roomLevels.Users, newRoomLevels.Users)
 		log.Printf("room %v power level update:\n%v", room, diff)
-		_, err := client.SendStateEvent(room, event.StatePowerLevels, "", makeDefaultsExplicit(&newRoomLevels))
+		_, err := client.SendStateEvent(room, event.StatePowerLevels, "", newRoomLevels)
 		if err != nil {
 			log.Printf("Failed to update power levels: %v", err)
 		}
