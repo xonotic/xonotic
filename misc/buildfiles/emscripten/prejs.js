@@ -1,38 +1,22 @@
 //current command in ascii decimal
 let currentcmd = [0,0,0] 
+let currentfile = "";
+const sleep = ms => new Promise(r => setTimeout(r,ms));
+
 let isready = function(){
-    if(FS.analyzePath("/data/",false).exists == true){return 1}
+    if(FS.analyzePath("/save/data",false).exists == true){return 1}
     return 0
 }
 let cmditerate = 0
-console.log("Run Terminal Commands by running cmd(\"command to run here\")")
-cmd = function(input){
-    for (let i = 0; i < input.length; i++){
-        
-        currentcmd[i] = input.charCodeAt(i)
-
-    }
-    currentcmd[input.length] = 10;
-    return 0
-}
-Module['arguments'] = ["-xonotic"]
+Module['arguments'] = ["-xonotic","-basedir /save/data"]
 Module['print'] = function(text){console.log(text);}
 Module['preRun'] = function(){
     
-    function stdin(){
-    /*//if current command is default, it just returns 0, code for null
-    if(currentcmd == [0,0,0]){
-        return 0
-    }
-    //it iterates through the cmd
-    cmditerate++;
-    if(cmditerate - 1 > currentcmd.length - 1) {currentcmd = [0,0,0]; return 10}
-    return currentcmd[cmditerate - 1]
-
-    */ return 10};
+    function stdin(){return 10};
     var stdout = null;
     var stderr = null; 
     FS.init(stdin,stdout,stderr);
-    FS.mkdir('/config')
-    FS.mount(IDBFS,{},"/config");
+    FS.mkdir('/save')
+    FS.mount(IDBFS,{},"/save");
+    
 }
