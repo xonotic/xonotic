@@ -31,7 +31,8 @@ export CACHEDIR=$HOME/.xonotic-cached-converter-crunch
 export dds_tool=crunch
 
 # Build locally.
-export HOSTS_THAT_ARE_MYSELF='xonotic-build-linux64 xonotic-build-win32 xonotic-build-win64 xonotic-build-osx'
+export HOSTS_THAT_ARE_MYSELF='xonotic-build-win32 xonotic-build-win64 xonotic-build-osx'
+export HOSTS_THAT_ARE_SCHROOT='xonotic-build-linux64'
 
 mepwd=$PWD
 me=$0
