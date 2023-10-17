@@ -293,7 +293,7 @@ install () {
 
 	# Required for win32 builds
 	if [ "$ARCH" = "i686" ]; then
-		cp -v "/usr/lib/gcc/i686-w64-mingw32/10-win32/libgcc_s_dw2-1.dll" "$out_dir"
+		cp -v /usr/lib/gcc/i686-w64-mingw32/[0-9][0-9]-win32/libgcc_s_dw2-1.dll "$out_dir"
 	fi
 
 	cd "$out_dir"
