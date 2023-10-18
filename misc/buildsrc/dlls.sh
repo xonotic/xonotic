@@ -261,6 +261,22 @@ build_curl () {
 	make install
 }
 
+build_libsdl2 ()
+{
+	fetch_source libsdl2 || true
+
+	# this subdir will be made available to DP's linker
+	mkdir -p "$pkg_dir/sdl"
+
+	mkcd "$work_dir/libsdl2"
+	cmake -DCMAKE_TOOLCHAIN_FILE="$toolchain_file" \
+	      -DCMAKE_SYSTEM_PROCESSOR="$ARCH" \
+	      -DCMAKE_INSTALL_PREFIX="$pkg_dir/sdl" \
+	      -G"Unix Makefiles" "$this_src"
+	make
+	make install
+}
+
 build_all () {
 	build_zlib
 	build_gmp
@@ -272,6 +288,7 @@ build_all () {
 	build_libpng16
 	build_libjpeg
 	build_curl
+	build_libsdl2
 }
 
 install () {
@@ -290,6 +307,7 @@ install () {
 	cp -v "$pkg_dir/bin/libpng16.dll" "$out_dir"
 	cp -v "$pkg_dir/bin/libjpeg-62.dll" "$out_dir/libjpeg.dll"
 	cp -v "$pkg_dir/bin/libcurl.dll" "$out_dir/libcurl-4.dll"
+#	cp -v "$pkg_dir/sdl/bin/SDL2.dll" "$out_dir"
 
 	# Required for win32 builds
 	if [ "$ARCH" = "i686" ]; then
@@ -320,6 +338,7 @@ list () {
 	echo libpng16
 	echo libjpeg
 	echo curl
+	echo libsdl2
 }
 
 usage () {
@@ -358,6 +377,7 @@ case $step in
 	libpng16)      prepare && build_libpng16 ;;
 	libjpeg)       prepare && build_libjpeg ;;
 	curl)          prepare && build_curl ;;
+	libsdl2)       prepare && build_libsdl2 ;;
 	build_all)     prepare && build_all ;;
 	install)       prepare && install ;;
 	all)           prepare && build_all && install ;;
