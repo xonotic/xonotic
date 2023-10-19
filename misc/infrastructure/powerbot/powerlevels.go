@@ -114,7 +114,7 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 		}
 		// TODO: Also skip users who aren't in the room for ages.
 		score := scores[room][user]
-		if level >= minPowerLevel && level <= maxPowerLevel && score.CurrentState == NotActive && time.Now().After(score.LastEvent.Add(powerExpireTime)) {
+		if level >= minPowerLevel && level <= maxPowerLevel && (score == nil || (score.CurrentState == NotActive && time.Now().After(score.LastEvent.Add(powerExpireTime)))) {
 			// User is inactive - prune them from the power level list. Saves space.
 			// But this doesn't mark the list dirty as there is no need to send an update.
 			log.Printf("room %v user %v power level: PRUNE %v (%v)", room, user, level, score)
