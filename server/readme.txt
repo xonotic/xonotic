@@ -19,6 +19,13 @@ in your server.cfg for the right port number, default is 26000) to the
 computer running your server.  How to do this does depend on your
 computer and network setup.
 
+If you want to run a dedicated server and a client on the the same
+machine, they need to have session ids that differ from each other.
+To start the server with a custom session id (different from the
+default id that the client uses) run it with the argument "-sessionid"
+followed by a session id of your choice.
+Example: server_linux.sh -sessionid server
+
 If you plan to install custom maps on your server you should read the
 file Xonotic/Docs/mapdownload.txt to learn how to setup automatic map
 downloads.
