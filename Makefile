@@ -44,7 +44,7 @@ help:
 	@echo   "  make clean                 Delete engine builds and build objects"
 	@echo
 	@echo   "  make update-stable         Update to the latest stable release via rsync"
-	@echo   "  make update-beta           Update to the latest daily autobuild via rsync"
+	@echo   "  make update-beta           Update to the latest beta autobuild via rsync"
 	@echo
 	@printf "  make server                Compile \e[1m$(SERVER)\e[m\n"
 	@printf "  make client                Compile \e[1m$(CLIENT)\e[m\n"
@@ -56,12 +56,17 @@ ifdef GIT
   $(error $(GIT))
 endif
 
-.EXTRA_PREREQS := $(findstring update-stable,$(MAKECMDGOALS)) $(findstring update-beta,$(MAKECMDGOALS))
+
+# If requested, these targets must always run first:
+.EXTRA_PREREQS := $(filter clean update-stable update-beta, $(MAKECMDGOALS))
+# It makes sense to `clean-sources` after building if requested.
+.NOTPARALLEL: $(.EXTRA_PREREQS) clean-sources
 
 .PHONY: clean-sources
 clean-sources:
 	$(MAKE) -C $(DPSRC) clean
-	$(MAKE) -C $(D0SRC) clean
+	( $(MAKE) -C $(D0SRC) clean || true ) # autotools may not have created the Makefile yet
+clean-sources: .EXTRA_PREREQS =  # prevents circular dependency
 
 .PHONY: clean
 clean: clean-sources
@@ -75,22 +80,28 @@ update-stable:
 update-beta:
 	misc/tools/rsync-updater/update-to-autobuild.sh
 
-$(D0SRC)/Makefile:
-	( cd $(D0SRC) && ./autogen.sh && ./configure --enable-static --disable-shared )
 
-.PHONY: d0_blind_id
-d0_blind_id: $(D0SRC)/Makefile
+$(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a:
+	( cd $(D0SRC) && ./autogen.sh && ./configure --enable-static --disable-shared )
+	$(MAKE) -C $(D0SRC) clean  # ensures missing .a files are created FIXME WORKAROUND
 	$(MAKE) -C $(D0SRC)
 
-.PHONY: server
-server: d0_blind_id
+$(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a
 	$(MAKE) -C $(DPSRC) sv-release
-	cp -v $(DPSRC)/darkplaces-dedicated $(SERVER)
+$(SERVER): $(DPSRC)/darkplaces-dedicated
+	cp $(DPSRC)/darkplaces-dedicated $(SERVER)
+
+$(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a
+	$(MAKE) -C $(DPSRC) sdl-release
+$(CLIENT): $(DPSRC)/darkplaces-sdl
+	cp $(DPSRC)/darkplaces-sdl $(CLIENT)
+
+
+.PHONY: server
+server: $(SERVER)
 
 .PHONY: client
-client: d0_blind_id
-	$(MAKE) -C $(DPSRC) sdl-release
-	cp -v $(DPSRC)/darkplaces-sdl $(CLIENT)
+client: $(CLIENT)
 
 .PHONY: both
 both: client server
