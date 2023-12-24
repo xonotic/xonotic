@@ -238,14 +238,10 @@ case "$cmd" in
 			fi
 		fi
 		if $compiled0; then
+			verbose sh autogen.sh
+			verbose ./configure
 			if $cleand0; then
-				if [ -f Makefile ]; then
-					verbose $MAKE $MAKEFLAGS distclean
-				fi
-			fi
-			if ! [ -f Makefile ]; then
-				verbose sh autogen.sh
-				verbose ./configure
+				verbose $MAKE $MAKEFLAGS distclean
 			fi
 			verbose $MAKE $MAKEFLAGS
 		fi
