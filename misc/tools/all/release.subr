@@ -378,7 +378,7 @@ case "$cmd" in
 		# Note: travis build script also had SDLCONFIG_MACOSX* flags; need to check if they're still needed with osxcross.
 		# Note: Mac bins cannot be stripped by the standard tool.
 		verbose "$SELF" release-compile osx \
-			'STRIP=: DP_MAKE_TARGET=macosx PATH="$HOME/osxcross/out/bin:$PATH" CC="$HOME/osxcross/out/bin/o64-clang -flto -arch x86_64 -mmacosx-version-min=10.6 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -I../../../.deps/include -L../../../.deps/lib" SDLCONFIG_MACOSXCFLAGS="-I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXSTATICLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared' \
+			'STRIP=: DP_MAKE_TARGET=macosx PATH="$HOME/osxcross/out/bin:$PATH" CC="$HOME/osxcross/out/bin/o64-clang -flto -arch x86_64 -mmacosx-version-min=10.7 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -I../../../.deps/include -L../../../.deps/lib" SDLCONFIG_MACOSXCFLAGS="-I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXSTATICLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared' \
 			release 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
 		;;
 	release-engine-linux64)
