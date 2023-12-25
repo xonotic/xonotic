@@ -289,7 +289,7 @@ case "$cmd" in
 			                    --host="$host" \
 			                    --prefix="$d0/misc/builddeps/$arch/d0_blind_id"
 			verbose make clean
-			verbose make "$makeflags"
+			verbose eval make "$makeflags"
 			verbose make install
 		)
 		;;
