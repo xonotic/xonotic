@@ -295,8 +295,9 @@ case "$cmd" in
 		;;
 	release-libs-linux64)
 		release_common
+		# TODO schroot support for libs so we can LTO this
 		verbose "$SELF" release-libs-compile linux64 \
-			'CC="gcc -m64 -flto=auto"' \
+			'CC="gcc -m64"' \
 			x86_64-pc-linux-gnu
 		;;
 	release-dlls-compile)
