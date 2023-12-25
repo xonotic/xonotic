@@ -314,6 +314,9 @@ case "$cmd" in
 		verbose cp -v $buildpath/out/$arch/* "$targetdir"
 		verbose mkdir -p "$d0/misc/builddeps/$arch/"
 		verbose rsync --delete -avP "$buildpath/pkg/$arch/sdl" "$d0/misc/builddeps/$arch/"
+		# PKG_CONFIG HACK: avoids needing to modify sdl2-config
+		verbose printf '#!/bin/sh\nprintf ../../../.deps/lib\n' > "$d0/misc/builddeps/$arch/sdl/libdir_hack.sh"
+		verbose chmod +x "$d0/misc/builddeps/$arch/sdl/libdir_hack.sh"
 		;;
 	release-dlls-win32)
 		release_common
@@ -357,7 +360,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
 		#$good
 		verbose "$SELF" release-compile win32 \
-			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" DP_LINK_SDL=static SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
+			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG="../../../.deps/libdir_hack.sh" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
 			release 'darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
 		;;
 	release-engine-win64)
@@ -366,8 +369,9 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
+		# PKG_CONFIG HACK: avoids needing to modify sdl2-config
 		verbose "$SELF" release-compile win64 \
-			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" DP_LINK_SDL=static SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
+			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG="../../../.deps/libdir_hack.sh" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen' \
 			release 'darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-osx)
