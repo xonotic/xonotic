@@ -228,7 +228,7 @@ case "$cmd" in
 		esac
 		case " $HOSTS_THAT_ARE_SCHROOT " in
 			*\ $host\ *)
-				schroot="schroot -c $host --"
+				schroot="schroot -c $host --preserve-environment --"
 				;;
 		esac
 		case " $HOSTS_THAT_ARE_MYSELF $HOSTS_THAT_ARE_SCHROOT " in
@@ -307,11 +307,13 @@ case "$cmd" in
 		targetdir=$3
 		verbose mkdir -p "$targetdir"
 		(
-			cd "misc/buildsrc"
+			cd "$d0/misc/buildsrc"
 			verbose ./dlls.sh clean "$buildpath"
 			verbose ./dlls.sh all "$buildpath" "$arch"
 		)
 		verbose cp -v $buildpath/out/$arch/* "$targetdir"
+
+		# SDL2
 		verbose mkdir -p "$d0/misc/builddeps/$arch/"
 		verbose rsync --delete -avP "$buildpath/pkg/$arch/sdl" "$d0/misc/builddeps/$arch/"
 		# PKG_CONFIG HACK: avoids needing to modify sdl2-config

@@ -55,8 +55,6 @@ endif
 
 # If requested, these targets must always run first:
 .EXTRA_PREREQS := $(filter clean update-stable update-beta, $(MAKECMDGOALS))
-# It makes sense to `clean-sources` after building if requested.
-.NOTPARALLEL: $(.EXTRA_PREREQS) clean-sources
 
 .PHONY: clean-sources
 clean-sources:
@@ -82,12 +80,12 @@ $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a:
 	$(MAKE) -C $(D0SRC) clean  # ensures missing .a files are created FIXME WORKAROUND
 	$(MAKE) -C $(D0SRC)
 
-$(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a
+$(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a
 	$(MAKE) -C $(DPSRC) sv-release
 $(SERVER): $(DPSRC)/darkplaces-dedicated
 	cp $(DPSRC)/darkplaces-dedicated $(SERVER)
 
-$(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a
+$(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a
 	$(MAKE) -C $(DPSRC) sdl-release
 $(CLIENT): $(DPSRC)/darkplaces-sdl
 	cp $(DPSRC)/darkplaces-sdl $(CLIENT)
