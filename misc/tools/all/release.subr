@@ -322,11 +322,31 @@ case "$cmd" in
 		release_common
 		verbose "$SELF" release-dlls-compile win64 /tmp/dlls Xonotic/bin64
 		;;
+	release-libs-osx)
+		release_common
+		verbose mkdir -p "$d0/misc/builddeps/osx"
+		(
+			verbose cd "$d0/misc/builddeps/osx"
+			verbose rm -rf sdl SDL2
+			verbose wget https://libsdl.org/release/SDL2-2.28.5.dmg
+			verbose 7z x *.dmg
+			# 7z still fails to extract working symlinks from any archive format, hackaround:
+			verbose ln -sf $(cat SDL2/SDL2.framework/Versions/Current) SDL2/SDL2.framework/Versions/Current
+			verbose ln -sf $(cat SDL2/SDL2.framework/Headers) SDL2/SDL2.framework/Headers
+			verbose ln -sf $(cat SDL2/SDL2.framework/Resources) SDL2/SDL2.framework/Resources
+			verbose ln -sf $(cat SDL2/SDL2.framework/SDL2) SDL2/SDL2.framework/SDL2
+			# THE HEADERS ARE NOT IN A SUBDIRECTORY CALLED SDL2
+			# YET SDL2/ WAS ADDED TO ALL THE INCLUDES, WHY?!?
+			# OLD VERSIONS WITHOUT IT WORKED
+			verbose sed -i "s/#include <SDL2\//#include </g" SDL2/SDL2.framework/Versions/Current/Headers/*.h
+		)
+		;;
 	release-libs)
 		release_common
 		verbose "$SELF" release-libs-linux64
 		verbose "$SELF" release-dlls-win32
 		verbose "$SELF" release-dlls-win64
+		verbose "$SELF" release-libs-osx
 		verbose rm -rf /tmp/dlls
 		;;
 	release-engine-win32)
