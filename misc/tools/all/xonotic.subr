@@ -32,7 +32,6 @@ case "$cmd" in
 		if [ -z "$CC" ]; then
 			export CC="gcc"
 		fi
-		export CC="$CC -DSUPPORTIPV6"
 		while :; do
 			case "$1" in
 				-0)
@@ -139,16 +138,6 @@ case "$cmd" in
 		fi
 
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			# win32: use SDL2
-			case `uname -m` in
-				x86_64)
-					MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win64/sdl/bin/sdl2-config"
-					;;
-				*)
-					MAKEFLAGS="$MAKEFLAGS SDL_CONFIG=$d0/misc/builddeps/win32/sdl/bin/sdl2-config"
-					;;
-			esac
-
 			# win32: don't rely on jpeg includes
 			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
 		fi

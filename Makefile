@@ -15,14 +15,10 @@ export CC += $(CFLAGS)
 export CC += -I$(PWD)/source/
 # d0_blind_id static libs location
 export CC += -L$(PWD)/$(D0SRC)/.libs/
-# Player IDs: DP_LINK_CRYPTO needs to be set (else it defaults to "dlopen"),
-# it should be set to "shared" but then LIB_CRYPTO gets overridden in DP makefile,
-# and we need to set LIB_CRYPTO such that libgmp gets linked
-export DP_LINK_CRYPTO=foo
-export CFLAGS_CRYPTO=-DLINK_TO_CRYPTO
-export LIB_CRYPTO=-ld0_blind_id -lgmp
+# Player IDs
+export DP_LINK_CRYPTO=static
 # AES
-export DP_LINK_CRYPTO_RIJNDAEL=shared
+export DP_LINK_CRYPTO_RIJNDAEL=static
 
 
 .PHONY: help
