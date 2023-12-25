@@ -369,7 +369,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-linux64-dedicated || good=false
 		#$good
 		verbose "$SELF" release-compile linux64 \
-			'CC="gcc -m64 -flto=auto -I../../../.deps/include -L../../../.deps/lib" DP_LINK_CRYPTO=static DP_LINK_CRYPTO_RIJNDAEL=static DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=shared CFLAGS_ODE="-DUSEODE -DLINK_TO_LIBODE -DdDOUBLE" LIB_ODE="../../../.deps/lib/libode.a -lstdc++ -pthread" DP_LINK_ZLIB=shared' \
+			'CC="gcc -m64 -flto=auto -I../../../.deps/include -L../../../.deps/lib" DP_LINK_CRYPTO=static DP_LINK_CRYPTO_RIJNDAEL=static DP_LINK_JPEG=shared LIB_JPEG=/usr/lib/x86_64-linux-gnu/libjpeg.a DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared' \
 			release 'darkplaces-sdl:Xonotic/xonotic-linux64-sdl darkplaces-dedicated:Xonotic/xonotic-linux64-dedicated'
 		;;
 	release-engine)
