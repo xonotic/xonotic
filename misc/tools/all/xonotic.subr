@@ -137,12 +137,6 @@ case "$cmd" in
 			MAKEFLAGS=-$(echo $MAKEFLAGS)                  # echo here and above will trim whitespaces
 		fi
 
-		if [ x"`uname`" = x"Darwin" ]; then
-			# osx: use SDL2
-			f=$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks
-			MAKEFLAGS="$MAKEFLAGS SDLCONFIG_MACOSXCFLAGS=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXLIBS=-F$f SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=SDL2 SDLCONFIG_MACOSXLIBS+=-framework SDLCONFIG_MACOSXLIBS+=Cocoa SDLCONFIG_MACOSXLIBS+=-I$f/SDL2.framework/Headers SDLCONFIG_MACOSXSTATICLIBS=-F$f SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=SDL2 SDLCONFIG_MACOSXSTATICLIBS+=-framework SDLCONFIG_MACOSXSTATICLIBS+=Cocoa SDLCONFIG_MACOSXSTATICLIBS+=-I$f/SDL2.framework/Headers"
-		fi
-
 		# workaround ARM issue in DP's makefile.inc
 		case `uname -m` in
 			x86_64|*86)
