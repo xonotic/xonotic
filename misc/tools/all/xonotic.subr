@@ -137,11 +137,6 @@ case "$cmd" in
 			MAKEFLAGS=-$(echo $MAKEFLAGS)                  # echo here and above will trim whitespaces
 		fi
 
-		if [ -n "$WE_HATE_OUR_USERS" ]; then
-			# win32: don't rely on jpeg includes
-			MAKEFLAGS="$MAKEFLAGS LIB_JPEG= CFLAGS_LIBJPEG="
-		fi
-
 		if [ x"`uname`" = x"Darwin" ]; then
 			# osx: use SDL2
 			f=$d0/misc/buildfiles/osx/Xonotic.app/Contents/Frameworks
