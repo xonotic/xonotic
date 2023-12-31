@@ -178,10 +178,14 @@ case "$cmd" in
 			compiled0=true
 		fi
 		if $compiled0; then
-			verbose sh autogen.sh
-			verbose ./configure
+			if ! [ -f Makefile ]; then
+				verbose sh autogen.sh
+				verbose ./configure
+			fi
 			if $cleand0; then
 				verbose $MAKE $MAKEFLAGS distclean
+				verbose sh autogen.sh
+				verbose ./configure
 			fi
 			verbose $MAKE $MAKEFLAGS
 		fi
