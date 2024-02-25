@@ -46,7 +46,7 @@ set -ex
 
 test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
-	s0=`date -d "now - 7 days - 12 hours" +%s`;
+	s0=`date -d "now - 30 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
 	for X in * */*; do
 		[ -f "$X" ] || continue;
@@ -57,6 +57,7 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 		[ x"$d" != x"latest" ] || continue;
 		w=`date -d $d +%w`;
 		s=`date -d $d +%s`;
+		w=$(($w % 2));
 		if [ "$w" -ne 0 -a "$s" -lt "$s0" -o "$s" -lt "$s00" ]; then
 			rm -f "$X";
 		fi;
