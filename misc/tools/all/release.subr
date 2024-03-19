@@ -346,6 +346,7 @@ case "$cmd" in
 			# OLD VERSIONS WITHOUT IT WORKED
 			verbose sed -i "s/#include <SDL2\//#include </g" SDL2/SDL2.framework/Versions/Current/Headers/*.h
 		)
+		cp -R "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/MacOS/
 		;;
 	release-libs)
 		release_common
