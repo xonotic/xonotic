@@ -345,6 +345,10 @@ case "$cmd" in
 			# YET SDL2/ WAS ADDED TO ALL THE INCLUDES, WHY?!?
 			# OLD VERSIONS WITHOUT IT WORKED
 			verbose sed -i "s/#include <SDL2\//#include </g" SDL2/SDL2.framework/Versions/Current/Headers/*.h
+			# The dirs are extracted with 700 permissions which breaks the rsync updater
+			find SDL2 -type d -exec chmod 755 {} \;
+			# macOS prefers dylibs be marked executable (this one has no file extension)
+			verbose chmod 755 SDL2/SDL2.framework/Versions/Current/SDL2
 		)
 		cp -R "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/Frameworks/
 		;;
