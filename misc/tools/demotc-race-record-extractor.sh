@@ -5,10 +5,10 @@ case "$2" in
 		PATTERN='all-time fastest lap record with (.*)\n'
 		;;
 	cts)
-		PATTERN='//cts RECORD SET (.*)\n'
+		PATTERN='//CTS RECORD SET (.*)\n'
 		;;
 	ctf)
-		PATTERN='//ctf RECORD SET (.*)\n'
+		PATTERN='//CTS RECORD SET (.*)\n'
 		;;
 	new|race|rc|*)
 		PATTERN='//(?:RA?CE?|rc) RECORD SET (.*)\n'
