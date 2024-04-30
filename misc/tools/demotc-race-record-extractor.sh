@@ -11,7 +11,7 @@ case "$2" in
 		PATTERN='//CTS RECORD SET (.*)\n'
 		;;
 	new|race|rc|*)
-		PATTERN='//(?:RA?CE?|rc) RECORD SET (.*)\n'
+		PATTERN='//RA?CE? RECORD SET (.*)\n'
 		;;
 esac
 
