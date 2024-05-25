@@ -601,6 +601,7 @@ case "$cmd" in
 		release_common
 		verbose "$SELF" release-buildpk3s data/font-unifont.pk3dir      raw ''
 		verbose "$SELF" release-buildpk3s data/font-xolonium.pk3dir     raw ''
+		verbose "$SELF" release-buildpk3s data/font-notoemoji.pk3dir    raw ''
 		verbose "$SELF" release-buildpk3s data/xonotic-data.pk3dir             normaldds ''                    normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-maps.pk3dir             normaldds '' mapping '-mapping' normal '-high'
 		verbose "$SELF" release-buildpk3s data/xonotic-music.pk3dir     raw ''
@@ -648,7 +649,8 @@ case "$cmd" in
 			Xonotic/server \
 			Xonotic/key_0.d0pk \
 			Xonotic/data/font-unifont-$pk3stamp.pk3 \
-			Xonotic/data/font-xolonium-$pk3stamp.pk3
+			Xonotic/data/font-xolonium-$pk3stamp.pk3 \
+			Xonotic/data/font-notoemoji-$pk3stamp.pk3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-source.zip
 		verbose mkzipr Xonotic-$stamp-source.zip \
 			Xonotic/source/d0_blind_id/ \

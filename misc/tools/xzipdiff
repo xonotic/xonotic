@@ -20,6 +20,7 @@ excludes="
 	Xonotic/data/font-nimbussansl-*.pk3
 	Xonotic/data/font-unifont-*.pk3
 	Xonotic/data/font-xolonium-*.pk3
+	Xonotic/data/font-notoemoji-*.pk3
 "
 
 makepatchname()
