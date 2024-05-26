@@ -4,7 +4,7 @@ Noto Emoji Variable Font
 This font provided by Google Fonts is used as a fallback font to display all kinds of emoticons.
 The fonts have been transformed using FontForge to fit the dimensions of Xonotic using the following options:
 1. Origin: Glyph origin, Scale Uniformly: 80%
-2. Origin: Glyph origin, Move: 112
+2. Origin: Glyph origin, Move Y: 112
 
 License
 -------
