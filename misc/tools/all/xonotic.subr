@@ -378,7 +378,7 @@ case "$cmd" in
 			verbose $MAKE $MAKEFLAGS clean
 		fi
 		for T in $TARGETS; do
-			verbose $MAKE $MAKEFLAGS -l
+			verbose $MAKE $MAKEFLAGS "$T"
 		done
 		for T in $BAD_TARGETS; do
 			$ECHO "Warning: discarded invalid client $T."
