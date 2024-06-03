@@ -228,6 +228,165 @@ case "$cmd" in
 
 		verbose "$SELF" update-maps
 		;;
+	compile-switch)
+		cleand0=false
+		cleandp=false
+		cleanqcc=false
+		cleanqc=false
+		compiled0=
+		debug=release  # when changing this default, change the description in the zsh autocompletion script
+		if [ -z "$CC" ]; then
+			export CC="$DEVKITPRO/devkitA64/bin/aarch64-none-elf-gcc"
+		fi
+		while :; do
+			case "$1" in
+				-0)
+					compiled0=true
+					shift
+					;;
+				-1)
+					compiled0=false
+					shift
+					;;
+				-c)
+					cleand0=true
+					cleandp=true
+					cleanqcc=true
+					cleanqc=true
+					shift
+					;;
+				-qc)
+					cleanqc=true
+					shift
+					;;
+				-d|-p|-r)
+					case "$1" in
+						-d)
+							debug=debug
+							;;
+						-p)
+							debug=profile
+							;;
+						-r)
+							debug=release
+							;;
+					esac
+					export CC="$CC -g"
+					shift
+					;;
+				*)
+					break
+					;;
+			esac
+		done
+
+		TARGETS="sdl-$debug"
+
+		if [ $# -gt 0 ] && [ x"$1" = x"" ]; then
+			# if we give the command make the arg "", it will surely fail (invalid filename),
+			# so better handle it as an empty client option
+			BAD_TARGETS=" "
+			shift
+		elif [ -n "$1" ]; then
+			BAD_TARGETS=
+			TARGETS_SAVE=$TARGETS
+			TARGETS= "sdl-$debug"
+			if [ -n "$TARGETS" ]; then # at least a valid client
+				shift
+			else # no valid client, let's assume this option is not meant to be a client then
+				TARGETS=$TARGETS_SAVE
+				BAD_TARGETS=
+			fi
+		fi
+
+		if [ -z "$MAKE" ]; then
+			MAKE=make
+		fi
+
+		if [ -z "$MAKEFLAGS" ]; then
+			ncpus=`getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1`
+			if [ $ncpus -gt 1 ]; then
+				MAKEFLAGS=-j$ncpus
+			fi
+			MAKEFLAGS="$MAKEFLAGS DP_MAKE_TARGET=switch"
+		elif echo $MAKEFLAGS | head -c1 | grep -qv -; then # MAKEFLAGS starts with a single letter option
+			MAKEFLAGS=-$(echo $MAKEFLAGS)                  # echo here and above will trim whitespaces
+		fi
+
+		# workaround ARM issue in DP's makefile.inc
+		case `uname -m` in
+			x86_64|*86) 
+				;;
+			*)
+				MAKEFLAGS="$MAKEFLAGS CFLAGS_SSE= CFLAGS_SSE2="
+				;;
+		esac
+
+		if ! verbose $CC misc/tools/conftest.c -o conftest; then
+			msg ""
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~ COMPILER ~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~_...._~~~~~~~~~~"
+			msg "~~~~~~~~~~~,-'     \\\`-._~~~~~~"
+			msg "~~~~~~~~~~/     --. ><  \\~~~~~"
+			msg "~~~~~~~~~/      (*)> -<: \\~~~~"
+			msg "~~~~~~~~~(     ^~-'  (*) )~~~~"
+			msg "~~~~~~~~~\\        ^+-_/  |~~~~"
+			msg "~~~~~~~~~~\\       {vvv}  |~~~~"
+			msg "~~~~~~~~~~,\\    , {^^^},/~~~~~"
+			msg "~~~~~~~~,/  \`---.....-'~~W~~~~"
+			msg "~~~~~~,/   \\_____/_\\_W~~/~~~~~"
+			msg "~~~~~/          /~~~\\__/~~~~~~"
+			msg "~~~~/          /~~~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg "~~~~~~~ Y U NO COMPILE ~~~~~~~"
+			msg "~~~~~~~~~~~~ CODE ~~~~~~~~~~~~"
+			msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			msg ""
+			exit 1
+		fi
+		rm -f conftest
+
+		verbose cd "$d0/gmqcc"
+		if $cleanqcc; then
+			verbose $MAKE $MAKEFLAGS clean
+		fi
+		if [ -n "$WE_HATE_OUR_USERS" ]; then
+			verbose $MAKE $MAKEFLAGS gmqcc.exe
+		else
+			verbose $MAKE $MAKEFLAGS gmqcc
+		fi
+
+		if [ -n "$MSYSTEM" ]; then
+			DATAMAKE=mingw32-make
+		else
+			DATAMAKE=$MAKE
+		fi
+		verbose cd "$d0/data/xonotic-data.pk3dir"
+		if $cleanqc; then
+			verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS clean
+		fi
+		verbose ${DATAMAKE} QCC="../../../../gmqcc/gmqcc" "$@" $MAKEFLAGS
+		# 4 levels up: data, xonotic-data, qcsrc, server
+
+		verbose cd "$d0/darkplaces"
+		if [ x"$BAD_TARGETS" = x" " ]; then
+			$ECHO "Warning: invalid empty client, default clients will be used."
+		fi
+		if $cleandp; then
+			verbose $MAKE $MAKEFLAGS clean
+		fi
+		for T in $TARGETS; do
+			verbose $MAKE $MAKEFLAGS -l
+		done
+		for T in $BAD_TARGETS; do
+			$ECHO "Warning: discarded invalid client $T."
+		done
+
+		verbose "$SELF" update-maps
+		;;
+	
 	run)
 		if [ -n "$WE_HATE_OUR_USERS" ]; then
 			case `uname -m` in
