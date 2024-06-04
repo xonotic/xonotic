@@ -3,7 +3,7 @@
 # misc/tools/tag-release.sh
 
 # bail when we aren't supposed to be making a release :)
-[ "$REALLY_DO_IT" != "yes" ] && exit 1
+[ "$REALLY_DO_IT" != "yes" ] && exit 2
 
 case "$#" in
 	1)
@@ -48,6 +48,6 @@ for r in "${repositories[@]}"
 do
 	cd "$r"
 
-	git tag --force --message="version $VER" "xonotic-v$VER"
+	git tag --sign --message="version $VER" "xonotic-v$VER"
 	git push origin "xonotic-v$VER"
 done
