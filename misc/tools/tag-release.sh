@@ -1,31 +1,53 @@
-#!/bin/sh
+#!/bin/bash
 
-VER=$1
+# misc/tools/tag-release.sh
 
-case "$VER" in
-	'')
+# bail when we aren't supposed to be making a release :)
+[ "$REALLY_DO_IT" != "yes" ] && exit 1
+
+case "$#" in
+	1)
+		VER=$1
+		;;
+	*)
 		echo "Need version number as argument"
 		exit 1
 		;;
-	*)
-		;;
 esac
 
-for r in \
-	/home/rpolzer/Games/Xonotic/. \
-	/home/rpolzer/Games/Xonotic/data/xonotic-data.pk3dir \
-	/home/rpolzer/Games/Xonotic/data/xonotic-music.pk3dir \
-	/home/rpolzer/Games/Xonotic/data/xonotic-nexcompat.pk3dir \
-	/home/rpolzer/Games/Xonotic/darkplaces \
-	/home/rpolzer/Games/Xonotic/d0_blind_id \
-	/home/rpolzer/Games/Xonotic/data/xonotic-maps.pk3dir \
-	/home/rpolzer/Games/Xonotic/mediasource \
-	/home/rpolzer/Games/Xonotic/gmqcc
+set -eux
+
+
+
+# find xonotic/xonotic.git root repo
+ROOTREPO="$(realpath "$(dirname misc/tools/tag-release.sh)/../../")"
+cd "$ROOTREPO"
+git pull
+./all checkout
+./all update
+
+
+
+repositories=(
+	"$ROOTREPO"
+	"$ROOTREPO/data/xonotic-data.pk3dir"
+	"$ROOTREPO/data/xonotic-music.pk3dir"
+	"$ROOTREPO/data/xonotic-nexcompat.pk3dir"
+	"$ROOTREPO/data/xonotic-xoncompat.pk3dir"
+	"$ROOTREPO/darkplaces"
+	"$ROOTREPO/d0_blind_id"
+	"$ROOTREPO/data/xonotic-maps.pk3dir"
+	"$ROOTREPO/mediasource"
+	"$ROOTREPO/gmqcc"
+)
+# excluded repos because not included with releases:
+	#"$ROOTREPO/netradiant"
+	#"$ROOTREPO/div0-gittools"
+
+for r in "${repositories[@]}"
 do
 	cd "$r"
-	git tag -u D276946B -m"version $VER" xonotic-v"$VER"
-done
 
-# excluded repos because not included with releases:
-#	/home/rpolzer/Games/Xonotic/netradiant \
-#	/home/rpolzer/Games/Xonotic/div0-gittools \
+	git tag --force --message="version $VER" "xonotic-v$VER"
+	git push origin "xonotic-v$VER"
+done
