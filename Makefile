@@ -28,11 +28,11 @@ help:
 	@echo
 	@printf "The DarkPlaces Engine builds will be named \e[1;32m$(CLIENT) \e[mand \e[1;32m$(SERVER)\e[m\n"
 	@printf "and will be preferred by \e[1;32mxonotic-linux-sdl.sh \e[mand \e[1;32mxonotic-linux-dedicated.sh \e[mscripts\n"
-	@echo   "which should be used to start a Xonotic client or a dedicated Xonotic server."
+	@echo   "which should be used to play with the SDL client or host a dedicated Xonotic respectively."
 	@echo
 	@echo   "Moving binaries or data files outside of this directory is not officially supported as"
-	@echo   "this prevents us from easily updating and maintaining them without being error prone."
-	@printf "You can symlink to the previously mentioned \e[1;32mscripts\e[m or create scripts which call them.\n"
+	@echo   "this prevents us from easily and safely updating them. To make starting Xonotic easier"
+	@printf "you can symlink to the above \e[1;32mscripts\e[m, or call them from other scripts or .desktop files.\n"
 	@echo
 	@printf "More info is available at \e[1;36mhttps://gitlab.com/xonotic/xonotic/-/wikis/Compiling\e[m\n"
 	@echo
