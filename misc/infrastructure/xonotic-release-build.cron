@@ -102,8 +102,11 @@ rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonoti
 if [ -z "$RELEASETYPEDIR" ]; then
 	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
 
-	# pipeline files, see: .gitlab-ci.yml in xonotic-data.pk3dir
+	# also upload pipeline files for .gitlab-ci.yml in xonotic-data.pk3dir
 	cp data/stormkeep-????????????????????????????????????????-????????????????????????????????????????.pk3 stormkeep.pk3
+	cd data/xonotic-maps.pk3dir # need correct path inside pk3
+	7z a -tzip -mx=9 ../../stormkeep.pk3 maps/stormkeep.mapinfo maps/stormkeep.waypoints*
+	cd ~/xonotic-release-build
 	PIPELINE_FILES="gmqcc/gmqcc Xonotic/xonotic-linux64-dedicated stormkeep.pk3"
 	rsync -vSP $PIPELINE_FILES autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
 	rm -f stormkeep.pk3
