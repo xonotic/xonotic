@@ -217,6 +217,7 @@ case "$cmd" in
 		depsdir=$6
 		targetfiles=$7
 		schroot=
+		makeflags="$makeflags VCREVISION=$(git -C "$srcdir" describe --always --dirty='~' 2>/dev/null || echo FIXME)"
 		set -x
 		if [ -z "$targetfiles" ]; then
 			exit
