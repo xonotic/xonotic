@@ -57,8 +57,7 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 		[ x"$d" != x"latest" ] || continue;
 		w=`date -d $d +%w`;
 		s=`date -d $d +%s`;
-		w=$(($w % 2));
-		if [ "$w" -ne 0 -a "$s" -lt "$s0" -o "$s" -lt "$s00" ]; then
+		if [ "$w" -ne 0 -a "$w" -ne 6 -a "$s" -lt "$s0" -o "$s" -lt "$s00" ]; then
 			rm -f "$X";
 		fi;
 	done
