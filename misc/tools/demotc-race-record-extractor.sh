@@ -8,7 +8,7 @@ case "$2" in
 		PATTERN='//CTS RECORD SET (.*)\n'
 		;;
 	ctf)
-		PATTERN='//CTS RECORD SET (.*)\n'
+		PATTERN='//CTF RECORD SET (.*)\n'
 		;;
 	new|race|rc|*)
 		PATTERN='//RA?CE? RECORD SET (.*)\n'
