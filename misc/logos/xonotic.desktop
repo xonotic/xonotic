@@ -6,7 +6,30 @@ Comment=Multiplayer, deathmatch oriented first person shooter
 Comment[de]=Deathmatch- und Mehrspieler-orientierter Ego-Shooter
 Comment[fr]=Jeu de tir à la première personne multijoueur
 Icon=xonotic
+
+# Note to packagers and/or .desktop file installers:
+#
+# Xonotic by default expects basedir's root to be the PWD which can lead to
+# issues when calling the engine directly without xonotic-linux-sdl.sh
+#
+# Options:
+# 1)
+#   Create a symlink from PATH binaries to the location of xonotic-linux-sdl.sh
+#   This relies on xonotic-linux-sdl.sh changing PWD to where Xonotic is
+# 2)
+#   Opt into the absolute path Exec and fix its path
+#   This also relies on xonotic-linux-sdl.sh changing PWD to where Xonotic is
+# 3)
+#   Recompile Xonotic with DP_FS_BASEDIR=/path/to/xonotic/ , for example
+#   with DP_FS_BASEDIR=/usr/share/xonotic/ it's no longer necessary
+#   to change your PWD and xonotic-sdl can be anywhere in PATH
+# 4)
+#   DIY your own wrapper script with "-basedir" "/path/to/Xonotic" arguments
+#   or just place the arguments in this file
+#
+#Exec=/absolute/path/to/xonotic-linux-sdl.sh
 Exec=xonotic-sdl
+
 Terminal=false
 PrefersNonDefaultGPU=true
 StartupNotify=false
