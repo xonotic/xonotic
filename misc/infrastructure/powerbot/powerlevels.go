@@ -19,7 +19,7 @@ const (
 	// 15 minutes idling = PL 1.
 	minPowerScore = 15 * 60 * idleScore
 	minPowerLevel = 1
-	// 1 year fulltime active dev = PL 10.
+	// 1 year fulltime active dev = PL 9.
 	maxPowerScore = 3600 * (365*24*idleScore + 8*261*(activeScore-idleScore))
 	maxPowerLevel = 9
 	// Do not touch users outside this range.
