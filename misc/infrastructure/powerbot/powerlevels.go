@@ -99,7 +99,7 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 		for user, score := range scores[room] {
 			// Expire users that for some reason did not get pruned from the database.
 			// This may cause them to lose their power level below.
-			if _, found := roomUsers[room][user]; !found && score.CurrentState != NotActive {
+			if _, found := roomUsers[room][user]; !found && score.CurrentState != NotActive && score.CurrentState != Kicked {
 				log.Printf("Pruning long inactive user %v from room %v.", user, room)
 				setUserStateAt(room, user, time.Now(), NotActive, NotActive)
 				score.CurrentState = NotActive
