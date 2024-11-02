@@ -129,6 +129,14 @@ func handleLeave(now time.Time, room id.RoomID, member id.UserID, raw *event.Eve
 	setUserStateAt(room, member, now, Active, NotActive)
 }
 
+func handleKicked(now time.Time, room id.RoomID, member id.UserID, raw *event.Event) {
+	log.Printf("[%v] Kicked %v by %v from %v", now, member, raw.Sender, room)
+	roomUsersMu.Lock()
+	delete(roomUsers[room], member)
+	roomUsersMu.Unlock()
+	setUserStateAt(room, member, now, Active, Kicked)
+}
+
 func handlePowerLevels(now time.Time, room id.RoomID, levels *event.PowerLevelsEventContent, raw *event.Event) {
 	// log.Printf("[%v] Power levels for %v are %v", now, room, levels)
 	levelsCopy := *levels // Looks like mautrix always passes the same pointer here.
@@ -242,8 +250,14 @@ func Run() (err error) {
 		switch mem.Membership {
 		case event.MembershipJoin:
 			handleJoin(eventTime(evt), evt.RoomID, member, evt)
-		case event.MembershipLeave, event.MembershipBan:
-			handleLeave(eventTime(evt), evt.RoomID, member, evt)
+		case event.MembershipLeave:
+			if evt.Sender == member {
+				handleLeave(eventTime(evt), evt.RoomID, member, evt)
+			} else {
+				handleKicked(eventTime(evt), evt.RoomID, member, evt)
+			}
+		case event.MembershipBan:
+			handleKicked(eventTime(evt), evt.RoomID, member, evt)
 		default: // Ignore.
 		}
 	})

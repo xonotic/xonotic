@@ -11,9 +11,10 @@ import (
 type State int
 
 const (
-	NotActive State = iota
-	Idle
-	Active
+	Kicked    State = -1
+	NotActive State = 0
+	Idle      State = 1
+	Active    State = 2
 )
 
 type Score struct {
@@ -114,6 +115,9 @@ func advanceScore(score Score, now time.Time) Score {
 		score.Idle += dt
 	case Active:
 		score.Active += dt
+	case Kicked:
+		score.Idle = 0
+		score.Active = 0
 	}
 	return score
 }
