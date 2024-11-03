@@ -209,6 +209,7 @@ deftransform(mapping
 
 buildpk3s(font-unifont.pk3dir "raw\;")
 buildpk3s(font-xolonium.pk3dir "raw\;")
+buildpk3s(font-notoemoji.pk3dir "raw\;")
 buildpk3s(xonotic-data.pk3dir "low\;-low" "normaldds\;" "normal\;-high")
 buildpk3s(xonotic-maps.pk3dir "low\;-low" "normaldds\;" "normal\;-high" "mapping\;-mapping")
 buildpk3s(xonotic-music.pk3dir "raw\;" "low\;-low")
