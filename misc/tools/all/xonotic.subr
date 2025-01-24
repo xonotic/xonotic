@@ -312,8 +312,9 @@ case "$cmd" in
 		verbose "$SELF" run dedicated "$@" -noconfig -userdir .serverbench_temp +exec serverbench.cfg |\
 			tee /dev/stderr |\
 			grep '^:' |\
-			grep -v '^:gamestart:' |\
 			grep -v '^:anticheat:' |\
+			grep -v '^:gamestart:' |\
+			grep -v '^:verbose:' |\
 			md5sum
 		;;
 	*)
