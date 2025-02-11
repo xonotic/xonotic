@@ -9,6 +9,9 @@ for v in SimplifiedChinese,sc TraditionalChinese,tc TraditionalChineseHK,hk Jana
         "https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/${v%,*}/NotoSansCJK${v#*,}-${weight}.otf"
 done
 
+# get license (SIL)
+curl -o "fonts/LICENSE" "https://raw.githubusercontent.com/notofonts/noto-cjk/refs/heads/main/Sans/LICENSE"
+
 # move jp variant as the default
 mv "fonts/NotoSansCJKjp-${weight}.otf" "fonts/NotoSansCJK-${weight}.otf"
 
