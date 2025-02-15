@@ -2,7 +2,7 @@
 
 It's recommended to [request access](https://docs.gitlab.com/ee/user/group/index.html#request-access-to-a-group) to the [Xonotic project group](https://gitlab.com/xonotic).  Forking our repositories and submitting merge requests from there will work but you won't be able to use our CI setup for the [xonotic-data.pk3dir](https://gitlab.com/xonotic/xonotic-data.pk3dir) repo.
 
-Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so we know you're legit.
+Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so that we know you're legit.
 
 
 # Licensing
@@ -24,14 +24,14 @@ Build tools are documented on the [Repository_Access wiki page](https://gitlab.c
 
 # Policies
 
-### for all Developers
+### For all Developers
 
 - Branches should be named `myname/mychange`. For instance, if your name is Alex and the change you are committing is a menu fix, use something like `alex/menufix`.
 - Ask the branch owner before pushing to someone else's branch.
 
-### for Maintainers
+### For Maintainers
 
-- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (eg new features, redesigns, refactors) must be discussed with the team first.
+- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (e.g. new features, redesigns, refactors) must be discussed with the team first.
 - Pushing to someone else's branch is allowed if changes are required for merging the branch AND the owner has left the project or indicated they won't develop the branch further.
 - Any change pushed directly to `master` must be top quality: no regressions, no controversy, thoughtful design, great perf, clean and readable, successful pipeline, compliant with the Code Style below, no compiler warnings.
 - When merging, if the commit history is "messy" (contains commits that just fix the previous commit(s), and/or commits that don't compile and run, and/or poorly described commits) the MR should be squash merged.  Clean concise commit history is useful and is to be merged intact.
