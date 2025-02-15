@@ -133,6 +133,18 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
   Functions in CamelCase, macros in UPPERCASE.  
   Underscores should be included if they improve readability.
 
+- TODO notes which are time sensitive and pending on a release period to begin or end in
+  order to be actionable should use the following formatting.  
+  The version number is a git release tag such as `xonotic-v0.8.2`,
+  existing tags can be found [here](https://gitlab.com/xonotic/xonotic/-/tags).
+
+	```c
+	// XONRELEASE TODO: xonotic-v0.9 before release drink water
+	// XONRELEASE TODO: xonotic-v0.8.6 before release candidate eat food
+	// XONRELEASE TODO: xonotic-v0.8.5 after release hydrate more
+	// XONRELEASE TODO: xonotic-v0.8.2 after release candidate take a shower
+	```
+
 - If following these guidelines in any manner would make any code less
   readable or harder to follow, ***ignore them***. This section is only
   guidelines, not rules. We're not going to beat you over the head in
