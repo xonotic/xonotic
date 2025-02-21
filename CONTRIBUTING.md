@@ -7,13 +7,15 @@ Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so
 
 # Licensing
 
-A condition for write (push) access and submission of merge requests is that **you agree that any code or data you push will be licensed under the [GNU General Public License, version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html), or any later version.**
+A condition for write (push) access and submission of merge requests is that **you agree that any code or other data you push will be licensed under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html), or any later version.**
 
-If the directory or repository your changes apply to contains a LICENSE or COPYING file indicating another license or a dual license, then **you agree that your pushed code will be licensed as specified in that file.**  Examples of subdirectories and repositories with a dual license or a different license:
-* [xonotic-data.pk3dir/qcsrc/lib/warpzone](https://gitlab.com/xonotic/xonotic-data.pk3dir/-/tree/master/qcsrc/lib/warpzone) - dual licensed with GNU GPLv2 (or any later version), or MIT license.
+**Exceptions:** if the directory or repository your changes apply to contains a LICENSE or COPYING file indicating another license or a dual license, then **you agree that your pushed code or other data will be licensed as specified in that file.**  Examples of subdirectories and repositories with a dual license or a different license:
+* [xonotic-data.pk3dir/qcsrc/lib/warpzone](https://gitlab.com/xonotic/xonotic-data.pk3dir/-/tree/master/qcsrc/lib/warpzone) - dual-licensed with GNU GPLv2 (or any later version), or MIT license.
 * [xonstat-go](https://gitlab.com/xonotic/xonstat-go/) - licensed with [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)
 
-In case the code you pushed was not written by you, it is your responsibility to ensure proper licensing.
+In case the code or other data you pushed was not created by you, it is your responsibility to ensure proper licensing.
+
+See also the primary licensing document [COPYING](COPYING)
 
 
 # Technical
