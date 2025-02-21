@@ -1,6 +1,6 @@
 # Requesting Access
 
-It's recommended to [request access](https://docs.gitlab.com/ee/user/group/index.html#request-access-to-a-group) to the [Xonotic project group](https://gitlab.com/xonotic).  Forking our repositories and submitting merge requests from there will work but you won't be able to use our CI setup for the [xonotic-data.pk3dir](https://gitlab.com/xonotic/xonotic-data.pk3dir) repo.
+It's recommended to [request access](https://docs.gitlab.com/user/group/#request-access-to-a-group) to the [Xonotic project group](https://gitlab.com/xonotic).  Forking our repositories and submitting merge requests from there will work but is less convenient and you won't be able to use our CI pipeline.
 
 Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so that we know you're legit.
 
@@ -135,8 +135,8 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
   Functions in CamelCase, macros in UPPERCASE.  
   Underscores should be included if they improve readability.
 
-- TODO notes which are time sensitive and pending on a release period to begin or end in
-  order to be actionable should use the following formatting.  
+- TODO notes which are waiting for a release-related event in
+  order to become actionable should use the following formatting.  
   The version number is a git release tag such as `xonotic-v0.8.2`,
   existing tags can be found [here](https://gitlab.com/xonotic/xonotic/-/tags).
 
@@ -147,10 +147,8 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
 	// XONRELEASE TODO: xonotic-v0.8.2 after release candidate take a shower
 	```
 
-- If following these guidelines in any manner would make any code less
-  readable or harder to follow, ***ignore them***. This section is only
-  guidelines, not rules. We're not going to beat you over the head in
-  merge requests because you misplaced a dereference operator.
+- If following this code style to the letter would make some code less
+  readable or harder to understand, make suitable style adjustments.
 
   For example, in some situations, placing the block on the same line as
   the condition would be okay because it looks cleaner:
