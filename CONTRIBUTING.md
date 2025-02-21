@@ -33,11 +33,12 @@ Build tools are documented on the [Repository_Access wiki page](https://gitlab.c
 
 ### For Maintainers
 
-- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (e.g. new features, redesigns, refactors) must be discussed with the team first.
-- Pushing to someone else's branch is allowed if changes are required for merging the branch AND the owner has left the project or indicated they won't develop the branch further.
+- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (e.g. new features, redesigns, refactors, [balance changes](https://xonotic.org/teamvotes/436/)) must be discussed with the team first.
+- Pushing to someone else's branch is allowed IF changes are required for merging the branch AND the owner has left the project or indicated they won't develop the branch further.
 - Any change pushed directly to `master` must be top quality: no regressions, no controversy, thoughtful design, great perf, clean and readable, successful pipeline, compliant with the Code Style below, no compiler warnings.
-- When merging, if the commit history is "messy" (contains commits that just fix the previous commit(s), and/or commits that don't compile and run, and/or poorly described commits) the MR should be squash merged.  Clean concise commit history is useful and is to be merged intact.
+- When merging, if the commit history is "messy" (contains commits that e.g. just fix the previous commit(s), don't compile and run, are poorly described and/or crufty) the MR should be squash merged.  Clean concise commit history is useful and is to be merged intact (no squashing).
 - Force pushes must not be made to the default branch (typically `master` or `main`).
+- It's recommended for maintainers to merge their own MRs (once approved) as they're usually best qualified to realise a problem has been missed.
 
 
 # Code Style
