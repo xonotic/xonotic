@@ -25,7 +25,8 @@ case "${0##*/}" in
 		;;
 esac
 
-options="-Prtzil --executability --delete-after --delete-excluded --stats"
+# use fuzzy matching because file names may differ (release->release, release<>autobuild)
+options="-Prtzily --executability --delete-after --delete-excluded --stats"
 
 if [ -d "../../../.git" ]; then
 	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
@@ -35,13 +36,11 @@ elif [ -e "Xonotic" ]; then
 	echo "targetting the normal $buildtype version"
 	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	target="../../.."
-	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -e "Xonotic-high" ]; then
 	echo "found manually created 'Xonotic-high' file"
 	echo "targetting the high $buildtype version"
 	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
 	target="../../.."
-	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
 		echo "found rsync high data files"
@@ -51,7 +50,6 @@ elif [ -d "../../../data" ]; then
 		echo "found release high data files"
 		echo "targetting the high $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
-		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
 		echo "found Xonotic rsync data files"
 		echo "targetting the normal $buildtype version"
@@ -60,7 +58,6 @@ elif [ -d "../../../data" ]; then
 		echo "found Xonotic release data files"
 		echo "targetting the normal $buildtype version"
 		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-		options="$options -y" # use fuzzy matching because file names differ
 	else
 		echo >&2 "FATAL: unrecognized Xonotic build. This update script cannot be used."
 		exit 1

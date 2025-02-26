@@ -16,7 +16,8 @@ if /i not "%choice%" == "Y" goto end
 set buildtype=release
 if "%~n0" == "update-to-autobuild" set buildtype=autobuild
 
-set options=-Prtzil --executability --delete-after --delete-excluded --stats
+:: use fuzzy matching because file names may differ (release->release, release<>autobuild)
+set options=-Prtzily --executability --delete-after --delete-excluded --stats
 
 if exist ..\..\..\.git goto xonoticdatagit
 if exist ..\..\..\data goto xonoticdata
@@ -30,13 +31,13 @@ goto xonotic
 :xonoticswitchtohigh
 	set PATH=misc\tools\rsync-updater;%PATH%
 	cd ..\..\..
-	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatahighfuzzy
+	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatahigh
 	echo FATAL: rsync not in misc\tools\rsync-updater. This update script cannot be used.
 	goto end
 :xonoticswitchtonormal
 	set PATH=misc\tools\rsync-updater;%PATH%
 	cd ..\..\..
-	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatanormalfuzzy
+	if exist misc\tools\rsync-updater\rsync.exe goto xonoticdatanormal
 	echo FATAL: rsync not in misc\tools\rsync-updater. This update script cannot be used.
 	goto end
 :xonoticdata
@@ -47,24 +48,16 @@ goto xonotic
 	set PATH=misc\tools\rsync-updater;%PATH%
 	cd ..\..\..
 	if exist data\xonotic-rsync-data-high.pk3 goto xonoticdatahigh
-	if exist data\xonotic-*-data-high.pk3 goto xonoticdatahighfuzzy
+	if exist data\xonotic-*-data-high.pk3 goto xonoticdatahigh
 	if exist data\xonotic-rsync-data.pk3 goto xonoticdatanormal
-	if exist data\xonotic-*-data.pk3 goto xonoticdatanormalfuzzy
+	if exist data\xonotic-*-data.pk3 goto xonoticdatanormal
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatahigh
 		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
 		goto endxonoticdata
-:xonoticdatahighfuzzy
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
-		set options=%options% -y
-		goto endxonoticdata
 :xonoticdatanormal
 		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
-		goto endxonoticdata
-:xonoticdatanormalfuzzy
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
-		set options=%options% -y
 		goto endxonoticdata
 :endxonoticdata
 	set target=./
