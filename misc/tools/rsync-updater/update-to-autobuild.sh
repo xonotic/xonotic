@@ -6,6 +6,12 @@ if ! which rsync > /dev/null; then
 	printf >&2 "\n\e[1;31mFATAL: rsync not found, please install the rsync package!\e[m\n"
 	exit 1
 fi
+if which rsync-ssl > /dev/null; then
+	cmd=rsync-ssl
+else
+	printf >&2 "\n\e[1;33mWARNING: rsync-ssl not found, connection will be insecure!\e[m\n"
+	cmd=rsync
+fi
 
 if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
 	choice=y
@@ -56,7 +62,7 @@ elif [ -d "../../../data" ]; then
 else
 	target="Xonotic/"
 fi
-url="beta.xonotic.org/$buildtype-$package/"
+url="rsync.xonotic.org/$buildtype/$package/"
 
 excludes=
 if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
@@ -87,4 +93,4 @@ if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 fi
 
 echo "Syncing $(cd $target && printf $PWD/) with $url ..."
-rsync $options $excludes "rsync://$url" "$target"
+$cmd $options $excludes "rsync://$url" "$target"

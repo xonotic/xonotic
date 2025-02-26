@@ -67,7 +67,7 @@ goto xonotic
 	set target=Xonotic/
 	goto endxonotic
 :endxonotic
-set url=rsync://beta.xonotic.org/%buildtype%-%package%/
+set url=rsync://rsync.xonotic.org/%buildtype%/%package%/
 
 set excludes=
 if not "%XONOTIC_INCLUDE_ALL%" == "" goto endbit
