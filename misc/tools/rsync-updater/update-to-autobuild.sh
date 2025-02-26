@@ -9,6 +9,27 @@ if ! command -v rsync > /dev/null; then
 	exit 1
 fi
 
+if ! command -v rsync-ssl >/dev/null; then
+	export PATH="$PWD/usr/bin:$PATH"
+fi
+
+# openssl is the only option, as gnutls-cli is broken in rsync-ssl and stunnel doesn't verify the cert.
+rsynccmd=rsync-ssl
+if ! command -v openssl > /dev/null; then
+	if [ $interactive = false ]; then
+		printf >&2 "\033[1;31mFATAL: openssl not found, please install the openssl package!\033[m\n"
+		exit 1
+	fi
+	printf "\033[1;33mWARNING: openssl not found, please install the openssl package!\033[m\n"
+	unset secchoice # no automated skipping, this is important
+	until [ "$secchoice" = y ] || [ "$secchoice" = Y ]; do
+		printf "\033[1;33mConnecting without openssl is insecure, continue? [Y/N] \033[m"
+		read -r secchoice
+		[ "$secchoice" = n ] || [ "$secchoice" = N ] && exit 1
+	done
+	rsynccmd=rsync
+fi
+
 case "${0##*/}" in
 	update-to-autobuild.sh)
 		buildtype=autobuild
@@ -26,7 +47,10 @@ if [ -n "$(rsync --help | sed -En 's/(--delete-delay)/\1/p')" ]; then
 else
 	options="$options --delete-after"
 fi
-if [ "$OS" != "Windows_NT" ]; then
+if [ "$OS" = "Windows_NT" ]; then
+	# use blocking stdio for the remote shell (openssl) to avoid random failures (msys2/cygwin bug?)
+	options="$options --blocking-io"
+else
 	options="$options --executability"
 fi
 
@@ -55,7 +79,7 @@ elif [ -e "Xonotic-high" ]; then
 	printf "\033[1;35mFound manually created 'Xonotic-high' package override\033[m\n"
 	package="Xonotic-high"
 fi
-url="beta.xonotic.org/$buildtype-$package"
+url="rsync.xonotic.org/$buildtype/$package"
 
 excludes=
 if [ -n "$XONOTIC_INCLUDE_ALL" ]; then
@@ -124,4 +148,4 @@ until [ "$choice" = y ] || [ "$choice" = Y ]; do
 done
 
 # exec ensures this script stops before it's updated to prevent potential glitches
-exec rsync $options $excludes "rsync://$url/" "$target"
+exec $rsynccmd $options $excludes "rsync://$url/" "$target"
