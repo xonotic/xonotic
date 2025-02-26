@@ -53,27 +53,28 @@ goto xonotic
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatahigh
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
+		set package=Xonotic-high
 		goto endxonoticdata
 :xonoticdatahighfuzzy
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
+		set package=Xonotic-high
 		set options=%options% -y
 		goto endxonoticdata
 :xonoticdatanormal
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
+		set package=Xonotic
 		goto endxonoticdata
 :xonoticdatanormalfuzzy
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
+		set package=Xonotic
 		set options=%options% -y
 		goto endxonoticdata
 :endxonoticdata
 	set target=./
 	goto endxonotic
 :xonotic
-	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
+	set package=Xonotic
 	set target=Xonotic/
 	goto endxonotic
 :endxonotic
+set url=beta.xonotic.org/%buildtype%-%package%
 
 set excludes=
 if not "%XONOTIC_INCLUDE_ALL%" == "" goto endbit
@@ -101,7 +102,9 @@ if "%ProgramFiles(x86)%" == "" goto bit32
 :endbit
 
 for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
-%TEMP%\xonotic-rsync-updater\rsync %options% %excludes% %url% %target%
+cd %target%
+echo Updating %CD% from %url% ...
+%TEMP%\xonotic-rsync-updater\rsync %options% %excludes% rsync://%url%/ %target%
 %TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
 
 :end
