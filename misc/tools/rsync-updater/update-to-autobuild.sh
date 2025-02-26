@@ -27,49 +27,39 @@ esac
 
 options="-Prtzil --executability --delete-after --delete-excluded --stats"
 
+package="Xonotic"
+target="../../.."
 if [ -d "../../../.git" ]; then
 	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
 	exec ../../../all update
 elif [ -e "Xonotic" ]; then
 	echo "found manually created 'Xonotic' file"
-	echo "targetting the normal $buildtype version"
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-	target="../../.."
 	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -e "Xonotic-high" ]; then
 	echo "found manually created 'Xonotic-high' file"
-	echo "targetting the high $buildtype version"
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
-	target="../../.."
+	package="Xonotic-high"
 	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
 		echo "found rsync high data files"
-		echo "targetting the high $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
+		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-*-data-high.pk3 ]; then
 		echo "found release high data files"
-		echo "targetting the high $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
+		package="Xonotic-high"
 		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
 		echo "found Xonotic rsync data files"
-		echo "targetting the normal $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
 		echo "found Xonotic release data files"
-		echo "targetting the normal $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 		options="$options -y" # use fuzzy matching because file names differ
 	else
 		echo >&2 "FATAL: unrecognized Xonotic build. This update script cannot be used."
 		exit 1
 	fi
-	target="../../.."
 else
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	target="Xonotic/"
 fi
+url="beta.xonotic.org/$buildtype-$package"
 
 excludes=
 if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
@@ -99,4 +89,6 @@ if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 	esac
 fi
 
-rsync $options $excludes "$url" "$target"
+resolvedtarget=$(cd $target && [ "${PWD#$HOME}" != "$PWD" ] && printf "~${PWD#$HOME}" || printf "$PWD")
+printf "Updating \033[1;34m$resolvedtarget\033[m from \033[0;36m$url \033[m...\n"
+rsync $options $excludes "rsync://$url/" "$target"
