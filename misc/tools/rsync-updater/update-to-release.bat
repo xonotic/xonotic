@@ -54,19 +54,20 @@ goto xonotic
 	echo FATAL: unrecognized Xonotic build. This update script cannot be used.
 	goto end
 :xonoticdatahigh
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic-high/
+		set package=Xonotic-high
 		goto endxonoticdata
 :xonoticdatanormal
-		set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
+		set package=Xonotic
 		goto endxonoticdata
 :endxonoticdata
 	set target=./
 	goto endxonotic
 :xonotic
-	set url=rsync://beta.xonotic.org/%buildtype%-Xonotic/
+	set package=Xonotic
 	set target=Xonotic/
 	goto endxonotic
 :endxonotic
+set url=rsync://beta.xonotic.org/%buildtype%-%package%/
 
 set excludes=
 if not "%XONOTIC_INCLUDE_ALL%" == "" goto endbit

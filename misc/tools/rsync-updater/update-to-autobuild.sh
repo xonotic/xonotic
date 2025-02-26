@@ -28,45 +28,35 @@ esac
 # use fuzzy matching because file names may differ (release->release, release<>autobuild)
 options="-Prtzily --executability --delete-after --delete-excluded --stats"
 
+package="Xonotic"
+target="../../.."
 if [ -d "../../../.git" ]; then
 	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
 	exec ../../../all update
 elif [ -e "Xonotic" ]; then
 	echo "found manually created 'Xonotic' file"
-	echo "targetting the normal $buildtype version"
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
-	target="../../.."
 elif [ -e "Xonotic-high" ]; then
 	echo "found manually created 'Xonotic-high' file"
-	echo "targetting the high $buildtype version"
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
-	target="../../.."
+	package="Xonotic-high"
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
 		echo "found rsync high data files"
-		echo "targetting the high $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
+		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-*-data-high.pk3 ]; then
 		echo "found release high data files"
-		echo "targetting the high $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic-high/"
+		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
 		echo "found Xonotic rsync data files"
-		echo "targetting the normal $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
 		echo "found Xonotic release data files"
-		echo "targetting the normal $buildtype version"
-		url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	else
 		echo >&2 "FATAL: unrecognized Xonotic build. This update script cannot be used."
 		exit 1
 	fi
-	target="../../.."
 else
-	url="rsync://beta.xonotic.org/$buildtype-Xonotic/"
 	target="Xonotic/"
 fi
+url="beta.xonotic.org/$buildtype-$package/"
 
 excludes=
 if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
@@ -96,4 +86,5 @@ if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
 	esac
 fi
 
-rsync $options $excludes "$url" "$target"
+echo "Syncing $(cd $target && printf $PWD/) with $url ..."
+rsync $options $excludes "rsync://$url" "$target"
