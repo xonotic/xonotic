@@ -3,7 +3,7 @@
 cd "${0%/*}" || exit 1
 
 if ! which rsync > /dev/null; then
-	echo >&2 "FATAL: rsync not found, please install the rsync package"
+	printf >&2 "\n\e[1;31mFATAL: rsync not found, please install the rsync package!\e[m\n"
 	exit 1
 fi
 
@@ -11,7 +11,7 @@ if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
 	choice=y
 fi
 until [ "$choice" = y ] || [ "$choice" = Y ]; do
-	printf "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? "
+	printf "\e[1mThis script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? \e[m"
 	read -r choice
 	[ "$choice" = n ] || [ "$choice" = N ] && exit 1
 done
@@ -31,26 +31,26 @@ options="-Prtzily --executability --delete-after --delete-excluded --stats"
 package="Xonotic"
 target="../../.."
 if [ -d "../../../.git" ]; then
-	echo >&2 "NOTE: this is a git repository download. Using the regular update method."
+	printf >&2 "\e[1;33mNOTE: this is a git repository. Using the git update method.\e[m\n"
 	exec ../../../all update
 elif [ -e "Xonotic" ]; then
-	echo "found manually created 'Xonotic' file"
+	printf "\e[1mfound manually created 'Xonotic' file\e[m"
 elif [ -e "Xonotic-high" ]; then
-	echo "found manually created 'Xonotic-high' file"
+	printf "\e[1mfound manually created 'Xonotic-high' file\e[m"
 	package="Xonotic-high"
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
-		echo "found rsync high data files"
+		echo "found beta autobuild Xonotic-high files"
 		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-*-data-high.pk3 ]; then
-		echo "found release high data files"
+		echo "found stable release Xonotic-high files"
 		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
-		echo "found Xonotic rsync data files"
+		echo "found beta autobuild Xonotic files"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
-		echo "found Xonotic release data files"
+		echo "found stable release Xonotic files"
 	else
-		echo >&2 "FATAL: unrecognized Xonotic build. This update script cannot be used."
+		printf >&2 "\n\e[1;31mFATAL: unrecognized Xonotic build. This update script cannot be used.\e[m\n"
 		exit 1
 	fi
 else
