@@ -1,19 +1,21 @@
 # Requesting Access
 
-It's recommended to [request access](https://docs.gitlab.com/ee/user/group/index.html#request-access-to-a-group) to the [Xonotic project group](https://gitlab.com/xonotic).  Forking our repositories and submitting merge requests from there will work but you won't be able to use our CI setup for the [xonotic-data.pk3dir](https://gitlab.com/xonotic/xonotic-data.pk3dir) repo.
+It's recommended to [request access](https://docs.gitlab.com/user/group/#request-access-to-a-group) to the [Xonotic project group](https://gitlab.com/xonotic).  Forking our repositories and submitting merge requests from there will work but is less convenient and you won't be able to use our CI pipeline.
 
-Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so we know you're legit.
+Please let us know your GitLab username [on Matrix](https://xonotic.org/chat) so that we know you're legit.
 
 
 # Licensing
 
-A condition for write (push) access and submission of merge requests is that **you agree that any code or data you push will be licensed under the [GNU General Public License, version 2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html), or any later version.**
+A condition for write (push) access and submission of merge requests is that **you agree that any code or other data you push will be licensed under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html), or any later version.**
 
-If the directory or repository your changes apply to contains a LICENSE or COPYING file indicating another license or a dual license, then **you agree that your pushed code will be licensed as specified in that file.**  Examples of subdirectories and repositories with a dual license or a different license:
-* [xonotic-data.pk3dir/qcsrc/lib/warpzone](https://gitlab.com/xonotic/xonotic-data.pk3dir/-/tree/master/qcsrc/lib/warpzone) - dual licensed with GNU GPLv2 (or any later version), or MIT license.
+**Exceptions:** if the directory or repository your changes apply to contains a LICENSE or COPYING file indicating another license or a dual license, then **you agree that your pushed code or other data will be licensed as specified in that file.**  Examples of subdirectories and repositories with a dual license or a different license:
+* [xonotic-data.pk3dir/qcsrc/lib/warpzone](https://gitlab.com/xonotic/xonotic-data.pk3dir/-/tree/master/qcsrc/lib/warpzone) - dual-licensed with GNU GPLv2 (or any later version), or MIT license.
 * [xonstat-go](https://gitlab.com/xonotic/xonstat-go/) - licensed with [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)
 
-In case the code you pushed was not written by you, it is your responsibility to ensure proper licensing.
+In case the code or other data you pushed was not created by you, it is your responsibility to ensure proper licensing.
+
+See also the primary licensing document [COPYING](COPYING)
 
 
 # Technical
@@ -24,18 +26,19 @@ Build tools are documented on the [Repository_Access wiki page](https://gitlab.c
 
 # Policies
 
-### for all Developers
+### For all Developers
 
 - Branches should be named `myname/mychange`. For instance, if your name is Alex and the change you are committing is a menu fix, use something like `alex/menufix`.
 - Ask the branch owner before pushing to someone else's branch.
 
-### for Maintainers
+### For Maintainers
 
-- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (eg new features, redesigns, refactors) must be discussed with the team first.
-- Pushing to someone else's branch is allowed if changes are required for merging the branch AND the owner has left the project or indicated they won't develop the branch further.
+- During a release freeze only user-visible fixes/polishing and documentation may be merged/pushed to master, other changes (e.g. new features, redesigns, refactors, [balance changes](https://xonotic.org/teamvotes/436/)) must be discussed with the team first.
+- Pushing to someone else's branch is allowed IF changes are required for merging the branch AND the owner has left the project or indicated they won't develop the branch further.
 - Any change pushed directly to `master` must be top quality: no regressions, no controversy, thoughtful design, great perf, clean and readable, successful pipeline, compliant with the Code Style below, no compiler warnings.
-- When merging, if the commit history is "messy" (contains commits that just fix the previous commit(s), and/or commits that don't compile and run, and/or poorly described commits) the MR should be squash merged.  Clean concise commit history is useful and is to be merged intact.
+- When merging, if the commit history is "messy" (contains commits that e.g. just fix the previous commit(s), don't compile and run, are poorly described and/or crufty) the MR should be squash merged.  Clean concise commit history is useful and is to be merged intact (no squashing).
 - Force pushes must not be made to the default branch (typically `master` or `main`).
+- It's recommended for maintainers to merge their own MRs (once approved) as they're usually best qualified to realise a problem has been missed.
 
 
 # Code Style
@@ -133,10 +136,20 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
   Functions in CamelCase, macros in UPPERCASE.  
   Underscores should be included if they improve readability.
 
-- If following these guidelines in any manner would make any code less
-  readable or harder to follow, ***ignore them***. This section is only
-  guidelines, not rules. We're not going to beat you over the head in
-  merge requests because you misplaced a dereference operator.
+- TODO notes which are waiting for a release-related event in
+  order to become actionable should use the following formatting.  
+  The version number is a git release tag such as `xonotic-v0.8.2`,
+  existing tags can be found [here](https://gitlab.com/xonotic/xonotic/-/tags).
+
+	```c
+	// XONRELEASE TODO: xonotic-v0.9 before release drink water
+	// XONRELEASE TODO: xonotic-v0.8.6 before release candidate eat food
+	// XONRELEASE TODO: xonotic-v0.8.5 after release hydrate more
+	// XONRELEASE TODO: xonotic-v0.8.2 after release candidate take a shower
+	```
+
+- If following this code style to the letter would make some code less
+  readable or harder to understand, make suitable style adjustments.
 
   For example, in some situations, placing the block on the same line as
   the condition would be okay because it looks cleaner:
