@@ -26,17 +26,17 @@ help:
 	@echo
 	@printf "     \e[1;33m===== Xonotic Makefile for stable and beta releases =====\e[m\n"
 	@echo
-	@printf "The DarkPlaces Engine builds will be named \e[1;32m$(CLIENT) \e[mand \e[1;32m$(SERVER)\e[m\n"
-	@printf "and will be preferred by \e[1;32mxonotic-linux-sdl.sh \e[mand \e[1;32mxonotic-linux-dedicated.sh \e[mscripts\n"
-	@echo   "which should be used to play with the SDL client or host a dedicated server (respectively)."
+	@printf "The new executables will be named \e[1;32m$(CLIENT) \e[mand \e[1;32m$(SERVER)\e[m\n"
+	@printf "and will be preferred by the \e[1;32mxonotic-linux-sdl.sh \e[mand \e[1;32mxonotic-linux-dedicated.sh \e[mscripts\n"
+	@echo   "which are used to play with the SDL client or host a dedicated server (respectively)."
 	@echo
-	@echo   "Moving binaries or data files outside of this directory is not officially supported as"
-	@echo   "this isn't compatible with the included updater and the working directory may be incorrect."
-	@printf "The above \e[1;32mscripts\e[m may be called from elsewhere via symlinks, .desktop files, or other scripts.\n"
+	@echo   "Moving files outside of this directory isn't officially supported as it's"
+	@echo   "incompatible with the included updater and the working directory may be incorrect."
+	@printf "Instead the above \e[1;32mscripts\e[m may be called from elsewhere via symlinks, .desktop files, etc.\n"
 	@echo
 	@printf "More info is available at \e[1;36mhttps://gitlab.com/xonotic/xonotic/-/wikis/Compiling\e[m\n"
 	@echo
-	@echo   "-O3 is already enabled for DarkPlaces Engine. Do not add any math flags!"
+	@echo   "-O3 and all optimisations for your CPU are enabled by default. Do not add any math flags!"
 	@echo
 	@echo   "MAKEFLAGS=$(MAKEFLAGS)"
 	@echo   "CFLAGS= $(CFLAGS)"
@@ -64,7 +64,8 @@ endif
 .PHONY: clean-sources
 clean-sources:
 	$(MAKE) -C $(DPSRC) clean
-	( $(MAKE) -C $(D0SRC) clean || true ) # autotools may not have created the Makefile yet
+# autotools may not have created the Makefile yet so check first and don't fail
+	( [ -f $(D0SRC)/Makefile ] && $(MAKE) -C $(D0SRC) clean || true )
 clean-sources: .EXTRA_PREREQS =  # prevents circular dependency
 
 .PHONY: clean
