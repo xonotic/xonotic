@@ -6,7 +6,7 @@ Xonotic is an addictive, arena-style first person shooter with crisp movement an
 
 ## License
 
-Xonotic is and will always be free and open source. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv3+](https://www.gnu.org/licenses/gpl-3.0.html) license (see the [COPYING](COPYING) file for details).
+Xonotic is and will always be free and open source. It is available under the [copyleft](https://www.gnu.org/copyleft/)-style [GPLv3+](https://www.gnu.org/licenses/gpl-3.0.html) license (see the [COPYING](COPYING) and [CONTRIBUTING](CONTRIBUTING.md#licensing) files for full details).
 
 ## Download
 
