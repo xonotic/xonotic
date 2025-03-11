@@ -3,9 +3,11 @@ setlocal
 
 if "%1" == "did-copy" goto copied
 cd %~dp0
-rmdir /s /q %TEMP%\xonotic-rsync-updater
+rmdir /s /q %TEMP%\xonotic-rsync-updater  2>NUL
 mkdir %TEMP%\xonotic-rsync-updater
-for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
+copy /b %~nx0 %TEMP%\xonotic-rsync-updater\  >NUL
+:: windows has no cp -r equivalent, this seems least-bad
+robocopy usr %TEMP%\xonotic-rsync-updater\usr /e   >NUL
 %TEMP%\xonotic-rsync-updater\%~n0 did-copy
 :: can only get here if above batch file couldn't be created
 pause
@@ -19,7 +21,7 @@ if /i not "%choice%" == "Y" goto end
 set buildtype=release
 if "%~n0" == "update-to-autobuild" set buildtype=autobuild
 
-set options=-Prtzil --executability --delete-after --delete-excluded --stats
+set options=-Prtzil --delete-after --delete-excluded --stats
 
 if exist ..\..\..\.git goto xonoticdatagit
 if exist Xonotic goto xonoticswitchtonormal
@@ -104,12 +106,11 @@ if "%ProgramFiles(x86)%" == "" goto bit32
 	goto endbit
 :endbit
 
-for %%f in (*.exe *.dll) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 cd %target%
 echo Updating %CD% from %url% ...
-%TEMP%\xonotic-rsync-updater\rsync %options% %excludes% rsync://%url%/ %target%
-%TEMP%\xonotic-rsync-updater\chmod -R a+x %target%
+%TEMP%\xonotic-rsync-updater\usr\bin\rsync %options% %excludes% rsync://%url%/ %target%
 
 :end
 pause
-rmdir /s /q %TEMP%\xonotic-rsync-updater
+:: hack: delete running batch file without error by deleting after batch exit
+(goto) 2>NUL & rmdir /s /q %TEMP%\xonotic-rsync-updater
