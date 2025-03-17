@@ -2,13 +2,18 @@
 
 cd "${0%/*}" || exit 1
 
-if ! which rsync > /dev/null; then
+[ -t 2 ] && [ -t 1 ] && [ -t 0 ] && interactive=true || interactive=false
+
+if ! command -v rsync > /dev/null; then
 	echo >&2 "FATAL: rsync not found, please install the rsync package"
 	exit 1
 fi
 
 if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
 	choice=y
+elif [ $interactive = false ]; then
+	printf >&2 "\033[1;31mFATAL: non-interactive mode requires the \033[1;37m--yes\033[1;31m argument to acknowledge that this script will DELETE any custom files in the Xonotic directory.\033[m\n"
+	exit 1
 fi
 until [ "$choice" = y ] || [ "$choice" = Y ]; do
 	printf "This script will DELETE any custom files in the Xonotic folder. Do you want to continue [Y/N]? "
@@ -91,4 +96,5 @@ fi
 
 resolvedtarget=$(cd $target && [ "${PWD#$HOME}" != "$PWD" ] && printf "~${PWD#$HOME}" || printf "$PWD")
 printf "Updating \033[1;34m$resolvedtarget\033[m from \033[0;36m$url \033[m...\n"
-rsync $options $excludes "rsync://$url/" "$target"
+# exec ensures this script stops before it's updated to prevent potential glitches
+exec rsync $options $excludes "rsync://$url/" "$target"

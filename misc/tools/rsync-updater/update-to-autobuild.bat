@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 if "%1" == "did-copy" goto copied
 cd %~dp0
@@ -6,7 +7,9 @@ rmdir /s /q %TEMP%\xonotic-rsync-updater
 mkdir %TEMP%\xonotic-rsync-updater
 for %%f in (*.exe *.dll *.bat) do copy /b %%f %TEMP%\xonotic-rsync-updater\
 %TEMP%\xonotic-rsync-updater\%~n0 did-copy
-exit
+:: can only get here if above batch file couldn't be created
+pause
+exit /b
 
 :copied
 
