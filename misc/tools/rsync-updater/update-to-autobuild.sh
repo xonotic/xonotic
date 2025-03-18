@@ -9,12 +9,11 @@ if ! command -v rsync > /dev/null; then
 	exit 1
 fi
 
-if ! command -v rsync-ssl >/dev/null; then
-	export PATH="$PWD/usr/bin:$PATH"
-fi
+# always prefer our own rsync-ssl script, we need its --ipv4 and --ipv6 option support
+export PATH="$PWD/usr/bin:$PATH"
 
 # openssl is the only option, as gnutls-cli is broken in rsync-ssl and stunnel doesn't verify the cert.
-rsynccmd=rsync-ssl
+rsynccmd="rsync-ssl --timeout=3"
 if ! command -v openssl > /dev/null; then
 	if [ $interactive = false ]; then
 		printf >&2 "\033[1;31mFATAL: openssl not found, please install the openssl package!\033[m\n"
@@ -27,7 +26,7 @@ if ! command -v openssl > /dev/null; then
 		read -r secchoice
 		[ "$secchoice" = n ] || [ "$secchoice" = N ] && exit 1
 	done
-	rsynccmd=rsync
+	rsynccmd="rsync --contimeout=3"
 fi
 
 case "${0##*/}" in
@@ -79,7 +78,7 @@ elif [ -e "Xonotic-high" ]; then
 	printf "\033[1;35mFound manually created 'Xonotic-high' package override\033[m\n"
 	package="Xonotic-high"
 fi
-url="rsync.xonotic.org/$buildtype/$package"
+source="$buildtype/$package"
 
 excludes=
 if [ -n "$XONOTIC_INCLUDE_ALL" ]; then
@@ -131,8 +130,56 @@ else
 	esac
 fi
 
+bestmirror=rsync.xonotic.org
+if [ -z "$(rsync --help | sed -En 's/(--write-devices)/\1/p')" ]; then
+	printf "\033[1;33mNOTE: your rsync version is too old for mirror autoselect and modern compression, expect bad performance. Please update to rsync 3.2.0 or later!\033[m\n"
+else
+	printf "Updating mirror list ... "
+	out=$($rsynccmd -t "rsync://$bestmirror/autobuild/Xonotic/misc/tools/rsync-updater/mirrors.txt" mirrors.txt 2>&1) \
+		&& printf "\033[0;32mOK\033[m\n" \
+		|| printf "\033[1;31mFAILED\n\033[0;31m$out\033[m\n" | sed '2,${s/^/  /}'
+
+	bestspeed=-1
+	while read firstword secondword restoflineignored; do
+		mirror=${firstword%%//*}
+		[ -z $mirror ] && continue
+		location=${secondword%%//*}
+		# Sometimes perf differs greatly between v6 and v4
+		for ipv in ipv6 ipv4; do
+			printf "Testing mirror \033[36m$mirror\033[m [$location] $ipv ... \033[m"
+			# not the most rigorous benchmark, but fit for purpose and unaffected by local filesystem perf
+			# NB: /dev/null as the DEST arg is intended
+			if out=$(LC_ALL=C.UTF-8 $rsynccmd --compress-choice=none --write-devices --stats --$ipv "rsync://$mirror/$source/GPL-3" /dev/null 2>&1); then
+				# parse the speed from the --stats output (integer part only), and strip any commas (thousands separators)
+				speed=$(printf "$out" | sed -En 's/.*  ([0-9,]+)\.?[0-9]* bytes\/sec$/\1/p' | sed 's/,//g')
+				if [ -n "$speed" ]; then
+					printf "\033[0;32mOK, speed $speed\033[m\n"
+				else
+					printf "\033[1;33mfailed to parse speed value!\n\033[0;33m$out\033[m\n" | sed '2,${s/^/  /}'
+					speed=0
+				fi
+				if [ $speed -gt $bestspeed ]; then
+					bestspeed=$speed
+					bestmirror=$mirror
+					bestipv=$ipv
+				fi
+			elif [ $ipv = ipv6 ]; then
+				# omit error text to reduce spam as the ISP may not support v6
+				printf "\033[0;31mFAILED\033[m\n"
+			else
+				printf "\033[0;31mFAILED\n\033[0;31m$out\033[m\n" | sed '2,${s/^/  /}'
+			fi
+		done
+	done < mirrors.txt
+	if [ $bestspeed -eq -1 ]; then
+		printf "\033[1;31mFATAL: all mirror tests failed, no internet?\033[m\n"
+		exit 1
+	fi
+	options="$options --$bestipv"
+fi
+
 resolvedtarget=$(cd $target && [ "${PWD#$HOME}" != "$PWD" ] && printf "~${PWD#$HOME}" || printf "$PWD")
-printf "Updating \033[1;34m$resolvedtarget\033[m from \033[0;36m$url \033[m...\n"
+printf "Updating \033[1;34m$resolvedtarget\033[m from \033[0;36m$bestmirror/$source \033[m$bestipv ...\n"
 
 targetname=$(cd "$target" && printf "${PWD##*/}")
 if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
@@ -148,4 +195,4 @@ until [ "$choice" = y ] || [ "$choice" = Y ]; do
 done
 
 # exec ensures this script stops before it's updated to prevent potential glitches
-exec $rsynccmd $options $excludes "rsync://$url/" "$target"
+exec $rsynccmd $options $excludes "rsync://$bestmirror/$source/" "$target"
