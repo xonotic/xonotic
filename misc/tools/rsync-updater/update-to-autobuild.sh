@@ -30,7 +30,10 @@ case "${0##*/}" in
 		;;
 esac
 
-options="-Prtzil --executability --delete-after --delete-excluded --stats"
+options="-Prtzil --delete-after --delete-excluded --stats"
+if [ "$OS" != "Windows_NT" ]; then
+	options="$options --executability"
+fi
 
 package="Xonotic"
 target="../../.."
@@ -67,7 +70,29 @@ fi
 url="beta.xonotic.org/$buildtype-$package"
 
 excludes=
-if [ -z "$XONOTIC_INCLUDE_ALL" ]; then
+if [ -n "$XONOTIC_INCLUDE_ALL" ]; then
+	: noot noot
+elif [ "$OS" = "Windows_NT" ]; then
+	excludes="$excludes --exclude=/xonotic-linux*"
+	excludes="$excludes --exclude=/xonotic-osx-*"
+	excludes="$excludes --exclude=/Xonotic*.app"
+	excludes="$excludes --exclude=/gmqcc/gmqcc.linux*"
+	excludes="$excludes --exclude=/gmqcc/gmqcc.osx"
+
+	if [ "$PROCESSOR_ARCHITECTURE" = AMD64 ]; then
+		if [ -z "$XONOTIC_INCLUDE_32BIT" ]; then
+		excludes="$excludes --exclude=/xonotic-x86.exe"
+		excludes="$excludes --exclude=/xonotic-x86-dedicated.exe"
+		excludes="$excludes --exclude=/xonotic-x86-wgl.exe"
+		excludes="$excludes --exclude=/bin32"
+		fi
+	else
+		excludes="$excludes --exclude=/xonotic.exe"
+		excludes="$excludes --exclude=/xonotic-dedicated.exe"
+		excludes="$excludes --exclude=/xonotic-wgl.exe"
+		excludes="$excludes --exclude=/bin64"
+	fi
+else
 	excludes="$excludes --exclude=/*.exe"
 	excludes="$excludes --exclude=/bin32"
 	excludes="$excludes --exclude=/*.dll"
