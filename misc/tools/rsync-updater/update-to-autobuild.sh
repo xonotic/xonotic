@@ -30,7 +30,14 @@ case "${0##*/}" in
 		;;
 esac
 
-options="-Prtzil --delete-after --delete-excluded --stats"
+# always use fuzzy (-y) because file names may differ (release->release, release<>autobuild)
+# fuzzy requires --delete-delay or --delete-after
+options="-Prtzilyhh --delete-excluded --stats"
+if [ -n "$(rsync --help | sed -En 's/(--delete-delay)/\1/p')" ]; then
+	options="$options --delete-delay" # more efficient, requires rsync 3.0.0 or later
+else
+	options="$options --delete-after"
+fi
 if [ "$OS" != "Windows_NT" ]; then
 	options="$options --executability"
 fi
@@ -42,11 +49,9 @@ if [ -d "../../../.git" ]; then
 	exec ../../../all update
 elif [ -e "Xonotic" ]; then
 	echo "found manually created 'Xonotic' file"
-	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -e "Xonotic-high" ]; then
 	echo "found manually created 'Xonotic-high' file"
 	package="Xonotic-high"
-	options="$options -y" # use fuzzy matching because file names may differ
 elif [ -d "../../../data" ]; then
 	if [ -f ../../../data/xonotic-rsync-data-high.pk3 ]; then
 		echo "found rsync high data files"
@@ -54,12 +59,10 @@ elif [ -d "../../../data" ]; then
 	elif [ -f ../../../data/xonotic-*-data-high.pk3 ]; then
 		echo "found release high data files"
 		package="Xonotic-high"
-		options="$options -y" # use fuzzy matching because file names differ
 	elif [ -f ../../../data/xonotic-rsync-data.pk3 ]; then
 		echo "found Xonotic rsync data files"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
 		echo "found Xonotic release data files"
-		options="$options -y" # use fuzzy matching because file names differ
 	else
 		echo >&2 "FATAL: unrecognized Xonotic build. This update script cannot be used."
 		exit 1
