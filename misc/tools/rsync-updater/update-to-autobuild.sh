@@ -64,6 +64,9 @@ elif PWD="${PWD%/}" && [ "$PWD" != "${PWD%/misc/tools/rsync-updater}" ]; then
 		package="Xonotic-high"
 	elif [ -f ../../../data/xonotic-*-data.pk3 ]; then
 		echo "Found Xonotic data files"
+	elif [ -f ../../../data/xonotic-*-maps-mapping.pk3 ]; then
+		echo "Found Xonotic-mappingsupport files"
+		package="Xonotic-mappingsupport"
 	else
 		printf "\033[1;31mNOTE: found misc/tools/rsync-updater parent directories but no data files!\033[m\n"
 	fi
