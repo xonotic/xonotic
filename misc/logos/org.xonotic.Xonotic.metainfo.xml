@@ -109,7 +109,15 @@
     <content_attribute id="money-gambling">none</content_attribute>
   </content_rating>
   <releases>
-    <release version="0.8.6" date="2023-06-20"/>
+    <release version="0.8.6" date="2023-06-20">
+      <description>
+        <p>
+          This release should have been nerfed by the balance council because there’s a lot here for a point version.<br>
+          Two maps popular for years have been polished up and included. There’s new gametypes and moderation features, new bot capabilities, new HUD and interface features, quality of life and customisation features for players and server admins, XonStat upgrades, and as usual more fixes and optimisations than you can swing a shotgun at.
+        </p>
+      </description>
+      <url type="details">https://xonotic.org/posts/2023/xonotic-0-8-6-release/</url>
+    </release>
     <release version="0.8.5" date="2022-06-30"/>
     <release version="0.8.2" date="2017-04-01"/>
   </releases>
