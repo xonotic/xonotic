@@ -263,6 +263,11 @@ screenshotthemap()
 		return
 	fi
 
+	if lwp-request -m HEAD "$url$M-$blobhash/$M.ircss"; then
+		# already spammed the chatroom
+		return
+	fi
+
 	if ! unzip -l "$bspdir/$M-$blobhash.pk3" "maps/$M.bsp"; then
 		# no BSP file
 		return
