@@ -306,13 +306,13 @@ case "$cmd" in
 		arch=$1
 		buildpath=$2
 		targetdir=$3
-		verbose mkdir -p "$targetdir"
+		# TODO: cache the dlls and skip rebuilding them if their package versions are unchanged
 		(
 			cd "$d0/misc/buildsrc"
 			verbose ./dlls.sh clean "$buildpath"
 			verbose ./dlls.sh all "$buildpath" "$arch"
 		)
-		verbose cp -v $buildpath/out/$arch/* "$targetdir"
+		verbose cp -r --preserve=timestamps -v "$buildpath/out/$arch" "$targetdir"
 
 		# SDL2
 		verbose mkdir -p "$d0/misc/builddeps/$arch/"
@@ -351,7 +351,7 @@ case "$cmd" in
 			# macOS prefers dylibs be marked executable (this one has no file extension)
 			verbose chmod 755 SDL2/SDL2.framework/Versions/Current/SDL2
 		)
-		cp -R "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/Frameworks/
+		cp -R --preserve=timestamps "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/Frameworks/
 		;;
 	release-libs)
 		release_common
@@ -671,6 +671,8 @@ case "$cmd" in
 			Xonotic/data/xonotic-$pk3stamp-nexcompat-high.pk3 \
 			Xonotic/data/xonotic-$pk3stamp-xoncompat-high.pk3
 		verbose mkzipr Xonotic-$stamp-mappingsupport.zip \
+			Xonotic/misc/tools/rsync-updater/ \
+			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3 \
 			Xonotic/mapping
 		verbose mkzip0 Xonotic-$stamp-mappingsupport.zip \
 			Xonotic/data/xonotic-$pk3stamp-maps-mapping.pk3
@@ -678,9 +680,33 @@ case "$cmd" in
 			Xonotic/gmqcc \
 			Xonotic/source/gmqcc
 		;;
+	release-rsync)
+		release_common
+		# make sure everything we need is installed and updated
+		verbose "$d0"/misc/tools/msys2-linux.sh --schroot=sid rsync dash openssl sed
+		targetroot="$PWD/Xonotic"
+		verbose cd "$HOME/msys64" # see msys2-linux.sh
+		verbose cp --parents --preserve=timestamps \
+			usr/bin/msys-2.0.dll \
+			usr/bin/msys-crypto-3.dll \
+			usr/bin/msys-iconv-2.dll \
+			usr/bin/msys-intl-8.dll \
+			usr/bin/msys-lz4-1.dll \
+			usr/bin/msys-ssl-3.dll \
+			usr/bin/msys-xxhash-0.dll \
+			usr/bin/msys-zstd-1.dll \
+			usr/bin/openssl.exe \
+			usr/bin/rsync.exe \
+			usr/bin/sed.exe \
+			usr/ssl/cert.pem \
+			"$targetroot/misc/tools/rsync-updater/"
+		# msys2 sh.exe is currently bash
+		verbose cp --preserve=timestamps usr/bin/dash.exe "$targetroot/misc/tools/rsync-updater/usr/bin/sh.exe"
+		;;
 	release)
 		release_common
 		verbose "$SELF" release-prepare
+		verbose "$SELF" release-rsync
 		verbose "$SELF" release-maps
 		verbose "$SELF" release-libs
 		verbose "$SELF" release-engine
