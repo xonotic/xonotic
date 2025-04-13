@@ -8,7 +8,9 @@
   </provides>
   <launchable type="desktop-id">xonotic.desktop</launchable>
   <name>Xonotic</name>
-  <developer_name>Team Xonotic</developer_name>
+  <developer id="org.xonotic">
+    <name>Team Xonotic</name>
+  </developer>
   <summary>Multiplayer, deathmatch oriented first person shooter</summary>
   <summary xml:lang="de">Deathmatch- und Mehrspieler-orientierter Ego-Shooter</summary>
   <summary xml:lang="fr">Jeu de tir à la première personne multijoueur</summary>
@@ -69,7 +71,13 @@
       compétitifs.
     </p>
   </description>
+  <url type="bugtracker">https://gitlab.com/groups/xonotic/-/issues</url>
   <url type="homepage">https://xonotic.org</url>
+  <url type="contact">https://xonotic.org/chat/</url>
+  <url type="faq">https://gitlab.com/xonotic/xonotic#documentation</url>
+  <url type="translate">https://gitlab.com/xonotic/xonotic/-/wikis/home#translating</url>
+  <url type="contribute">https://gitlab.com/xonotic/xonotic#developing</url>
+  <url type="vcs-browser">https://gitlab.com/xonotic</url>
   <screenshots>
     <screenshot type="default"><image>https://xonotic.org/m/uploads/2012/07/frontpage_005.jpg</image></screenshot>
     <screenshot><image>https://xonotic.org/m/uploads/2012/07/frontpage_006.jpg</image></screenshot>
@@ -82,4 +90,17 @@
     <content_attribute id="violence-bloodshed">mild</content_attribute>
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
+  <releases>
+    <release version="0.8.6" date="2023-06-20">
+      <description>
+        <p>
+          This release should have been nerfed by the balance council because there’s a lot here for a point version.
+          Two maps popular for years have been polished up and included. There’s new gametypes and moderation features, new bot capabilities, new HUD and interface features, quality of life and customisation features for players and server admins, XonStat upgrades, and as usual more fixes and optimisations than you can swing a shotgun at.
+        </p>
+      </description>
+      <url type="details">https://xonotic.org/posts/2023/xonotic-0-8-6-release/</url>
+    </release>
+    <release version="0.8.5" date="2022-06-30"/>
+    <release version="0.8.2" date="2017-04-01"/>
+  </releases>
 </component>
