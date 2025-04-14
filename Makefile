@@ -1,7 +1,7 @@
 DPSRC = source/darkplaces
 D0SRC = source/d0_blind_id
-CLIENT = xonotic-local-sdl
-SERVER = xonotic-local-dedicated
+CLIENTBIN ?= xonotic-sdl
+SERVERBIN ?= xonotic-dedicated
 
 # CC and MAKEFLAGS are always set so ?= has no effect, therefore
 # we use CFLAGS to set default optimisations which users may override
@@ -26,7 +26,7 @@ help:
 	@echo
 	@printf "     \e[1;33m===== Xonotic Makefile for stable and beta releases =====\e[m\n"
 	@echo
-	@printf "The new executables will be named \e[1;32m$(CLIENT) \e[mand \e[1;32m$(SERVER)\e[m\n"
+	@printf "The new executables will be named \e[1;32m$(CLIENTBIN) \e[mand \e[1;32m$(SERVERBIN)\e[m\n"
 	@printf "and will be preferred by the \e[1;32mxonotic-linux-sdl.sh \e[mand \e[1;32mxonotic-linux-dedicated.sh \e[mscripts\n"
 	@echo   "which are used to play with the SDL client or host a dedicated server (respectively)."
 	@echo
@@ -47,8 +47,8 @@ help:
 	@echo   "  make update-stable         Update to the latest stable release via rsync"
 	@echo   "  make update-beta           Update to the latest beta autobuild via rsync"
 	@echo
-	@printf "  make server                Compile \e[1;32m$(SERVER)\e[m\n"
-	@printf "  make client                Compile \e[1;32m$(CLIENT)\e[m\n"
+	@printf "  make server                Compile \e[1;32m$(SERVERBIN)\e[m\n"
+	@printf "  make client                Compile \e[1;32m$(CLIENTBIN)\e[m\n"
 	@echo   "  make both"
 	@echo
 
@@ -70,7 +70,7 @@ clean-sources: .EXTRA_PREREQS =  # prevents circular dependency
 
 .PHONY: clean
 clean: clean-sources
-	$(RM) $(CLIENT) $(SERVER)
+	$(RM) $(CLIENTBIN) $(SERVERBIN)
 
 .PHONY: update-stable
 update-stable:
@@ -88,20 +88,20 @@ $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a:
 
 $(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a
 	$(MAKE) -C $(DPSRC) sv-release
-$(SERVER): $(DPSRC)/darkplaces-dedicated
-	cp $(DPSRC)/darkplaces-dedicated $(SERVER)
+$(SERVERBIN): $(DPSRC)/darkplaces-dedicated
+	cp $(DPSRC)/darkplaces-dedicated $(SERVERBIN)
 
 $(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a
 	$(MAKE) -C $(DPSRC) sdl-release
-$(CLIENT): $(DPSRC)/darkplaces-sdl
-	cp $(DPSRC)/darkplaces-sdl $(CLIENT)
+$(CLIENTBIN): $(DPSRC)/darkplaces-sdl
+	cp $(DPSRC)/darkplaces-sdl $(CLIENTBIN)
 
 
 .PHONY: server
-server: $(SERVER)
+server: $(SERVERBIN)
 
 .PHONY: client
-client: $(CLIENT)
+client: $(CLIENTBIN)
 
 .PHONY: both
 both: client server
