@@ -12,16 +12,6 @@ MAKEFLAGS := -j$(shell nproc)
 # DP makefile overrides CFLAGS (exporting CFLAGS does work for d0_blind_id but so does this)
 export CC += $(CFLAGS)
 
-# d0_blind_id header location
-export CC += -I$(PWD)/source/
-# d0_blind_id static libs location
-export CC += -L$(PWD)/$(D0SRC)/.libs/
-# Player IDs
-export DP_LINK_CRYPTO=static
-# AES
-export DP_LINK_CRYPTO_RIJNDAEL=static
-
-
 .PHONY: help
 help:
 	@echo
@@ -87,25 +77,27 @@ $(D0SRC)/.libs/libd0_blind_id.a $(D0SRC)/.libs/libd0_rijndael.a:
 	$(MAKE) -C $(D0SRC) clean  # ensures missing .a files are created FIXME WORKAROUND
 	$(MAKE) -C $(D0SRC)
 
-$(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a
-	$(MAKE) -C $(DPSRC) sv-release
-$(SERVERBIN): $(DPSRC)/darkplaces-dedicated
-	cp $(DPSRC)/darkplaces-dedicated $(SERVERBIN)
-
-$(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a
-	$(MAKE) -C $(DPSRC) sdl-release
-$(CLIENTBIN): $(DPSRC)/darkplaces-sdl
-	cp $(DPSRC)/darkplaces-sdl $(CLIENTBIN)
-
-
-.PHONY: server
-server: $(SERVERBIN)
-
-.PHONY: client
-client: $(CLIENTBIN)
+export DP_LINK_CRYPTO=static
+export DP_LINK_CRYPTO_RIJNDAEL=static
+# d0_blind_id/d0_blind_id.h and .a locations (respectively)
+D0INC=-I"$(PWD)/source/" -L"$(PWD)/$(D0SRC)/.libs/"
 
 .PHONY: all both
 all both: client server
+
+.PHONY: server
+server: $(SERVERBIN)
+$(DPSRC)/darkplaces-dedicated: $(D0SRC)/.libs/libd0_blind_id.a
+	CC='$(CC) $(D0INC)' $(MAKE) -C $(DPSRC) sv-release
+$(SERVERBIN): $(DPSRC)/darkplaces-dedicated
+	cp $(DPSRC)/darkplaces-dedicated $(SERVERBIN)
+
+.PHONY: client
+client: $(CLIENTBIN)
+$(DPSRC)/darkplaces-sdl: $(D0SRC)/.libs/libd0_blind_id.a
+	CC='$(CC) $(D0INC)' $(MAKE) -C $(DPSRC) sdl-release
+$(CLIENTBIN): $(DPSRC)/darkplaces-sdl
+	cp $(DPSRC)/darkplaces-sdl $(CLIENTBIN)
 
 
 # GNU make standard directory variables for install targets
