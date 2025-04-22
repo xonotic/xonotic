@@ -17,7 +17,7 @@
   </branding>
   <!-- Flathub wants summary to be 35 chars max (at least in English) -->
   <summary>The Free and Fast Arena Shooter</summary>
-  <summary xml:lang="de">Deathmatch- und Mehrspieler-orientierter Ego-Shooter</summary>
+  <summary xml:lang="de">Der freie und schnelle Arena-Shooter</summary>
   <summary xml:lang="fr">Jeu de tir à la première personne multijoueur</summary>
   <description>
     <p>
