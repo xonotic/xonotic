@@ -107,9 +107,9 @@ elif [ "$OS" = "Windows_NT" ]; then
 		excludes="$excludes --exclude=/bin64"
 	fi
 else
-	excludes="$excludes --exclude=/*.exe"
+	excludes="$excludes --exclude=*.exe"
 	excludes="$excludes --exclude=/bin32"
-	excludes="$excludes --exclude=/*.dll"
+	excludes="$excludes --exclude=*.dll"
 	excludes="$excludes --exclude=/bin64"
 
 	case $(uname):$(uname -m) in
