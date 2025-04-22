@@ -33,4 +33,4 @@ Exec=xonotic-sdl
 Terminal=false
 PrefersNonDefaultGPU=true
 StartupNotify=false
-Categories=Game;ActionGame;
+Categories=Game;ActionGame;Shooter;
