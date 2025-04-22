@@ -19,6 +19,7 @@
   <summary>The Free and Fast Arena Shooter</summary>
   <summary xml:lang="de">Der freie und schnelle Arena-Shooter</summary>
   <summary xml:lang="fr">Le jeu de tir Arena-shooter libre et rapide</summary>
+  <summary xml:lang="it">Lo sparatutto arena libero e veloce</summary>
   <description>
     <p>
       Xonotic is a free and fast-paced first person shooter which combines
@@ -33,6 +34,11 @@
     <p xml:lang="fr">
       Xonotic est un jeu de tir à la première personne gratuit, qui combine un
       style de jeu en arène rapide et addictif avec une large sélection d'armes.
+    </p>
+    <p xml:lang="it">
+      Xonotic è uno sparatutto arena in prima persona libero e veloce che
+      combina uno stile di gioco arena e additivo con un movimento veloce e una
+      vasta selezione di armi.
     </p>
     <p>
       Xonotic is easy to learn, but hard to master! Besides thrilling action for
@@ -57,6 +63,15 @@
       opportunités e-sport pour ceux qui sont intéressés par l'aspect
       compétitif.
     </p>
+    <p xml:lang="it">
+      Xonotic è facile da imparare ma è difficile diventare esperti! A parte
+      l'entusiasmante azione per il giocatore occasionale, il gioco regala anche
+      opportunità di e-sport per quelli che sono interessati nei suoi aspetti
+      competitivi. Da gare di creazione di mappe e tornei veloci mensili a
+      tornei sponsorizzati, Xonotic permette ad ogni appassionato di e-sport di
+      participare alle competizioni organizzate dalla sua comunità di larghe
+      vedute.
+    </p>
     <p>
       Features such as simple items, fully customizable configs and servers, a
       functioning anticheat system, the spectator mode, and the opportunity to
@@ -74,6 +89,12 @@
       anti-triche, un mode spectateur, ainsi que la possibilité d'enregistrer et
       visionner des démos rendent Xonotic attrayant pour les joueurs
       compétitifs.
+    </p>
+    <p xml:lang="it">
+      Caratteristiche come oggetti semplici, configurazioni e server interamente
+      personalizzabili, un funzionante sistema anti imbroglio, la modalità
+      spettatore, e la possibilità di guardare e registrare le partite rende
+      Xonotic attraente per i giocatori competitivi.
     </p>
   </description>
   <url type="bugtracker">https://gitlab.com/groups/xonotic/-/issues</url>
