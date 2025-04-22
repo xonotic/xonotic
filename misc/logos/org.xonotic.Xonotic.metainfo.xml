@@ -11,7 +11,12 @@
   <developer id="org.xonotic">
     <name>Team Xonotic</name>
   </developer>
-  <summary>Multiplayer, deathmatch oriented first person shooter</summary>
+  <branding>
+    <color type="primary" scheme_preference="light">#04264a</color>
+    <color type="primary" scheme_preference="dark">#001021</color>
+  </branding>
+  <!-- Flathub wants summary to be 35 chars max (at least in English) -->
+  <summary>The Free and Fast Arena Shooter</summary>
   <summary xml:lang="de">Deathmatch- und Mehrspieler-orientierter Ego-Shooter</summary>
   <summary xml:lang="fr">Jeu de tir à la première personne multijoueur</summary>
   <description>
