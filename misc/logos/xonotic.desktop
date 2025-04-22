@@ -22,7 +22,9 @@ Icon=xonotic
 # 3)
 #   Recompile Xonotic with DP_FS_BASEDIR=/path/to/xonotic/ , for example
 #   with DP_FS_BASEDIR=/usr/share/xonotic/ it's no longer necessary
-#   to change your PWD and xonotic-sdl can be anywhere in PATH
+#   to change your PWD and xonotic-sdl can be anywhere in PATH .
+#   Downstream packages are expected to use this option, supported in the Makefile,
+#   see: https://gitlab.com/xonotic/xonotic/-/wikis/Compiling
 # 4)
 #   DIY your own wrapper script with "-basedir" "/path/to/Xonotic" arguments
 #   or just place the arguments in this file

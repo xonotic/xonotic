@@ -17,7 +17,7 @@ case $(uname):$(uname -m) in
 esac
 
 # prefer locally built binary if available (see: Makefile)
-xonotic="xonotic-local-${mode}"
+xonotic="xonotic-${mode}"
 [ -x "$xonotic" ] || xonotic="xonotic-${arch}-${mode}"
 echo "Executing: $xonotic ${*}"
 
