@@ -29,6 +29,12 @@ if ! command -v openssl > /dev/null; then
 	rsynccmd="rsync --contimeout=3"
 fi
 
+# scan cmdline args
+for arg in "$@"; do
+	[ "$arg" = "--yes" ] || [ "$arg" = "-y" ] && choice=y
+	[ "$arg" = "--include-all" ] || [ "$arg" = "-a" ] && XONOTIC_INCLUDE_ALL=true
+done
+
 case "${0##*/}" in
 	update-to-autobuild.sh)
 		buildtype=autobuild
@@ -185,9 +191,7 @@ resolvedtarget=$(cd $target && [ "${PWD#$HOME}" != "$PWD" ] && printf "~${PWD#$H
 printf "Updating \033[1;34m$resolvedtarget\033[m from \033[0;36m$bestmirror/$source \033[m$bestipv ...\n"
 
 targetname=$(cd "$target" && printf "${PWD##*/}")
-if [ "$1" = "-y" ] || [ "$1" = "--yes" ]; then
-	choice=y
-elif [ $interactive = false ]; then
+if [ $interactive != true ] && [ "$choice" != y ]; then
 	printf >&2 "\033[1;31mFATAL: non-interactive mode requires the \033[1;37m--yes\033[1;31m argument to acknowledge that this will DELETE any custom files in the \"$targetname\" directory.\033[m\n"
 	exit 1
 fi
