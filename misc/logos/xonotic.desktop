@@ -2,9 +2,11 @@
 Type=Application
 Version=1.0
 Name=Xonotic
-Comment=Multiplayer, deathmatch oriented first person shooter
-Comment[de]=Deathmatch- und Mehrspieler-orientierter Ego-Shooter
-Comment[fr]=Jeu de tir à la première personne multijoueur
+# Comment= values should match the <summary> values in org.xonotic.Xonotic.metainfo.xml
+Comment=The Free and Fast Arena Shooter
+Comment[de]=Der freie und schnelle Arena-Shooter
+Comment[fr]=Le jeu de tir Arena-shooter libre et rapide
+Comment[it]=Lo sparatutto arena libero e veloce
 Icon=xonotic
 
 # Note to packagers and/or .desktop file installers:
@@ -36,3 +38,4 @@ Terminal=false
 PrefersNonDefaultGPU=true
 StartupNotify=false
 Categories=Game;ActionGame;Shooter;
+Keywords=FPS;AFPS;arena;shooter;multiplayer;Quake;Q3;Q3A;Nexuiz;

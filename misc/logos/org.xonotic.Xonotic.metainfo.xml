@@ -16,6 +16,7 @@
     <color type="primary" scheme_preference="dark">#001021</color>
   </branding>
   <!-- Flathub wants summary to be 35 chars max (at least in English) -->
+  <!-- <summary> values should match the Comment= values in xonotic.desktop -->
   <summary>The Free and Fast Arena Shooter</summary>
   <summary xml:lang="de">Der freie und schnelle Arena-Shooter</summary>
   <summary xml:lang="fr">Le jeu de tir Arena-shooter libre et rapide</summary>
