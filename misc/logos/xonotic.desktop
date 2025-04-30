@@ -35,7 +35,8 @@ Icon=xonotic
 Exec=xonotic-sdl
 
 Terminal=false
-PrefersNonDefaultGPU=true
+# If the game is using the wrong GPU, consider enabling this flag
+#PrefersNonDefaultGPU=true
 StartupNotify=false
 Categories=Game;ActionGame;Shooter;
 Keywords=FPS;AFPS;arena;shooter;multiplayer;Quake;Q3;Q3A;Nexuiz;
