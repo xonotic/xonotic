@@ -99,13 +99,49 @@ if [ -z "$RELEASETYPEDIR" ]; then
 fi
 rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
-	ssh autobuild-release-uploader@beta.xonotic.org sh ../../update-rsync.sh "$d"
+	# Update one package at a time (to reduce temp space requirement), on all mirrors simultaneously
+	rm -rf rsynctmp && mkdir rsynctmp && cd rsynctmp
+	for suffix in '' -high -mappingsupport; do
+		package="Xonotic$suffix"
+		unzip ../Xonotic-"$d$suffix".zip
+		[ "$package" != Xonotic ] && mv Xonotic "$package"
+		# RELEASE TODO: remove this renaming well after 0.9 release, when autobuild users should all have the newer updater that always uses fuzzy matching.
+		cd "$package"/data
+		for X in *"$d"*; do
+			pre=${X%$d*}
+			post=${X##*$d}
+			mv "$X" "$pre"rsync"$post"
+		done
+		cd ../..
+		# END renaming RELEASE TODO
+		while read firstword restoflineignored; do
+			mirror=${firstword%%//*}
+			[ -z $mirror ] && continue
+			# if desired an extra word could be parsed from mirrors.txt to change /var/rsync
+			# ports and usernames should be specified in .ssh/config
+			rpath=/var/rsync/autobuild
+			rsync -rtzlyhhS --delete-delay --executability --stats --link-dest="$rpath/$package" \
+				"$package/" "$mirror:$rpath/.$package.new/" \
+			&& ssh "$mirror" "
+				set -e
+				cd $rpath
+				rm -rf .$package.old
+				[ -e $package ] && mv $package .$package.old
+				mv .$package.new $package
+				rm -rf .$package.old
+			" || echo "<font color=\"red\">Failed to update $package on rsync mirror $mirror</font>" | $IRCSPAM \
+			&
+		done < ../misc/tools/rsync-updater/mirrors.txt
+		wait
+		rm -rf "$package"
+	done
+	cd .. && rm -rf rsynctmp
 
 	# also upload pipeline files for .gitlab-ci.yml in xonotic-data.pk3dir
 	cp data/stormkeep-????????????????????????????????????????-????????????????????????????????????????.pk3 stormkeep.pk3
 	cd data/xonotic-maps.pk3dir # need correct path inside pk3
-	7z a -tzip -mx=9 ../../stormkeep.pk3 maps/stormkeep.mapinfo maps/stormkeep.waypoints*
-	cd ~/xonotic-release-build
+		7z a -tzip -mx=9 ../../stormkeep.pk3 maps/stormkeep.mapinfo maps/stormkeep.waypoints*
+	cd ../..
 	PIPELINE_FILES="gmqcc/gmqcc Xonotic/xonotic-linux64-dedicated stormkeep.pk3"
 	rsync -vSP $PIPELINE_FILES autobuild-release-uploader@beta.xonotic.org:../pipeline-bin/
 	rm -f stormkeep.pk3
