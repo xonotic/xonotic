@@ -549,14 +549,10 @@ case "$cmd" in
 					echo "set menu_watermark \"\"" >> xonotic-common.cfg
 					;;
 			esac
-			(
-				verbose cd gfx/menu/luminos
-				verbose rm -f background_l2.tga background_ingame_l2.tga
-				verbose cp "$d0"/mediasource/gfx/menu/luminos_versionbuilder/background_l2.svg .
-				verbose "$d0"/mediasource/gfx/menu/luminos_versionbuilder/versionbuilder "$versionstr"
-				verbose rm background_l2.svg
-			)
-			verbose "$d0"/mediasource/gfx/luma/render-version.sh "$d0/mediasource/gfx/luma" "$PWD" "$versionstr"
+			verbose "$d0"/mediasource/gfx/menu/versionbuilder/build.sh \
+				"$d0"/mediasource/gfx/menu/versionbuilder gfx/menu/luminos "$versionstr"
+			verbose "$d0"/mediasource/gfx/menu/versionbuilder/build.sh \
+				"$d0"/mediasource/gfx/menu/versionbuilder gfx/menu/luma "$versionstr"
 		fi
 		if [ x"$src" = x"data/xonotic-maps.pk3dir" ]; then
 			for X in ../../data/*-????????????????????????????????????????-????????????????????????????????????????.pk3; do
