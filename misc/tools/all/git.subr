@@ -659,6 +659,7 @@ case "$cmd" in
 					checkself "$cmd" "$@"
 					cd "$d0/$d"
 					verbose git remote prune origin
+					verbose git gc
 					cd "$d0"
 				fi
 			else
