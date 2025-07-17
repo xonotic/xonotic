@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -50,7 +51,7 @@ func (c *Config) Save() error {
 	return ioutil.WriteFile("config.json", data, 0700)
 }
 
-func Login(config *Config) (*mautrix.Client, error) {
+func Login(ctx context.Context, config *Config) (*mautrix.Client, error) {
 	configMu.Lock()
 	defer configMu.Unlock()
 
@@ -61,7 +62,7 @@ func Login(config *Config) (*mautrix.Client, error) {
 		return nil, fmt.Errorf("failed to create client: %v", err)
 	}
 	if config.AccessToken == "" {
-		resp, err := client.Login(&mautrix.ReqLogin{
+		resp, err := client.Login(ctx, &mautrix.ReqLogin{
 			Type: mautrix.AuthTypePassword,
 			Identifier: mautrix.UserIdentifier{
 				Type: mautrix.IdentifierTypeUser,
@@ -178,7 +179,7 @@ func isRoom(room id.RoomID) bool {
 	return found
 }
 
-func Run() (err error) {
+func Run(ctx context.Context) (err error) {
 	err = InitDatabase()
 	if err != nil {
 		return fmt.Errorf("failed to init database: %v", err)
@@ -200,12 +201,12 @@ func Run() (err error) {
 			roomUsers[room.ID] = map[id.UserID]struct{}{}
 		}
 	}
-	client, err := Login(config)
+	client, err := Login(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to login: %v", err)
 	}
 	syncer := newSyncer()
-	syncer.OnEventType(event.StateTombstone, func(source mautrix.EventSource, evt *event.Event) {
+	syncer.OnEventType(event.StateTombstone, func(ctx context.Context, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
 			return
 		}
@@ -231,13 +232,13 @@ func Run() (err error) {
 		}
 		log.Printf("Room not found in config, so not doing room upgrade: %v", evt)
 	})
-	syncer.OnEventType(event.EventMessage, func(source mautrix.EventSource, evt *event.Event) {
+	syncer.OnEventType(event.EventMessage, func(ctx context.Context, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
 			return
 		}
 		handleMessage(eventTime(evt), evt.RoomID, evt.Sender, evt)
 	})
-	syncer.OnEventType(event.StateMember, func(source mautrix.EventSource, evt *event.Event) {
+	syncer.OnEventType(event.StateMember, func(ctx context.Context, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
 			return
 		}
@@ -261,13 +262,13 @@ func Run() (err error) {
 		default: // Ignore.
 		}
 	})
-	syncer.OnEventType(event.StatePowerLevels, func(source mautrix.EventSource, evt *event.Event) {
+	syncer.OnEventType(event.StatePowerLevels, func(ctx context.Context, evt *event.Event) {
 		if !isRoom(evt.RoomID) {
 			return
 		}
 		handlePowerLevels(eventTime(evt), evt.RoomID, evt.Content.AsPowerLevels(), evt)
 	})
-	syncer.OnSync(func(resp *mautrix.RespSync, since string) bool {
+	syncer.OnSync(func(ctx context.Context, resp *mautrix.RespSync, since string) bool {
 		// j, _ := json.MarshalIndent(resp, "", "  ")
 		// log.Print(string(j))
 		roomUsersMu.Lock()
@@ -276,7 +277,7 @@ func Run() (err error) {
 			for room, users := range roomUsers {
 				if _, found := users[config.UserID]; !found {
 					log.Printf("Not actually joined %v yet...", room)
-					_, err := client.JoinRoom(string(room), "", nil)
+					_, err := client.JoinRoom(ctx, string(room), nil)
 					if err != nil {
 						log.Printf("Failed to join %v: %v", room, err)
 					}
@@ -305,7 +306,7 @@ func Run() (err error) {
 			}
 			for _, group := range config.Rooms {
 				for _, room := range group {
-					syncPowerLevels(client, room.ID, group, scoreData, counter%syncForceFrequency == 0)
+					syncPowerLevels(ctx, client, room.ID, group, scoreData, counter%syncForceFrequency == 0)
 				}
 			}
 			roomUsersMu.RUnlock()
@@ -316,7 +317,7 @@ func Run() (err error) {
 }
 
 func main() {
-	err := Run()
+	err := Run(context.Background())
 	if err != nil {
 		log.Fatalf("Program failed: %v", err)
 	}

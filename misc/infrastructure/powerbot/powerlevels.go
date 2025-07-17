@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/google/go-cmp/cmp"
 	"log"
@@ -78,7 +79,7 @@ func allPowerLevels(roomLevels *event.PowerLevelsEventContent) []int {
 	return ret
 }
 
-func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, scores map[id.RoomID]map[id.UserID]*Score, force bool) {
+func syncPowerLevels(ctx context.Context, client *mautrix.Client, room id.RoomID, roomGroup []Room, scores map[id.RoomID]map[id.UserID]*Score, force bool) {
 	roomLevels := roomPowerLevels[room]
 	if roomLevels == nil {
 		log.Printf("trying to ensure power levels for room %v, but did not get power level map yet", room)
@@ -184,7 +185,7 @@ func syncPowerLevels(client *mautrix.Client, room id.RoomID, roomGroup []Room, s
 	if dirty {
 		diff := cmp.Diff(roomLevels.Users, newRoomLevels.Users)
 		log.Printf("room %v power level update:\n%v", room, diff)
-		_, err := client.SendStateEvent(room, event.StatePowerLevels, "", newRoomLevels)
+		_, err := client.SendStateEvent(ctx, room, event.StatePowerLevels, "", newRoomLevels)
 		if err != nil {
 			log.Printf("Failed to update power levels: %v", err)
 		}
