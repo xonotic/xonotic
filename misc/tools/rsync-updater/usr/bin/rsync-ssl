@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Minimal and POSIX-compatible version of rsync-ssl, supports only openssl
+# because gnutls-cli is broken and stunnel doesn't verify the server's certificate.
+
+# Other differences:
+# - supports -4 -6 and --ipv4 --ipv6 options
+# - supports spaces in the path to this script
+
+# By default this script takes rsync args and hands them off to the actual
+# rsync command with an --rsh option that makes it open an SSL connection to an
+# rsync daemon.  See the rsync-ssl manpage for usage details and env variables.
+
+# When the first arg is --HELPER, we are being used by rsync as an --rsh helper
+# script, and the args are (note the trailing dot):
+#
+#    rsync-ssl --HELPER HOSTNAME rsync --server --daemon .
+#
+# --HELPER is not a user-facing option, so it is not documented in the manpage.
+
+if [ "$1" = --HELPER ]; then
+	shift
+
+	[ "$1" = "-4" ] || [ "$1" = "-6" ] && ipv=$1 && shift
+
+	port="${RSYNC_PORT:-0}"
+	if [ "$port" -eq 0 ]; then
+		port="${RSYNC_SSL_PORT:-874}"
+	fi
+
+	# If the user specified USER@HOSTNAME::module, then rsync passes us
+	# the -l USER option too, so we must be prepared to ignore it.
+	if [ "$1" = "-l" ]; then
+		shift 2
+	fi
+
+	hostname="$1"
+	shift
+
+	if [ -z "$hostname" ] || [ "$1" != rsync ] || [ "$2" != --server ] || [ "$3" != --daemon ]; then
+		echo "Usage: rsync-ssl --HELPER HOSTNAME rsync --server --daemon ." 1>&2
+		exit 1
+	fi
+
+	exec openssl s_client -verify_return_error -verify 4 -quiet -verify_quiet -servername $hostname -verify_hostname $hostname -connect $hostname:$port $ipv
+fi
+
+for arg in "$@"; do
+	[ "$arg" = "--ipv6" ] || [ "$arg" = "-6" ] && ipv=-6 && break
+	[ "$arg" = "--ipv4" ] || [ "$arg" = "-4" ] && ipv=-4 && break
+done
+
+# The --rsh parameter string will need to be word split between $0 and --HELPER when executed
+# but $0 may contain space(s) and must not be split, hence its extra quotes.
+exec rsync --rsh="'$0' --HELPER $ipv" "${@}"

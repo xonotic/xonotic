@@ -1,0 +1,3 @@
+// One mirror per line, the first word is the FQDN, the second is the location
+rsync.xonotic.org DE // admins: Xonotic Core Team
+rsync.xonotic.au  AU // admins: rly and bones_was_here

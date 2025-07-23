@@ -19,6 +19,6 @@ On Linux or Mac the "~/.xonotic/data/" directory
 
 Secret trick: if you create any file/directory named "Xonotic-high"
 in this directory before running the updater, this script will
-download Xonotic with uncompressed textures. Otherwise it will
-download regular Xonotic. To change from Xonotic-high to regular
-create any file/directory named "Xonotic" and run the script again.
+download Xonotic with jpeg textures. Otherwise it will
+download regular Xonotic. To change from Xonotic-high (jpeg) to regular
+create any file/directory named "Xonotic" in this directory and run the script again.
