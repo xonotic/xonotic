@@ -694,8 +694,14 @@ case "$cmd" in
 			usr/bin/openssl.exe \
 			usr/bin/rsync.exe \
 			usr/bin/sed.exe \
-			usr/ssl/cert.pem \
 			"$targetroot/misc/tools/rsync-updater/"
+		# Previously the above list included usr/ssl/cert.pem
+		# but msys2 changed something and now that file is always 0 bytes
+		# and so is its source file etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+		# NB: usr/bin/update-ca-trust is responsible for updating both.
+		# This file can also be obtained using debian's native p11-kit program:
+		verbose mkdir -p "$targetroot/misc/tools/rsync-updater/usr/ssl"
+		verbose p11-kit extract --format=pem-bundle --filter=ca-anchors --overwrite --comment --purpose server-auth "$targetroot/misc/tools/rsync-updater/usr/ssl/cert.pem"
 		# msys2 sh.exe is currently bash
 		verbose cp --preserve=timestamps usr/bin/dash.exe "$targetroot/misc/tools/rsync-updater/usr/bin/sh.exe"
 		;;
