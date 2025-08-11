@@ -247,12 +247,16 @@ build_curl () {
 	# private USE identifiers
 	verlt $this_ver 7.81.0 && PARAM="CMAKE" || PARAM="CURL"
 
+	# libpsl dependency disabled: xon doesn't use cookies
+	# see: https://daniel.haxx.se/blog/2024/01/10/psl-in-curl/
+
 	mkcd "$work_dir/curl"
 	cmake -DCMAKE_TOOLCHAIN_FILE="$toolchain_file" \
 	      -DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 	      -DZLIB_INCLUDE_DIR="$pkg_dir/include" \
 	      -DZLIB_LIBRARY="$pkg_dir/lib/libzlib.dll.a" \
 	      -D${PARAM}_USE_SCHANNEL=ON \
+	      -D${PARAM}_USE_LIBPSL=OFF \
 	      -DBUILD_SHARED_LIBS=ON \
 	      -DBUILD_CURL_EXE=OFF \
 	      -DHTTP_ONLY=ON \
