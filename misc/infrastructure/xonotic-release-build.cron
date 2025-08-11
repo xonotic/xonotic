@@ -6,18 +6,6 @@ handle_sigterm()
 	exit 0
 }
 trap 'handle_sigterm' TERM
-handle_error()
-{
-	status=$?
-	set +x
-	[ $status -eq 137 -o $status -eq 143 ] && handle_sigterm " (subprocess exit: $status)"
-	tail -n 10000 ~/xonotic-release-build.log > ~/xonotic-release-build/error_log.txt
-	scp ~/xonotic-release-build/error_log.txt autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
-	printf '<p><font color="#FF0000">Failed to create a new %s!</font> See: https://beta.xonotic.org/autobuild/%serror_log.txt\n' "$RELEASETYPEDIR" | $IRCSPAM
-	exit $status
-}
-# bashism: like set -e but it calls a handling func
-trap 'handle_error' ERR
 
 if [ -z "$RELEASETYPE" ]; then
 	export RELEASETYPE=autobuild
@@ -42,6 +30,19 @@ esac
 # is being run as cronjob, better set PATH
 export PATH=/home/xonotic-build/ccache:/home/xonotic-build/bin:/usr/local/bin:/usr/bin:/bin:/usr/games
 
+handle_error()
+{
+	status=$?
+	set +x
+	[ $status -eq 137 -o $status -eq 143 ] && handle_sigterm " (subprocess exit: $status)"
+	tail -n 10000 ~/xonotic-release-build.log > ~/xonotic-release-build/error_log.txt
+	scp ~/xonotic-release-build/error_log.txt autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
+	printf '<p><font color="#FF0000">Failed to create a new %s!</font> See: https://beta.xonotic.org/autobuild/%serror_log.txt\n' "$RELEASETYPE" "$RELEASETYPEDIR" | $IRCSPAM
+	exit $status
+}
+# bashism: like set -e but it calls a handling func
+trap 'handle_error' ERR
+
 # TEST: use s2tc, high quality
 #export dds_tool=s2tc
 
@@ -65,6 +66,7 @@ set -x
 
 test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 	set -e;
+	rm -f error_log.txt;
 	s0=`date -d "now - 30 days - 12 hours" +%s`;
 	s00=`date -d "now - 60 days - 12 hours" +%s`;
 	for X in * */*; do
@@ -79,8 +81,7 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 		if [ "$w" -ne 0 -a "$w" -ne 6 -a "$s" -lt "$s0" -o "$s" -lt "$s00" ]; then
 			rm -f "$X";
 		fi;
-	done;
-	rm -f error_log.txt
+	done
 '
 
 cd ~/xonotic-release-build
