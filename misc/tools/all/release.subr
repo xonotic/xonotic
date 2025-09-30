@@ -351,6 +351,7 @@ case "$cmd" in
 			# macOS prefers dylibs be marked executable (this one has no file extension)
 			verbose chmod 755 SDL2/SDL2.framework/Versions/Current/SDL2
 		)
+		mkdir -p Xonotic/Xonotic.app/Contents/Frameworks # the Frameworks directory isn't in git because it'd be empty
 		cp -R --preserve=timestamps "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/Frameworks/
 		;;
 	release-libs)
