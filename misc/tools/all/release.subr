@@ -600,7 +600,7 @@ case "$cmd" in
 		stamp=`cat Xonotic/stamp.txt`
 		pk3stamp=`cat Xonotic/pk3stamp.txt`
 		# exe and dll files do not need +x
-		chmod a-x Xonotic/*.exe Xonotic/*.dll Xonotic/bin64/*.dll Xonotic/bin32/*.dll || true
+		chmod a-x Xonotic/*.exe Xonotic/bin64/*.dll Xonotic/bin32/*.dll || true
 		# build the archives
 		verbose mkzipr Xonotic-$stamp-enginesource.zip \
 			Xonotic/Makefile \
@@ -608,7 +608,6 @@ case "$cmd" in
 			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-engine.zip
 		verbose mkzipr Xonotic-$stamp-engine.zip \
-			Xonotic/*.dll \
 			Xonotic/bin32/*.dll \
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
@@ -621,7 +620,6 @@ case "$cmd" in
 			Xonotic/source/qcsrc/ \
 			Xonotic/Docs \
 			Xonotic/misc \
-			Xonotic/gmqcc \
 			Xonotic/server \
 			Xonotic/key_0.d0pk \
 			Xonotic/data/font-unifont-$pk3stamp.pk3 \
