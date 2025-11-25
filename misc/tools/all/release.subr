@@ -60,29 +60,13 @@ release_common()
 	{
 		archive=$1; shift
 
-		# bones_was_here: 7za still doesn't store symlinks correctly (even with -snl)
-		# but it does now store the executable bit.
-		# compared to advzip, 7za achieves very similar final zip size, is multi threaded,
-		# and avoids https://gitlab.com/xonotic/xonotic/-/issues/371
-
-		sevenzipflags=-mx=9
-		zipflags=-9
 		# git restore-mtime replaces this hack:
 		#find "$@" -exec touch -d "2001-01-01 01:01:01 +0000" {} \+ # ugly hack to make the pk3 files rsync-friendly
-		ziplist=`mktemp`
-		find "$@" -xtype f \( -type l \) -print | sed 's,\([./][^./]*$\),\1 \1,' | sort -k2 | cut -d\  -f1 > "$ziplist"
-		7za a -tzip $sevenzipflags -x@"$ziplist" "$archive" "$@" || true
-		zip         $zipflags -y   -@<"$ziplist" "$archive"      || true
-		rm -f "$ziplist"
-	}
 
-	mkzip()
-	{
-		# not using this currently, see above
-		archive=$1; shift
-		zipflags=-1ry
-		zip $zipflags "$archive" "$@" || true
-		advzip -z -4 "$archive"
+		# Compared to advzip, 7za achieves very similar final zip size, is multi threaded,
+		# and avoids https://gitlab.com/xonotic/xonotic/-/issues/371
+		# Version 25.01 in Debian 13 now handles symlinks correctly.
+		7za a -tzip -mx=9 -snl "$archive" "$@"
 	}
 
 	mkzip0()
@@ -337,11 +321,6 @@ case "$cmd" in
 			verbose rm -rf sdl SDL2
 			verbose wget https://libsdl.org/release/SDL2-2.28.5.dmg
 			verbose 7z x *.dmg
-			# 7z still fails to extract working symlinks from any archive format, hackaround:
-			verbose ln -sf $(cat SDL2/SDL2.framework/Versions/Current) SDL2/SDL2.framework/Versions/Current
-			verbose ln -sf $(cat SDL2/SDL2.framework/Headers) SDL2/SDL2.framework/Headers
-			verbose ln -sf $(cat SDL2/SDL2.framework/Resources) SDL2/SDL2.framework/Resources
-			verbose ln -sf $(cat SDL2/SDL2.framework/SDL2) SDL2/SDL2.framework/SDL2
 			# THE HEADERS ARE NOT IN A SUBDIRECTORY CALLED SDL2
 			# YET SDL2/ WAS ADDED TO ALL THE INCLUDES, WHY?!?
 			# OLD VERSIONS WITHOUT IT WORKED
