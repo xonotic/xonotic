@@ -118,7 +118,7 @@ if [ -z "$RELEASETYPEDIR" ]; then
 	done
 	sha512sum Xonotic-latest*.zip > Xonotic-latest.sha512
 fi
-rsync -vaSHP Xonotic*.zip Xonotic*.sha512 autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
+rsync -vaSHP Xonotic*.zip Xonotic*.sha512 gmqcc*.zip autobuild-release-uploader@beta.xonotic.org:"$RELEASETYPEDIR"
 if [ -z "$RELEASETYPEDIR" ]; then
 	# Update one package at a time (to reduce temp space requirement), on all mirrors simultaneously
 	rm -rf rsynctmp && mkdir rsynctmp && cd rsynctmp
