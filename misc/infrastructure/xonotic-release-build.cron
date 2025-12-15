@@ -84,6 +84,9 @@ test -z "$RELEASETYPEDIR" && ssh autobuild-release-uploader@beta.xonotic.org '
 	done
 '
 
+echo 19 | tee /proc/$$/autogroup || true
+renice 19 $$
+
 cd ~/xonotic-release-build
 ./all clean --reclone
 # ./all checkout maint
