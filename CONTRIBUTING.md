@@ -43,8 +43,6 @@ Build tools are documented on the [Repository_Access wiki page](https://gitlab.c
 
 # Code Style
 
-This should be approximately consistent with the [DarkPlaces style](https://gitlab.com/xonotic/darkplaces/-/blob/master/CONTRIBUTING.md).
-
 ### All code submitted should follow the Allman style for the most part.
 
 - In statements, the curly brace should be placed on the next line at the
@@ -63,6 +61,23 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
 
 	if (bar == 1)
 		Do_Something_Else_Else_Else();
+	```
+
+- It's preferred to use the same indent level for each line of a multi-line condition,
+  but [readability is the priority](#if-following-this-code-style-to-the-letter-would-make-some-code-less-readable-or-harder-to-understand-make-suitable-style-adjustments).
+
+	```c
+	// clear indentation, conditions can be aligned in columns
+	if (foo = 1 // note about foo
+	|| (bar = 1 && baz = 2))
+		for (int i = 0; i < 3; ++i)
+			DoStuff(i);
+
+	// misleading indentation, conditions can't be aligned
+	if (foo = 1 // note about foo
+		|| (bar = 1 && baz = 2))
+		for (int i = 0; i < 3; ++i)
+			DoStuff(i);
 	```
 
 - Use tabs for indentation.  
@@ -148,11 +163,10 @@ This should be approximately consistent with the [DarkPlaces style](https://gitl
 	// XONRELEASE TODO: xonotic-v0.8.2 after release candidate take a shower
 	```
 
-- If following this code style to the letter would make some code less
-  readable or harder to understand, make suitable style adjustments.
+#### If following this code style to the letter would make some code less readable or harder to understand, make suitable style adjustments.
 
   For example, in some situations, placing the block on the same line as
-  the condition would be okay because it looks cleaner:
+  the condition would be okay because it aligns and looks cleaner:
 
 	```c
 	if (foo)  DoSomething();
