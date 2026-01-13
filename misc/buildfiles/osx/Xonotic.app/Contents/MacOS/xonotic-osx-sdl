@@ -1,12 +1,31 @@
 #!/bin/sh
 
+# Resolve symlinks to find the real script location
+# This allows Xonotic.app to be symlinked (e.g., from /Applications) while
+# the actual app bundle remains in the Xonotic folder with the data files
+# Uses a loop with readlink (no flags) for compatibility with all macOS versions
+SCRIPT_DIR=$(
+    script="$0"
+    cd "$(dirname "$script")"
+    script="$(basename "$script")"
+    while [ -L "$script" ]; do
+        script="$(readlink "$script")"
+        cd "$(dirname "$script")"
+        script="$(basename "$script")"
+    done
+    pwd -P
+)
+
 # if we ever want to remove this script, install_name_tool can be used to replace the DYLD_LIBRARY_PATH hack
-export DYLD_LIBRARY_PATH="${0%/*}"
+export DYLD_LIBRARY_PATH="$SCRIPT_DIR"
 	# same dir as the executable
 
-set -- "$0"-bin "$@" -notexturenonpoweroftwo
+# Basedir is 3 levels up from MacOS folder (MacOS -> Contents -> Xonotic.app -> Xonotic)
+BASEDIR="$SCRIPT_DIR/../../.."
 
-case "`sw_vers -productVersion`" in
+set -- "$SCRIPT_DIR/xonotic-osx-sdl-bin" "$@" -notexturenonpoweroftwo -basedir "$BASEDIR"
+
+case "$(sw_vers -productVersion)" in
 	# OSX Lion up to 10.7.2 has problems with SDL and running fullscreen, hence we force windowed mode
 	10.7.[0-2])
 		exec "$@" +vid_fullscreen 0
