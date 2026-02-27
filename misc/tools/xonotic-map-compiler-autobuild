@@ -299,13 +299,15 @@ screenshotthemap()
 	fi
 	mv ~/.xonotic/data/"$M.ircss" "$M-$blobhash"/
 	mv ~/.xonotic/data/autoscreenshot.log "$M-$blobhash"/
-	chmod 1777 "$M-$blobhash"
+	chmod 1775 "$M-$blobhash"
 	ln -snf "../$M-$blobhash" "$M" # from ALL branches, so beware!
 	rsync -vaSHP "$M-$blobhash" "$url_ssh"
 	rsync -vaSHP "$M" "$url_ssh""latest/"
 	if [ -n "$IRCSPAM" ]; then
 		# It takes about 5 minutes for the server to update.
-		sleep 360  # Cut it one more minute of slack.
+		#sleep 360  # Cut it one more minute of slack.
+		# bones_was_here: we now update the indexes after we finish screenshots,
+		# in the meantime caddy has a nice auto index page, even has a thumbnail grid view!
 
 		$IRCSPAM < "$M-$blobhash/$M.ircss" || true
 	fi
@@ -379,6 +381,7 @@ runmakeindex()
 
 case "$1" in
 	build)
+		mkdir -p "$build_cachedir"
 		cd data/xonotic-maps.pk3dir
 		branches | while read -r HASH TYPE REFNAME; do
 			if [ -f "$build_cachedir/$HASH" ]; then
@@ -390,6 +393,7 @@ case "$1" in
 		git checkout -f master
 		;;
 	screenshot)
+		mkdir -p "$screenshot_cachedir"
 		runmakeindex > "branches.idx.new"
 		rsync -vaSHP "branches.idx.new" "$url_ssh""branches.idx.new"
 		rm -f "branches.idx.new"
