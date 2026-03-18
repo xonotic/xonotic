@@ -7,7 +7,7 @@ echo 19 | tee /proc/$$/autogroup || true
 renice 19 $$
 
 set -ex
-[ -d xonotic-map-compiler ] || git clone git://git.xonotic.org/xonotic/xonotic.git xonotic-map-compiler
+[ -d xonotic-map-compiler ] || git clone https://git.xonotic.org/xonotic/xonotic.git xonotic-map-compiler
 cd xonotic-map-compiler
 ./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
 cd netradiant

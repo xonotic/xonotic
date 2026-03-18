@@ -8,7 +8,7 @@ echo 19 | tee /proc/$$/autogroup || true
 renice 19 $$
 
 set -e
-[ -d xonotic-map-screenshot ] || git clone git://git.xonotic.org/xonotic/xonotic.git xonotic-map-screenshot
+[ -d xonotic-map-screenshot ] || git clone https://git.xonotic.org/xonotic/xonotic.git xonotic-map-screenshot
 cd xonotic-map-screenshot
 ./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
 
