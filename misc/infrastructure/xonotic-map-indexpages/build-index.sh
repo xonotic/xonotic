@@ -95,17 +95,7 @@ cleanup()
 	mv .to_delete_new .to_delete
 }
 
-minnumber=3
 sscnt=9
-
-decade=315569520
-year=31556952
-month=2629746
-week=604800
-day=86400
-hour=3600
-minute=60
-second=1
 
 case "$QUERY_STRING" in
 	nq)
@@ -158,6 +148,7 @@ cat <<EOF
 <head>
 <title>Map compile server</title>
 <link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
 </head>
 <body>
 <h1>Map compile server</h1>
@@ -165,7 +156,7 @@ cat <<EOF
 <tr>
 <th class="mapname"><a href="index-$sort_mapname.html">Map name</a></td>
 <th class="branches">Branches</td>
-<th class="date"><a href="index-$sort_date.html">Date</a></td>
+<th class="date"><a id="dateheader" href="index-$sort_date.html">Date</a></td>
 <th class="bspk3">BSP-only pk3</td>
 <th class="fullpk3">Full pk3</td>
 <th class="sshot">Screenshots</td>
@@ -240,7 +231,6 @@ EOF
 	replace="-->$branches<!--"
 }
 
-d0=`date +%s`
 for M in *-????????????????????????????????????????-????????????????????????????????????????/; do
 	basename=${M%%-????????????????????????????????????????-????????????????????????????????????????/}
 	date=`stat -c %Y "${M%/}.pk3"`
@@ -258,19 +248,6 @@ done | sort $sort | {
 			esac
 		fi
 		seen=$seen" $basename"
-		dd=$(($d0 - $date))
-		datestring=
-		for interval in second minute hour day week month year decade; do
-			eval "vv=\$$interval"
-			if [ -z "$datestring" ] || [ $(($dd / $vv)) -ge $minnumber ]; then
-				datestring=$(($dd / $vv))
-				if [ $datestring -gt 1 ]; then
-					datestring="$datestring $interval""s ago"
-				else
-					datestring="$datestring $interval ago"
-				fi
-			fi
-		done
 		for X in "$M/$basename-"??????".jpg"; do
 			thumb=${X%.jpg}-t.jpg
 			small=${X%.jpg}-s.jpg
@@ -306,10 +283,10 @@ done | sort $sort | {
 		<tr class="row$rowidx">
 			<td class="mapname">$thisname</td>
 			<td class="branches">$branches_html</td>
-			<td class="date">$datestring</td>
+			<td class="date"><time data-ut="$date">$(date -d "@$date" -u '+%F %H:%M %Z')</time></td>
 			<td class="bspk3"><a href="$bspk3">bspk3</a></td>
 			<td class="fullpk3"><a href="$fullpk3">fullpk3</a></td>
-			<td class="sshot"><a href="$M/"><img src="$M/$basename-$ssid-t.jpg" width="100" height="75" alt="gallery"></a></td>
+			<td class="sshot"><a href="$M/"><img src="$M/$basename-$ssid-t.jpg" width="100" height="75" alt="gallery" loading="lazy"></a></td>
 		</tr>
 EOF
 	done
@@ -323,7 +300,7 @@ EOF
 
 if $dowrite; then
 	t=`date +%s`
-	if [ "$t" -gt "`cat .cleanup`" ]; then
+	if [ ! -f .cleanup ] || [ "$t" -gt "$(cat .cleanup)" ]; then
 		cleanup
 		own .cleanup
 		echo "$(($t+3600))" > .cleanup
