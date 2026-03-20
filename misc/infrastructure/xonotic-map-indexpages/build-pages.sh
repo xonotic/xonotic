@@ -1,7 +1,7 @@
 #!/bin/sh
 
-echo 19 | tee /proc/$$/autogroup || true
-renice 19 $$
+echo 10 | tee /proc/$$/autogroup || true
+renice 10 $$
 
 set -ex
 for q in nq dq nr n dr d; do

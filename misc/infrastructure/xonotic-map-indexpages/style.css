@@ -1,0 +1,90 @@
+img
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid #ccccff;
+}
+
+/* common */
+body
+{
+	color: #cccccc;
+	background-color: #000000;
+}
+a
+{
+	color: #ccccff;
+}
+img
+{
+}
+
+/* main table */
+table
+{
+	width: 100%;
+	border-spacing: 0px;
+}
+table tr.row0
+{
+	background-color: #222233;
+}
+table tr.row1
+{
+	background-color: #332222;
+}
+table td
+{
+	text-align: center;
+	vertical-align: middle;
+}
+
+/* screenshots */
+.block
+{
+	position: relative;
+	width: 1024px;
+	height: 768px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.full
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 1024px ! important;
+	height: 768px ! important;
+	display: none;
+}
+.area
+{
+	position: absolute;
+	width: 336px;
+	height: 252px;
+}
+.area0, .area3, .area6
+{
+	left: 0px;
+}
+.area1, .area4, .area7
+{
+	left: 344px;
+}
+.area2, .area5, .area8
+{
+	left: 688px;
+}
+.area0, .area1, .area2
+{
+	top: 0px;
+}
+.area3, .area4, .area5
+{
+	top: 258px;
+}
+.area6, .area7, .area8
+{
+	top: 516px;
+}

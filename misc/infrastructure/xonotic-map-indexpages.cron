@@ -3,10 +3,8 @@
 mepwd=$PWD
 me=$0
 
-echo 19 | tee /proc/$$/autogroup || true
-renice 19 $$
-
 set -ex
-cd xonotic-map-compiler/misc/infrastructure/
-rsync -E build-pages.sh build-index.sh autobuild-bsp-uploader@beta.xonotic.org:
+cd xonotic-map-compiler/misc/infrastructure/xonotic-map-indexpages
+git pull
+rsync -E build-pages.sh build-index.sh style.css script.js autobuild-bsp-uploader@beta.xonotic.org:
 ssh autobuild-bsp-uploader@beta.xonotic.org 'sh build-pages.sh'
