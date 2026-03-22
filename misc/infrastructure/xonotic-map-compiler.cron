@@ -1,15 +1,19 @@
 #!/bin/sh
 
-mepwd=$PWD
-me=$0
+export IRCSPAM="ssh pytibot@beta.xonotic.org"
 
 echo 19 | tee /proc/$$/autogroup || true
 renice 19 $$
 
-set -ex
+set -e
+. /data/common.sh
+LockAndLog ~/"$(basename "${0%.*}").log" 21600
+set -x
+
 [ -d xonotic-map-compiler ] || git clone https://git.xonotic.org/xonotic/xonotic.git xonotic-map-compiler
 cd xonotic-map-compiler
 ./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
+
 cd netradiant
 cmake -G "Unix Makefiles" -H. -B build -D CMAKE_BUILD_TYPE=Release -D BUILD_TOOLS=TRUE -D BUILD_CRUNCH=FALSE -D BUILD_RADIANT=FALSE -D DOWNLOAD_GAMEPACKS=FALSE
 cmake --build build -- q3map2
@@ -18,3 +22,4 @@ sh -x ./misc/tools/xonotic-map-compiler-autobuild build
 
 
 touch ~/xonotic-map-screenshot.run
+
