@@ -18,3 +18,6 @@
 .idea/
 /result*
 /.serverbench_temp
+
+# macOS ad-hoc code signing artifacts (team will use proper signing)
+misc/buildfiles/osx/Xonotic.app/Contents/_CodeSignature/
