@@ -1,10 +1,12 @@
 #!/bin/sh
 
-mepwd=$PWD
-me=$0
+set -e
+. /data/common.sh
+LockAndLog ~/"$(basename "${0%.*}").log" 21600
+set -x
 
-set -ex
 cd xonotic-map-compiler/misc/infrastructure/xonotic-map-indexpages
 git pull
 rsync -E build-pages.sh build-index.sh style.css script.js autobuild-bsp-uploader@beta.xonotic.org:
 ssh autobuild-bsp-uploader@beta.xonotic.org 'sh build-pages.sh'
+

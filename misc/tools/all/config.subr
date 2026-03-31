@@ -10,35 +10,38 @@ allrepos()
 	"$@" data/xonotic-xoncompat.pk3dir xonotic-xoncompat.pk3dir.git main           "no"
 	"$@" darkplaces                    darkplaces.git               master         ""
 	"$@" netradiant                    netradiant.git               master         ""
+	"$@" netradiant-xonoticpack        netradiant-xonoticpack.git   master         "no"
 	"$@" div0-gittools                 div0-gittools.git            master         "no"
 	"$@" d0_blind_id                   d0_blind_id.git              master         ""
 	"$@" data/xonotic-maps.pk3dir      xonotic-maps.pk3dir.git      master         ""
 	"$@" mediasource                   mediasource.git              master         "no"
 	"$@" gmqcc                         gmqcc.git                    main           ""
-	"$@" xonstat                       xonstat.git                  master         "no"
+	"$@" xonstat-go                    xonstat-go.git               master         "no"
 	"$@" xonstatdb                     xonstatdb.git                master         "no"
+	"$@" xonstat-badges                xonstat-badges.git           master         "no"
 	"$@" xonotic.org                   xonotic.org.git              master         "no"
-	"$@" wiki                          xonotic.wiki.git             master         "no"
+	"$@" xonotic.wiki                  xonotic.wiki.git             master         "no"
 }
 
 allmirrors()
 {
 	# Legacy git URLs.
 	"$@" git  ''   git://git.xonotic.org/xonotic/      ''
-	"$@" http ''   http://git.xonotic.org/xonotic/     ''
 	"$@" ssh  ''   ssh://xonotic@git.xonotic.org/      ''
 	"$@" git  ''   git://nl.git.xonotic.org/xonotic/   ''
 	"$@" http ''   http://nl.git.xonotic.org/xonotic/  ''
 	"$@" git  ''   git://us.git.xonotic.org/xonotic/   ''
 	"$@" http ''   http://us.git.xonotic.org/xonotic/  ''
 
-	# Gitlab host (divVerent).
-	"$@" http gitlab   https://gitlab.com/xonotic/     ''
-
 	# German host - disabled (divVerent).
 	"$@" git  ''   git://de.git.xonotic.org/xonotic/   ''
 	"$@" http ''   http://de.git.xonotic.org/xonotic/  ''
 
+	# German host (srv04)
+	"$@" http de   https://git.xonotic.org/xonotic/    ''
+
+	# Gitlab host (divVerent).
+	"$@" http gitlab   https://gitlab.com/xonotic/     ''
 	# Pushing destination (authoritative server; merlijn).
 	"$@" ssh  push ssh://git@gitlab.com/xonotic/       ''
 }
