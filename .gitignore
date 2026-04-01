@@ -18,3 +18,7 @@
 .idea/
 /result*
 /.serverbench_temp
+
+# macOS code signature directories (signing requires an Apple Developer subscription
+# and cannot be automated; these are generated locally by codesign and not committed)
+_CodeSignature/
