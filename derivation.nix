@@ -26,6 +26,9 @@ let
 
         srcs."data/font-xolonium" = localFiles ./data/font-xolonium.pk3dir;
         vers."data/font-xolonium" = "xonotic-${VERSION}";
+		
+		srcs."data/font-notoemoji" = localFiles ./data/font-notoemoji.pk3dir;
+        vers."data/font-notoemoji" = "xonotic-${VERSION}";
 
 
         # https://gitlab.com/xonotic/d0_blind_id
@@ -173,6 +176,18 @@ let
             version = vers."data/font-xolonium";
 
             src = srcs."data/font-xolonium";
+
+            phases = [ "installPhase" ];
+            installPhase = ''
+                cp -r $src $out
+            '';
+        };
+		
+        font-notoemoji = mkDerivation rec {
+            name = "font-notoemoji-${version}";
+            version = vers."data/font-notoemoji";
+
+            src = srcs."data/font-notoemoji";
 
             phases = [ "installPhase" ];
             installPhase = ''
