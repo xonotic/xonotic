@@ -251,11 +251,53 @@ build_libjpeg () {
 	fetch_source libjpeg-turbo || true
 
 	mkcd "$work_dir/libjpeg"
+	# WITH_SIMD=0: SIMD assembly can't be compiled for multiple architectures in
+	# one pass. Disable for now; full SIMD is possible by building each arch
+	# separately and merging with the universal step.
 	cmake_cross "$this_src" \
 		-DCMAKE_SYSTEM_PROCESSOR="$ARCH" \
 		-DENABLE_SHARED=ON \
 		-DENABLE_STATIC=OFF \
-		-DWITH_TURBOJPEG=OFF
+		-DWITH_TURBOJPEG=OFF \
+		-DWITH_SIMD=0
+	make
+	make install
+}
+
+build_zlib () {
+	fetch_source zlib || true
+
+	mkcd "$work_dir/zlib"
+	cmake_cross "$this_src" \
+		-DBUILD_SHARED_LIBS=ON
+	make
+	make install
+}
+
+build_libcurl () {
+	fetch_source curl || true
+
+	mkcd "$work_dir/curl"
+	cmake_cross "$this_src" \
+		-DCMAKE_INSTALL_PREFIX="$pkg_dir" \
+		-DCURL_USE_SECTRANSP=ON \
+		-DCURL_USE_LIBPSL=OFF \
+		-DBUILD_SHARED_LIBS=ON \
+		-DBUILD_CURL_EXE=OFF \
+		-DHTTP_ONLY=ON
+	make
+	make install
+}
+
+build_libsdl2 () {
+	fetch_source libsdl2 || true
+
+	mkdir -p "$pkg_dir/sdl"
+
+	mkcd "$work_dir/libsdl2"
+	cmake_cross "$this_src" \
+		-DCMAKE_SYSTEM_PROCESSOR="$ARCH" \
+		-DCMAKE_INSTALL_PREFIX="$pkg_dir/sdl"
 	make
 	make install
 }
@@ -273,6 +315,7 @@ build_libode () {
 }
 
 build_all () {
+	build_zlib
 	build_gmp
 	build_libd0
 	build_libogg
@@ -282,6 +325,8 @@ build_all () {
 	build_libpng16
 	build_libjpeg
 	build_libode
+	build_libcurl
+	build_libsdl2
 }
 
 fix_install_names () {
@@ -348,7 +393,36 @@ install () {
 		echo "WARNING: libode dylib not found — check ODE build output"
 	fi
 
-	"$STRIP_CMD" -S "$out_dir"/*.dylib
+	# Do not strip: osxcross already strips before signing, and stripping
+	# after removes the ad-hoc signature that arm64 binaries require to run.
+}
+
+universal () {
+	# Merge osx64 and osxarm64 outputs into universal (fat) dylibs using lipo.
+	# Run 'all' for both osx64 and osxarm64 first.
+	local lipo="$OSXCROSS_PATH/out/bin/lipo"
+	if [ ! -x "$lipo" ]; then
+		echo "lipo not found at $lipo — set OSXCROSS_PATH correctly"
+		exit 1
+	fi
+
+	local out64="$buildpath/out/osx64"
+	local outarm64="$buildpath/out/osxarm64"
+	local outuniv="$buildpath/out/universal"
+	mkdir -p "$outuniv"
+
+	set -ex
+
+	for f in "$out64"/*.dylib; do
+		local name
+		name=$(basename "$f")
+		if [ -f "$outarm64/$name" ]; then
+			"$lipo" -create "$f" "$outarm64/$name" -output "$outuniv/$name"
+		else
+			echo "WARNING: $name missing from osxarm64 output — copying x86_64 slice only"
+			cp "$f" "$outuniv/$name"
+		fi
+	done
 }
 
 clean () {
@@ -361,6 +435,7 @@ clean () {
 list () {
 	echo "Compilable libraries:"
 	echo
+	echo zlib
 	echo gmp
 	echo libd0
 	echo libogg
@@ -370,6 +445,8 @@ list () {
 	echo libpng16
 	echo libjpeg
 	echo libode
+	echo libcurl
+	echo libsdl2
 }
 
 usage () {
@@ -384,6 +461,7 @@ usage () {
 	echo "  all        prepare, build_all, and install"
 	echo
 	echo "steps without arch:"
+	echo "  universal  lipo osx64+osxarm64 outputs into universal dylibs"
 	echo "  list       list compilable libraries"
 	echo "  clean      delete all work directories"
 	echo
@@ -400,6 +478,7 @@ buildpath=$2
 target_arch=$3
 
 case $step in
+	zlib)       prepare && build_zlib ;;
 	gmp)        prepare && build_gmp ;;
 	libd0)      prepare && build_libd0 ;;
 	libogg)     prepare && build_libogg ;;
@@ -409,9 +488,12 @@ case $step in
 	libpng16)   prepare && build_libpng16 ;;
 	libjpeg)    prepare && build_libjpeg ;;
 	libode)     prepare && build_libode ;;
+	libcurl)    prepare && build_libcurl ;;
+	libsdl2)    prepare && build_libsdl2 ;;
 	build_all)  prepare && build_all ;;
 	install)    prepare && install ;;
 	all)        prepare && build_all && install ;;
+	universal)  universal ;;
 	clean)      clean ;;
 	list)       list ;;
 	*)          usage ;;
