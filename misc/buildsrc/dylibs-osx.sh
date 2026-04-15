@@ -278,6 +278,11 @@ build_libcurl () {
 	fetch_source curl || true
 
 	mkcd "$work_dir/curl"
+	# CURL_USE_SECTRANSP: SecureTransport was deprecated by Apple and support
+	# removed in curl 8.15. Debian stable ships 8.14 so this is fine for now.
+	# When Debian stable moves to curl 8.15+, switch to USE_APPLE_SECTRUST=ON
+	# and add a TLS library (e.g. openssl or mbedtls) built and statically
+	# linked into libcurl or shipped as an additional dylib.
 	cmake_cross "$this_src" \
 		-DCMAKE_INSTALL_PREFIX="$pkg_dir" \
 		-DCURL_USE_SECTRANSP=ON \
