@@ -23,7 +23,7 @@ export DYLD_LIBRARY_PATH="$SCRIPT_DIR"
 # Basedir is 3 levels up from MacOS folder (MacOS -> Contents -> Xonotic.app -> Xonotic)
 BASEDIR="$SCRIPT_DIR/../../.."
 
-set -- "$SCRIPT_DIR/xonotic-osx-sdl-bin" "$@" -notexturenonpoweroftwo -basedir "$BASEDIR"
+set -- "$SCRIPT_DIR/xonotic-macos-sdl-bin" "$@" -notexturenonpoweroftwo -basedir "$BASEDIR"
 
 case "$(sw_vers -productVersion)" in
 	# OSX Lion up to 10.7.2 has problems with SDL and running fullscreen, hence we force windowed mode

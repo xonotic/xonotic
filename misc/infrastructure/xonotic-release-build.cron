@@ -28,7 +28,7 @@ case "$RELEASETYPE" in
 esac
 
 # is being run as cronjob, better set PATH
-export PATH=/home/xonotic-build/ccache:/home/xonotic-build/bin:/usr/local/bin:/usr/bin:/bin:/usr/games
+export PATH="$HOME/ccache:$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
 
 handle_error()
 {
@@ -40,8 +40,7 @@ handle_error()
 	printf '<p><font color="#FF0000">Failed to create a new %s!</font> See: https://beta.xonotic.org/autobuild/%serror_log.txt\n' "$RELEASETYPE" "$RELEASETYPEDIR" | $IRCSPAM
 	exit $status
 }
-# bashism: like set -e but it calls a handling func
-trap 'handle_error' ERR
+trap 'handle_error' ERR  # ERR is a bashism: like set -e but it calls a handling func
 
 # TEST: use s2tc, high quality
 #export dds_tool=s2tc
@@ -51,7 +50,7 @@ export CACHEDIR=$HOME/.xonotic-cached-converter-crunch
 export dds_tool=crunch
 
 # Build locally.
-export HOSTS_THAT_ARE_MYSELF='xonotic-build-win32 xonotic-build-win64 xonotic-build-osx'
+export HOSTS_THAT_ARE_MYSELF='xonotic-build-win32 xonotic-build-win64 xonotic-build-macos-x86_64 xonotic-build-macos-arm64'
 export HOSTS_THAT_ARE_SCHROOT='xonotic-build-linux64'
 
 mepwd=$PWD
@@ -171,4 +170,3 @@ if [ -z "$RELEASETYPEDIR" ]; then
 	rm -f stormkeep.pk3
 fi
 echo "Finished a new $RELEASETYPENAME at https://beta.xonotic.org/autobuild/$RELEASETYPEDIR" | $IRCSPAM
-cd

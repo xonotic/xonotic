@@ -245,7 +245,7 @@ case "$cmd" in
 		darkplaces_maketargets=$3
 		darkplaces_files=$4
 		host=xonotic-build-$suffix
-		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces.build."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/$suffix" "$darkplaces_files"
+		verbose "$SELF" release-compile-run "$host" /tmp/Darkplaces."$HOME"."$suffix" "$darkplaces_maketargets" "$makeflags" "Xonotic/source/darkplaces" "$d0/misc/builddeps/$suffix" "$darkplaces_files"
 		;;
 	release-getbinary)
 		release_common
@@ -257,7 +257,7 @@ case "$cmd" in
 		[ -s "$binary" ] || rm -f "$binary"
 		[ -f "$binary" ]
 		case "$binary" in
-			Xonotic/*osx*|Xonotic/*linux*)
+			Xonotic/*macos*|Xonotic/*linux*)
 				chmod +x "$binary"
 				;;
 		esac
@@ -290,56 +290,36 @@ case "$cmd" in
 		arch=$1
 		buildpath=$2
 		targetdir=$3
-		# TODO: cache the dlls and skip rebuilding them if their package versions are unchanged
-		(
-			cd "$d0/misc/buildsrc"
-			verbose ./dlls.sh clean "$buildpath"
-			verbose ./dlls.sh all "$buildpath" "$arch"
-		)
+		verbose "$d0"/misc/infrastructure/dlls.sh all "$buildpath" "$arch"
+		verbose mkdir -p "$d0/misc/builddeps/$arch"
+		verbose ln -sf "$buildpath/pkg/$arch" "$d0/misc/builddeps/$arch/all"
 		verbose cp -r --preserve=timestamps -v "$buildpath/out/$arch" "$targetdir"
-
-		# SDL2
-		verbose mkdir -p "$d0/misc/builddeps/$arch/"
-		verbose rsync --delete -avP "$buildpath/pkg/$arch/sdl" "$d0/misc/builddeps/$arch/"
-		# PKG_CONFIG HACK: avoids needing to modify sdl2-config
-		verbose printf '#!/bin/sh\nprintf ../../../.deps/lib\n' > "$d0/misc/builddeps/$arch/sdl/libdir_hack.sh"
-		verbose chmod +x "$d0/misc/builddeps/$arch/sdl/libdir_hack.sh"
 		;;
-	release-dlls-win32)
+	release-libs-windows)
 		release_common
-		verbose "$SELF" release-dlls-compile win32 /tmp/dlls Xonotic/bin32
+		buildpath=/tmp/dlls.$HOME
+		verbose "$d0"/misc/infrastructure/dlls.sh clean "$buildpath"
+		verbose "$SELF" release-dlls-compile win32 "$buildpath" Xonotic/bin32
+		verbose "$SELF" release-dlls-compile win64 "$buildpath" Xonotic/bin64
 		;;
-	release-dlls-win64)
+	release-libs-macos)
 		release_common
-		verbose "$SELF" release-dlls-compile win64 /tmp/dlls Xonotic/bin64
-		;;
-	release-libs-osx)
-		release_common
-		verbose mkdir -p "$d0/misc/builddeps/osx"
-		(
-			verbose cd "$d0/misc/builddeps/osx"
-			verbose rm -rf sdl SDL2
-			verbose wget https://libsdl.org/release/SDL2-2.28.5.dmg
-			verbose 7z x *.dmg
-			# THE HEADERS ARE NOT IN A SUBDIRECTORY CALLED SDL2
-			# YET SDL2/ WAS ADDED TO ALL THE INCLUDES, WHY?!?
-			# OLD VERSIONS WITHOUT IT WORKED
-			verbose sed -i "s/#include <SDL2\//#include </g" SDL2/SDL2.framework/Versions/Current/Headers/*.h
-			# The dirs are extracted with 700 permissions which breaks the rsync updater
-			find SDL2 -type d -exec chmod 755 {} \;
-			# macOS prefers dylibs be marked executable (this one has no file extension)
-			verbose chmod 755 SDL2/SDL2.framework/Versions/Current/SDL2
-		)
-		mkdir -p Xonotic/Xonotic.app/Contents/Frameworks # the Frameworks directory isn't in git because it'd be empty
-		cp -R --preserve=timestamps "$d0/misc/builddeps/osx/SDL2/SDL2.framework" Xonotic/Xonotic.app/Contents/Frameworks/
+		buildpath=/tmp/dylibs.$HOME
+		verbose "$d0"/misc/infrastructure/dylibs.sh clean "$buildpath"
+		for machine in macos-x86_64 macos-arm64; do
+			verbose "$d0"/misc/infrastructure/dylibs.sh all "$buildpath" $machine
+			verbose mkdir -p "$d0/misc/builddeps/$machine"
+			verbose ln -sf "$buildpath/pkg/$machine" "$d0/misc/builddeps/$machine/all"
+		done
+		verbose "$d0"/misc/infrastructure/dylibs.sh universal "$buildpath"
+		verbose mkdir -p Xonotic/Xonotic.app/Contents/MacOS
+		verbose cp -rdv --preserve=timestamps "$buildpath"/out/universal/* Xonotic/Xonotic.app/Contents/MacOS/
 		;;
 	release-libs)
 		release_common
 		verbose "$SELF" release-libs-linux64
-		verbose "$SELF" release-dlls-win32
-		verbose "$SELF" release-dlls-win64
-		verbose "$SELF" release-libs-osx
-		verbose rm -rf /tmp/dlls
+		verbose "$SELF" release-libs-windows
+		verbose "$SELF" release-libs-macos
 		;;
 	release-engine-win32)
 		release_common
@@ -348,7 +328,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
 		#$good
 		verbose "$SELF" release-compile win32 \
-			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG="../../../.deps/libdir_hack.sh" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
+			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG_LIBDIR="../../../.deps/lib/pkgconfig" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
 			release 'darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
 		;;
 	release-engine-win64)
@@ -357,22 +337,25 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic.exe || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
-		# PKG_CONFIG HACK: avoids needing to modify sdl2-config
 		verbose "$SELF" release-compile win64 \
-			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG="../../../.deps/libdir_hack.sh" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
+			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG_LIBDIR="../../../.deps/lib/pkgconfig" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
 			release 'darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
-	release-engine-osx)
+	release-engine-macos)
 		release_common
 		#good=true
 		#verbose "$SELF" release-getbinary Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin || good=false
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-osx-dedicated || good=false
 		#$good
-		# Note: travis build script also had SDLCONFIG_MACOSX* flags; need to check if they're still needed with osxcross.
-		# Note: Mac bins cannot be stripped by the standard tool.
-		verbose "$SELF" release-compile osx \
-			'STRIP=: DP_MAKE_TARGET=macosx PATH="$HOME/osxcross/out/bin:$PATH" CC="$HOME/osxcross/out/bin/o64-clang -flto -arch x86_64 -mmacosx-version-min=10.7 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -I../../../.deps/include -L../../../.deps/lib" DP_LINK_SDL=shared SDLCONFIG_MACOSXCFLAGS="-I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" SDLCONFIG_MACOSXSTATICLIBS="-F../../../.deps -framework SDL2 -framework Cocoa -I../../../.deps/SDL2.framework/Headers" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared DP_LINK_XMP=dlopen' \
-			release 'darkplaces-sdl:Xonotic/Xonotic.app/Contents/MacOS/xonotic-osx-sdl-bin darkplaces-dedicated:Xonotic/xonotic-osx-dedicated'
+		sed -i 's/LDFLAGS_MACOSXSDL=$(LDFLAGS_UNIXCOMMON) -ldl -framework IOKit $(SDLCONFIG_STATICLIBS)/LDFLAGS_MACOSXSDL=$(LDFLAGS_UNIXCOMMON) -ldl -framework IOKit $(LDFLAGS_UNIXSDL)/' Xonotic/source/darkplaces/makefile.inc
+		verbose "$SELF" release-compile macos-x86_64 \
+			'STRIP=: DP_MAKE_TARGET=macosx DP_MACHINE=x86_64 PATH="$HOME/osxcross/out/bin:$PATH" CC="x86_64-apple-darwin22.4-clang -flto -mmacos-version-min=10.9 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -Wl,-framework,Cocoa -I../../../.deps/include -L../../../.deps/lib" DP_LINK_SDL=shared SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared DP_LINK_XMP=dlopen' \
+			release 'darkplaces-sdl:xonotic-macos-x86_64-sdl-bin darkplaces-dedicated:xonotic-macos-x86_64-dedicated'
+		verbose "$SELF" release-compile macos-arm64 \
+			'STRIP=: DP_MAKE_TARGET=macosx DP_MACHINE=arm64 PATH="$HOME/osxcross/out/bin:$PATH" CC="arm64-apple-darwin22.4-clang -flto -mmacos-version-min=11.0 -Wl,-rpath -Wl,@loader_path/../Frameworks -Wl,-rpath -Wl,@loader_path -Wl,-framework,Cocoa -I../../../.deps/include -L../../../.deps/lib" DP_LINK_SDL=shared SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=shared DP_LINK_XMP=dlopen' \
+			release 'darkplaces-sdl:xonotic-macos-arm64-sdl-bin darkplaces-dedicated:xonotic-macos-arm64-dedicated'
+		verbose $HOME/osxcross/out/bin/lipo -create xonotic-macos-x86_64-sdl-bin xonotic-macos-arm64-sdl-bin -output Xonotic/Xonotic.app/Contents/MacOS/xonotic-macos-sdl-bin
+		verbose $HOME/osxcross/out/bin/lipo -create xonotic-macos-x86_64-dedicated xonotic-macos-arm64-dedicated -output Xonotic/xonotic-macos-dedicated
 		;;
 	release-engine-linux64)
 		release_common
@@ -392,7 +375,7 @@ case "$cmd" in
 		verbose "$SELF" release-engine-linux64 && good=true
 		verbose "$SELF" release-engine-win32 && good=true
 		verbose "$SELF" release-engine-win64 && good=true
-		verbose "$SELF" release-engine-osx && good=true
+		verbose "$SELF" release-engine-macos && good=true
 		$good
 		;;
 	release-maps)
