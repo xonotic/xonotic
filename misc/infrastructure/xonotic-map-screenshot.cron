@@ -1,14 +1,16 @@
 #!/bin/sh
 
-mepwd=$PWD
-me=$0
-#export PATH=/home/xonotic/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+export IRCSPAM="ssh pytibot@beta.xonotic.org"
 
 echo 19 | tee /proc/$$/autogroup || true
 renice 19 $$
 
 set -e
-[ -d xonotic-map-screenshot ] || git clone git://git.xonotic.org/xonotic/xonotic.git xonotic-map-screenshot
+. /data/common.sh
+LockAndLog ~/"$(basename "${0%.*}").log" 21600
+set -x
+
+[ -d xonotic-map-screenshot ] || git clone https://git.xonotic.org/xonotic/xonotic.git xonotic-map-screenshot
 cd xonotic-map-screenshot
 ./all clean -m -fU -D # like reclone but do not delete untracked, so q3map2.x86 compile stays
 
@@ -27,3 +29,4 @@ startx /bin/sh -x ./misc/tools/xonotic-map-compiler-autobuild screenshot -- /usr
 
 
 touch ~/xonotic-map-indexpages.run
+

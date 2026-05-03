@@ -4,15 +4,18 @@
 /gmqcc
 /div0-gittools
 /netradiant
+/netradiant-xonoticpack
 /mediasource
 /d0_blind_id
 /*.d0si
 *.yes
 *.no
 /data.old/
-/xonstat/
+/xonstat-go/
 /xonstatdb/
+/xonstat-badges/
 /xonotic.org
+/xonotic.wiki
 /wiki
 
 .idea/
