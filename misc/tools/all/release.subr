@@ -299,7 +299,6 @@ case "$cmd" in
 		release_common
 		buildpath=/tmp/dlls.$LOGNAME
 		verbose "$d0"/misc/infrastructure/dlls.sh clean "$buildpath"
-		verbose "$SELF" release-dlls-compile win32 "$buildpath" Xonotic/bin32
 		verbose "$SELF" release-dlls-compile win64 "$buildpath" Xonotic/bin64
 		;;
 	release-libs-macos)
@@ -321,16 +320,6 @@ case "$cmd" in
 		verbose "$SELF" release-libs-windows
 		verbose "$SELF" release-libs-macos
 		;;
-	release-engine-win32)
-		release_common
-		#good=true
-		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86.exe || good=false
-		#verbose "$SELF" release-getbinary Xonotic/xonotic-x86-dedicated.exe || good=false
-		#$good
-		verbose "$SELF" release-compile win32 \
-			'DP_MAKE_TARGET=mingw WIN32RELEASE=1 CC="i686-w64-mingw32-gcc -static -flto=auto -mstackrealign -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="i686-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG_LIBDIR="../../../.deps/lib/pkgconfig" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
-			release 'darkplaces-sdl.exe:Xonotic/xonotic-x86.exe darkplaces-dedicated.exe:Xonotic/xonotic-x86-dedicated.exe'
-		;;
 	release-engine-win64)
 		release_common
 		#good=true
@@ -338,7 +327,7 @@ case "$cmd" in
 		#verbose "$SELF" release-getbinary Xonotic/xonotic-dedicated.exe || good=false
 		#$good
 		verbose "$SELF" release-compile win64 \
-			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32-windres" DP_LINK_SDL=static PKG_CONFIG_LIBDIR="../../../.deps/lib/pkgconfig" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
+			'DP_MAKE_TARGET=mingw WIN64RELEASE=1 CC="x86_64-w64-mingw32ucrt-gcc -static -flto=auto -Wl,--dynamicbase -Wl,--nxcompat -I../../../.deps/include -L../../../.deps/lib" WINDRES="x86_64-w64-mingw32ucrt-windres" DP_LINK_SDL=static PKG_CONFIG_LIBDIR="../../../.deps/lib/pkgconfig" SDL_CONFIG="../../../.deps/bin/sdl2-config" DP_LINK_CRYPTO=dlopen DP_LINK_CRYPTO_RIJNDAEL=dlopen DP_LINK_JPEG=dlopen DP_LINK_ODE=dlopen DP_LINK_ZLIB=dlopen DP_LINK_XMP=dlopen' \
 			release 'darkplaces-sdl.exe:Xonotic/xonotic.exe darkplaces-dedicated.exe:Xonotic/xonotic-dedicated.exe'
 		;;
 	release-engine-macos)
@@ -373,7 +362,6 @@ case "$cmd" in
 		# TODO report failures here.
 		good=false
 		verbose "$SELF" release-engine-linux64 && good=true
-		verbose "$SELF" release-engine-win32 && good=true
 		verbose "$SELF" release-engine-win64 && good=true
 		verbose "$SELF" release-engine-macos && good=true
 		$good
@@ -592,7 +580,7 @@ case "$cmd" in
 		stamp=`cat Xonotic/stamp.txt`
 		pk3stamp=`cat Xonotic/pk3stamp.txt`
 		# exe and dll files do not need +x
-		chmod a-x Xonotic/*.exe Xonotic/bin64/*.dll Xonotic/bin32/*.dll || true
+		verbose chmod a-x Xonotic/*.exe Xonotic/bin64/*.dll
 		# build the archives
 		verbose mkzipr Xonotic-$stamp-enginesource.zip \
 			Xonotic/Makefile \
@@ -600,7 +588,6 @@ case "$cmd" in
 			Xonotic/COPYING Xonotic/GPL-2 Xonotic/GPL-3
 		verbose cp Xonotic-$stamp-enginesource.zip Xonotic-$stamp-engine.zip
 		verbose mkzipr Xonotic-$stamp-engine.zip \
-			Xonotic/bin32/*.dll \
 			Xonotic/bin64/*.dll \
 			Xonotic/*.app \
 			Xonotic/xonotic-* \

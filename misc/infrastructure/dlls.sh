@@ -28,7 +28,7 @@ prepare ()
 	out_dir="$buildpath/out/$target_arch"
 
 	# Set arch vars
-	CHOST="$ARCH-w64-mingw32"
+	CHOST="$ARCH-w64-mingw32ucrt"
 
 	export LDFLAGS="-L$pkg_dir/lib"
 	export CPPFLAGS="-I$pkg_dir/include"
@@ -36,7 +36,9 @@ prepare ()
 
 	# Check dependencies
 	require libtool
-	require mingw-w64
+	require gcc-mingw-w64-ucrt64 # provides x86_64-w64-mingw32ucrt-gcc
+	require g++-mingw-w64-ucrt64 # provides x86_64-w64-mingw32ucrt-g++
+	require mingw-w64-tools # provides x86_64-w64-mingw32ucrt-pkg-config
 	require automake
 	require cmake
 	require nasm
