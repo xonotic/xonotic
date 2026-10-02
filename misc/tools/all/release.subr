@@ -643,10 +643,12 @@ case "$cmd" in
 			usr/bin/msys-2.0.dll \
 			usr/bin/msys-crypto-3.dll \
 			usr/bin/msys-iconv-2.dll \
+			usr/bin/msys-idn2-0.dll \
 			usr/bin/msys-intl-8.dll \
 			usr/bin/msys-lz4-1.dll \
 			usr/bin/msys-popt-0.dll \
 			usr/bin/msys-ssl-3.dll \
+			usr/bin/msys-unistring-5.dll \
 			usr/bin/msys-xxhash-0.dll \
 			usr/bin/msys-zstd-1.dll \
 			usr/bin/openssl.exe \
