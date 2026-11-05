@@ -26,6 +26,10 @@ Build tools are documented on the [Repository_Access wiki page](https://gitlab.c
 
 # Policies
 
+### For security researchers
+
+- Follow Responsible Disclosure AKA Coordinated Vulnerability Disclosure best practises. Failure to do so makes your post(s) eligible for deletion. Patches must be incorporated into a stable release prior to public disclosure.
+
 ### For all Developers
 
 - Branches should be named `myname/mychange`. For instance, if your name is Alex and the change you are committing is a menu fix, use something like `alex/menufix`.
