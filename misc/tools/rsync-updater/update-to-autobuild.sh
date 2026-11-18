@@ -9,8 +9,13 @@ if ! command -v rsync > /dev/null; then
 	exit 1
 fi
 
-# always prefer our own rsync-ssl script, we need its --ipv4 and --ipv6 option support
-export PATH="$PWD/usr/bin:$PATH"
+# Always prefer our own rsync-ssl script, we need its --ipv4 and --ipv6 option support.
+# BUG WORKAROUND: in ~ the 3rd quarter of 2026, msys-2.0.dll was updated such that
+# rsync does nothing after this export, even `rsync --help` produces no output and no errors.
+# Fortunately on Windows this PATH export isn't needed because the .bat script set it already.
+if [ "$OS" != "Windows_NT" ]; then
+	export PATH="$PWD/usr/bin:$PATH"
+fi
 
 # openssl is the only option, as gnutls-cli is broken in rsync-ssl and stunnel doesn't verify the cert.
 rsynccmd="rsync-ssl --timeout=3"
